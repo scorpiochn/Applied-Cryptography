@@ -1,0 +1,18 @@
+CC=cc
+LDFLAGS=-Llibdir 
+CFLAGS=-O -Ilibdir  -I../lib
+LIBS=
+ELIBS=-ldes -lhut
+OBJS=des-certify.o des.o des-ktest.o test-crypt.o
+PROGS=des-certify des des-ktest test-crypt
+all:	$(PROGS)
+des-certify:	des-certify.o $(LIBS)
+	$(CC) $(LDFLAGS) -o des-certify des-certify.o $(LIBS) $(ELIBS)
+des:	des.o $(LIBS)
+	$(CC) $(LDFLAGS) -o des des.o $(LIBS) $(ELIBS)
+des-ktest:	des-ktest.o $(LIBS)
+	$(CC) $(LDFLAGS) -o des-ktest des-ktest.o $(LIBS) $(ELIBS)
+test-crypt:	test-crypt.o $(LIBS)
+	$(CC) $(LDFLAGS) -o test-crypt test-crypt.o $(LIBS) $(ELIBS)
+clean::
+	rm -f $(PROGS) $(OBJS)

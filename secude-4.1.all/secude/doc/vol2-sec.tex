@@ -1,0 +1,1247 @@
+\subsection{Cryptographic Functions}
+\subsubsection{sec\_encrypt}
+\nm{3X}{sec\_encrypt}{Encrypt octetstring}
+\label{sec_encrypt}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_encrypt} {\em (in\_octets, out\_bits, more, key)} \\
+OctetString *{\em in\_octets}; \\
+BitString *{\em out\_bits}; \\
+More {\em more}; \\
+Key *{\em key};
+\hl{Parameter}
+\parname  {{\em in\_octets}}
+\pardescript  {OctetString of the data to be encrypted.}
+
+\parname  {{\em out\_bits}}
+\pardescript  {BitString of the encrypted data. Memory must be provided by the calling program.}
+
+\parname  {{\em more}}
+\pardescript  {MORE: More data will follow for this encryption process. \\
+                  END: Last data of this encryption process.}
+
+\parname  {{\em key}}
+\pardescript  {Structure which identifies the encryption key.}
+
+\parname  {{\em Return Value}}
+\pardescript  {Number of encrypted bits in {\em out\_bits}, or -1.}
+\hl{Description}
+Sec\_encrypt encrypts the input data of octetstring {\em in\_octets} and returns the encrypted data
+in {\em out\_bits}. Several successive calls of sec\_encrypt can be chained
+to one encryption process by means of {\em more}.
+          
+The number of octets in {\em in\_octets} is arbitrary. The number of bits in {\em out\_bits}
+corresponds in case of {\em more} $=$ MORE to the parameters of the indicated algorithm
+(e.g. a multiple of 64 in case of DES or DES3 algorithms and a multiple of keysize
+in case of RSA). The remaining bits are collected by sec\_encrypt.
+
+Sec\_encrypt puts the encrypted data into {\em out\_bits}\pf bits at the offset
+{\em out\_bits}\pf nbits and returns the number of encrypted bits. In addition, this number is added 
+to {\em out\_bits}\pf nbits.
+The calling program must provide {\em out\_bits}\pf nbits and {\em out\_bits}\pf bits and sufficient
+memory in {\em out\_bits}\pf bits. 
+The amount of memory should be not less than
+{\em in\_octets}\pf noctets $+$ ({\em out\_bits}\pf nbits) $/$ 8 $+$ $n$ with $n = 8$ 
+in case of DES or DES3 algorithms and $n = keysize / 8$ in case of RSA.
+
+Encryption key and corresponding algorithm are determined by parameter {\em key} as follows:
+\be
+\m If {\em key}\pf key is not the NULL pointer, the structure it points to
+   contains algorithm identifier and key.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $>$ 0,
+   key and algorithm identifier which are referenced by this number are used. This is a key
+   previously installed under this reference with {\em sec\_gen\_key} or 
+   {\em sec\_put\_EncryptedKey}.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $=$ 0,
+   {\em key}\pf pse\_sel indicates the PSE object which contains key and algorithm.
+\ee
+
+{\bf In case of RSA algorithm:}
+\be
+\m The encryption key which is of type BitString is supposed to be
+   a {\bf public key}. It consists of the substructure described in
+   SEC-PSE-OBJECTS(4), which in case of a public key consists of the
+   modulus and the public exponent. Sec\_encrypt uses internally the
+   decoding function {\em d\_KeyBits} to get the modulus {\em n} and the exponent {\em e}.
+\m The octetstring passed through {\em in\_octets} is internally blocked into portions of
+   {\em blocksize} bits, each block considered to represent a positive integer number with the first bit
+   being the most significant bit. These blocks are encrypted into blocks of {\em keysize} bits
+   (padded with trailing ZEROES) which in turn are combined into the bitstring {\em out\_bits}, i.e
+   the bitstring of the encrypted data consists of more bits than the octetstring of the cleartext data
+   according to the relation between {\em blocksize} and {\em keysize}. 
+   The length of the encrypted data is always a multiple of {\em keysize} bits. 
+   {\em blocksize} is derived from {\em keysize} as the largest multiple of octets which consists of
+   less bits than {\em keysize} (for instance $keysize = 512$ leads to $blocksize = 63$).
+\m There is no special mechanism to encode the length of the original plaintext prior
+   to encryption. Decrypting encrypted (with {\em sec\_encrypt}) data with {\em sec\_decrypt}
+   leads to a result with a length of a multiple of {\em blocksize} octets, i.e. the decrypted
+   plaintext is longer than the original plaintext with trailing zeroes.
+\ee
+{\bf In case of DES or DES3 algorithm:}
+   The length of the encryption result is always a multiple of 64 bits.
+
+
+\subsubsection{sec\_decrypt}
+\nm{3X}{sec\_decrypt}{Decrypt bitstring}
+\label{sec_decrypt}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_decrypt} {\em (in\_bits, out\_octets, more, key)} \\
+BitString *{\em in\_bits}; \\
+OctetString *{\em out\_octets}; \\
+More {\em more}; \\
+Key *{\em key};
+\hl{Parameter}
+\parname  {{\em in\_bits}}
+\pardescript  {BitString of the data to be decrypted.}
+
+\parname  {{\em out\_octets}}
+\pardescript  {OctetString of the decrypted data. Memory must be provided by the calling program.}
+
+\parname  {{\em more}}
+\pardescript  {MORE: More data will follow for this decryption process. \\
+                  END: Last data of this decryption process.}
+
+\parname  {{\em key}}
+\pardescript  {Structure which identifies the decryption key.}
+
+\parname  {{\em Return Value}}
+\pardescript  {Number of decrypted octets in {\em out\_octets}, or -1.}
+\hl{Description}
+Sec\_decrypt decrypts the input data of bitstring {\em in\_bits} and returns the decrypted data
+in {\em out\_octets}. Several successive calls of sec\_decrypt can be chained
+to one decryption process by means of {\em more}.
+          
+The number of bits in {\em in\_bits} is arbitrary (see remark below for DES). The number of octets in {\em out\_octets}
+corresponds in case of {\em more} $=$ MORE to the parameters of the indicated algorithm
+(e.g. a multiple of eight in case of DES or DES3 algorithms and a multiple of blocksize/8
+in case of RSA). The remaining octets are collected by sec\_decrypt.
+
+Sec\_decrypt puts the decrypted data into {\em out\_octets}\pf octets at the offset
+{\em out\_octets}\pf noctets and returns the number of decrypted octets. In addition, this number is added 
+to {\em out\_octets}\pf noctets.
+The calling program must provide {\em out\_octets}\pf noctets and {\em out\_octets}\pf octets and sufficient
+memory in {\em out\_octets}\pf octets. 
+The amount of memory should be not less than
+({\em in\_bits}\pf nbits) $/$ 8 $+$ {\em out\_octets}\pf noctets $+$ $n$ with $n = 8$ 
+in case of DES or DES3 algorithms and $n = keysize / 8$ in case of RSA.
+
+Decryption key and corresponding algorithm are determined by parameter {\em key} as follows:
+\be
+\m If {\em key}\pf key is not the NULL pointer, the structure it points to
+   contains algorithm identifier and key.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $>$ 0,
+   key and algorithm identifier which are referenced by this number are used. This is a key
+   previously installed under this reference with {\em sec\_gen\_key} or 
+   {\em sec\_put\_EncryptedKey}.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $=$ 0,
+   {\em key}\pf pse\_sel indicates the PSE object which contains key and algorithm.
+\ee
+
+{\bf In case of RSA algorithm:}
+\be
+\m The decryption key which is of type BitString is supposed to be
+   a {\bf secret key}. It consists of the substructure described in
+   SEC-PSE-OBJECTS(4), which in case of a secret key consists of the secret
+   prime factors. Sec\_decrypt uses internally the
+   decoding function {\em d\_KeyBits} to get the prime factors {\em p} and {\em q}.
+\m The bitstring passed through {\em in\_bits} is internally blocked into portions of
+   {\em keysize} bits, each block considered to represent a positive integer number with the first bit
+   being the most significant bit. These blocks are decrypted into blocks of {\em blocksize} bits
+   (padded with trailing ZEROES) which in turn are combined into the octetstring {\em out\_octets}, i.e
+   the octetstring of the decrypted data consists of less bits than the bitstring 
+   of the encrypted data
+   according to the relation between {\em blocksize} and {\em keysize}.
+   The length of the decrypted data is always a multiple of {\em blocksize} octets.
+   {\em blocksize} is derived from {\em keysize} as the largest multiple of octets which consists of
+   less bits than {\em keysize} (for instance $keysize = 512$ leads to $blocksize = 63$).
+\m Sec\_decrypt does not assume any specific padding prior encrypting in order to be able to
+   restore the original plaintext length. This must be done by the application before 
+   calling  sec\_encrypt and after calling sec\_decrypt.
+\m Since there is no special mechanism to encode the length of the original plaintext prior
+   to encryption, decrypting encrypted (with {\em sec\_encrypt}) data with {\em sec\_decrypt}
+   leads to a result which is longer than the original plaintext with trailing zeroes.
+\ee
+{\bf In case of DES or DES3 algorithm:} \\ [1em]
+   While the number of bits in {\em in\_bits} is arbitrary for each single call to
+   {\em sec\_decrypt}, the number of bits of the input data for the whole
+   decryption process (until {\em more} $=$ END) must be a multiple of 64. 
+
+
+\subsubsection{sec\_hash}
+\nm{3X}{sec\_hash}{Hash octetstring}
+\label{sec_hash}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_hash} {\em (in\_octets, hash\_result, more, alg\_id, hash\_input)} \\
+OctetString *{\em in\_octets}; \\
+OctetString *{\em hash\_result}; \\
+More {\em more}; \\
+AlgId *{\em alg\_id}; \\
+HashInput *{\em hash\_input};
+\hl{Parameter}
+\parname  {{\em in\_octets}}
+\pardescript  {OctetString of the data to be hashed.} 
+
+\parname  {{\em hash\_result}}
+\pardescript  {OctetString of the hash result. Memory is provided by the called program.} 
+
+\parname  {{\em more}}
+\pardescript  {MORE: More data will follow for this hash process. \\
+                  END: Last data of this hash process.} 
+      
+\parname  {{\em alg\_id}}
+\pardescript  {Algorithm identifier of the hash function to be used. Each algorithm which is of type
+              HASH or SIG (see INTRO(3)) is possible, e.g.: \\
+                  sqmodn \\
+                  md2 \\
+                  md4 \\
+                  md5 \\
+                  sha \\
+                  sqmodnWithRsa \\
+                  md2WithRsa \\
+                  md4WithRsa \\
+                  md5WithRsa \\
+                  md2WithRsaEncryption \\
+                  md4WithRsaEncryption \\
+                  md5WithRsaEncryption \\
+                  rsa\_md2\_pem \\
+                  rsa\_md5\_pem} \\ [0.5cm]
+\parname  {{\em hash\_input}}
+\pardescript  {Additional algorithm specific parameters.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+OctetString {\em in\_octets} is hashed into octetstring {\em hash\_result} using the algorithm
+{\em alg\_id}. {\em More} allows to chain several successive calls of sec\_hash to one
+hash process. 
+
+The number of octets in {\em in\_octets} is arbitrary. Sec\_hash puts the hash value as octetstring into
+{\em hash\_result} in case of {\em more} $=$ END. The called program provides sufficient memory
+in {\em hash\_result}. 
+
+In case of sqmodn or sqmodnWithRsa, {\em hash\_input} is a BitString which contains the 
+public key (as ASN.1 encoded sequence of the modulus $n$ and the public
+exponent $e$). Sec\_hash extracts the modulus $n$ from this BitString by using the function
+d\_KeyBits.
+
+\subsubsection{sec\_sign}
+\nm{3X}{sec\_sign}{Sign octetstring}
+\label{sec_sign}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_sign} {\em (in\_octets, signature, more, key, hash\_input)} \\
+OctetString *{\em in\_octets}; \\
+Signature *{\em signature}; \\
+More {\em more}; \\
+Key *{\em key}; \\
+HashInput *{\em hash\_input};
+\hl{Parameter}
+\parname  {{\em in\_octets}}
+\pardescript  {OctetString of the data to be signed.} 
+
+\parname  {{\em signature}}
+\pardescript  {Returned signature. Memory is provided by the called program.} 
+
+\parname  {{\em more}}
+\pardescript  {MORE: More data will follow for this sign process. \\
+                  END: Last data of this sign process.} 
+
+\parname  {{\em key}}
+\pardescript  {Structure which identifies the signature key.} 
+
+\parname  {{\em hash\_input}}
+\pardescript  {Additional algorithm specific parameters.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+In case of {\em more} $=$ MORE or END sec\_sign hashes {\em in\_octets} onto
+an internal hash value, using the algorithm as described below.
+If {\em hash\_input} is not the NULL pointer, this parameter is taken
+as initial value for the hash function.
+In case of {\em more} $=$ END this hash value is encrypted using key and
+algorithm as described below and returned as BitString in {\em signature}\pf signature.
+All necessary memory for returned information will be provided by the
+called program. 
+
+The signature key is determined by parameter {\em key} as follows:
+\be
+\m If {\em key}\pf key is not the NULL pointer, the structure it points to
+   contains the key.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $>$ 0,
+   the key which is referenced by this number is used. This is a key
+   previously installed under this reference with {\em sec\_gen\_key} or 
+   {\em sec\_put\_EncryptedKey}.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $=$ 0,
+   {\em key}\pf pse\_sel indicates the PSE object which contains the key.
+\ee
+The algorithm to be used is determined in the following order:
+\be
+\m If {\em key}\pf alg is not the NULL pointer, this algorithm
+   is used.
+\m If {\em signature}\pf signAI is not the NULL pointer, this algorithm
+   is used.
+\m Otherwise, the algorithm associated to the key is used.
+\ee
+   The used algorithm identifier 
+   is returned in {\em signature}\pf signAI.
+   All necessary memory allocation is done by the called program.
+
+If the algorithm is sqmodnWithRsa, {\em hash\_input} is a BitString which contains the 
+public key (as ASN.1 encoded sequence of the modulus $n$ and the public
+exponent $e$). The modulus $n$ is extracted from this BitString by using the function
+d\_KeyBits.
+
+\subsubsection{sec\_verify}
+\nm{3X}{sec\_verify}{Verify signature}
+\label{sec_verify}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_verify} {\em (in\_octets, signature, more, key, hash\_input)} \\
+OctetString *{\em in\_octets}; \\
+Signature *{\em signature}; \\
+More {\em more}; \\
+Key *{\em key}; \\
+HashInput *{\em hash\_input};
+\hl{Parameter}
+\parname  {{\em in\_octets}}
+\pardescript  {OctetString of the input data for the verification.} 
+
+\parname  {{\em signature}}
+\pardescript  {Signature to be verified.} 
+
+\parname  {{\em more}}
+\pardescript  {MORE: More input data will follow for this verification process. \\
+                  END: Last input data of this verification process.} 
+
+\parname  {{\em key}}
+\pardescript  {Structure which identifies the verification key.} 
+
+\parname  {{\em hash\_input}}
+\pardescript  {Additional algorithm specific parameters.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 (verification positive) or -1.}
+\hl{Description}
+In case of {\em more} $=$ MORE or END sec\_verify hashes {\em in\_octets} onto
+an internal hash value, using the algorithm as described below.
+If {\em hash\_input} is not the NULL pointer, this parameter is taken
+as initial value for the hash function.
+In case of {\em more} $=$ END the signature given in {\em signature}\pf signature
+is decrypted using key and algorithm as described below, and the result is compared
+with the previously computed internal hash value. If both are equal, the verification
+is positive. 
+
+The verification key is determined by parameter {\em key} as follows:
+\be
+\m If {\em key}\pf key is not the NULL pointer, the structure it points to
+   contains the key.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $>$ 0,
+   the key which is referenced by this number is used. This is a key
+   previously installed under this reference with {\em sec\_gen\_key} or 
+   {\em sec\_put\_EncryptedKey}.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $=$ 0,
+   {\em key}\pf pse\_sel indicates the PSE object which contains the key.
+\ee
+The algorithm to be used is determined as follows:
+\be
+\m If {\em signature}\pf signAI\pf objid is not the NULL pointer, the algorithm
+   determined by this object identifier is used.
+\m Otherwise, i.e. if either {\em signature}\pf signAI or {\em signature}\pf signAI\pf objid 
+   is the NULL pointer, the algorithm
+   associated to the key determined by parameter {\em key} as above is used.
+\ee
+If the algorithm is sqmodnWithRsa, {\em hash\_input} is a BitString which contains the 
+public key (as ASN.1 encoded sequence of the modulus $n$ and the public
+exponent $e$). The modulus $n$ is extracted from this BitString by using the function
+d\_KeyBits.
+
+\subsubsection{sec\_gen\_key}
+\nm{3X}{sec\_gen\_key}{Generate DES or RSA key}
+\label{sec_gen_key}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_gen\_key} {\em (key, replace)} \\
+Key *{\em key}; \\
+Boolean {\em replace};
+\hl{Parameter}
+\parname  {{\em key}}
+\pardescript  {Structure which determines the generated key.} 
+
+\parname  {{\em replace}}
+\pardescript  {if FALSE, do not overwrite existing key.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+Sec\_gen\_key generates a
+\bi
+\m  DES key, 
+    if the algorithm encryption method 
+    of {\em key}\pf key\pf subjectAI (as returned by aux\_ObjId2AlgEnc()) is DES. 
+
+    A DES key is a 64 bit long BitString.
+\m  DES3 key, 
+    if the algorithm encryption method 
+    of {\em key}\pf key\pf subjectAI (as returned by aux\_ObjId2AlgEnc()) is DES3. 
+
+    DES3 is triple block encryption in the fashion encryption(k1)-decryption(k2)-encryption(k1).
+    A DES3 key is a 128 bit long BitString, the first 64 bits comprising k1 and the
+    second 64 bits comprising k2.
+\m  RSA key pair, 
+    if the algorithm encryption method 
+    of {\em key}\pf key\pf subjectAI (as returned by aux\_ObjId2AlgEnc()) is RSA. 
+
+    An RSA public key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       n INTEGER,   \\
+    \4  \2       e INTEGER  \\
+    \4  \} \\
+    \evtab
+    $n$ is the modulus and $e$ is the public exponent.
+    
+
+    An RSA secret key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       p INTEGER,   \\
+    \4  \2       q INTEGER  \\
+    \4  \} \\
+    \evtab
+    $p$ and $q$ are the two prime factors of the modulus.
+
+\m  DSA key pair, 
+    if the algorithm encryption method 
+    of {\em key}\pf key\pf subjectAI (as returned by aux\_ObjId2AlgEnc()) is DSA. 
+
+    A DSA public key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       key INTEGER, - - y (public key)   \\
+    \4  \2       params DSAParameters OPTIONAL  \\
+    \4  \} \\
+    \evtab
+    with
+    \bvtab
+    DSAParameters ::= SEQUENCE \{ \\
+    \4  \2       prime1 [0] INTEGER, - - p \\
+    \4  \2       prime2 [1] INTEGER, - - q \\
+    \4  \2       base [2] INTEGER, - - g \\
+    \4  \} \\
+    \evtab
+    
+    A DSA secret key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       key INTEGER, - - x (secret key)   \\
+    \4  \2       params DSAParameters OPTIONAL  \\
+    \4  \} \\
+    \evtab
+    with
+    \bvtab
+    DSAParameters ::= SEQUENCE \{ \\
+    \4  \2       prime1 [0] INTEGER, - - p \\
+    \4  \2       prime2 [1] INTEGER, - - q \\
+    \4  \2       base [2] INTEGER, - - g \\
+    \4  \} \\
+    \evtab
+\ei
+
+The key is returned as follows in case of a DES key or DES3 key:
+\be
+\m If {\em key}\pf keyref $=$ 0 and {\em key}\pf pse\_sel is the NULL pointer, the generated key is
+   returned as BitString in {\em key}\pf key\pf subjectkey. Memory is provided by the called program. 
+\m If {\em key}\pf keyref $=$ 0 and {\em key}\pf pse\_sel is not the NULL pointer, the generated key
+   is stored in the PSE object specified by {\em key}\pf pse\_sel.
+   The object will be created first. If the object exists already and {\em replace} is FALSE, 
+   {\em sec\_gen\_key} does not overwrite the object and returns -1.
+\m If {\em key}\pf keyref $>$ 0, the generated key is stored under this key reference until it is
+   deleted with sec\_del\_key.
+   If the key reference exists already and {\em replace} is FALSE, {\em sec\_gen\_key}
+   does not overwrite the key and returns -1.
+\m If {\em key}\pf keyref $=$ -1, the generated key is stored under a key reference which is generated 
+   by sec\_gen\_key and returned in {\em key}\pf keyref. The key remains there until it is deleted
+   with sec\_del\_key.
+\ee
+The keys are returned as follows in case of an RSA or DSA key pair: 
+
+The public key is returned in {\em key}\pf key\pf subjectkey. Memory is provided by the called program.
+The private key is stored under a key reference or in a PSE object as described above for a DES key in 
+cases 2, 3, or 4.
+
+\subsubsection{sec\_get\_key}
+\nm{3X}{sec\_get\_key}{Get key from key pool or from PSE}
+\label{sec_get_key}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_get\_key} {\em (keyinfo, keyref, key)} \\
+KeyInfo *{\em keyinfo}; \\
+KeyRef {\em keyref}; \\
+Key *{\em key};
+\hl{Parameter}
+\parname  {{\em keyinfo}}
+\pardescript  {KeyInfo structure which holds the returned key.} 
+
+\parname  {{\em keyref}}
+\pardescript  {Reference to an existing key.} 
+
+\parname  {{\em key}}
+\pardescript  {Structure which determines the key.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+If {\em keyref} is non zero, the content of the keyinfo structure referenced 
+by {\em keyref} is restored from the key pool and returned 
+in {\em keyinfo}. The necessary memory in {\em keyinfo} is provided
+by the called program. 
+
+If {\em keyref} is zero, and {\em key} is not the NULL pointer, {\em key}
+refers to the key to be returned.
+
+\subsubsection{sec\_put\_key}
+\nm{3X}{sec\_put\_key}{Put key to the key pool with reference number}
+\label{sec_put_key}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_put\_key} {\em (keyinfo, keyref)} \\
+KeyInfo *{\em keyinfo}; \\
+KeyRef {\em keyref};
+\hl{Parameter}
+\parname  {{\em keyinfo}}
+\pardescript  {KeyInfo structure with the key to be stored in the key pool.} 
+
+\parname  {{\em keyref}}
+\pardescript  {Reference to a non existing key.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {keyref or -1.}
+\hl{Description}
+The content of the given {\em keyinfo} is stored in the key pool according to {\em keyref}: 
+\be
+\m If {\em keyref} $>$ 0, {\em keyinfo} is stored under this key reference until it is
+   deleted with sec\_del\_key. {\em keyref} must not exist.
+\m If {\em key}\pf keyref $=$ -1, {\em keyinfo} is stored under a key reference which is generated 
+   by sec\_put\_key and returned in the return value. It remains there until it is deleted
+   with sec\_del\_key.
+\ee
+
+\subsubsection{sec\_del\_key}
+\nm{3X}{sec\_del\_key}{Delete key by reference from key pool}
+\label{sec_del_key}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_del\_key} {\em (keyref)} \\
+KeyRef {\em keyref};
+\hl{Parameter}
+\parname  {{\em keyref}}
+\pardescript  {Reference to an existing key.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+The key referenced by {\em keyref} is deleted from the key pool.
+
+\subsubsection{sec\_get\_EncryptedKey}
+\nm{3X}{sec\_get\_EncryptedKey}{Encrypt key}
+\label{sec_get_enc_key}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_get\_EncryptedKey} {\em (encrypted\_key, plain\_key, encryption\_key)} \\
+EncryptedKey *{\em encrypted\_key}; \\
+Key *{\em plain\_key}; \\
+Key *{\em encryption\_key};
+\hl{Parameter}
+\parname  {{\em encrypted\_key}}
+\pardescript  {Encrypted key.} 
+
+\parname  {{\em plain\_key}}
+\pardescript  {Structure which identifies the key to be encrypted.} 
+
+\parname  {{\em encryption\_key}}
+\pardescript  {Structure which identifies the encryption key.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+The key identified by {\em plain\_key} is encrypted with the key and algorithm identified by
+{\em encryption\_key} and returned in 
+{\em encrypted\_key}. All memory in {\em encrypted\_key} which is referred to by pointers
+is provided by the called program. 
+
+This function is intended to support the so called ``hybrid method'' where information which
+has to be transmitted confidentially is encrypted with the DES algorithm while the corresponding DES key
+is transmitted in RSA encrypted form. Sec\_get\_encrypted\_key is useful for the sender
+of such a key.
+
+\subsubsection{sec\_put\_EncryptedKey}
+\nm{3X}{sec\_put\_EncryptedKey}{Decrypt key}
+\label{sec_put_decr_key}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_put\_EncryptedKey} {\em (encrypted\_key, plain\_key, decryption\_key, replace)} \\
+EncryptedKey *{\em encrypted\_key}; \\
+Key *{\em plain\_key}; \\
+Key *{\em decryption\_key}; \\
+Boolean {\em replace};
+\hl{Parameter}
+\parname  {{\em encrypted\_key}}
+\pardescript  {Encrypted key.} 
+
+\parname  {{\em plain\_key}}
+\pardescript  {Structure which determines the decrypted key.} 
+
+\parname  {{\em decryption\_key}}
+\pardescript  {Structure which identifies the decryption key.} 
+
+\parname  {{\em replace}}
+\pardescript  {If TRUE, replace existing key} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+The encrypted key given in {\em encrypted\_key} is decrypted with the key and algorithm identified by
+{\em decryption\_key}. The decrypted key is handled according to {\em plain\_key} as follows: 
+
+If {\em plain\_key}\pf keyref $=$ 0 and {\em plain\_key}\pf pse\_sel is the NULL pointer, the decrypted key is
+returned as BitString in {\em plain\_key}\pf key\pf subjectkey. Memory is provided by the called program. 
+
+If {\em plain\_key}\pf keyref $=$ 0 and {\em plain\_key}\pf pse\_sel is not the NULL pointer, the decrypted key
+is stored in the PSE object specified by {\em plain\_key}\pf pse\_sel. The object must already exist. 
+
+If {\em plain\_key}\pf keyref $>$ 0, the decrypted key is stored under this key reference until it is
+deleted with sec\_del\_key. 
+
+If {\em plain\_key}\pf keyref $=$ -1, the decrypted key is stored under a key reference which is generated 
+by sec\_put\_EncryptedKey and returned in {\em plain\_key}\pf keyref. The key remains there until it is deleted
+with sec\_del\_key. 
+
+If the decrypted key is to be stored in the key\_pool or as PSE object, and a key with that
+reference or name exists already, it will be replaced only in case of {\em replace} set to TRUE.
+
+This function is intended to support the so called ``hybrid method'' where information which
+has to be transmitted confidentially is encrypted with the DES algorithm while the corresponding DES key
+is transmitted in RSA encrypted form. Sec\_put\_decrypted\_key is useful for the receiver
+of such a key.
+
+\subsubsection{sec\_string\_to\_key}
+\nm{3X}{sec\_string\_to\_key}{Generate DES key from string}
+\label{sec_string_to_key}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_string\_to\_key} {\em (pin, des\_key)} \\
+char *{\em pin}; \\
+Key *{\em des\_key};
+\hl{Parameter}
+\parname  {{\em pin}}
+\pardescript  {PIN (Personal Identification Number) or password.} 
+
+\parname  {{\em des\_key}}
+\pardescript  {Structure which determines the resulting DES key.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}                                
+\hl{Description}
+Sec\_string\_to\_key is a one-way function which generates a DES key from a PIN or password.
+The resulting DES key is returned as specified by {\em des\_key}:
+\be
+\m If {\em des\_key}\pf keyref $=$ 0 and {\em des\_key}\pf pse\_sel is the NULL pointer, the generated key is
+   returned as BitString in {\em des\_key}\pf key\pf subjectkey. Memory is provided by the called program. 
+\m If {\em des\_key}\pf keyref $=$ 0 and {\em des\_key}\pf pse\_sel is not the NULL pointer, the generated key
+   is stored in the PSE object specified by {\em des\_key}\pf pse\_sel. The object must already exist. 
+\m If {\em des\_key}\pf keyref $>$ 0, the generated key is stored under this key reference until it is
+   deleted with sec\_del\_key.
+\m If {\em des\_key}\pf keyref $=$ -1, the generated key is stored under a key reference which is generated 
+   by sec\_string\_to\_key and returned in {\em des\_key}\pf keyref. The key remains there until it is deleted
+   with sec\_del\_key.
+\ee
+The assigned algorithm identifier is {\em desCBC} in either case.
+
+\subsubsection{sec\_random}
+\nm{3X}{sec\_random}{Generate random octetstring, bitstring, characterstring, integer, long}
+\label{random}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+OctetString {\bf *sec\_random\_ostr} {\em (noctets)} \\
+unsigned int {\em noctets}; 
+
+BitString {\bf *sec\_random\_bstr} {\em (nbits)} \\
+unsigned int {\em nbits}; 
+
+char {\bf *sec\_random\_str} {\em (nchar, chars)} \\
+unsigned int {\em nchar}; \\
+char *{\em chars}; 
+
+int {\bf sec\_random\_int} {\em (r1, r2)} \\
+int {\em r1, r2}; 
+
+long {\bf sec\_random\_long} {\em (r1, r2)} \\
+long {\em r1, r2};
+\hl{Description}
+Sec\_random\_* return each a randomly generated OctetString, BitString, or NULL-terminated
+character string of the required length, and integer or long integer in the range between
+{\em r1} and {\em r2} respectively. Memory is provided by the called program
+where appropriate. 
+
+In sec\_random\_str the set of characters the returned character string shall consist of can
+be specified in {\em chars}. If {\em chars} is the NULL pointer, the returned character string
+consists of the ASCII representation of characters as defined by the ASN.1 type
+PrintableString.
+They consist of the characters
+\begin{center}
+{\small
+A to Z \\
+a to z \\
+0 to 9 \\
+' ( ) + , - . / : = ?  
+}
+\end {center}
+
+\subsubsection{sec\_create}
+\nm{3X}{sec\_create}{Create PSE or PSE object}
+\label{sec_create}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_create} {\em (pse\_sel)} \\
+PSESel *{\em pse\_sel};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE object.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+Sec\_create creates an entire PSE or a PSE object. 
+The object belongs to the application identified by {\em pse\_sel}\pf app\_name.
+In case of the SW-PSE, the application name is the name of the corresponding directory. 
+
+{\em pse\_sel}\pf object.name is the name of the object to be created. It can be omitted 
+(NULL pointer) in order to create a new application. In case of the SW-PSE, 
+this creates the entire PSE, i.e. it creates a new directory
+with the name {\em pse\_sel}\pf app\_name in the HOME directory of
+the user. 
+ 
+The PIN which allows the creation of a new object in the PSE ist either specified in
+{\em pse\_sel}\pf pin, or sec\_create asks for it interactively.
+The PIN to be installed for the object
+is either specified in {\em pse\_sel}\pf object.pin, or sec\_create asks for it interactively.
+If the user returns CR only in this case, no PIN protection for the created object
+is installed. All interactively entered PIN's are returned by sec\_create in the appropriate
+parameter fields.
+
+\subsubsection{sec\_delete}
+\nm{3X}{sec\_delete}{Delete PSE object}
+\label{sec_delete}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_delete} {\em (pse\_sel)} \\
+PSESel *{\em pse\_sel};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE object.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+Sec\_delete deletes a PSE object. 
+The object belongs to the application identified by {\em pse\_sel}\pf app\_name.
+In case of the SW-PSE, the application name is the name of the corresponding directory. 
+
+{\em pse\_sel}\pf object.name is the name of the object to be deleted. It can be omitted 
+(NULL pointer) in case of the SW-PSE in order to delete the entire PSE. \\[1ex]
+The PSE-PIN is either specified in
+{\em pse\_sel}\pf pin, or sec\_delete asks for it interactively.
+The object specific PIN, if any, is either specified in {\em pse\_sel}\pf object.pin, 
+or sec\_delete asks for it interactively.
+
+\subsubsection{sec\_rename}
+\nm{3X}{sec\_rename}{Rename an object in the PSE}
+\label{sec_rename}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_rename} {\em (pse\_sel, name)} \\
+PSESel *{\em pse\_sel}; \\
+char  *{\em name};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE object.} 
+
+\parname  {{\em name}}
+\pardescript  {the new name of the PSE object.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+The object of the PSE identified by {\em pse\_sel} will be renamed
+with the name given in the second parameter. The contents of the
+object will not be changed, but the Toc entry of this object
+will reflect that change. If the call succeeds the function
+returns 0, otherwise in case of errors -1.
+
+\subsubsection{sec\_open}
+\nm{3X}{sec\_open}{Open PSE or PSE object}
+\label{sec_open}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_open} {\em (pse\_sel)} \\
+PSESel *{\em pse\_sel};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE object.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+Sec\_open opens a PSE object. If the object is PIN protected, sec\_open performs
+all necessary actions for the PIN check.
+The object belongs to the application identified by {\em pse\_sel}\pf app\_name.
+In case of the SW-PSE the application name is the name of the corresponding directory. 
+
+{\em pse\_sel}\pf object.name is the name of the object to be opened. If {\em pse\_sel}\pf object.name
+is the NULL pointer, sec\_open refers to the entire PSE. \\
+If the object is PIN protected, the PIN check is performed with {\em pse\_sel}\pf object.pin.
+If {\em pse\_sel}\pf object.pin is the NULL pointer, sec\_open asks for the PIN
+interactively and returns the plain PIN in {\em pse\_sel}\pf object.pin. 
+
+Sec\_open returns a reference number for the application in {\em pse\_sel}\pf app\_id which
+can be used instead of the application name during successive sec\_close, sec\_read, 
+or sec\_write calls.
+
+\subsubsection{sec\_close}
+\nm{3X}{sec\_close}{Close PSE object}
+\label{sec_close}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_close} {\em (pse\_sel)} \\
+PSESel *{\em pse\_sel};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE object.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+Sec\_close closes a PSE object. This is a dummy operation in case of the SW-PSE. \\ [0.5cm]
+In case of a SC, a closed object cannot be accessed anymore prior to reopen 
+it with sec\_open. 
+
+{\em pse\_sel}\pf app\_id can be used to pass a reference to an application which was generated
+by sec\_open, instead of an application name.
+
+\subsubsection{sec\_read}
+\nm{3X}{sec\_read}{Read PSE object into an octetstring}
+\addtotoc{sec\_read\_PSE}
+\label{sec_read}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_read} {\em (pse\_sel, content)} \\
+PSESel *{\em pse\_sel}; \\
+OctetString *{\em content}; 
+
+RC {\bf sec\_read\_PSE} {\em (pse\_sel, type, value)} \\
+PSESel *{\em pse\_sel}; \\
+ObjId *type; \\
+OctetString *{\em value};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE object.} 
+
+\parname  {{\em content}}
+\pardescript  {Decrypted content of the object identified by {\em pse\_sel}\pf object.name.} 
+
+\parname  {{\em type}}
+\pardescript  {Object identifier of the PSE object.} 
+
+\parname  {{\em value}}
+\pardescript  {Decrypted content of the objectValue part of the object 
+               identified by {\em pse\_sel}\pf object.name.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+{\bf Sec\_read} reads the PSE object -- identified by {\em pse\_sel}\pf object.name 
+and previously opened by sec\_open -- into octetstring {\em content}.
+In case of PIN protection the octetstring is
+decrypted before using the PIN which is either passed to the program through {\em pse\_sel}
+or which was interactively asked for. Sec\_read reads the entire object. 
+
+Sec\_read provides {\em content}\pf noctets and allocates the necessary memory
+in {\em content}\pf octets which can be released by the calling program using free(). 
+
+In case of a SW-PSE, the object can be read without being opened before. It is recommended, however,
+to use sec\_open before reading an object to be compatible with applications using
+a SC environment. \\ [1em]
+{\bf Sec\_read\_PSE} returns the objectType in {\em type} and the DER-code of objectValue
+in {\em value} for objects of the form
+\bc
+{\small
+\bvtab
+PSEObject ::= \3 {\bf SEQUENCE} \{ \\
+\5 objectType \3 OBJECT IDENTIFIER, \\
+\5 objectValue \3 ANY DEFINED BY objectType \\
+\3 \}
+\evtab
+}
+\ec
+It uses d\_PSEObject() to decode PSEObject (see E\_SEC(3X)).
+It returns -1 if the object is not of this form, i.e. it cannot be decoded with d\_PSEObject().
+Sec\_read\_PSE allocates the necessary memory for {\em type}\pf oid\_elements and {\em value}\pf octets.
+
+\subsubsection{sec\_write}
+\nm{3X}{sec\_write}{Write PSE object from octetstring}
+\addtotoc{sec\_write\_PSE}
+\label{sec_write}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_write} {\em (pse\_sel, content)} \\
+PSESel *{\em pse\_sel}; \\
+OctetString *{\em content}; 
+
+RC {\bf sec\_write\_PSE} {\em (pse\_sel, type, value)} \\
+PSESel *{\em pse\_sel}; \\
+ObjId *type; \\
+OctetString *{\em value};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE object.} 
+
+\parname  {{\em content}}
+\pardescript  {Decrypted content of the object identified by {\em pse\_sel}\pf object.name.} 
+
+\parname  {{\em type}}
+\pardescript  {Object identifier of the PSE object.} 
+
+\parname  {{\em value}}
+\pardescript  {Decrypted content of the objectValue part of the object 
+               identified by {\em pse\_sel}\pf object.name.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+{\bf Sec\_write} writes octetstring {\em content} to the PSE object specified by 
+{\em pse\_sel}\pf object.name which has been previously opened by sec\_open. 
+In case of PIN protection the octetstring is
+PIN encrypted before. Sec\_write overwrites the entire object. 
+
+In case of a SW-PSE, the object can be overwritten without being opened before. It is recommended, however,
+to use sec\_open before writing an object to be compatible with applications using
+a SC environment. \\ [1em]
+{\bf Sec\_write\_PSE} encodes the given {\em type} and {\em value} into the DER-code of the 
+ASN.1 structure
+\bc
+{\small
+\bvtab
+PSEObject ::= \3 {\bf SEQUENCE} \{ \\
+\5 objectType \3 OBJECT IDENTIFIER, \\
+\5 objectValue \3 ANY DEFINED BY objectType \\
+\3 \}
+\evtab
+}
+\ec
+and writes it to the PSE object specified by {\em pse\_sel}\pf object.name. It uses the encoding function
+e\_PSEObject() (see E\_SEC(3X)). Sec\_write\_PSE overwrites the entire object.
+
+\subsubsection{sec\_chpin}
+\nm{3X}{sec\_chpin}{Change PIN}
+\label{sec_chpin}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_chpin} {\em (pse\_sel, newpin)} \\
+PSESel *{\em pse\_sel}; \\
+char *{\em newpin};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE object.} 
+
+\parname  {{\em newpin}}
+\pardescript  {New PIN.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+Sec\_chpin changes the PIN of the PSE object specified by {\em pse\_sel}.
+As a result, the PSE object is decrypted with the old PIN (if any) and eventually
+encrypted with the new PIN.
+If {\em pse\_sel}\pf object.name is omitted, the PIN corresponding to the entire
+PSE is changed. In this case, all PSE objects which have the global PIN (including the
+Toc) are decrypted with the old key and encrypted with the new key.\\
+The old PIN can be passed to sec\_chpin in {\em pse\_sel}\pf pin or {\em pse\_sel}\pf object.pin,
+or the program will ask for it interactively.
+If {\em newpin} is the NULL pointer, the program will also ask for the new PIN.
+
+\subsubsection{sec\_read\_toc}
+\nm{3X}{sec\_read\_toc}{Read the table of contents of the PSE}
+\label{sec_read_toc}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+PSEToc *{\bf sec\_read\_toc} {\em (pse\_sel)} \\
+PSESel *{\em pse\_sel};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of PSEToc or NULL.}
+\hl{Description}
+The table of contents (toc) of the PSE identified by {\em pse\_sel} is returned
+as PSEToc. The necessary memory for PSEToc is provided by the called program.
+
+\subsubsection{sec\_print\_toc}
+\nm{3X}{sec\_read\_toc}{Print the table of contents of the PSE}
+\label{sec_print_toc}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+RC {\bf sec\_print\_toc} {\em (pse\_sel)} \\
+PSESel *{\em pse\_sel};
+\hl{Parameter}
+\parname  {{\em pse\_sel}}
+\pardescript  {Structure which identifies the PSE.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+The table of contents (toc) of the PSE identified by {\em pse\_sel} is printed to stderr.
+
+\subsection{ASN.1 encoding and Decoding Functions}
+\nm{3X}{e\_SEC}{ASN.1 encoding and decoding functions for SEC-IF}
+\label{Encoding-/Decoding-Secure}
+\hl{Synopsis}
+\#include $<$secure.h$>$ \\ [0.5cm]
+OctetString *{\bf e\_KeyInfo} {\em (keyinfo)} \\
+KeyInfo *{\em keyinfo}; 
+
+KeyInfo *{\bf d\_KeyInfo} {\em (octetstring)} \\
+OctetString *{\em octetstring}; 
+
+RC {\bf d2\_KeyInfo} {\em (octetstring, keyinfo)} \\
+OctetString *{\em octetstring}; \\
+KeyInfo *{\em keyinfo}; 
+
+OctetString *{\bf e\_EncryptedKey} {\em (encryptedkey)} \\
+EncryptedKey *{\em encryptedkey}; 
+
+EncryptedKey *{\bf d\_EncryptedKey} {\em (octetstring)} \\
+OctetString *{\em octetstring}; 
+
+RC {\bf d2\_EncryptedKey} {\em (octetstring, encryptedkey)} \\
+OctetString *{\em octetstring}; \\
+EncryptedKey *{\em encryptedkey}; 
+
+OctetString *{\bf e\_Signature} {\em (signature)} \\
+Signature *{\em signature}; 
+
+Signature *{\bf d\_Signature} {\em (octetstring)} \\
+OctetString *{\em octetstring}; 
+
+RC {\bf d2\_Signature} {\em (octetstring, signature)} \\
+OctetString *{\em octetstring}; \\
+Signature *{\em signature}; 
+
+BitString *{\bf e\_KeyBits} {\em (keybits)} \\
+KeyBits *{\em keybits}; 
+
+RC {\bf e2\_KeyBits} {\em (keybits, bitstring)} \\
+KeyBits *{\em keybits}; \\
+BitString *{\em bitstring}; 
+
+KeyBits *{\bf d\_KeyBits} {\em (bitstring)} \\
+BitString *{\em bitstring}; 
+
+RC {\bf d2\_KeyBits} {\em (bitstring, keybits)} \\
+BitString *{\em bitstring}; \\
+KeyBits *{\em keybits}; 
+
+OctetString *{\bf e\_AlgId} {\em (alg\_id)} \\
+AlgId *{\em alg\_id}; 
+
+AlgId *{\bf d\_AlgId} {\em (octetstring)} \\
+OctetString *{\em octetstring}; 
+
+RC {\bf d2\_AlgId} {\em (octetstring, alg\_id)} \\
+OctetString *{\em octetstring}; \\
+AlgId *{\em alg\_id}; 
+
+OctetString *{\bf e\_PSEToc} {\em (pse\_toc)} \\
+PSEToc *{\em pse\_toc}; 
+
+PSEToc *{\bf d\_PSEToc} {\em (octetstring)} \\
+OctetString *{\em octetstring}; 
+
+OctetString *{\bf e\_PSEObject} {\em (objectType, objectValue)} \\
+ObjId *{\em objectType}; \\
+OctetString *{\em objectValue}; 
+
+OctetString *{\bf d\_PSEObject} {\em (objectType, PSEObject)} \\
+ObjId *{\em objectType}; \\
+OctetString *{\em PSEObject}; 
+
+\hl{Description}     
+The functions e\_* encode the given structure into an OctetString or BitString
+respectively and return its address. Memory of the entire structure is provided 
+by the called program and can be released
+by aux\_free\_OctetString() or aux\_free\_BitString(). 
+
+The functions e2\_* encode the given structure into a given OctetString or BitString
+respectively. Memory for the {\em octets} member or {\em bits} member of the given structure
+is provided by the called program and can be released
+using  free(). 
+
+The functions d\_* decode the given OctetString into the indicated structure and return
+a pointer to that structure. Memory of the entire structure is provided 
+by the called program and can be released by the respective aux\_free* function (see~\ref{aux_free}).
+
+The functions d2\_* decode the given OctetString into the given structure.
+Memory for those members of the given structure which are pointers is provided 
+by the called program and can be released using appropriate aux\_free* function (see~\ref{aux_free}).
+
+OctetString or BitString consists of the ASN.1 encoding of the corresponding ASN.1 description of the C-structure (see SEC-PSE-OBJECTS(4) and AF-PSE-OBJECTS(4)). 
+\\ [1em]
+The function e\_PSEObject encodes the given {\em objectType} and {\em objectValue} into the
+DER-code of the ASN.1 structure
+\bc
+{\small
+\bvtab
+PSEObject ::= \3 {\bf SEQUENCE} \{ \\
+\5 objectType \3 OBJECT IDENTIFIER, \\
+\5 objectValue \3 ANY DEFINED BY objectType \\
+\3 \}
+\evtab
+}
+\ec
+{\em ObjectValue} is the DER-code of an arbitrary ASN.1 structure. 
+
+The function d\_PSEObject extracts objectType and objectValue from the given
+DER-code in {\em PSEObject} and returns objectType in {\em objectType} and
+objectValue as return value. All necessary memory is allocated by the 
+called program.
+
+\subsection{PSE-Objects}
+\nm{4}{SEC-PSE-Objects}{PSE Objects of the SEC-Interface}
+\label{sec-sw-cc}
+\hl{Synopsis}
+\#include $<$secure.h$>$ 
+
+\hl{Description}     
+This section lists PSE objects needed by the sec\_* functions. Each object is presented in terms
+of C-language structures as they are needed by the interface subroutines and
+by the application programmer as well. The bit coding of the objects in the PSE
+is given by applaying ASN.1 Basic Encoding Rules to the corresponding ASN.1 structures which
+are additionally listed here.
+Transformation between those two representations
+is provided by the respective encoding/decoding functions e\_*(3X).
+
+\subsubsection{Keys}
+\hll{Keys}
+On invocation of {\em sec\_encrypt}, {\em sec\_decrypt}, {\em sec\_sign}, {\em sec\_verify},
+{\em sec\_get\_EncryptedKey}, {\em sec\_put\_EncryptedKey}, and {\em sec\_gen\_key}, necessary
+keys can also be specified by reference to a PSE object (through parameter {\em key}). In this
+case, the PSE object must be internally structured as X.509 (Annex G) defined
+{\em SubjectPublicKeyInfo}. Seen from the C-language programmer, the PSE object 
+has the following structure:
+       
+{\small
+\bvtab
+\4      typedef struct KeyInfo \{ \\
+\6              AlgId \3        *subjectAI; \\
+\6              BitString \3    subjectkey; \\
+\4      \} KeyInfo;  \\
+\evtab
+}
+
+In case of RSA keys, the BitString {\em subjectkey} consists of the ASN.1-encoded representation of the
+ASN.1 sequence {\em KeyBits} (see SEC-PSE-OBJECTS(4)). 
+It can be decoded with the function
+{\em d\_KeyBits()} into the following C-structure:
+
+{\small
+\bvtab
+\4      typedef struct KeyBits \{ \\
+\6	        OctetString \4 part1; \\
+\6      	OctetString \4 part2; \\
+\4      \} KeyBits; \\
+\evtab
+}
+
+Part1 and part2 contain the prime numbers $p$ and $q$ in case of secret keys, and the 
+modulus $m$ and the public exponent $e$ in case of public keys. The content of the
+C-structure can be encoded into the ASN.1-encoded BitString with the function
+{\em e\_KeyBits()}.
+
+The corresponding ASN.1 notation which is the basis for the bit coding of the objects are:
+
+{\small
+\bvtab
+\1 KeyInfo ::= \3 {\bf SEQUENCE} \{  \\
+\5 algorithm         \2 AlgorithmIdentifier,    \\
+\5 key               \2 BitString            \\
+\5 -- -- \\
+\5 -- -- the BitString of key    \\
+\5 -- -- contains the ASN.1 encoding of a sequence of two \\
+\5 -- -- INTEGERs part1 and part2, which are the RSA-modulus    \\
+\5 -- -- n and the public RSA-exponent e in case of a public key,    \\
+\5 -- -- or the two prime numbers $p$ and $q$ in case of a secret key.    \\
+\5 -- -- \\
+\5 -- -- SEQUENCE \{ \\
+\5 -- -- \2       part1 INTEGER,   \\
+\5 -- -- \2       part2 INTEGER  \\
+\5 -- -- \} \\
+\4 \}
+\evtab
+}
+
+and
+
+{\small
+\bvtab
+\1 KeyBits ::= \3 {\bf SEQUENCE} \{ \\
+\5                 part1 \2  INTEGER    \\
+\5                 part2 \2  INTEGER \\
+\4 \}
+\evtab
+}
+
+
+For explanation of the used names see SEC(5). 
+
+The OctetString which is stored on the PSE can be encoded or decoded with functions
+{\em e\_KeyInfo} and {\em d\_KeyInfo} respectively.
+
+\subsubsection{Toc}
+\hll{Toc}
+The table of contents (toc) of the PSE is maintained by those sec\_* functions which 
+handle the PSE. The C-structure of the toc given below is used only internally by these
+functions. The application programmer does not need to handle them.
+
+{\small
+\bvtab
+\4      typedef struct PSE\_Toc \{ \\
+\6              char                \4 *owner; \\
+\6              UTCTime             \4 *create; \\
+\6              UTCTime             \4 *update; \\
+\6		unsigned int        \4  status; \\
+\6              struct PSE\_Objects \4 *obj; \\
+\4      \} PSEToc;
+\evtab
+}
+with:
+{\small
+\bvtab
+\4      struct PSE\_Objects \{ \\
+\6              char                \4 *name; \\
+\6              UTCTime             \4 *create; \\
+\6              UTCTime             \4 *update; \\
+\6	        int                 \4  noOctets; \\
+\6	        unsigned int        \4  status; \\
+\6              struct PSE\_Objects \4 *next; \\
+\4      \};
+\evtab
+}
+
+UTCTime is defined in SEC(5).

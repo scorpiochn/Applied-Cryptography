@@ -1,0 +1,139 @@
+% basic.tex - this file contains a variety of things that seem
+	% so useful one wonders why they are not in plain.tex
+
+		%% Send to Teletype
+
+% send a message to the teletype.  This function has no effect 
+% on the document
+
+	\def\sendtty#1{\immediate\write16{#1}}
+
+% \spc and \tab expand to one space and eight spaces respectively
+% for use in \sendtty messages to the console and log file
+
+	\xdef\spc{ } \xdef\tab{\spc\spc}
+	\xdef\tab{\tab\tab} \xdef\tab{\tab\tab}
+
+
+% The conditional \ifnull tests whether a string is empty
+
+	\def\ifnull
+	#1% string to be tested
+	{\setbox\tempbox\hbox{#1}%
+	 \expandafter\ifdim\wd\tempbox=0pt\relax}
+
+% and follows the normal syntax of TeX conditionals.  The actual
+% test is whether the argument has zero width when put in a box.
+% This is not guaranteed to work if the argument can be something
+% other than a string.  In particular, it will be fooled by a
+% non-empty box of zero width.
+
+% The conditional \ifundefined tests whether a string has a
+
+\def\ifundefined#1{\expandafter\ifx\csname#1\endcsname\relax}
+
+% macro definition and also follows standard conditional syntax.
+
+
+% The functions \Alph and \alph generate lower and uppercase letters
+% from numbers between 1 and 26.  They are analogous to \roman and
+% \Roman.
+
+\def\alph
+#1% number between 1 and 26
+{\ifcase #1 \or a\or b\or c\or d\or e\or f\or g\or h\or 
+	    i\or j\or k\or l\or m\or n\or o\or p\or q\or 
+	    r\or s\or t\or u\or v\or w\or x\or y\or z\fi}
+
+\def\Alph
+#1% number between 1 and 26
+{\ifcase #1 \or A\or B\or C\or D\or E\or F\or G\or H\or 
+	    I\or J\or K\or L\or M\or N\or O\or P\or Q\or 
+	    R\or S\or T\or U\or V\or W\or X\or Y\or Z\fi}
+
+\def\enddoc{\par \vfill \supereject \end}
+	% \enddoc can be redefined by a document
+	% format to preform some additional action
+	% before ending.
+
+
+	%%% Boxes and glue macros
+
+\def\pinch#1{\hbox to 0pt{#1}}
+
+\def\lft#1{#1\hss} \def\rt#1{\hss#1} \def\ctr#1{\hss#1\hss}
+
+\def\llap#1{\pinch{\rt{#1}}} \def\rlap#1{\pinch{\lft{#1}}} 
+\def\clap#1{\pinch{\ctr{#1}}}
+
+\def\crush#1{\vbox to 0pt{#1}}
+\def\tp#1{\vss#1} % vertical analog of \lft 
+\def\bt#1{#1\vss} % vertical analog of \rt
+\def\vctr#1{\vss#1\vss} % vertical analog of \ctr
+\def\tlap#1{\crush{\tp{#1}}} % vertical analog of \llap
+\def\blap#1{\crush{\bt{#1}}} % vertical analog of \rlap
+\def\vclap#1{\crush{\vctr{#1}}} % vertical analog of \clap
+\def\contract#1{\vclap{\clap{#1}}}
+
+
+\newcount\tempcount
+\newbox\tempbox
+
+\def\note#1{}		% a manuscript note that does not appear
+			% in the document
+
+% At numerous places in the text, the quality is improved by
+% giving TeX advice that it should not have needed.  This is
+% termed a hint.
+
+		\long\def\hint#1{#1}
+
+% and has no function except to label the hint so it can be 
+% found.
+
+		% date and time macro
+
+\def\monthname
+   {\ifcase \month \or January\or February\or March\or
+	 April\or May\or June\or July\or August\or 
+	 September\or October\or November\or December \fi}
+
+\def\setdatetime
+   {\tempcount=\time 
+    \divide\tempcount by 60 \multiply\tempcount by 60
+    \global\advance\time by-\tempcount 
+    \xdef\minute{\expandafter\the\time}%
+    \advance \time by \tempcount
+    \divide \tempcount by 60%
+    \xdef \hour{\expandafter\the\tempcount}}
+\setdatetime
+
+\xdef\datetime{\the\day\monthname\the\year-\hour:\ifnum\minute<10 0\fi\minute}
+
+		% Default Parameters
+
+\hfuzz=1pt \tolerance=10000 \hbadness=10000 \vbadness=10000
+
+% The \overfullrule parameter marks overfull boxes with an ugly
+% black rule.  This is useful in debugging, it is much better
+% to forget that it was turned off than to forget that it was
+% turned on.
+
+\overfullrule=0pt 	% don't mark overfull boxes with black slugs
+
+% to be integrated
+
+\let\ty=\tt	% Used in lots of place
+
+% \endpar is made a synonym for TeX's standard \par control sequence.
+% This leaves the conveniently short sequence \par to be redefined
+% to do something more complex at the end of a paragraph.
+
+		\let \endpar=\par 
+
+% The commands \hmode and \vmode are named to suggest exactly what they
+% do, force TeX into horizontal mode and vertical mode respectively.
+
+\let\hmode=\leavevmode		% Force \TeX into horizontal mode.
+\let\vmode=\endpar		% Force \TEX into vertical mode.
+

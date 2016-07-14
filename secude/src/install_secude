@@ -1,0 +1,19 @@
+#
+#  SecuDE Release 4.1 (GMD)
+#
+#
+#    Copyright (C) 1991, GMD Darmstadt
+#
+#                         NOTICE
+#
+#    Acquisition, use, and distribution of this module 
+#    and related materials are subject to restrictions 
+#    mentioned in each volume of the documentation.
+#
+#
+# This shell-script was introduced because it always caused trouble
+# if the PATH environment variable being in use at the installation 
+# site didn't start with a . or :, indicating that the current
+# directory shall be examined first.
+# 
+./make

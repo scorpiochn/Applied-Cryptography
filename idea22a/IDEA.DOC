@@ -1,0 +1,65 @@
+IDEA v2.2
+        IDEA encryption for dos.
+
+IDEA stands for International Data Encryption Algorithm
+        it was invented by Xuejia Lai and James Massey in Switzerland
+        its a private key block algorithm, and is thought to be 
+        very secure.
+
+This manifestation of the algorithm is adapted pretty much wholesale from 
+Dr. Dobbs Journal #208 December 1993.  I simplified it, and made it
+useable on dos files.
+
+the algorithm operates on 64-bit data blocks, divided into 4 16-bit 
+subblocks.  for dos files, it packs two characters into a 16-bit word
+and treats 4 such words as the subblocks. since not all files have the right
+length for this, a header is used to tell idea's decrypter how long the file
+will be. thus encrypted files are a few bytes longer than they started. they
+are of course put back to normal when decrypted.
+
+the key is a 128-bits.  This program uses a simplified key, in that it takes
+up to 8 characters and casts each one into a 16-bit word, by shifting it left
+8 bits, and OR'ing it with the previous character (0 for the first character), 
+making 8 16-bit subblocks of the key, which is no where near as complex a key 
+is possible. this undoubtedly affects the security of the algorithm, but it 
+should still be good for most purposes.  A future version will have an option
+for a more complex key.  of course, source is included so feel free to write 
+a better keying function yourself.
+
+the .exe file i include here is a simple demonstration program.  Source code
+is included and the program is written as a sort of "toolbox"---you can
+use the algorithm through the 3 functions provided as a sort of "front-end": 
+encode, decode, & clean-up.  actually, you can easily change the way it works 
+too if you like--the algorithm is a bit obtuse but the usage is real easy.
+
+
+usage is "idea <filename.ext> [e|d[w]] key"
+        [e|d[w]] stands for either an "e" or a "d", instructing whether to  
+                e-ncode or d-ecode, plus an optional "w", which tells
+                IDEA to overwrite the original file with the encrypted
+                data. leaving "w" off creates a new file called 
+                "filename.enc" where "filename" is the same as the input file.
+                overwriting is more secure--it destroys old data--but may
+                not be what you want.
+        key is a word up to 8 characters BUT NOT MORE!!! extra characters
+                will be truncated offa there.
+
+its not my code so don't send money or anything. (the IDEA algorithm is in 
+fact patented, but it can be freely used and distributed for non-commercial 
+use.  The patent is held by Ascom-Tech AG in switzerland, tel: +41 65 242-885) 
+if you want to contact me, i'm on the internet as "shaggy@phantom.com".
+
+Please note that use of this program is done with no insurance from me that 
+it will work or anything----use it at your own risk. i've bug checked it
+and everything and it looks good, but i'm not gonna be responsible for 
+failure.  While we're on this topic, please do not forget your key!!!
+a brute-force attack on this algorithm "requires 2^128 encryptions to
+recover the key.....a billion chips testing a billion keys a second would 
+take 10^13 years to break IDEA"*----a very secure algorithm (at least against
+brute force attacks).
+
+
+
+
+
+* Dr. Dobbs Journal #208 p.54

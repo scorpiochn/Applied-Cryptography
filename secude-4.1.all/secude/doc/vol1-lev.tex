@@ -1,0 +1,98 @@
+\section{Security Levels}
+\markboth{Security Levels}{Security Levels}
+\thispagestyle{myheadings}
+\label{sl}
+
+\subsection{Security Levels of Signature Verification}
+\label{sl-sv}
+
+\begin {center}
+\begin {tabular}{|c|l|l|}
+\hline
+{\em Security} & {\em Short Name} & {\em Service} \\
+{\em Level} & & \\ \hline
+0 & No Security  & No Service \\ \hline
+1 & Simple       & Verification of signature \\
+  & Authenticity & without certificate \\ \hline
+2 & Certified    & Verification of signature and of \\
+  & Authenticity & originator certificate \\ \hline
+3 & Certified and& Like 2. Additionally:  \\
+  & Unrevoked    & Check of black lists \\
+  & Authenticity & \\ \hline
+\end {tabular}
+\end {center}
+ 
+\label{fig-sl-sv}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: Services of security levels}
+
+\subsubsection{Security Level 0: No Security}
+\label{sl-sv0}
+ 
+\subsubsection{Security Level 1: Simple Authenticity}
+\label{sl-sv1}
+
+Signature verification (or encryption, respectively)
+is performed without certificate.
+The public key of the partner is known and stored on the user's smartcard
+({\em PKList} or {\em EKList}, respectively).
+\\[1ex]
+This security level is safe against attacks.
+However, its usage is limited.
+It works between mutually trusted partners.
+It also works within
+a closed communication network with one trustworthy CA
+(cf. Kerberos \cite{ste1}).
+Inside of an open network, any pairs or groups of mutually trusted
+partners can exchange and verify certified public keys,
+and then store them in order to communicate on this security level 1.
+
+\subsubsection{Security Level 2: Certified Authenticity}
+\label{sl-sv2}
+
+Signature verification (or encryption, respectively)
+includes a check of the consistence of the certificate chain up to
+a known and trusted public key.
+The known and trusted public key belongs either to
+a trusted communication partner and was verified
+at an earlier occasion,
+or it belongs to a certification authority of oneself's trusted
+certification path to the Root CA.
+In any case, it is stored on the smartcard table {\em PKList}
+or {\em EKList}, respectively.
+
+This security level
+ 
+\begin{itemize}
+\item prevents from acceptance of expired keys, but
+\item correctly accepts expired but formerly valid certificates;
+\item protects against wrongly or incompletely certified keys,
+\item does not protect against revoked keys.
+\end{itemize}
+ 
+Expired CA certificates are valid as parts of certificate chains,
+which certify an old signature within the validity time intervals of all
+certificates of the chain.
+If the last certificate of a chain is signed by an old signature key
+of the Root CA,
+a valid cross certificate can be obtained from the directory table
+``Old Certificates'' (see paragraph \ref{ds-roc} above).
+
+In this security level, black lists are not involved.
+
+\subsubsection{Security Level 3:
+Certified and Unrevoked Authenticity}
+\label{sl-sv3}
+
+This security level 3 includes
+security level 2 and additionally requires black list inquiries.
+This provides a protection against keys,
+which have been revoked by their certification authorities,
+because they are compromised or have been used against CA policies.
+One revoked certificate of a chain of certificates discredits
+all certificates below and the user signature as well.
+
+Complete black list consults require
+at worst one directory access per certificate of a chain.
+The number of directory accesses can be reduced, if one authority
+keeps the revoked certificates of other CAs as well.

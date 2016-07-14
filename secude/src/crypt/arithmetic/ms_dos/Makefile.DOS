@@ -1,0 +1,84 @@
+#
+#    Copyright (C) 1991, GMD Darmstadt
+#
+#                         NOTICE
+#
+#    Acquisition, use, and distribution of this module
+#    and related materials are subject to restrictions
+#    mentioned in each volume of the documentation.
+#
+AS        =  ml
+AR        =  lib
+
+
+
+OPT        =  -c
+
+ADD     = add.obj
+SUB     = sub.obj
+MULT    = mult.obj
+DIV     = div.obj
+SHIFT   = shift.obj
+
+OBJS    = \
+$(ADD) $(SUB) \
+$(MULT) $(DIV)\
+$(SHIFT)
+
+
+!IF "$(SM)"==""
+!   ERROR  call nmake with SM=L (for LARGE-Model) or SM=M (for MEDIUM-Model)!
+!ENDIF
+
+
+!   IF ("$(SM)"!="L") && ("$(SM)"!="M")      # Small- und Compact-Modell haben
+!   ERROR  L or M must be great letter!
+!ENDIF
+
+
+
+LFLAGS     =  /NOI
+
+
+
+LIBDIR     =  ..\..\..\..\lib
+#create library for medium or large model
+LIB        =  $(LIBDIR)\$(SM)libcryp.lib
+
+
+
+.asm.obj :
+        $(AS) $(OPT) $*.asm
+
+
+
+all:   aus1    $(OBJS)
+
+aus1:
+        @ echo ---------------------------------------------------------------
+        @ ECHO                Makefile
+        @ echo     Compile  $(OBJS)
+        @ echo ---------------------------------------------------------------
+
+
+inst-all: aus2  lib
+
+aus2:
+        @ echo ---------------------------------------------------------------
+        @ echo $(OBJS)
+        @ echo will be installed in the library $(SM)LIBCRYP.LIB
+        @ echo ---------------------------------------------------------------
+
+lib:
+        $(AR) $(LIB) $(LFLAGS) -+$(ADD) -+$(SUB);
+        $(AR) $(LIB) $(LFLAGS) -+$(MULT) -+$(DIV);
+        $(AR) $(LIB) $(LFLAGS) -+$(SHIFT);
+
+
+clean:
+        @ ECHO ---------------------------------------------------------------
+        @ ECHO $(OBJS)
+        @ ECHO will be deleted
+        @ ECHO ---------------------------------------------------------------
+        @ DEL *.obj
+        @ DEL *.bak

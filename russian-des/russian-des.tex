@@ -1,0 +1,1315 @@
+% russian-des.tex - This is a translation of GOST 28147---89, the 
+% Russian equivalent of the U.S. Data Encryption Standard by 
+% Aleksandr Malchik of Sun Microsystems Laboratories, Mountain View,
+% California, with editorial and typographic assistance from
+% Whitfield Diffie, Sun Microsystems, Mountain View, California.
+
+% Load a variety of files that provide functions not in plain TeX.
+
+\input basic		% useful functions not in plain TeX
+\input misc		% miscellaneous (non-fundamental) TeX macros
+\input borders		% white borders and black frames
+\input page-layout	% page headers and footers
+
+% Increase the size of the type to about 14 points.
+
+		\magnification=\magstep2
+
+% In order to facilitate an open style of layout in the TeX
+% manuscript, carriage return is made equivalent to a space 
+
+			\catcode'15=10	
+
+% so that double carriage returns don't break paragraphs.  Paragraph
+% breaking is done by explicit \par markers.
+
+% Provide extra space between lines and extra space between
+% paragaraphs.
+
+		\parskip=1ex plus 1ex
+		\baselineskip=12pt
+
+% Define headings and footings of the pages
+
+\def\documentnumber{GOST 28147---89}
+\def\lefthead
+{{\rm \iffirstpage \vbox{\baselineskip=10pt
+			 \hbox{Inv. No. 3583}%
+			 \hbox{UDC 681.325.6:006.354}}%
+	\else \ifodd\pageno \else C.\ {\tenrm\folio} \documentnumber\fi\fi}}%
+\def\centerhead{}%
+\def\righthead
+{{\rm \iffirstpage \vbox{\baselineskip=10pt
+			 \halign{\rt{##}\cr
+			         For Official Use\cr
+			         Group P85\cr}}%
+	\else \ifodd\pageno \documentnumber\ C.\ {\tenrm\folio}\fi\fi}}%
+\def\leftfoot{{\rm \iffirstpage Official Publication \fi}}%
+\def\centerfoot{{\rm \vtop{\baselineskip=10pt
+				  \halign{\ctr{##}\cr
+					  DRAFT\cr
+					  \datetime\cr}}}}%
+\def\centerfoot{{\rm \vtop{\vskip 1ex
+			   \hbox{Draft of Translation --- \datetime}}}}%
+\def\rightfoot{{\rm \iffirstpage Reproduction Prohibited \fi}}%
+
+% A section at any level begins a paragraph and begins with a
+% number
+
+		\def\seclab
+		#1% number of the section
+		{\par {\bf #1.}\hbox to .5em{}}%
+
+% Establish a section number count
+
+			\newcount\secnum
+
+% and define a routine that begins major (titled) sections.
+
+\def\section	% Begin a section of the document, by
+	  	% incrementing the section number,
+	  	% printing the section title, and
+	  	% sending the section title to the console.
+#1% Section number (not used)
+#2% Title of the section
+{\par\bigbreak
+ \advance\secnum by 1
+ {\raggedcenter {\bf \the\secnum.}\ \uppercase{#2}\par}%
+ \vskip 1ex \nobreak
+ \sendtty{\tab\the\secnum. #2}}%
+
+% Establish an appendix number count
+
+			\newcount\appnum
+
+% and define a routine that begins appendices.
+
+\def\appendix	% Begin an appendix of the document, by
+	  	% incrementing the appendix number,
+	  	% printing the appendix title, and
+	  	% sending the appendix title to the console.
+#1% Appendix number (not used)
+#2% Type of appendix: obligatory or information
+#3% Title of the appendix
+{\sendtty{\tab\the\appnum. #3}%
+ \par\bigbreak
+ \advance\appnum by 1
+ \rightline{\vbox{\baselineskip=12pt
+		  \halign{\lft{##}\cr Appendix #1\cr #2\cr}}}%
+ {\raggedcenter \uppercase{#3}\par}%
+  \nobreak \vskip 1ex}%
+
+% Because titles are centered and some are too long for a single line,
+% they are centered on several lines without explicit specifiations of
+% the line breaks.
+
+\def\raggedcenter{\leftskip=0pt plus4em \rightskip=\leftskip
+		  \parfillskip=0pt \spaceskip=.3333em \xspaceskip=.5em
+		  \pretolerance=9999 \tolerance=9999
+		  \hyphenpenalty=9999 \exhyphenpenalty=9999 }%
+
+
+% Leave space for a figure in the text and mark its position with a
+% light outline.
+
+\def\figure
+#1% number of the figure
+#2% height of the figure
+{\par
+ \vbox{\vskip2ex
+       \boxit{#2}
+       \vskip2ex
+       \centerline{Figure #1}%
+       \vskip 3ex}}%
+
+% End a line with a horizontall fill.  The effect is much like \rightline,
+% but can occur in the middle of text.
+
+		\def\endline{\hfill\break}
+
+% Debugging function - to be removed when translation is complete
+% This is called \spaceout rather than \hskip so it can be found.
+
+		\def\spaceout#1{\hskip #1}
+
+% The \pageparity counter gives TeX hints about whether the page
+% number is even or odd.  This is used in placing text in
+% the margins, because the pagenumber is not well defined from
+% within the text.
+
+		\newcount\pageparity
+
+% Write marginal notes in a small font
+
+		 \font\marginalnotefont=cmr5
+
+% Indicate the end of a page in the original document.  If the page
+% break was in horizontal mode, a vertical bar appears in the text
+% and also separates the page numbers shown in the margin.  If the
+% break was in vertical mode, two paragraphs are show separated by
+% a horizontal bar and a horizontal bar separates page number in
+% the margin.
+
+\def\endpage
+#1% page number of page in original document
+{\ifnum \pageparity=0 \def\pageparity{\the\pageno}\fi
+ {\tempcount=#1 \advance\tempcount by 1%
+  \marginalnotefont
+  \ifhmode
+    \unskip
+    \hbox to .5em
+	 {\ctr{\lower1ex\hbox{\vrule width 1pt\vbox to 4.5ex{}}}}%
+    \strut
+    \vadjust{\kern-\dp\strutbox
+	     \vbox to \dp\strutbox
+		  {\vss
+		   \pinch{\ifodd\pageparity \hskip\hsize\kern 10pt
+				\else \hss\fi
+			  \boxit{#1$\,$\lower.5ex\hbox{\vrule width 1pt
+					 \vbox to 2.5ex{}}%
+				 $\,$\the\tempcount}%
+			  \ifodd\pageparity \hss \else \kern 10pt\fi}}}%
+  \else
+    \ifvmode 
+      \setbox\tempbox\vclap{\boxit{\vbox{\hbox{#1}\vskip2pt
+			    \hrule height 1pt depth 0pt
+			    \vskip2pt\hbox{\the\tempcount}}}}%
+      \line{\ifodd \pageparity \else \llap{\box\tempbox\kern 10pt}\fi
+	    \hfil\vbox{\hrule height 1pt depth 0pt
+		       \hbox to 2em{}}\hfil
+	    \ifodd \pageparity \rlap{\kern 10pt\box\tempbox}\fi}%
+    \else \ifmmode \sendtty{Math mode at end of page: #1}\fi \fi \fi
+  \mark{\the\tempcount}}%
+ \gdef\pageparity{0}}%
+
+		% Mathematical Symbols
+
+% Define the symbol \xor to be synonymous with \oplus to indicate
+% its meaning.
+
+			\def\xor{\oplus}%
+
+% Define a boxed plus sign for addition modulo $2^{32}.  No functional
+% name has been given to this symbol, for lack of an obvious, terse,
+% candidate.
+
+\def\boxplus
+{\mathbin{\hbox{\frame{\fourborder{+}{0pt}{0pt}{-1pt}{-1pt}}{.3pt}}}}%
+
+% Define \SM to be the two letter variable CM used to denote adders.
+% This gives better spacing in math mode.
+
+		\def\SM{{\it SM\!}}
+
+% Define \for to be `for' in Roman type with spaces around it
+% for use in math formulas.
+
+		\def\for{{\rm \ for\ }}
+
+\firstpagetrue
+
+% beginning of GOST 28147---89
+\null%\vskip 1ex
+
+	\centerline{Government Standard of the U.S.S.R.}
+
+\vskip 1ex 
+\hrule height 2pt
+\vskip 3ex 
+	\centerline{Cryptographic Protection}
+	\centerline{for Data Processing Systems}
+\vskip 2ex
+{\baselineskip=10pt% hack to get spacing in footnote to come out right
+\centerline{Cryptographic Transformation Algorithm%
+	    \footnote*{{\rm Translated from the Russian by 
+			Aleksandr Malchik, Sun Microsystems
+			Laboratories, Mountain View, California,
+			with editorial and typographic
+			assistance from Whitfield Diffie,
+			Sun Microsystems, Mountain View,
+		        California.}}%
+	    \qquad 
+	    \vbox{\baselineskip=12pt
+		  \halign{\ctr{#}\cr GOST\cr 28147---89\cr}}}}%
+\vskip 3ex
+\hrule height 1pt
+\vskip 1ex 
+\rightline{Effective Date $\underline{01\ {\rm July}\ 90}$}
+\vskip 1in
+
+     The following standard establishes the authorized cryptographic
+transformation algorithm for data processing systems in computer
+networks, separate computing complexes, and computers that defines the
+rules for data enciphering and for producing message authentication
+codes. \par
+
+     The cryptographic transformation algorithm is intended for either
+hardware or software implementation, satisfies the cryptographic
+requirements, and does not place any limitations on the secrecy level
+of the protected information. \par
+
+     This standard is obligatory for organizations, companies, and
+offices that use cryptographic protection for data stored in or
+transferred through computer networks, separate computer complexes,
+or computers. \par
+
+     Definitions of the terms used in this standard are given in
+Appendix 1. \par
+
+\par\vfill\supereject
+
+\section{1}{Structure of the Cryptographic Transformation Algorithm.}
+
+\seclab{1.1}The cryptographic transformation contains (see Figure 1): \par
+
+     A 256-bit key memory unit (KMU) that consists of eight 32-bit
+registers $(X_0, X_1, X_2, X_3, X_4, X_5, X_6, X_7)$; \par
+
+     four 32-bit registers $(N_1, N_2, N_3, N_4)$; \par
+
+\endpage{1}%
+
+     two 32-bit registers $(N_5, N_6)$ containing constants $S_2$, $S_1$; \par
+
+     two 32-bit modulo $2^{32}$ adders $(\SM_1, \SM_3)$; \par
+
+     one 32-bit modulo 2 bitwise adder $(\SM_2)$; \par
+
+     one 32-bit modulo $(2^{32}-1)$ adder $(\SM_4)$; \par
+
+     one modulo 2 adder $(\SM_5)$, with no limitation placed on the length
+of adder $\SM_5$; \par
+
+     a substitution block ($K$); \par
+
+     a cyclic shift register, shifting  11 steps towards the higher bit.
+
+\seclab{1.2}The substitution block K consists of 8 replacement modules
+(subkeys) $K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8$ with 64-bits of memory each.
+A 32-bit vector that enters the substitution block is split into eight
+4-bit vectors, each of which is transformed into a 4-bit
+vector by the appropriate subkey, each representing a sixteen-line
+table containing 4 bits of data in each line.  The entering vector
+determines the address of the line in the table, the contents of
+this particular line is the output vector.
+
+\seclab{1.3}During the addition and cyclic shift of binary vectors
+the higher bit is the one with bigger number.
+
+\seclab{1.4}When loading the key $(W_1, W_2, \ldots, W_{256}), W_q \in \{0,1\}, 1 \le q \le 256$,
+into the KMU, the contents of $W_1$ are entered into the
+1{\st} bit of register $X_0$, the contents of $W_2$ are entered into the 2{\nd}
+bit of register $X_0$, $\ldots\,$, the contents of $W_{32}$ are entered into the    
+32{\nd} bit of register $X_0$, the contents of $W_{33}$ are entered into the
+1{\st} bit of register $X_1$, the contents of $W_{34}$ are entered into the 2{\nd}
+bit of register $X_1$, $\ldots$, the contents of $W_{64}$ are entered into the    
+32{\nd} bit of register $X_1$, the contents of $W_{65}$ are entered into the
+1{\st} bit of register $X_2$, etc.; finally, the contents of $W_{256}$ are
+entered into the 32{\nd} bit of register $X_7$.
+
+\seclab{1.5}During the transfer of data, the contents of bit $p$ of one
+register (or adder) are written into bit $p$ of another register (or adder).
+
+\seclab{1.6}The values of the constants $S_1$, $S_2$ in the registers $N_6$,
+$N_5$ is given in the Appendix 2.
+
+\seclab{1.7}The keys that determine the contents of the KMU and the
+tables of the substitution block $K$ are secret elements and are
+distributed only in the proper channels. \par
+
+     The contents of the substitution tables of block $K$ are a
+long-term key element that is common throughout a network. \par
+
+     Organization of the different kinds of communications is achieved
+by building an appropriate key management system.  It is possible to
+produce the keys (KMU contents) and encipher them in electronic
+codebook mode or electronic codebook mode with message authentication
+for transmission over communication channels or storage in computer
+memory.
+
+\endpage{2}
+
+\seclab{1.8}The cryptographic system has four modes of operation: \par
+
+     enciphering (and deciphering) of data in the electronic codebook mode; \par
+
+     enciphering (and deciphering) of data in the output feedback mode; \par
+
+     enciphering (and deciphering) of data in the cipher feedback mode; \par
+
+     producing message authentication codes. \par
+
+     The flowcharts for software implementation of the cryptographic
+transformation algorithm are given in Appendix 3. \par
+
+\figure{1}{\hbox to \hsize{\vbox to 1truein{}}}%
+
+\endpage{3}%
+
+\section{2}{Electronic Codebook Mode.}%
+
+\seclab{2.1}Enciphering of plaintext in the electronic codebook mode.
+
+\seclab{2.1.1}The operation of the enciphering algorithm in electronic
+codebook mode is shown in Figure 2. \par
+
+     Plaintext to be enciphered is split into 64-bit blocks.
+Input of any block 
+$T_p = (a_1(0), a_2(0), \ldots, a_{31}(0), a_{32}(0),
+        b_1(0), b_2(0), \ldots, b_{32}(0))$
+of binary data into the registers $N_1$ and $N_2$ is
+done so that the contents of $a_1(0)$ are entered into the 1{\st} bit of $N_1$,
+contents of $a_2(0)$ are entered into the 2{\nd} bit of $N_1$ etc., contents of
+$a_{32}(0)$ are entered into the 32{\nd} bit of $N_1$; contents of $b_1(0)$ are entered
+into the 1{\st} bit of $N_2$, contents of $b_2(0)$ are entered into the 2{\nd} bit
+of $N_2$ etc., contents of $b_{32}(0)$ are entered into the 32{\nd} bit of $N_2$.  The
+result is: state $(a_{32}(0), a_{31}(0), \ldots, a_2(0), a_1(0))$ of the register $N_1$
+and state $(b_{32}(0), b_{31}(0), \ldots, b_1(0))$ of the register $N_2$.
+
+\seclab{2.1.2}The 256 bits of key are entered into the KMU.  The
+contents of eight 32-bit registers $X_0, X_1, \ldots, X_7$ are then: \par
+
+$$ \def\leaderfill{\leaders\hbox to 2em{\hss$\cdot$\hss}\hfill}
+   \eqalign{X_0 &= (W_{32}, W_{31}, \ldots, W_2, W_1) \cr
+            X_1 &= (W_{64}, W_{63}, \ldots, W_{34}, W_{33}) \cr
+	      \noalign{\hbox to 13em{\leaderfill}}
+            X_7 &= (W_{256}, W_{255}, \ldots, W_{226}, W_{225}) \cr} $$
+
+\seclab{2.1.3}The algorithm for enciphering 64-bit blocks of plaintext
+in the electronic codebook mode consists of 32 rounds. \par
+
+     In the first round the initial contents of register $N_1$ are
+added modulo $2^{32}$ in the adder $\SM_1$ to the contents of the
+register $X_0$.  Note: the contents of register $N_1$ are unchanged.
+\par
+
+     The result of the addition is transformed in the substitution
+block $K$ and the resulting vector enters register $R$, in which
+it is shifted, cyclically, by 11 steps towards the higher bits.  The
+result of this shift is added bitwise modulo 2 in the adder $\SM_2$
+to the 32-bit contents of register $N_2$.  The result produced in
+$\SM_2$ is then stored in $N_1$.  Note: the old contents of $N_1$ are
+stored in $N_2$.  This ends the first round. \par
+
+     The subsequent rounds are analogous to the first one: in the
+2{\nd} round the contents of $X_1$ are read from the KMU, in the 3{\rd} round
+the contents of $X_2$ are read from the KMU etc., in the 8{\th} round the
+contents of $X_7$ are read from KMU.  In rounds 9 through 16 and 
+17 through 24 the contents of the KMU are read in the same order:
+
+	$$ X_0, X_1, X_2, X_3, X_4, X_5, X_6, X_7. $$
+
+     In the last eight rounds from the 25{\th} to the 32{\nd} the
+contents of the KMU are read backwards:
+
+	$$ X_7, X_6, X_5, X_4, X_3, X_2, X_1, X_0. $$ \par
+
+\endpage{4}%
+
+\figure{2}{\hbox to \hsize{\vbox to 1truein{}}}%
+
+     In the 32 enciphering rounds, the registers are used in the
+following order:
+
+$$ \eqalign{&X_0, X_1, X_2, X_3, X_4, X_5, X_6, X_7, 
+	     X_0, X_1, X_2, X_3, X_4, X_5, X_6, X_7, \cr
+	    &X_0, X_1, X_2, X_3, X_4, X_5, X_6, X_7,
+	     X_7, X_6, X_5, X_4, X_3, X_2, X_1, X_0. \cr} $$ \par
+
+     In the 32{\nd} round the output of the adder $\SM_2$ is entered
+into the register $N_2$, and the old contents of register $N_1$ are
+unchanged. \par
+
+     The combined contents of registers $N_1$ and $N_2$ resulting
+from the 32{\nd} round of enciphering is the block of ciphertext that
+corresponds to the block of plaintext. \par
+
+\leftline{3 3ak. 413 DSP}
+
+\endpage{4}%
+
+\seclab{2.1.4}The equations for enciphering in the electronic codebook mode
+are:
+
+$$ \left\{\vcenter{\halign{$\displaystyle{#}$ \cr
+	 a(j) = (a(j-1) \boxplus X_{(j-1)\pmod{8}})KR \xor b(j-1) \cr
+	 b(j) = a(j-1) \cr}}\right. $$
+
+$$ \for 1 \le j \le 24; $$
+
+$$ \left\{\vcenter{\halign{$\displaystyle{#}$ \cr
+	 a(j) = (a(j-1) \boxplus X_{(32 - j)})KR \xor b(j-1) \cr
+	 b(j) = a(j-1) \cr}}\right. $$
+
+$$ \for \ 25 \le j \le 31; $$
+
+$$ \left\{\vcenter{\halign{$\displaystyle{#}$ \cr
+	 a(32) = a(31) \cr
+	 b(32) = (a(31) \boxplus x_0)KR \xor b(31) \cr}}\right. $$
+
+for $j=32$, \par
+
+\noindent
+where $a(0)=(a_{32}(0), a_{31}(0), \ldots, a_1(0))$ --- the initial contents of $N_1$
+before the first round of enciphering; \par
+
+\noindent
+     $b(0)=(b_{32}(0), b_{31}(0), \ldots, b_1(0))$ --- the initial contents of $N_2$
+before the first round of enciphering; \par
+
+     $a(j)=(a_{32}(j), a_{31}(j), \ldots, a_1(j))$ --- the contents of $N_1$ after the $j${\th}
+round of enciphering; \par
+
+     $b(j)=(b_{32}(j), b_{31}(j), \ldots, b_1(j))$ --- the contents of $N_2$ after the $j${\th}
+round of enciphering,  $ 1 \le j \le 32$. \par
+
+     The symbol $\xor$ denotes the bitwise addition of 32-bit vectors
+modulo 2. \par
+
+     The symbol $\boxplus$ denotes addition of 32-bit vectors modulo
+$2^{32}$.  The rules of the addition modulo $2^{32}$ are given in 
+Appendix 4; \par
+
+     R --- cyclic shift towards the higher bits by 11 steps, as follows,
+
+%error% two adjacent equal signs in this formula
+$$ \eqalign{&R(r_{32}, r_{31}, r_{30}, r_{29}, r_{28}, r_{27}, r_{26}, r_{25}, r_{24}, r_{23}, r_{22}, r_{21}, r_{20}, \ldots, r_{2}, r_{1}) = \cr
+	    &= r(r_{31}, r_{30}, r_{29}, r_{28}, r_{27}, r_{26}, r_{25}, r_{24}, r_{23}, r_{22}, r_{21}, r_{20}, \ldots, r_{2}, r_{1}, r_{32}) \cr} $$
+
+%$$ r(r_{32}, r_{31}, r_{30}, r_{29}, r_{28}, r_{27}, r_{26}, r_{25}, r_{24}, r_{23}, r_{22}, r_{21}, r_{20}, \ldots, r_{2}, r_{1}) = $$
+%\vskip -.5ex
+%$$ = r(r_{31}, r_{30}, r_{29}, r_{28}, r_{27}, r_{26}, r_{25}, r_{24}, r_{23}, r_{22}, r_{21}, r_{20}, \ldots, r_{2}, r_{1}, r_{32}) $$
+
+\seclab{2.1.5}The 64-bit block of ciphertext $T_c$ is taken out of the
+registers $N_1$, $N_2$ in the following order: the 1{\st}, 2{\nd}, $\ldots$,
+32{\nd} bit of the register $N_1$, then the 1{\st}, 2{\nd},  $\ldots$, 32{\nd} bit of the register $N_2$, i.e.,
+
+      $$ T_c = (a_1(32), a_2(32), \ldots, a_{32}(32), 
+		b_1(32), b_2(32), \ldots, b_{32}(32)). $$ \par
+
+\endpage{6}%
+
+     The remaining blocks of plaintext in electronic codebook mode are
+enciphered in the same fashion.
+
+\seclab{2.2}Deciphering of the ciphertext in the simple substitution
+mode.
+
+\seclab{2.2.1}The deciphering operation in the electronic codebook
+mode is the same as that for enciphering (see Figure 2).  The same 
+256-bit key that was used for enciphering is loaded into the KMU.
+The ciphertext to be deciphered is divided into 64-bit blocks.
+The loading of a block
+
+      $$ T_c = (a_1(32), a_2(32), \ldots, a_{32}(32), 
+		b_1(32), b_2(32), \ldots, b_{32}(32)). $$
+
+into the registers $N_1$ and $N_2$ is done in such a way that the contents of $a_1(32)$
+are entered into the 1{\st} bit of $N_1$, the contents of $a_2(32)$ are entered into the
+2{\nd} bit of $N_1$ and so on, the contents of $a_{32}(32)$ are entered into the 32{\nd}
+bit of $N_1$; the contents of $b_1(32)$ are entered into the 1{\st} bit of $N_2$ and so
+on, and the contents of $b_{32}(32)$ are entered into the 32{\nd} bit of $N_2$.
+
+\seclab{2.2.2}The deciphering procedure uses the same
+algorithm as the enciphering of plaintext, with one exception:
+the contents of the registers $X_0, X_1, \ldots, X_7$ are read from 
+the KMU in the deciphering rounds in the following order:
+
+$$ \eqalign{&X_0, X_1, X_2, X_3, X_4, X_5, X_6, X_7, 
+	     X_7, X_6, X_5, X_4, X_3, X_2, X_1, X_0, \cr
+	    &X_7, X_6, X_5, X_4, X_3, X_2, X_1, X_0, 
+	     X_7, X_6, X_5, X_4, X_3, X_2, X_1, X_0. \cr} $$ \par
+
+\seclab{2.2.3}The equations for deciphering are:
+
+$$ \left\{\vcenter{\halign{$\displaystyle{#}$ \cr
+	 a(32-j) = (a(32-j+1) \boxplus X_{(j-1)})KR \xor b(32-j+1) \cr
+	 b(32-j) = a(32-j+1) \cr}}\right. $$
+
+$$ \for 1 \le j \le 8; $$
+
+$$ \left\{\vcenter{\halign{$\displaystyle{#}$ \cr
+	 a(32-j) = (a(32-j+1) \boxplus X_{(32-j)\pmod{8}})KR \xor b(32-j+1) \cr
+	 b(32-j) = a(32-j+1) \cr}}\right. $$
+
+$$ \for 9 \le j \le 31; $$
+
+$$ \left\{\vcenter{\halign{$\displaystyle{#}$ \cr
+	 a(0) = a(1) \cr
+	 b(0) = (a(1) \boxplus X_0)KR \xor b(1) \cr}}\right. $$
+
+for $j=32$, \par
+
+%note% changed the formula below to display
+\seclab{2.2.4}The contents of the registers $N_1$ and $N_2$ resulting
+from the 32 rounds comprise the block of plaintext 
+
+$$ T_p = (a_1(0), a_2(0), \ldots, a_{32}(0), b_1(0), b_2(0), \ldots, b_{32}(0)), $$
+
+corresponding to the block of ciphertext.
+\endpage{7}%
+Note: the contents of $a_1(0)$ from block $T_p$ correspond to the
+content of the 1{\st} bit of $N_1$, the contents of $a_2$(0)
+correspond to the contents of the 2{\nd} bit of $N_1$ and so on, the
+contents of $a_{32}(0)$ correspond to the contents of the 32{\nd} bit
+of $N_1$; the contents of $b_1(0)$ correspond to the contents of the
+1{\st} bit of $N_2$, the contents of $b_2(0)$ corresponds to the
+contents of the 2{\nd} bit of $N_2$ and so on, the contents of
+$b_{32}(0)$ corresponds to the contents of the 32{\nd} bit of $N_2$. \par
+
+     The remaining blocks of ciphertext are deciphered in the same
+way. \par
+
+\seclab{2.3}The enciphering algorithm in electronic codebook mode
+of the 64-bit block $T_p$ is denoted by $A$, so
+
+	$$ A(T_p) = A(a(0), b(0)) = (a(32), b(32)) = T_c. $$
+
+\seclab{2.4}Electronic codebook mode is to be used for enciphering
+(deciphering) data only in the cases described in 1.7.
+
+\section{3}{Output Feedback Mode.}
+
+\seclab{3.1}Enciphering plaintext in the output feedback mode.
+
+\seclab{3.1.1}The operation of the enciphering algorithm in output 
+feedback mode is shown in Figure 3. \par
+
+     The plaintext, divided into 64-bits blocks $T_p^{(1)}, T_p^{(2)},
+\ldots, T_p^{(M-1)}, T_p^{(M)}$, is enciphered in the output feedback
+mode by bitwise addition modulo 2 in the adder $\SM_5$ to the
+keystream $\Gamma_c$, which is produced in the 64-bit blocks
+
+$$ \Gamma_c = (\Gamma_c^{(1)}, \Gamma_c^{(2)}, \ldots, \Gamma_c^{(M-1)}, \Gamma_c^{(M)}), $$
+
+where $M$ is determined by the quantity of data to be enciphered.
+\par
+
+     $\Gamma_c^{(i)}$ is the $i${\th} 64-bit block, $1 \le i \le M$.
+If the number of bits in the block $T_p^{(M)}$ is be less than 64, the
+part of the keystream not used for enciphering from the block
+$\Gamma_c^{(M)}$ is discarded.
+
+\seclab{3.1.2}The 256 bits of key are entered into the KMU.  The 
+64-bit binary sequence (initialization vector) $S=(S_1, S_2, \ldots,
+S_{64})$ is entered into the registers $N_1$, $N_2$.  This sequence is
+the initial contents of these registers for the subsequent production
+of $M$ blocks of keystream.  The initialization vector is entered into
+$N_1$ and $N_2$ so that the value of $S_1$ is entered into the 1{\st}
+bit of $N_1$, value of $S_2$ is entered into the 2{\nd} bit of $N_1$,
+etc., the value of $S_{32}$ is entered into the 32{\nd} bit of $N_1$,
+the value of $S_{33}$ is entered into the 1{\st} bit of $N_2$, the
+value of $S_{34}$ is entered into the 2{\nd} bit of $N_2$, etc., the
+value of $S_{64}$ is entered into the 32{\nd} bit of $N_2$.
+
+\seclab{3.1.3}The initial contents of the registers $N_1$ and $N_2$
+(the initialization vector $S$) is enciphered in electronic codebook
+mode as described in 2.1.  The result of enciphering $A(S) = (Y_0,
+Z_0)$ is copied into the 32-bit registers $N_3$ and $N_4$ so that the
+contents
+\endpage{8}%
+of $N_1$ are copied into $N_3$, and contents of $N_2$ into $N_4$.
+
+\seclab{3.1.4}The contents of the register $N_4$ are added modulo 
+$(2^{32}-1)$ in the adder $\SM_4$ with the 32-bit constant $S_1$ from
+the register $N_6$; the result is copied into $N_4$.  The rules for
+addition modulo $(2^{32}-1)$ are given in Appendix 4.  The contents of
+the register $N_3$ are added modulo $2^{32}$ in the adder $\SM_3$ with
+the 32-bit constant $S_2$ from the register $N_5$; the result is
+copied into $N_3$. \par
+
+\figure{3}{\hbox to \hsize{\vbox to 1truein{}}}%
+
+%question% Are these Ns in the right order?
+     The contents of $N_4$ are copied into $N_1$, and the contents of $N_3$
+into $N_2$, so that the contents of $N_3$ and $N_4$ are preserved. \par
+
+     The contents of $N_1$ and $N_2$ are enciphered in electronic
+codebook mode as described in 2.1.  The results
+\endpage{9}%
+of enciphering the contents of $N_1$, $N_2$ comprise the first
+64-bit block of the keystream $\Gamma_c^{(1)}$, which is then added
+bitwise modulo 2 in the adder $\SM_5$ to the first 64-bit block of
+plaintext
+
+$$ T_p^{(1)} = (t_1^{(1)}, t_2^{(1)}, \ldots, t_{63}^{(1)}, t_{64}^{(1)}). $$
+
+The result is the 64-bit block of ciphertext $T_c^{(1)} =
+(\tau_1^{(1)}, \tau_2^{(1)}, \ldots, \tau_{63}^{(1)}, \tau_{64}^{(1)})$. \par
+
+     The value $\tau_1^{(1)}$ of the $T_c^{(1)}$ block is the result of addition modulo 2
+in $\SM_5$ of the value $\tau_1^{(1)}$ from the $T_p^{(1)}$ block with the value of the 1{\st} bit
+of $N_1$; the value $\tau_2^{(1)}$ of the $T_c^{(1)}$ block is the result of addition modulo
+2 in $\SM_5$ of the value $\tau_2^{(1)}$ from the $T_p^{(1)}$ block with the value of the 2{\nd}
+bit of $N_1$ and so on, the value of $\tau_{64}^{(1)}$ of the $T_p^{(1)}$ block --- addition of $\tau_{64}^{(1)}$
+with the value of the 32{\nd} bit of $N_2$. \par
+
+     3.1.5. For the next 64-bit block of the keystream $\Gamma_c^{(2)}$ the
+contents of $N_4$ are added modulo $(2^{32}-1)$ in the adder $\SM_4$ with the
+constant $S_1$ from $N_6$, the contents $N_3$ are added modulo $2^{32}$ in the
+adder $\SM_3$ with the constant $S_3$ from $N_5$.  The new contents of $N_3$ are
+copied into $N_1$, and the new contents of $N_4$ are copied into $N_2$, so the
+contents of $N_3$, $N_4$ are unchanged. \par
+
+%note% The original contains an erroneous paragraph break after the 
+     % formula $\Gamma_c^{(3)}, \Gamma_c^{(4)}, \ldots, \Gamma_c^{(M)}$
+
+     The combined contents of $N_1$ and $N_2$ are enciphered in the simple
+substitution mode as described in 2.1.  The result
+of enciphering the contents of $N_1$, $N_2$ comprises the second 64-bit
+block of keysteam $\Gamma_c^{(2)}$, which is then added bitwise
+modulo 2 in the adder $\SM_5$ with the second block of plaintext
+$T_p^{(2)}$.  The blocks of keystream
+ $\Gamma_c^{(3)}, \Gamma_c^{(4)}, \ldots, \Gamma_c^{(M)}$
+are produced and the blocks of plaintext 
+$T_p^{(3)}, T_p^{(4)}, \ldots, T_p^{(M)}$
+are enciphered in the same way. \par
+
+     If the length of the last plaintext block $M$ is less than 64
+bits, then from the last, $M${\th}, block of the keystream
+$\Gamma_c^{(M)}$ only the corresponding number of bits of keystream are
+used for enciphering, the remaining bits are discarded. \par
+
+\seclab{3.1.6}The initialization vector $S$ and the blocks of ciphertext
+$T_c^{(1)}, T_c^{(2)}, \ldots, T_{c}^{(M)}$.
+are transferred to the communication channel or to the memory of the 
+computer. \par
+
+\seclab{3.1.7}The equation for enciphering is:
+
+$$ \eqalign{&T_c^{(i)} = A(Y_{i-1} \boxplus S_2, Z_{i-1} \boxplus' S_1) \xor T_p^{(i)} = \Gamma_c^{(i)} \xor T_p^{(i)}, \cr
+	    &1 \le i \le M \cr} $$
+
+where $\boxplus'$ denotes the addition modulo $(2^{32}-1)$ of the 32-bit
+contents; \par
+
+\endpage{10}%
+
+      $\xor$ --- bitwise addition modulo 2 of the two contents; \par
+
+      $Y_i$ --- the contents of the register $N_3$ after enciphering the
+$i${\th} block of plaintext $T_p^{(i)}$; \par
+
+       $Z_i$ --- the contents of the register $N_4$ after enciphering the
+$i${\th} block of plaintext $T_p^{(i)}$; \par
+
+	$$ (Y_0, Z_0) = A(S). $$
+
+\seclab{3.2}Deciphering of ciphertext in the output feedback mode.
+
+\seclab{3.2.1}The deciphering operation is the same as the
+enciphering operation (see Figure 3).  The 256 bits of key that were used for enciphering 
+the data $T_p^{(1)}, T_p^{(2)}, \ldots, T_p^{(M)}$
+are entered into the KMU. The initialization vector $S$ is entered into the 
+registers $N_1$ and $N_2$, and, in analogy to 3.1.2--3.1.5 the 
+process of the $M$ blocks of the keystream
+$\Gamma_c^{(1)}, \Gamma_c^{(2)}, \ldots, \Gamma_c^{(M))}$
+production is performed.  The blocks of ciphertext 
+$T_c^{(1)}, T_c^{(2)}, \ldots, T_c^{(M)}.$
+are added bitwise modulo 2 in the adder
+$\SM_5$ with the blocks of the keystream.  As the result, blocks of plaintext
+$T_p^{(1)}, T_p^{(2)}, \ldots, T_p^{(M)}.$
+are recovered, and $T_p^{(M)}$ may contain less than 64 bits.
+
+\seclab{3.2.2}The equation for deciphering is:
+
+$$ \eqalign{&T_p^{(i)} = A(Y_{i-1} \boxplus S_2, Z_{i-1} \boxplus' S_1) \xor T_c^{(i)} = \Gamma_c^{(i)} \xor T_c^{(i)}, \cr
+	    &1 \le i \le M \cr} $$
+
+\section{4}{Cipher Feedback Mode.}
+
+\seclab{4.1}Enciphering plaintext in cipher feedback mode.
+
+\seclab{4.1.1}The operation of the enciphering algorithm in
+cipher feedback mode is shown in Figure 4. \par
+
+     The plaintext, divided into 64-bit blocks 
+$T_p^{(1)}, T_p^{(2)}, \ldots, T_p^{(M)}$,
+is enciphered in cipher feedback mode by bitwise addition
+modulo 2 in the adder $\SM_5$ with the keystream $\Gamma_c$, which is
+produced as 64-bit blocks, 
+$(\Gamma_c^{(1)}, \Gamma_c^{(2)}, \ldots, \Gamma_c^{(M)})$,
+where $M$ is determined by the quantity of plaintext and 
+$\Gamma_i^{(i)}$ is the $i${\th} 64-bit block,
+$1 \le i \le M$.  The number of bits in the block $T_p^{(M)}$ may be less than 64. \par
+
+\seclab{4.1.2}The 256 bits of key are entered into the KMU.  The 64-bit
+initialization vector, $S=(S_1, S_2, \ldots, S_{64})$, is entered into $N_1$ and 
+$N_2$ as described in 3.1.2. \par
+
+\endpage{11}
+
+\figure{4}{\hbox to \hsize{\vbox to 1truein{}}}%
+
+\seclab{4.1.3}The initial contents of $N_1$ and $N_2$ are enciphered
+in the simple substitution mode as described in 2.1.  The results of 
+enciphering the contents $N_1$ and $N_2$ comprise the first 64-bit
+block of the keystream $\Gamma_c^{(1)} = A(S)$, which is added bitwise
+modulo 2 in the adder $\SM_5$ to the first 64-bit block of plaintext 
+$T_p^{(1)} = (t_1^{(1)}, t_2^{(1)}, \ldots, t_{64}^{(1)}).$ \par
+
+     The result is the 64-bit block of ciphertext
+
+$$ T_c^{(1)} = (\tau_1^{(1)}, \tau_2^{(1)}, \ldots, \tau_{64}^{(1)}). $$
+
+\seclab{4.1.4}The block of ciphertext $T_c^{(1)}$ is, simultaneously,
+the initial contents of $N_1$, $N_2$ for the production of the second
+block of the keystream $\Gamma_c^{(2)}$ and, by feedback, is loaded
+into the registers noted above.  The contents of $\tau_1^{(1)}$ are
+entered into the 1{\st} bit of $N_1$, the contents of $\tau_2^{(1)}$
+are entered into the 2{\nd} bit of $N_1$, and so on; the contents of
+$\tau_{32}^{(1)}$ into the 32{\nd} bit of $N_1$; $\tau_{33}^{(1)}$
+into the 1{\st} bit of 
+\endpage{12}%
+$N_2$, $\tau_{34}^{(1)}$ 2{\nd} bit of $N_2$, and so on;
+$\tau_{64}^{(1)}$ 32{\nd} bit of $N_2.$ \par
+
+     The contents of $N_1$, $N_2$ are enciphered in the electronic
+codebook mode according to the requirements of 2.1.  The result of
+enciphering the contents of $N_1$, $N_2$ comprises the second 64-bit
+block of the keystream $\Gamma_c^{(2)}$, which is then added bitwise
+modulo 2 in the adder $\SM_5$ with the second block of plaintext
+$T_c^{(2)}$. \par
+
+     The rest of the blocks of the keystream $\Gamma_c^{(i)}$ are
+produced and the corresponding blocks of plaintext $T_p^{(i)} (3 \le i
+\le M)$ are encrypted analogously.  If the length of the last,
+$M${\th}, block of plaintext $T_p^{(M)}$ is less than 64 bits, then
+from $\Gamma_c^{(M)}$ only the corresponding number of keystream bits
+are used and the rest are discarded.
+
+\seclab{4.1.5}The equations for the cipher feedback mode are:
+
+$$ \eqalign{&T_c^{(1)} = A(S) \xor T_p^{(1)} = \Gamma_c^{(1)} \xor T_p^{(1)} \cr
+	    &T_c^{(i)} = A(T_c^{(i-1)}) \xor T_p^{(i)} = \Gamma_c^{(i)} \xor T_p^{(i)} \qquad 1 \le i \le M \cr} $$
+
+\seclab{4.1.6}The initialization vector $S$ and blocks of ciphertext 
+$T_c^{(1)}, T_c^{(2)}, \ldots, T_c^{(M)}$, are transferred
+into the communications channel or the memory of the computer.
+
+\seclab{4.2}Deciphering of ciphertext in the cipher feedback mode.
+
+\seclab{4.2.1}The deciphering operation is the same as the 
+enciphering operation (see Figure 4). \par
+
+     The same 256 bits of key that were used for enciphering 
+$T_p^{(1)}, T_p^{(2)}, \ldots, T_p^{(M)}$.
+are entered into the KMU.  The initialization vector $S$ is entered into $N_1$ and
+$N_2$ just as described in 3.1.2.
+
+\seclab{4.2.2}The initial contents of $N_1$, $N_2$ (initialization vector $S$) is
+enciphered in the electronic codebook mode according to 2.1.  The result of 
+enciphering the contents of $N_1, N_2$ comprise the first
+block of the keystream $\Gamma_c^{(1)} = A(S)$, which is then added bitwise
+modulo 2 in the adder $\SM_5$ with the block of ciphertext $T_c^{(1)}$. 
+The result is the first block of plaintext $T_p^{(1)}$.
+
+\seclab{4.2.3}Block of ciphertext $T_c^{(1)}$ is the initial 
+contents of $N_1$, $N_2$ for the production of the second block of
+keystream $\Gamma^{(2)}$.  
+Block $T_c^{(1)}$ is recorded into $N_1$, $N_2$ according to the 
+requirements of 4.1.4.  The received contents of $N_1$, $N_2$ are enciphered in 
+the electronic codebook mode according to the requirements of 2.1, 
+received in the result block $\Gamma_c^{(2)}$ is added bitwise
+\endpage{13}%
+modulo 2 in the adder $\SM_5$ with the second block of ciphertext
+$T_c^{(2)}$.  The result is plaintext block $T_c^{(2)}$. \par
+
+     In the same way, the blocks of ciphertext $T_c^{(2)}, T_c^{(3)},
+\ldots, T_c^{(M-1)}$, from which the blocks of keystream
+$\Gamma_c^{(3)}, \Gamma_c^{(4)}, \ldots, \Gamma_c^{(M)}$ are derived
+in electronic codebook mode, are entered into $N_1$, $N_2$, one by
+one. \par
+
+    The blocks of keystream are added bitwise by modulo 2 addition in
+the adder $\SM_5$ with blocks of enciphered data $T_c^{(3)},
+T_c^{(4)}, \ldots, T_c^{(M)}$ producing blocks of plaintext data
+$T_p^{(3)}, T_p^{(4)}, \ldots, T_p^{(M)}$.  The last block $T_p{(M)}$
+may contain fewer than 64 bits.
+
+\seclab{4.2.4}The equations of decipherment in CFB have the form
+
+$$ T_p^{(1)} = A(S) \xor T_c^{(1)} = \Gamma_c^{(1)} \xor T_c^{(1)} $$
+
+$$ T_p^{(i)} = A(T_c^{(i-1)}) \xor T_c^{(i)}
+	     = \Gamma_c^{(i)} \xor T_c^{(i)}, 2 \le i \le M $$
+
+$$ T_p^{(1)} = A(S) \xor T_c^{(1)} = \Gamma_c^{(1)} \xor T_c^{(1)} $$
+
+
+\section{5}{Message Authentication Mode}
+
+\seclab{5.1}To insure the authenticity of the plaintext,
+consisting of $M$ 64-bit blocks $T_p^{(1)}, T_p^{(2)}, \ldots,
+T_p^{(M)}, M \ge 2$, the additional $l$-bit block (message
+authentication code $I$) is produced.  The process of producing
+the message authentication code is the same for all modes of
+enciphering.
+
+\seclab{5.2}The first block of plaintext
+
+%$$ \displaylines{T_p^{(1)} = \bigl(t_1^{(1)}, t_2^{(1)}, \ldots,
+%							t_{64}^{(1)}
+%	a_1^{(1)}(0), a_2^{(1)}(0), \ldots, a_{32}^{(1)}(0),\cr
+%	b_1^{(1)}(0), b_2^{(1)}(0), \ldots, b_{32}^{(1)}(0)
+%							\bigr)\cr} $$
+
+$$ \eqalign{T_p^{(1)} = \bigl(t_1^{(1)}, t_2^{(1)}, \ldots,
+						t_{64}^{(1)}\bigr)
+	= \bigl(&a_1^{(1)}(0), a_2^{(1)}(0), \ldots, a_{32}^{(1)}(0),\cr
+	        &b_1^{(1)}(0), b_2^{(1)}(0), \ldots, b_{32}^{(1)}(0)
+							\bigr)\cr} $$
+
+is stored in $N_1$ and $N_2$, so that the contents of 
+$t_1^{(0)} = a_1^{(0)}(0)$
+are entered into the 1{\st} bit of $N_1$, the contents of
+$t_2^{(0)} = a_2^{(0)}(0)$
+are entered into the 2{\nd} bit of $N_1$ and so on; the contents of
+$t_{32}^{(0)} = a_{32}^{(0)}(0)$
+are entered into the 32{\nd} bit of $N_1$; the contents of
+$t_{33}^{(0)} = b_1^{(0)}(0)$
+are entered into the 1{\st} bit of $N_2$, etc.; the contents of 
+$t_{64}^{(0)} = b_{32}^{(0)}(0)$
+are entered into the 32{\nd} bit of $N_2$.
+
+\seclab{5.3}$N_1$ and $N_2$ are transformed according to the first
+16 rounds of enciphering in electronic codebook mode
+(see Section 2.1).  Note: The KMU contains the same key that was
+used to encipher the blocks of plaintext
+$T_p^{(1)}, T_p^{(2)}, \ldots, T_p^{(M)}$
+into the corresponding blocks of the ciphertext
+$T_c^{(1)}, T_c^{(2)}, \ldots, T_c^{(M)}$. \par
+
+     The result after 16 cycles of enciphering $N_1$ and $N_2$,
+$\bigl(a_1^{(1)}(16), a_2^{(1)}(16), \ldots, a_{32}^{(1)}(16), 
+b_1^{(1)}(16), b_2^{(1)}(16), \ldots, b_{32}^{(1)}(16)\bigr)$,
+\endpage{14}%
+is added in $\SM_5$ by modulo 2 addition with the second block
+$T_p^{(2)} = \bigl(t_1^{(2)}, t_2^{(2)}, \ldots, t_{64}^{(2)}\bigr)$
+\par
+
+     The result of the addition
+
+$$ \displaylines{%
+ \bigl(a_1^{(1)}(16) \xor t_1^{(2)}, a_2^{(1)}(16) \xor t_2^{(2)}, \ldots, 
+  a_{32}^{(1)}(16) \xor t_{32}^{(2)}, \hfill \cr
+  b_1^{(1)}(16) \xor t_{33}^{(2)}, b_2^{(1)}(16) \xor t_{34}^{(2)}, \ldots, 
+  b_{32}^{(1)}(16) \xor t_{64}^{(2)}\bigr) = \hfill \cr
+  = \bigl(a_1^{(2)}(0), a_2^{(2)}(0), \ldots, a_{32}^{(2)}(0), 
+     b_1^{(2)}(0), b_2^{(2)}(0), \ldots, b_{32}^{(2)}(0)\bigr) \hfill \cr} $$
+
+is loaded into $N_1$ and $N_2$ and is transformed by the first
+16 cycles of enciphering in electronic codebook mode. \par
+
+    The resulting contents of $N_1$ and $N_2$ are added modulo 2 in
+the adder $\SM_5$ with the third block $T_p^{(3)}$ and so on, until the
+last block $T_p^{(M)} = (t_1^{(M)}, t_2^{(M)}, \ldots, t_{64}^{(M)})$,
+which must be padded to a full 64-bit block with zeros is added modulo 2
+in $\SM_5$ to the registers $N_1$, $N_2$
+$\bigl(a_1^{(M-1)}(16), a_2^{(M-1)}(16), \ldots, a_{32}^{(M-1)}(16), 
+  b_1^{(M-1)}(16), b_2^{(M-1)}(16), \ldots, b_{32}^{(M-1)}(16)\bigr)$. \par
+
+     The result of the addition
+
+$$ \displaylines{\bigl(a_1^{(M-1)}(16) \xor t_1^{(M)}, a_2^{(M-1)}(16) \xor t_2^{(M)}, \ldots, a_{32}^{(M-1)}(16) \xor t_{32}^{(M)}, \hfill\cr
+  b_1^{(M-1)}(16) \xor t_{33}^{(M)}, b_2^{(M-1)}(16) \xor t_{34}^{(M)}, \ldots, b_{32}^{(M-1)}(16) \xor t_{64}^{(M)}\bigr) \hfill\cr
+  = \bigl(a_1^{(M)}(0), a_2^{(M)}(0), \ldots, a_{32}^{(M)}(0), 
+     b_1^{(M)}(0), b_2^{(M)}(0), \ldots, b_{32}^{(M)}(0)\bigr) \hfill \cr} $$
+
+is written in $N_1$, $N_2$ and is enciphered in electronic codebook mode
+using the first 16 cycles of the algorithm.  From the resulting registers
+$N_1$ and $N_2$
+
+$$ \bigl(a_1^{(M)}(16), a_2^{(M)}(16), \ldots, a_{32}^{(M)}(16), 
+     b_1^{(M)}(16), b_2^{(M)}(16), \ldots, b_{32}^{(M)}(16)\bigr) $$
+
+the $l$-bit segment $I_l$ (message authentication code) is chosen
+to be:
+
+$$ I_l = [a_{32-l+1}^{(M)}(16), a_{32-l+2}^{(M)}(16), \ldots,
+					a_{32}^{(M)}(16)] $$ \par
+
+    This message authentication code $I_l$ is transfered into the
+communications channel or the memory of the computer at the end of the
+enciphered data: $T_c^{(1)}, T_c^{(2)}, \ldots, T_c^{(M)}, I_l$.
+
+\seclab{5.4}The received ciphertext $T_c^{(1)}, T_c^{(2)}, \ldots,
+T_c^{(M)}$ is deciphered and from the resulting blocks of plaintext
+the message authentication code $I_l'$ is produced (see 5.3), which
+then is compared with the message authentication code $I_l$,
+received with the enciphered data from the communications channel or
+the computer memory.  In case of a discrepancy between the two
+message authentication codes, the received blocks of plaintext
+$T_p^{(1)}, T_p^{(2)}, \ldots, T_p^{(M)}$ are considered inauthentic.
+\par
+
+\endpage{15}%
+
+     Production of the message authentication code $I_1$ ($I_1$') can
+be done either before encipherment (after decipherment) of the whole
+message, or in parallel with the encipherment (decipherment)
+blockwise.  The first blocks of the plaintext that take part in
+production of the message authentication code may contain auxiliary
+information (address part, time mark, initialization vector, etc.)
+and may not be enciphered.
+
+     The value of the parameter $l$ (the number of bits in the
+message authentication code) is determined by the cryptographic
+security requirements and makes the probability of accepting 
+inauthenic data $2^{-l}$. \par
+
+\par\vfill\supereject
+
+\appendix{1}{Explanatory}%
+	 {Terms used in this standard and their definitions.}
+
+\halign{#\hfil&\vtop{\baselineskip=12pt \hsize=2.5in\noindent#\vskip 1ex}\cr
+
+Algorithm	&GOST 19781 \cr
+
+Authentication	&Protection of the system of enciphered communication
+		 from introduction of inauthentic data. \cr
+
+Coding 		&Process of enciphering or deciphering. \cr
+
+Communication channel
+		&GOST 17657 \cr
+
+Cryptographic protection
+		&Protection of data by cryptographic transformation. \cr
+
+Cryptographic transformation
+		&Transformation of the data by enciphering and (or)
+		 generating a message authentication code. \cr
+
+Cryptosystem	&A set of invertable transformations of the set of
+		 possible plaintexts into the set of possible
+		 ciphertexts, performed according to specified rules
+		 using the keys. \cr
+
+Data		&GOST 15971 \cr
+
+Encipherment of data
+		&Process of transformating the plaintext into ciphertext
+ 		 using cryptographic algorithm. \cr
+
+Key		&Specified secret setting of some parameters of a
+		 cryptographic algorithm that provides the choice of one
+		 transformation out of the set of possible
+		 transformations. \cr
+
+Keystream	&Pseudo-random binary sequence generated by a
+		 specified algorithm for enciphering plaintext
+		 and deciphering ciphertext. \cr
+
+Message Authentication Code
+		&A segment of information of fixed length, generated
+		 by a special rule from the plaintext and a key, and
+		 attached to the enciphered data, providing
+		 authentication. \cr
+
+Output Feedback	&Process of masking the plaintext with the keystream
+		 generated by feeding the output of the cryptographic
+		 system back to its input. \cr
+
+\endpage{16}% occurs in the middle of a table
+
+Deciphering of data
+		&Process of transformation of the ciphertext into plaintext
+		 using a cryptosystem. \cr
+
+Initialization vector
+		&Values of the initial open parameters of the
+		 cryptographic transformation algorithm. \cr
+
+Equation of enciphering
+		&Expression of the generation process of the
+		 ciphertext from the plaintext as the result of
+		 transformations defined by the cryptographic
+		 transformation algorithm. \cr
+
+Equation of deciphering
+		&Expression of the generation process of the plaintext
+		 from the enciphered data as the result of
+		 transformations defined by the algorithm of the
+		 cryptographic transformation. \cr}
+
+\appendix{2}{Obligatory}{The Constants $S_1, S_2$}%
+
+\seclab{1}Constant $S_1$ is
+
+$$ \tabskip=0pt \offinterlineskip
+\def\lft#1{#1\hfil}\def\ctr#1{\hfil\thinspace#1\thinspace\hfil}
+\halign{\strut\lft{#}\qquad\vrule&
+	\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&
+	\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&
+	\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}\cr
+ Bit of Register $N_6$&32&31&30&29&28&27&26&25&24&23&22&21&20&19&18&17\cr
+ Value of Bit         & 0& 0& 0& 0& 0& 0& 0& 1& 0& 0& 0& 0& 0& 0& 0& 1\cr
+ \noalign{\vskip1ex\hrule\vskip1ex}
+ Bit of Register $N_6$&16&15&14&13&12&11&10& 9& 8& 7& 6& 5& 4& 3& 2& 1\cr
+ Value of Bit         & 0& 0& 0& 0& 0& 0& 0& 1& 0& 0& 0& 0& 0& 1& 0& 0\cr} $$
+
+\seclab{2}Constant $S_2$ is
+
+$$ \tabskip=0pt \offinterlineskip
+\def\lft#1{#1\hfil}\def\ctr#1{\hfil\thinspace#1\thinspace\hfil}
+\halign{\strut\lft{#}\qquad\vrule&
+	\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&
+	\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&
+	\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}&\ctr{#}\cr
+ Bit of Register $N_5$&32&31&30&29&28&27&26&25&24&23&22&21&20&19&18&17\cr
+ Value of Bit         & 0& 0& 0& 0& 0& 0& 0& 1& 0& 0& 0& 0& 0& 0& 0& 1\cr
+ \noalign{\vskip1ex\hrule\vskip1ex}
+ Bit of Register $N_5$&16&15&14&13&12&11&10& 9& 8& 7& 6& 5& 4& 3& 2& 1\cr
+ Value of Bit         & 0& 0& 0& 0& 0& 0& 0& 1& 0& 0& 0& 0& 0& 0& 0& 1\cr} $$
+
+\endpage{17}%
+
+\par\vfill\supereject
+
+\appendix{3}{Explanatory}%
+	 {Flowcharts for Software Implementation of the
+	  Cryptographic Transformation Algorithm}%
+
+\figure{5}{\hbox to \hsize{\vbox to 1truein{%
+           \vskip 1ex
+	   \centerline{1. Flowchart for one round of enciphering}%
+% 				Round (j1)
+% 				. . . . .
+% 			Divide  SM1 and R onto 8 parts 
+% 			4 bits each (. . . . . . . .)
+% 				. . . . .
+% 			Present SM1m as a number from
+% 			0 to 15 . . . . . . . . . . .
+% 				Substitution. . .
+% 				. . . . . . . .
+% 			No
+% 
+% 				
+% 				yes 
+% 		Cyclic shift R by 11 bits toward the 
+% 			higher bits.
+% 			. . . . . . . . 
+% 			RETURN
+% 
+	   \vfill}}}%
+
+\endpage{18}%
+
+ \figure{6}{\hbox to \hsize{\vbox to 1truein{%
+            \vskip 1ex
+            \centerline{2. Flowchart for 32 rounds of enciphering}%
+ % 			Round . . . .
+ % 
+ % for the rest: `Hem' means `No';  `Aa' (Da) means `Yes',
+ % \mu u k \Lambda means `round'
+           \vfill}}}%
+
+ \figure{7}{\hbox to \hsize{\vbox to 1truein{%
+            \vskip 1ex
+            \centerline{3. Flowchart for 32 rounds of deciphering}%
+            \vfill}}}%
+
+\endpage{19}%
+
+\figure{8}{\hbox to \hsize{\vbox to 1truein{%
+	   \raggedcenter 4. Flowchart for enciphering algorithm in
+			    electronic codebook mode
+% 			Begin
+% 			Fill KMU
+% 			Any data?   No
+% 			    Yes	      End
+% 			Round 32-3
+	   \vfil}}}%
+
+\figure{9}{\hbox to \hsize{\vbox to 1truein{%
+           \vskip 1ex
+	   \centerline{5. Flowchart for deciphering algorithm in
+			  electronic codebook mode}%
+% 			Begin
+% 			Fill KMU
+% 			Any data?   No
+% 			     Yes      End
+% 			Round 32-p
+	   \vfill}}}%
+
+\endpage{20}%
+
+\figure{10}{\hbox to \hsize{\vbox to 1truein{%
+            \vskip 1ex
+	    \centerline{6. Flowchart for enciphering algorithm in
+			   output feedback mode}%
+% 			Begin
+% 			Fill KMU
+% 			Enter S.....
+% 			Round  32-3
+% 
+% 			. . . . . .
+% 
+% 			Any data?   No
+% 			     Yes
+% 			Round 32-3   End
+	   \vfill}}}%
+
+\figure{11}{\hbox to \hsize{\vbox to 1truein{%
+            \vskip 1ex
+	   \centerline{7. Flowchart for deciphering algorithm in
+			   output feedback mode}%
+% 			<Same as above>
+	   \vfill}}}%
+
+\endpage{21}%
+
+\figure{12}{\hbox to \hsize{\vbox to 1truein{%
+            \vskip 1ex
+            \centerline{8. Flowchart for enciphering algorithm in
+			  cipher feedback mode}%
+% 			<Same wording as above>
+	   \vfill}}}%
+
+\figure{13}{\hbox to \hsize{\vbox to 1truein{%
+            \vskip 1ex
+	   \centerline{9. Flowchart for deciphering algorithm in
+			  cipher feedback mode}%
+% 			<Same wording as above>
+	   \vfill}}}%
+
+\endpage{22}%
+
+\figure{14}{\hbox to \hsize{\vbox to 1truein{%
+            \vskip 1ex
+	   \raggedcenter{10. Flowchart for cryptographic transformation
+			   for generating the message authentication
+			   code}% 
+% 			<Same, except the rightmost branch:>
+% 				i=2	Yes
+% 						Mistake
+% 				No
+% 				Extract the bits . . . 
+% 					from N1
+% 				End
+	   \vfill}}}%
+
+\endpage{23}%
+
+\par\vfill\supereject
+
+\appendix{4}{Explanatory}
+	 {Rules of Addition Modulo $2^{32}$, and $2^{32}-1$}
+
+\seclab{1}Two whole numbers $a$, $b$, where $0 < a,b < 2^{32}-1$, 
+represent binary numbers
+
+	$$ a = (a_{32}, a_{31}, \ldots, a_2, a_1), 
+	   b = (b_{32}, b_{31}, \ldots, b_2, b_1), $$
+
+
+that is, $a = a_{32}\cdot2^{31} + a_{31}\cdot2^{30}+ \cdots + a_2
+\cdot 2 + a_1, b = b_{32}\cdot2^{31} + b_{31}\cdot2^{30}+ \cdots +
+b_2 \cdot 2 + b_1$.
+are added modulo $2^{32}$ (operation $\boxplus$) by the following
+rule:
+
+$$ a \boxplus b = a + b, {\rm \ if\ } a+b < 2^{32}, $$
+
+$$ a \boxplus b = a + b - 2^{32}, {\rm \ if\ } a+b \ge 2^{32}, $$
+
+where the operation $+(-)$ is the arithmetic sum (difference)
+of 2 whole numbers.
+
+\seclab{2}Two whole numbers $a$, $b$, where $0 < a,b < 2^{32}-1$,
+represent binary numbers $a = (a_{32}, a_{31}, \ldots, a_2, a_1),
+b = (b_{32},  b_{31}, \ldots, b_2, b_1)$,
+are added modulo $(2^{32}-1)$ (operation ($\boxplus'$) by the following
+rule:
+
+$$ a \boxplus b = a + b, {\rm \ if\ } a+b < 2^{32}, $$
+
+$$ a \boxplus b = a + b - 2^{32} + 1, {\rm \ if\ } a+b \ge 2^{32}, $$
+
+\endpage{24}%
+\par\vfill\supereject
+
+\centerline{Contents}
+
+\par\noindent
+1. Structure of the Cryptographic Transformation Algorithm.
+
+\par\noindent
+2. Electronic Codebook Mode.
+
+\par\noindent
+3. Output Feedback Mode.
+
+\par\noindent
+4. Cipher Feedback Mode.
+
+\par\noindent
+5. Message Authentication Mode
+
+\par\noindent
+Appendix 1. Terms used in this standard and their definitions.
+
+\par\noindent
+Appendix 2. The Constants $S_1, S_2$
+
+\par\noindent
+Appendix 3. Flowcharts for Software Implementation of the
+	    Cryptographic Transformation Algorithm
+
+\par\noindent
+Appendix 4. Rules of Addition Modulo $2^{32}$, and $2^{32}-1$
+\par
+
+\endpage{25}%
+
+\par\vfill\supereject
+
+\centerline{Information About the Standard}
+\vskip 2ex
+
+\noindent 1. Authors of the standard \par
+
+    I. A. Zabotin (project leader), G. P. Glazkov, V.B. Isaeva \par
+
+\noindent 2. Accepted and introduced into use by the action of the
+State Standards  Committee of the USSR on 2 June 89 as No. 1409. \par
+
+\noindent 3. To be reviewed in 1993 \par
+
+\noindent 4. Initial release. \par
+
+\noindent 5. Technical-standardization documents cited
+
+$$ \tabskip=0pt \offinterlineskip
+\halign{# \qquad &\vrule\qquad # \cr
+	\noalign{\vskip .5ex}
+	\noalign{\hrule}
+	\noalign{\vskip 1ex}
+	\ctr{Technical standards documents} &
+			\ctr{Number of the section, subsection,}\cr
+	\ctr{cited} & \ctr{or appendix} \cr
+	\noalign{\vskip .5ex}
+	\noalign{\hrule}
+	\noalign{\vskip 1ex}
+	\lft{GOST 19781---83} & \lft{Appendix 1} \cr
+	\lft{GOST 15971---84} & \lft{Appendix 1} \cr
+	\lft{GOST 17657---79} & \lft{Appendix 1} \cr} $$
+
+\vskip 1in
+
+\centerline{Editor: G. A. Ivashina}
+\centerline{Technical editor: L. Ya. Mitrofanova}
+\centerline{Proof reader: A. I. Zyuban}
+\vskip 1ex
+{\raggedcenter Submitted for typesetting 28 June 89, Approved for publication 29 Sep 89, 
+1.73 USL, P. L. 1., 1.73 USL, P. L. kr.-ott. 1.54 uch.-izd. l. \par}
+
+\centerline{800 Copies printed \hskip 1in Price 10 Kopecs}
+\vskip 1ex \hrule \vskip 1ex
+\centerline{Order of the Sign of Honor Standards printing office 123557 Moscow GSP}
+\centerline{Novopresmeiski Passage 3}
+\centerline{Kaluzhskaja Standards Typesetting Office  Moscow St. 256 Order No. 413 DSP}
+
+\bye

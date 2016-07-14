@@ -1,0 +1,540 @@
+\subsection{Privacy Enhanced Mail Functions} 
+
+\subsubsection{pem\_create}
+\nm{3X}{pem\_create}{Generate a PEM text}
+\label{pem_create}
+\hl{Synopsis}
+\#include $<$pem.h$>$ 
+
+RC {\bf pem\_create} {\em (info, in, pem)} \\
+OctetString {\em *in, *pem}; \\
+PemInfo {\em *info};
+\hl{Input-Parameter}
+\parname  {\em info}
+\pardescript {Signature and encryption control informations.} \\
+\parname  {\em in}
+\pardescript {Cleartext created by user, subject to
+		  privacy enhanced services.
+		  It may contain embedded (multiple) PEMs.}
+\hl{Output-Parameter}
+\parname  {\em pem}
+\pardescript {RFC 1421 specified text between the
+		  privacy enhanced message encapsulation boundary lines
+		  (included).
+		  The OctetString structure of {\em pem} is
+		  created by the calling function.
+		  However, the character string in {\em pem}
+		  is allocated by {\em pem\_create}.} 
+
+\parname  {\em Returncode RC}
+\pardescript {negative if erraneous, 0 if OK.}
+\hl{Description}
+pem\_create evaluates the structure PemInfo (info) and the cleartext (in),
+and creates the PEM text (pem):
+the resulting text is the RFC 1421 specified text between the
+privacy enhanced message encapsulation boundary lines (included).
+The signature and encryption control informations
+stored in a structure PemInfo serve as input to the pem\_create function.
+The storage of these control informations into a structure PemInfo
+is supported by pem\_cinfo, which can be performed
+before the call to pem\_create.
+Alternatively, pem\_cinfo can be called as first step inside of
+pem\_create.
+pem\_create performs the following steps:
+
+{\small
+\parname  {\em pem\_cinfo}
+\pardescript {optional: prepares PemInfo for input to the other
+		    pem\_c* subroutines. Can also be called prior
+		    to pem\_create} 
+
+
+\parname  {\em pem\_chd}
+\pardescript {write any of the encapsulated header titles
+		    (called by the other pem\_c* functions)}
+
+\parname  {\em pem\_cinit}
+\pardescript {create pem\pf octets and put Pre-EB and Proc-Type header into it} \\
+\parname  {\em pem\_cdek}
+\pardescript {append DEK-Info header to pem\pf octets} \\
+\parname  {\em pem\_csend}
+\pardescript {append Originator-ID, Certificate,
+		    Issuer-Certificate header} \\
+\parname  {\em pem\_sign}
+\pardescript {produce MIC: canonicalize msg body {\em in} and apply
+		    digital signature to it
+		    (use MIC production defined by RFC 1421)}
+
+\parname  {\em pem\_cmic}
+\pardescript {(encrypt and) encode MIC and append MIC-Info} \\
+\parname  {\em pem\_crec}
+\pardescript {append Recipient-ID, Key-Info
+		    (recipient keys in structure PemInfo are already encrypted,
+		    e.g. by pem\_cinfo)} 
+
+
+\parname  {\em CR--LF}
+\pardescript {append empty line (local form: one extra line feed)} \\
+\parname  {\em pem\_cbody}
+\pardescript {canonicalize, encrypt and encode msg body (from {\em in})
+		    and append} \\
+\parname  {\em pem\_cend}
+\pardescript {append Post-EB as last line}
+}
+
+\subsubsection{pem\_scan}
+\nm{3X}{pem\_scan}{Scan a PEM text}
+\label{pem_scan}
+\hl{Synopsis}
+\#include $<$pem.h$>$ 
+
+RC {\bf pem\_scan} {\em (info, set\_of\_pemcrlwithcerts, issuer, cbody, pem, no\_path\_verification)} \\
+PemInfo {\em *info}; \\
+SET\_OF\_PemCrlWithCerts {\em **set\_of\_pemcrlwithcerts}; \\
+SET\_OF\_DName 	{\em **issuer}; \\
+OctetString {\em *cbody, *pem}; \\
+Boolean {\em *no\_path\_verification};
+\hl{Input-Parameter}
+\parname  {\em pem}
+\pardescript {RFC 1421 specified text between the
+		    privacy enhanced message encapsulation boundary lines
+		    (included).
+		    If an embedded multi-level PEM is to be scanned,
+		    the first Pre-EB of the pem OctetString must be
+		    the Pre-EB of the embedded PEM to be scanned.
+		    pem\_sbody will automatically find the corresponding
+		    Post-EB (counting Pre-EBs up, and Post-EBs down).}
+
+\parname  {\em no\_path\_verification}
+\pardescript {If set to TRUE the forward certification path is not verified.}
+\hl{Output-Parameter}
+\parname  {\em info}
+\pardescript {Signature and encryption control information.
+		    The {\em PemInfo} structure of {\em info}
+		    is to be allocated by the calling function.
+		    However, the pointers below {\em info}:
+		    {\em encryptKEY}, {\em origcert}, {\em signAI},
+		    and {\em recplist}, are created by {\em pem\_scan}.
+		    The informations stored into {\em info} are a result of
+		    scanning the encapsulated header fields in {\em pem}.} 
+
+\parname  {\em cbody}
+\pardescript {Cleartext created by {\em pem\_scan} as result
+		    of scanning the input parameter {\em pem}
+		    and applying the control informations found in the
+		    encapsulated header fields on the message body.
+		    The OctetString structure of {\em out} is created by
+		    the calling function.
+		    The character string in {\em out}, however,
+		    is allocated by {\em pem\_scan}.} 
+
+\parname  {\em set\_of\_pemcrl...}
+\pardescript {Structure to store CRLs in case of Proc-Type CRL.} \\
+\parname  {\em issuer}
+\pardescript {Structure to store issuer names in case of Proc-Type CRL-RETRIEVAL-REQUEST.} \\
+\parname  {\em Returncode RC}
+\pardescript {negative if erraneous, 0 if OK.} \\
+\hl{Description}
+
+pem\_scan evaluates the PEM text (pem) and fills structure PemInfo (info)
+and creates the cleartext (out) by scanning the encapsulated header fields and
+decrypting the message body.
+The message body is decrypted with the help of a DES-key
+which is contained in the recipient-related Key-Info header fields,
+however RSA-encrypted.
+In order to find ``my'' corresponding Key-Info field,
+the input parameter ``my name'' is used
+to find ``my'' corresponding Recipient-ID header field.
+If the input parameter ``myname'' is not set,
+pem\_scan evaluates the caller's encryption certificate from the PSE.
+\\
+The returncode tells, if the MIC was correct.
+pem\_scan performs the following steps:
+
+{\small
+\parname  {\em pem\_find\_delim}
+\pardescript {find first empty line (CR--LF--CR--LF or, in local form LF--LF)
+		    which is interpreted as delimiting line between
+		    encapsulated header portion and PEM body.} 
+
+\parname  {\em pem\_get\_header}
+\pardescript {scan and interpret the header field} \\
+\parname  {\em af\_decrypt}
+\pardescript {if encrypted, decrypt the body of the message} 
+
+\parname  {\em aux\_canon}
+\pardescript {canonicalize the plaintext msg body} 
+
+\parname  {\em af\_verify}
+\pardescript {verify the MIC and the forward certification path} 
+
+\parname  {\em aux\_add\_alias}
+\pardescript {store an alias for the sender of the message} 
+
+\parname  {\em af\_pse\_add\_PK}
+\pardescript {add the public key into the PSE object {\bf PKList}} 
+
+}
+\subsubsection{pem\_get\_header}
+\nm{3X}{pem\_get\_header}{Scan a PEM text}
+\label{pem_get_header}
+\hl{Synopsis}
+\#include $<$pem.h$>$ 
+
+RC {\bf pem\_get\_header} {\em (info, set\_of\_pemcrlwithcerts, issuer, signature, buf)} \\
+PemInfo {\em *info}; \\
+SET\_OF\_PemCrlWithCerts {\em **set\_of\_pemcrlwithcerts}; \\
+SET\_OF\_DName 	{\em **issuer}; \\
+BitString {\em *signature}; \\
+OctetString {\em *buf};
+\hl{Input-Parameter}
+\parname  {\em buf}
+\pardescript {RFC 1421 specified text between the
+		    privacy enhanced message encapsulation boundary lines
+		    (included).
+		    If an embedded multi-level PEM is to be scanned,
+		    the first Pre-EB of the pem OctetString must be
+		    the Pre-EB of the embedded PEM to be scanned.
+		    pem\_sbody will automatically find the corresponding
+		    Post-EB (counting Pre-EBs up, and Post-EBs down).}
+
+\hl{Output-Parameter}
+\parname  {\em info}
+\pardescript {Signature and encryption control information.
+		    The {\em PemInfo} structure of {\em info}
+		    is to be allocated by the calling function.
+		    However, the pointers below {\em info}:
+		    {\em encryptKEY}, {\em origcert}, {\em signAI},
+		    and {\em recplist}, are created by {\em pem\_scan}.
+		    The informations stored into {\em info} are a result of
+		    scanning the encapsulated header fields in {\em pem}.} 
+
+\parname  {\em signature}
+\pardescript {Signature of the scaned PEM body which is encoded in the {\bf MIC } header field.
+                    The memory of the BitString structure
+                    {\em signature} is created by the calling function.} 
+
+\parname  {\em set\_of\_pemcrl...}
+\pardescript {Structure to store CRLs in case of Proc-Type CRL.} \\
+\parname  {\em issuer}
+\pardescript {Structure to store issuer names in case of Proc-Type CRL-RETRIEVAL-REQUEST.} \\
+\parname  {\em Returncode RC}
+\pardescript {negative if erraneous, 0 if OK.} \\
+\hl{Description}
+
+pem\_get\_header evaluates the PEM text {\em buf} and fills the structures PemInfo {\em info} and Bitstring {\em signature } or
+SET\_OF\_PemCrlWithCerts {\em set\_of\_pemcrlwithcerts} or SET\_OF\_DName {\em issuer} depending
+on then Proc-Type of the PEM message.
+
+\subsubsection{pem\_cinfo}
+\nm{3X}{pem\_cinfo}{Generate signature and encryption control info for/of PEM text}
+\label{pem_cinfo}
+\hl{Synopsis}
+\#include $<$pem.h$>$ 
+
+RC {\bf pem\_cinfo} {\em (info)} \\
+PemInfo {\em *info};
+\hl{Description}
+{\em pem\_cinfo} supports the collection of signature and
+encryption control informations and stores them into
+the structure PemInfo {\em info}.
+pem\_cinfo is either the first of pem\_create,
+or, alternatively, it is performed prior to the call of pem\_create.
+That is, because the full set of informations in the structure PemInfo
+serves as input to pem\_create and all pem\_c* subroutines.
+
+
+The parameter {\em info} is defined by the calling function.
+Some informations are already stored on input to pem\_cinfo.
+pem\_cinfo completes the set of informations.
+
+
+On input to pem\_cinfo, the subfields {\em confidential} and {\em clear}
+must be set. If {\em confidential} = TRUE,
+{\em recplist} of {\em info} must be created by calling function, too;
+in this {\em recplist},
+for every recipient's certificate, at least
+the owner's name {\em tbs.subject} must be set on input.
+
+
+On output, pem\_cinfo will have filled the subfields
+{\em encryptKEY} and,  for every recipient in {\em recplist}, {\em key}.
+If on input one or more of the elements
+{\em origcert, signAI}, or a recipient's public encryption key
+in {\em recpcert} (in recplist) were not filled,
+pem\_cinfo will provide these informations, too.
+For every recipient's certificate, pem\_cinfo tries also to collect the
+informations {\em tbs.issuer} and {\em tbs.serialnumber}
+from {\em EKList} of the caller's PSE or from a public directory.
+
+
+pem\_cinfo performs the following steps:
+
+\begin{enumerate}
+\item
+If {\em origcert} has no value on input,
+read the originator-certificate (struct Certificates)
+with the help of {\em af\_pse\_get\_Certificates}
+and store it in {\em origcert}.
+\item
+If {\em signAI} has no value on input,
+take the public key algorithm identifier
+from the user's certificate of {\em origcert}
+and store it in {\em signAI}.
+
+
+If PEM type is not ``ENCRYPTED'',
+set {\em info\pf encryptKEY} to {\em NULL} and return.
+If confidentiality service is required, resume with the following steps:
+\item
+Generate a DES-key with the help of
+af\_gen\_key and store it as key-reference in
+{\em info\pf encryptKEY}.
+\item
+If in a {\em recpcert} (of {\em recplist})
+the public encryption key has no value on input,
+search for it in the {\em EKList} of the caller's PSE
+with the help of {\em af\_pse\_get\_owner}
+and store it in this {\em recpcert} .
+If this fails, try to collect the recipient's certificate
+from a public directory with the help of {\em af\_dir\_retrieve\_Certificate}.
+If this also fails, or if
+in a {\em recpcert}
+the owner's name (tbs.subject) has no input value,
+delete this entry from the recplist.
+\item
+For every recipient in the {\em recplist},
+use his public encryption key in {\em recpcert}
+in order to RSA-encrypt the DES-key stored in
+{\em info\pf encryptKEY}
+(call to {\em af\_get\_EncryptedKey}) and store
+the result in {\em key} of the respective {\em recplist} entry.
+\end{enumerate}
+
+\subsubsection{pem\_read}
+\nm{3X}{pem\_read}{Read and scan a PEM text, and report errors to caller}
+\label{pem_read}
+\hl{Synopsis}
+\#include $<$pem.h$>$ 
+
+RC {\bf pem\_read} {\em (ifname, ofname, depth, verbose, cadir)} \\
+char {\em *ifname, *ofname, *cadir}; \\
+int {\em depth}; \\
+Boolean {\em verbose} \\
+\hl{Input-Parameter}
+\parname  {\em ifname}
+\pardescript {Pathname of the file
+		    which contains the PEM text.
+		    If {\em ifname} is the NULL pointer,
+		    the PEM text is read from stdin.}
+
+\parname  {\em ofname}
+\pardescript {Pathname of the file
+		    into which the cleartext message body is written.
+		    If {\em ofname} is the NULL pointer,
+		    the cleartext message body is written to stdout.}
+
+\parname  {\em depth}
+\pardescript {Integer greater or equal to zero.
+		    $depth = 0$ reads the outmost PEM
+		    (first Pre-EB, last Post-EB).
+		    $depth > 0$ reads the {\em depth}'th embedded PEM
+		    ($(depth+1)$st Pre-EB, $(last-depth)$th Post-EB).
+		    $depth < 0$ is treated like $depth = 0$.}
+
+\parname  {\em verbose}
+\pardescript {If TRUE, pem\_read tells to stderr what it's doing.} \\
+\parname  {\em cadir}
+\pardescript {The UNIX directory of the CA.}
+
+\hl{Output-Parameter}
+\parname  {\em Returncode RC}
+\pardescript {-1 if any error occured, 0 if no error occured.} \\
+\hl{Description}
+pem\_read reads the input file $<$ifname$>$,
+opens the output file $<$ofname$>$,
+and opens the caller's PSE ({\em af\_pse\_open}).
+Then it skips all characters of the read file before the
+$(depth+1)$st Pro-EB
+and calls the function {\em pem\_scan}.
+In normal case pem\_read writes the (decrypted) PEM body in cleartext into the output file.
+If the PEM message if of Proc-Type CRL-RETRIEVAL-REQUEST, a corresponding PEM CRL messsage
+containing the requested CRLs is written to the output file.
+pem\_read evaluates all possible error codes and reports
+them in readable form to stderr, if {\em verbose } is TRUE.
+In particular, pem\_read reports very clearly
+the result of the message integrity check MIC of the PEM.
+
+\subsubsection{pem\_write}
+\nm{3X}{pem\_write}{Create and write a PEM text}
+\label{pem_write}
+\hl{Synopsis}
+\#include $<$pem.h$>$ 
+
+RC {\bf pem\_write} {\em (recips, ifname, ofname, encr, clear, verbose)} \\
+RecpList {\em *recips}; \\
+char {\em *ofname, *ifname}; \\
+Boolean {\em encr, clear, verbose}; \\
+\hl{Input-Parameter}
+\parname  {\em recips}
+\pardescript {List of intended recipients, only evaluated,
+		    if PEM type is ``ENCRYPTED''
+		    (i.e. if  parameter {\em encr} is set to TRUE).
+		    In this case, at least the certificates' owners
+		    must be set. If the other entries of {\em recips}
+		    are set, too, they would be respected by the
+		    PEM creation process. Otherwise, their values
+		    will be collected during the
+		    PEM creation process.}
+
+\parname  {\em ifname}
+\pardescript {Pathname of the UNIX file
+		    which contains the cleartext message body.
+		    If {\em ifname} is the NULL pointer or ZERO string,
+		    the message body is read from stdin.}
+
+\parname  {\em ofname}
+\pardescript {Pathname of the UNIX file
+		    into which the created PEM is written.
+		    If {\em ofname} is the NULL pointer or ZERO string,
+		    the PEM is written to stdout.}
+
+\parname  {\em encr}
+\pardescript {Boolean, set to TRUE, iff the type of the PEM to be created
+		    is intended to be ``ENCRYPTED''.}
+
+\parname  {\em clear}
+\pardescript {Boolean, set to TRUE, iff the type of the PEM to be created
+		    is intended to be ``MIC-CLEAR''.
+		    If {\em encr} = TRUE, {\em clear} is ignored.}
+
+\parname  {\em verbose}
+\pardescript {If TRUE, pem\_write tells to stderr what it's doing.} \\
+\hl{Output-Parameter}
+\parname  {\em Returncode RC}
+\pardescript {-1 if any error occured, 0 if no error occured.} \\
+\hl{Description}
+pem\_write reads the input file $<$ifname$>$,
+opens the output file $<$ofname$>$,
+and opens the caller's PSE ({\em af\_pse\_open}).
+A PemInfo structure is created, filled with the input parameters
+to pem\_write, and passed to the called function {\em pem\_cinfo},
+which completes the values for PemInfo.
+With these informations, {\em pem\_create} is called.
+pem\_write writes the created PEM into the output file.
+pem\_write evaluates all possible error codes and reports
+them in readable form to stderr if {\em verbose} is TRUE.
+
+\subsubsection{pem\_crl\_retrieval\_request}
+\nm{3X}{pem\_crl\_retrieval\_request}{Creates a PEM text of Proc-Type CRL-RETRIEVAL-REQUEST, and report errors to caller}
+\label{pem_crl_retrieval_request}
+\hl{Synopsis}
+\#include $<$pem.h$>$ 
+
+RC {\bf pem\_crl\_retrieval\_request} {\em (issuer, pem)} \\
+SET\_OF\_DName {\em *issuer}; \\
+OctetString {\em *pem}; \\
+\hl{Input-Parameter}
+\parname  {\em issuer}
+\pardescript {A list of issuers.}
+
+\hl{Output-Parameter}
+\parname  {\em pem}
+\pardescript {RFC 1421 specified text between the
+		  privacy enhanced message encapsulation boundary lines
+		  (included).
+		  The OctetString structure of {\em pem} is
+		  created by the calling function.
+		  However, the character string in {\em pem}
+		  is allocated by {\em pem\_crl\_retrieval\_request}.} 
+
+\parname  {\em Returncode RC}
+\pardescript {-1 if any error occured, 0 if no error occured.} \\
+\hl{Description}
+pem\_crl\_retrieval\_request creates the PEM message pem of Proc-Type CRL-RETRIEVAL-REQUEST.
+This message contains the {\bf Proc-Type } field and one {\bf Issuer} field
+for each issuer given in the list {\em issuer}. The value of such a field is the
+encoded distinguished name of the issuer.
+
+\subsubsection{pem\_crl}
+\nm{3X}{pem\_crl}{Creates a PEM text of Proc-Type CRL, and report errors to caller}
+\label{pem_crl}
+\hl{Synopsis}
+\#include $<$pem.h$>$ 
+
+RC {\bf pem\_crl} {\em (issuer, pem, cadir)} \\
+SET\_OF\_DName {\em *issuer}; \\
+OctetString {\em *pem}; \\
+char {\em *cadir}; \\
+\hl{Input-Parameter}
+\parname  {\em issuer}
+\pardescript {A list of issuers.}
+
+\parname  {\em cadir}
+\pardescript {The UNIX directory of the CA.}
+
+\hl{Output-Parameter}
+\parname  {\em pem}
+\pardescript {RFC 1421 specified text between the
+		  privacy enhanced message encapsulation boundary lines
+		  (included).
+		  The OctetString structure of {\em pem} is
+		  created by the calling function.
+		  However, the character string in {\em pem}
+		  is allocated by {\em pem\_crl}.} 
+
+\parname  {\em Returncode RC}
+\pardescript {-1 if any error occured, 0 if no error occured.} \\
+\hl{Description}
+pem\_crl creates the PEM message pem of Proc-Type CRL.
+This message contains the {\bf Proc-Type } field and one group of a {\bf CRL} field,
+an {\bf Originator-Certificate} field and any {\bf Issuer-Certificate} fields
+for each issuer given in the list {\em issuer}. A CRL field stores the certificate
+revocation list with a signature of one issuer which can be verified with the following
+originator and issuer certificates.
+
+\subsubsection{pem\_certify}
+\nm{3X}{pem\_certify}{Scan PEM msg, sign the Originator-Certificate, and create new PEM msg}
+\label{pem_certify}
+\hl{Synopsis}
+\#include $<$pem.h$>$ 
+
+RC {\bf pem\_certify} {\em (ifname, ofname, verbose, cadir)} \\
+char {\em *ifname, *ofname, *cadir}; \\
+Boolean {\em verbose} \\
+\hl{Input-Parameter}
+\parname  {\em ifname}
+\pardescript {Pathname of the  file
+		    which contains the PEM.
+		    If {\em ifname} is the NULL pointer,
+		    the PEM is read from stdin.}
+
+\parname  {\em ofname}
+\pardescript {Pathname of the file
+		    into which the cleartext message body is written.
+		    If {\em ofname} is the NULL pointer,
+		    the cleartext message body is written to stdout.}
+
+\parname  {\em cadir}
+\pardescript {The UNIX directory of the CA.}
+
+\parname  {\em verbose}
+\pardescript {If TRUE, pem\_certify tells to stderr what it's doing.} \\
+\hl{Output-Parameter}
+\parname  {\em Returncode RC}
+\pardescript {-1 if any error occured, 0 if no error occured.} \\
+\hl{Description}
+pem\_certify reads the input file $<$ifname$>$,
+opens the output file $<$ofname$>$,
+opens the caller's PSE ({\em af\_pse\_open})
+and calls the function {\em pem\_scan}.
+pem\_certify signs the originator certificate which is supposed to be 
+a prototype certificate and calls
+pem\_create to recreate the PEM message, now with a
+signed originator certificate and a forward certification path
+and writes it to $<$ofname$>$.
+This PEM massage  can be verified now.
+pem\_certify evaluates all possible error codes and reports
+them in readable form to stderr, if {\em verbose } is TRUE.
+In particular, pem\_certify reports very clearly
+the result of the message integrity check MIC of the PEM.

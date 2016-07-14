@@ -1,0 +1,31 @@
+\documentstyle[11pt,dina4,twoside]{article}
+\marginparsep5mm
+
+\input{makro}
+\def\authors{
+        Edited by Wolfgang Schneider \\ \\
+}
+\begin{document}
+
+\secudetitlepage{Vol. 3: Security Applications' Guide}{}
+
+\newcounter{Abb}
+\pagestyle{plain}
+\pagenumbering{roman}
+\tableofcontents
+
+\cleardoublepage
+\pagenumbering{arabic}
+\pagestyle{myheadings}
+\thispagestyle{myheadings}
+
+
+\parskip 1ex
+
+%\include{vol3-intro}
+%\include{vol3-km}
+\include{vol3-x500}
+\include{vol3-secquipu}
+\include{vol3-pem}
+\include{vol3-lit}
+\end{document}

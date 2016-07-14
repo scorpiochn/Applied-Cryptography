@@ -1,0 +1,1756 @@
+Newsgroups: sci.crypt,comp.security.misc,alt.security
+Subject: APPLIED CRYPTOGRAPHY - Electronic Version of Index
+Message-ID: <CGoB9q.Cyx@chinet.chinet.com>
+From: schneier@chinet.chinet.com (Bruce Schneier)
+Date: Thu, 18 Nov 1993 05:58:37 GMT
+Organization: Chinet - Public Access UNIX
+Lines: 1747
+
+Attached is the index to my book, Applied Cryptography.  Please feel free to
+distribute it at will in electronic form.  Permission is not given to print
+the index out; for that you have to buy the book.  I would appreciate it if
+this index were placed on various crypto ftp sites around the world.
+
+Bruce
+
+******************************************************************************
+
+APPLIED CRYPTOGRAPHY INDEX
+
+copyright 1994 by John Wiley & Sons.  Permission is granted only to copy and
+distribute this index electronically.
+
+
+Abreast Davies-Meyer hash function, 343
+Accreditation, single, 292
+Active attacks, 25
+Active cheaters, 25
+Adaptive-chosen-plaintext attack, 5
+ADFGVX cipher, 10
+Adjudicator, 23, 24
+Adleman, Leonard, 12, 282
+Advanced threshold schemes, 385, 86
+Adversaries, 4
+Agnew, G. B., 370
+Algebraic coding theory, 316
+Algorithms
+       and ciphers, 2, 3
+       breakable, 7
+       choosing, 183, 85, 272, 320
+       complexity of, 194, 95
+       for export, 184, 85, 448, 54
+       introduction, 2, 3
+       multiple and multiple encryption, 168
+       public, 183, 84
+       restricted, 2
+       secure, 7
+       security of symmetric cryptosystem and, 129, 30
+       strong, 7
+       types of, mathematically defined, 194
+       unconditionally secure, 7
+All or nothing disclosure of secrets (ANDOS)
+       introduction, 83, 84
+       multiple parties buying from single seller, 399, 401
+       voting with single central facility, 109
+Alternating stop-and-go generator, 360, 61
+American Bankers Association, 221
+American National Standards Institute (ANSI).  See ANSI.
+Anderson, Ross, 360
+Anonymous key distribution, 80, 81
+Anonymous messages
+       broadcasting, 124, 26
+       Dining Cryptographers problem, 124
+       multiparty unconditionally secure protocols, 126
+Anonymous money orders, 117, 19
+ANSI standards, DES, 221, 22
+ANSI X9.17 key generation, 145
+Arbitrated
+       protocols, 21, 23
+       solutions, 62, 63
+       timestamping services, 62
+Arbitrators
+       computer, 23
+       difference between adjudicators and, 24
+       group signatures with trusted, 70, 71
+       role of, 21, 23
+       signing documents with symmetric cryptosystems and, 31, 33
+       simultaneous contract signing with, 99
+       simultaneous contract signing without, (face-to-face), 99, 100
+       simultaneous contract signing without, (not face-to-face), 100, 1
+       simultaneous contract signing without, (using cryptography),101, 3
+Ascom-Tech AG, 266
+Asmuth-Bloom, 385
+Athena project, 417, 425
+AT&T, 370
+Attacks.  See also Authentication; Cryptanalysis
+       active, 25
+       against DES, 234, 238, 39
+       against poker protocols, 80
+       against proof-of-identity protocols, 49
+       against protocols, 24, 25
+       against public-key cryptography, 30, 31, 274
+       attackers, 4
+       birthday attack, 295, 322
+       block replay, 155, 57
+       brute-force, 130, 35
+       chosen-ciphertext attack, 274, 75, 286, 87
+       common modulus attack against RSA, 287
+       Den Boer and Bosselaer's attacks, 329, 333, 336, 337
+       dictionary, 142, 44
+       dictionary, and salt, 47, 48
+       digital signatures and encryption, 38
+       foiling resend, 39
+       insertion attack, stream ciphers, 174
+       introduction, 4
+       low exponent attack against RSA, 287, 88
+       man-in-the-middle attack, 43, 44, 50
+       meet-in-the-middle attack, 166
+       passive, 25
+       reduced keyspaces and, 141, 42
+       software-only brute-force, 135, 36
+       time and cost estimates for brute-force attack, 130, 35, 195
+       types of, 5, 6
+       viruses, 137
+Authentication
+       dictionary attacks and salt, 47, 48
+       Feige-Fiat-Shamir algorithm, 291, 96
+       introduction, 47
+       key exchange and, 51, 56
+       mutual, using interlock protocol, 49, 51
+       Schnorr algorithm, 303
+       SKID, 51
+       user identification with public-key cryptography, 48, 49
+Authenticators, 419
+Avalanche effect, 227, 245
+
+Backup keys, 149
+Banks and digital cash, 117, 24
+Bardell, Paul, 363
+Battisa, Leon, 10
+Beaufort cipher, 10
+Bellcore, 306
+Bell Laboratories, 237
+Bell-Northern Research, 415
+Bellovin, Steve, 50, 378, 380, 424
+Bennett, Charles, 408, 410
+Ben-Or, Michael, 100
+Berkovitz, Shimshon, 382
+Berson, Tom, 333
+Beth-Piper stop-and-go generators, 359, 60
+Beth, Thomas, 301
+Biases and correlations, generated sequences, 371, 72
+Biham, E., 234, 237, 238, 240, 244, 247, 249, 252, 253, 259, 260,
+       264, 268, 272, 324, 326, 329
+Bilateral stop-and-go generator, 361
+Biotechnology and brute-force attacks, 138, 39
+Birthday attacks, 322, 23
+       Fiat-Shamir signature scheme, 294, 96
+Bishop, Matthew, 429
+Bit commitment, 71, 74
+       blobs, 74
+       using one-way functions, 73
+       using pseudo-random sequence generators, 73, 74
+       using symmetric cryptography, 72
+Blakley, G. R., 60, 384
+Blind signatures
+       algorithm, 403, 4
+       completely, 94, 95
+       cut-and-choose technique, 95, 96
+       envelopes, 96
+       introduction, 93, 94
+       voting with, 106, 7
+Blobs, bit commitment, 74
+Block algorithms.  See Algorithms, block
+Block chaining (BC) mode, 163
+Block cipher MAC, 345
+Block cipher modes
+       block chaining (BC) mode, 163
+       block replay, 155, 57
+       choosing, 164, 65
+       cipher block chaining (CBC) mode, 157, 60, 231
+       cipher block chaining of plaintext difference (CBCPD), 164
+       cipher feedback (CFB) mode, 160, 61, 231
+       counter mode, 163
+       Electronic Codebook mode (ECB), 154, 55, 231
+       error propagation, 159, 60, 161, 162
+       framing, 160
+       Initialization vector, 48, 158, 161, 162
+       output feedback (OFB) mode, 162, 231
+       output feedback with a non-linear function (OFBNLF), 164
+       padding, 158, 59
+       plaintext block chaining (PCB) mode, 164
+       plaintext feedback (PFB) mode, 164
+       propagating cipher block chaining (PCBC) mode, 163, 64
+       self-recovering errors, 160
+Block ciphers
+       CA-1.1, 268, 69
+       DES as,  224
+       DES, overview and outline, 224
+       FEAL-N, 249, 52
+       IDEA, 260, 266, 436  
+       introduction, 3
+       Khufu and Khafre, 257, 59
+       LOKI, 255, 57
+       Lucifer, 220, 236, 244, 45
+       Madryga, 245, 47
+       MMB, 266, 68
+       NewDES, 247, 49
+       RC2 and RC4, 259, 60
+       REDOC, 252, 55
+       Skipjack, 269, 70, 437
+       stereotyped beginnings and endings, 155
+       using as stream ciphers, 175, 76
+       vs. stream ciphers, 176, 77
+Blocks
+       introduction, 3
+       length, doubling via multiple encryption, 167, 69
+       replay, 155, 57
+       size for computer analysis, 3
+Bloom, J., 385
+Blum integers, 208, 397, 98
+Blum, Manuel, 75, 87, 91, 407
+Blum-Mitcali generator, 365
+BlumBlumShub (BBS) generator, 365, 66, 407
+Boolean circuit, 117
+Bosselaers, A., 329, 333
+Boyar, Joan, 349
+Boyd, Colin, 56
+Branstead, Dennis, 223
+Brassard, Giles, 74, 408, 410
+Breakable algorithms and work factor, 7
+Brickell, Ernie, 304, 315
+British Telecom, 410
+Broadcast interactive proofs, 91
+Broadcasting
+       keys and messages, 46, 47, 57
+       anonymous messages, 124, 26
+       secrets, 381, 83
+Brute-force attack, 130, 35, 195
+       biotechnology, 138, 39
+       Chinese Lottery, 137
+       software crackers, 135, 36
+       software only, 135, 36
+       time and cost estimates for brute-force attacks, 130, 35, 195
+       viruses, 137
+Burmester, Mike, 91
+
+CA-1.1, 268, 69
+Cade algorithm, 318
+Cash, Digital.  See Digital Cash
+CCITT X.508 public-key protocol, 153
+CD-ROM applications, 15
+Cellular automata (CA), 268, 317, 337
+Cellular automaton generator, 363
+Central Legitimization Agency (CLA), 107
+Central Tabulating Facility (CTF), 105
+Certificates, 153, 426, 430
+Certification Authorities (CAs), 426, 430
+Certifying authority (CA), 153, 426
+Chaining variables, 330
+Chaining, 157, 60
+Chambers, W. G., 362
+Chaum, David, 68, 70, 114, 392, 393, 403, 404
+Cheaters
+       passive and active, 25
+       secret sharing with, 60, 386, 87
+Cheating
+       secure elections, 113, 14
+       with digital cash, 117, 24
+       with digital signatures, 36, 37
+Chess grandmaster problem, 91, 93
+Chinese Lottery, 137, 38
+Chinese remainder theorem, 204, 5
+Chips
+       and random noise, 370
+       Clipper and Capstone, 181, 269, 436, 437, 38
+       DES chip, 231
+       RSA, 281, 288
+Chor-Rivest knapsack, 280, 81
+Chosen-ciphertext attack, 5, 6, 274, 75, 286, 87
+Chosen-plaintext attack, 5, 274
+Cipher block chaining (CBC) mode, 157, 60
+       DES, 231
+       error propagation, 159, 60
+       initialization vector, 158
+       padding, 158, 59
+Cipher block chaining of plaintext difference (CBCPD), 164
+Cipher feedback (CFB) mode, 160, 61
+       DES, 231
+       error propagation, 161
+       self-synchronous stream ciphers, 174, 75
+Cipherpunks, 445
+Ciphers
+       and algorithms, 2, 3
+       blocks.  See Block ciphers
+       historic term, 8
+       stream.  See Stream ciphers
+       substitution, 8, 10, 193
+       transposition, 10
+Ciphertext, 1, 2
+Ciphertext pairs, 238
+Ciphertext-only attack, 5
+Civil War, American, 10
+Cleartext, 1-2
+Clock pulse, 351
+Clocks, computer for real random sequence generators, 369, 70
+Codes.  See also Cryptanalysis
+       historic term, 8
+       PURPLE, Japanese diplomatic, 6
+       q-code cryptosystems, 8
+Coefficients, solving for, 203
+Coin flipping
+       Dining Cryptographers problem, 124, 26
+       fair coin flips, 74, 78, 395, 98
+       into well, 77
+       key generation using, 78
+       using Blum integers, 397, 98
+       using exponentiation modulo p, 396, 97
+       using one-way functions, 75, 76
+       using public-key cryptography, 76, 77
+       using square roots, 396
+Commercial COMSEC Endorsement Program (CCEP), 223
+Common modulus attack on RSA, 287
+Communications
+       ANSI standards, 221, 22
+       protocols, purpose of, 20, 21
+       using public-key cryptography, 29, 31
+       using symmetric cryptography, 26, 27
+Communications networks, encrypting, 178, 80
+       end-to-end encryption, 179, 80
+       link-by-link encryption, 178, 79, 180
+       traffic-flow security, 178
+Company, example, 21
+Complement keys, 234
+Complexity classes of problems, 196, 97
+Complexity theory, 193, 98
+       algorithms, 194, 95, 319
+       computational complexity, 193
+       NP, complete problems, 197, 98, 277
+       problems, 195, 97
+       stream ciphers, 365, 66
+Compression permutation, 227
+Compromised keys, 150
+Computational complexity, 193
+Computer analysis
+       adjudicated protocols, 24
+       arbitrators, 23
+       block size for, 3
+       processors for brute-force attack, 131, 34
+       pseudo-random sequence generation, 15, 39, 41
+       software-only brute force attacks, 135, 36
+       XOR algorithm, 12, 13
+Computer communications.  See Communications
+Computer Professionals for Social Responsibility (CPSR), 438,446, 47
+Computer Security Act of 1987, 221, 304, 441
+Computing with encrypted data, 71, 395
+Computationally secure algorithm, 7
+COMSET (COMmunications SETup), 377, 78
+Confirmation messages, 37, 38
+Confusion, 193
+Connell, Charles, 249
+Continued Fraction Algorithm, 211
+Contract signing.  See Signing contracts, simultaneously
+Contraction functions, 28
+Convertible undeniable signatures, 393, 95
+Cook, S. A., 197
+Coppersmith, Don, 80, 240, 341
+Cost estimates for brute-force attack, 130, 35, 195
+Counter mode, 163, 172, 173
+Crime and digital cash, 123
+crypt(1), 364
+CRYPT(3), 242
+Crypt Breakers Workbench (CBW), 364
+Cryptanalysis
+       differential, 237, 238, 40
+       introduction, 1, 4, 7
+       linear, 241
+       of FEAL, 251, 52
+       of IDEA, 264
+       of LOKI, 255, 56
+       of Madryga, 247
+       of N-Hash, 326, 28
+       of NewDES, 248, 49
+       related-key, 240, 41
+       Snefru one-way hash function, 324, 25
+Cryptanalysts, 1
+Cryptech, Inc., 255
+CRYPTO conference, 91
+Cryptographers, 1
+Cryptographic facility, 414
+Cryptographic protection of databases, 61
+Cryptographic protocols, 20
+Cryptographically secure pseudo-random sequence generators (CSPRSGs), 
+356
+Cryptography
+       definition, 1
+       hybrid systems, 177
+       implementations.  See Example implementations
+       large numbers used in, 15, 16
+       quantum, 408, 10
+       relativized, 192
+       simultaneous contract signing without arbitrator, 101, 3
+Cryptologists, 1
+Cryptology, 1
+Cryptosystems
+       introduction, 4
+              security, 7, 191
+Cubic algorithms, 194
+Cusick, Thomas, 253
+Cut and choose technique, 85, 86
+       blind signatures and, 95, 96
+
+Damgard, Ivan, 337
+Damm, Arvid Gerhard, 11
+Data authentication code (DAC), 28
+Data Encryption Standard (DES)
+       adoption of, 221, 22
+       algorithm, overview and outline, 224
+       alternate S-boxes, 242
+       attacks against, 234, 238, 39
+       avalanche criteria, 227
+       complement keys, 234
+       compression permutation, 227
+       CRYPT(3), 242
+       decrypting, 230
+       development of, 219, 21
+       differential cryptanalysis, 237, 238, 40
+       E-boxes, 227
+       encryption speed, 231
+       expansion permutation, 227, 28
+       final permutation, 230
+       FIPS PUBs, 221
+       generalized (GDES), 243
+       hardware and software implementations of, 231
+       in 1987, 222, 23
+       in 1992, 223, 24
+       initial permutation, 26
+       key length, 236, 37
+       key transformation, 226, 27
+       linear cryptanalysis, 241
+       modes of, 231
+       multiple, 241
+       non-group benefits, 234, 45
+       P-box permutation, 230
+       permuted choice, 227
+       related-key cryptanalysis, 240, 41
+       rounds, 224, 237
+       S-boxes, 228, 29, 237, 38
+       security, 232
+       speed, compared to RSA, 286
+       straight permutation, 230
+       validation and certification of DES equipment, 222
+       weak keys, 232, 34
+       with independent subkeys, 241
+Data Encryption Algorithm (DEA). See Data Encryption Standard
+Data Encryption Standard  (DES), 221
+       brute-force attack, 130, 35, 195
+       introduction, 12
+       substitution boxes, 228
+Data Exchange Key (DEK), 433
+Data
+       computing with encrypted, 395
+       for storage, encrypting, 180, 81
+Data integrity check (DIC), 28
+Databases
+       cryptographic protection, 61
+       public-key, 43
+       secret keys, 30, 33
+Davies, D. W., 414
+Davies-Meyer hash function, 338, 39, 340, 41
+Deciphering, 8
+Declaration of Independence and NewDES, 248
+Decoding, 8
+Decryption
+       decrypting with public-key, 35
+       DES, 230
+       introduction, 1, 2
+       knapsack algorithm, 279, 80
+       public-key, 29
+Decryption algorithm, 2, 3
+Decryption keys, 4
+Defense Messaging System (DMS), 269, 313
+DeLaurentis, John, 315
+Den Boer, Bert, 326, 329, 333
+Den Boer and Bosselaer's attacks, 329, 333, 336, 337
+Denning, Dorothy, 11
+DES standard.  See Data Encryption Standard (DES)
+Desmedt, Yvo, 69, 91, 386
+Destroying keys, 152
+Dictionary attacks, 142, 44
+       and salt, 47, 48
+Differential cryptanalysis, 237, 238, 40
+Diffie, Whitfield, 29, 33, 131, 177, 212, 235, 273
+Diffie-Hellman algorithm, 275, 77
+       encrypted key exchange (EKE), 379, 80
+       extended, 275, 76
+       fair cryptosystems, 386, 398, 99
+       patents, 276
+       with three or more parties, 276
+Diffusion, 193
+DigiCash, 124
+Digital cash
+       and perfect crime, 123, 24
+       anonymous money orders, 117, 19
+       ideal system, 123
+       introduction, 117
+       protocols in working products, 124
+Digital certified mail, 103, 4
+Digital Equipment Corporation (DEC)
+       DES chip, 231
+       SPX protocols, 55, 56
+Digital Signature Algorithm (DSA), 304, 14
+       criticisms of, 305, 7
+       dangers of common modulus, 313
+       description of, 307, 8
+       digital signatures, 33
+       ElGamal encryption with, 310, 11
+       introduction, 12
+       patents, 313, 14
+       precomputations, 309
+       prime generation, 309, 10
+       reaction to announcement, 305, 7
+       RSA encryption with, 311
+       security, 311, 13
+       speed, 306
+       subliminal channels, 313, 390, 92
+Digital signatures
+       algorithms and terminology, 35, 36
+       applications of, 37
+       choosing algorithms, 320
+       Digital Signature Algorithm (DSA), 304, 14
+       ElGamal, 300, 2
+       with encryption, 37, 39
+       ESIGN, 314, 15
+       fail-stop, 69, 70
+       Feige-Fiat-Shamir algorithm, 291, 96
+       group signatures, 70, 71
+       Guillou-Quisquater signature scheme, 297, 99
+       identification schemes, 291, 96
+       introduction, 31
+       key exchange with, 45, 46
+       legal issues, 454
+       multiple signatures, 36, 296, 298, 99
+       Okamoto 92, 316, 17
+       Ong-Schnorr-Shamir, 299, 300
+       RSA standards, 288
+       Schnorr, 302, 4
+       signing documents and timestamps, 34
+       signing documents with symmetric cryptosystems and arbitrator, 31, 33
+       signing documents with public-key cryptography and one-way hash 
+functions, 34, 35, 39
+       subliminal-free signatures, 68
+       undeniable, 7, 68, 69, 392, 95
+Digital Signature Standard (DSS), 288, 304
+Dining Cryptographers problem, 124
+Discrete logarithm problem, 153, 317, 395. See also Logarithms,discrete
+Disk file erasure, 183
+Distributed convertible undeniable signatures, 395
+Distributed key management, 153
+Distributed protocols, 64, 65
+DoD standard for disk overwrites, 183
+Double encryption, 165, 66
+DSA.  See Digital Signature Algorithm (DSA)
+Durstenfeld, R., 374
+Dutchy of Mantua, 10
+
+E-boxes, 227
+Eavesdroppers, 4, 22, 24
+Ehrsham, W. F., 413
+8-bit CFB, 160
+Elections, secure
+       characteristics of, 105, 109
+       cheating, 113, 14
+       other voting schemes, 113, 14
+       simplistic voting protocols, 105, 6
+       voting with blind signatures, 106, 7
+       voting with single central facility 109, 10
+       voting with two central facilities, 107, 8
+       voting without Central Tabulating Facility (CTF), 110, 13
+Electronic Codebook mode (ECB), 154, 55, 231
+Electronic Frontier foundation (EEF), 438, 446
+ElGamal algorithm, 300, 2, 310, 11
+       encrypted key exchange (EKE), 379
+       subliminal channel, 388, 89
+ElGamal, Taher, 276, 290
+Elliptic curve cryptosystems, 317, 318
+Elliptic Curve Method (ECM), 211
+Enciphering, 8
+Encoding, 8
+Encrypt, decrypt-encrypt (EDE) mode, 166, 67
+Encrypted key exchange (EKE)
+       applications, 380, 81
+       basic protocol, 378, 79
+       Diffie-Hellman, 379, 80
+       ElGamal, 379
+       RSA implementation, 379
+       strengthening, 380
+Encryption
+       algorithms, 2, 3
+       communications networks, 178, 80
+       computing with encrypted data, 71, 395
+              data for storage, 180, 81
+       DES speed, 231
+       digital signatures and, 37, 38
+       ElGamal algorithm, 301, 2
+       ElGamal with DSA, 310, 11
+       encrypting with private key, 35
+       hardware vs. software, 181, 83
+       introduction, 1, 2
+       knapsack algorithm, 279
+       multiple, 165, 69
+       one-time pads, 13, 16
+       probabilistic, 406, 8
+       public-key, 29
+       RSA with DSA, 311
+       software and hardware implementations, 148
+Encryption keys, 4, 151
+End-to-end encryption, 179, 80
+Enemy, 4
+Enigma rotor device, 11, 364, 365
+Entropy and uncertainty, 189, 90
+Envelopes, 96
+Equipment, DES, 222
+Erritt, Michael, 50
+Error detection, 148
+Error propagation
+       block ciphers vs. stream ciphers, 177
+       cipher block chaining (CBC) mode, 159, 60
+       cipher feedback (CFB) mode, 160, 61
+       output feedback (OFB) mode, 162
+Error propagation in cypher block chaining (CBC) mode, 159, 60
+Errors, self-recovering, 160
+Errors, synchronization.  See Error propagation
+ESIGN algorithm, 314, 15, 389, 90
+       patents, 315
+       security, 315
+ESPCI, 269
+Euclid's algorithm, 200, 1, 202, 3
+Euler generalization of Fermat's little theorem, 203
+Euler phi function, 203
+Euler totient function, 203, 4
+EUROCRYPT conference, 91
+Example implementations
+       Capstone, 437, 38
+       Clipper, 437, 38
+       IBM secret key management protocol, 413, 14
+       ISDN (Integrated Services Digital Network Terminal, 415, 17
+       ISO authentication framework, 425, 28
+       KERBEROS, 417, 25
+       KryptoKnight, 425
+       Message Security Protocol (MSP), 436
+       MITRENET, 414, 15
+       Pretty Good Privacy (PGP), 153, 436, 37
+       Privacy-enhanced mail (PEM), 428, 36
+Exchanging keys and messages.  See Key exchange
+Expansion permutation, 227
+Exponential algorithms, 194
+Exponentiation modulo p, coin flipping using, 396, 97
+Export algorithms, 184, 85, 448, 54
+EXPTIME-complete problems, 197
+
+Face-to-face contract signing, 99, 100
+Factoring, 211, 13
+       algorithms, 211, 13
+       modular factoring machines, 212
+       security of RSA algorithm and, 282, 85
+       square roots modulo N, 213, 289
+Fail-stop digital signatures, 69, 70
+Fair coin flips, 74, 78
+Fair cryptosystems, 82, 83, 386, 398, 99
+Fast Elliptic Encryption (FEE), 318
+FEAL-N, 249, 52
+Fedeal Standards, 221, 222, 338
+Feedback
+       in cipher block chaining (CBC) mode, 157, 159
+       in cipher feedback (CFB) mode, 160, 61
+       in output feedback (OFB) mode, 162
+Feedforward in cipher block chaining (CBC) mode, 159
+Feige, Uriel, 91
+Feige-Fiat-Shamir, 291, 96, 392
+       enhancements, 294
+       Fiat-Shamir signature scheme, 294, 95
+       identifications scheme, 292, 94
+       improved Fiat-Shamir signature scheme, 295, 96
+       N-party identification, 296
+       Ohta-Okamoto identification scheme, 296
+       patents, 296
+       simplified identification scheme, 291, 92
+       single accreditation, 292
+Feldman, 238
+Feldmeier, David, 48
+Fermat's little theorem, 203
+Fiat, Amos, 91
+Fiat, Shamir signature scheme, 294, 95, 392
+File erasure, 183
+Financial Institution Retail Security Working Group, 221
+Fingerprint, 28
+Finite field, 209
+       discrete logarithms in, 216, 18
+FIPS PUBs, 221, 231
+Fixed-bit index (FBI), 399
+Follett, Robert, 306
+Foundations of Computer Science (FOCS) conference, 91
+Frankel, Yair, 386
+French banking community and RSA, 288
+French Direction Generale de la Securite Exterieure (DGSE), 237
+Fujioka, A., 318
+Functions, one-way, 27, 29
+
+Gait, 162
+Galois, Evariste, 210
+Galois field, computing in, 209, 10, 276
+Garey, Michael, 197
+Gaussian integer scheme, 217
+Geffe generator, 358, 59
+General Services Administration (GSA), 221
+Generalized DES (GDES), 243
+Generating good keys, 144, 45
+Generators, 208, 9, 309, 10
+GF(2^n), computing in, 210, 11, 276
+Goldreich, Oded, 100
+Goldwasser, Shafi, 80, 406
+Gollman, D., 363
+Gollmann cascade, 360
+Goodman-McAuley cryptosystem, 280
+Goppa codes, 316
+Graham-Shamir knapsack, 280
+Graph theory
+       graph isomorphism, 88, 89
+       Hamiltonian cycles, 87, 88
+Greatest common divisor, 200, 1
+Greene, J. W., 385
+Group signatures, 70, 71
+       with trusted arbitrator, 70, 71
+Groups
+       DES, 234, 36
+       double encryption, 166
+       IDEA, 266
+Guam, P., 317
+Gude, M., 370
+Guillou, Louis, 85
+Guillou-Quisquater algorithm, 297, 99
+       identification scheme, 297, 98
+       signature scheme, 298
+Gutmann, Peter, 271
+Gutowitz, Howard, 268
+
+Haber, Stuart, 62, 306, 309
+Hamiltonian cycles, 87, 88
+Hard problems, 196, 319
+Hardware
+       DES implementation, 231
+       RSA in, 285
+Hardware encryption, 148, 181, 82, 263, 64
+Harn, Lein, 393
+Hastad, J., 287
+HAVAL one-way hash function, 336, 37
+Hellman, Martin, 29, 33, 131, 166, 167, 217, 236, 273, 277, 385
+Herlestam, T., 280
+Hill cipher, 10
+Hill, I. D., 349
+Historic terms, 8
+Homophonic substitution cypher, 8, 10
+Hybrid cryptographic systems, 177
+Hybrid cryptosystems, 31
+
+I/p generator, 363, 64
+IBM, 220, 232, 236, 273, 306
+IBM secret key management protocol, 413, 14
+IDEA, 260, 66, 436
+Ideal secrecy, 192
+Identification schemes
+       Feige-Fiat-Shamir, 291, 96
+       Guillou-Quisquater, 297, 98
+Imai, H., 270
+Increment, 347
+Information theory, 189, 93
+       approach to stream ciphers, 366, 67
+       confusion and diffusion, 193
+       entropy and uncertainty, 189, 90
+       in practice, 193
+       rate of language, 190, 91
+       security of cryptosystems, 191
+       unicity distance, 192
+Information, amount in messages, 189
+Ingemarsson, I., 367
+Initial chaining value, 159
+Initialization Vector
+       cipher block chaining (CBC) mode, 158
+       cipher feedback mode, 161
+       salt, 48
+Initializing variable, 158
+Insertion attack, stream ciphers, 174
+Interactive proofs, 91
+Interactive protocols, 86
+Interceptors, 4
+Interchange Key (IK), 433
+Interlock protocol, 44, 45, 49, 51
+Interlopers, 4
+Internal feedback, 162
+International Association of Cryptographic Research (IACR), 445
+International Data Encryption Algorithm (IDEA).  See IDEA
+International Organization of Standards, 288
+Internet, 428, 430.  See also Privacy-enhanced mail (PEM)
+Internet Policy Registration Authority (IPRA), 430
+Intractable problems, 195, 96
+Introducers, 153
+Intruders, 4
+Inverses in modular arithmetic, 201, 3
+IPES (Improved Proposed Encryption Standard), 260
+Irreducible polynomials, 210
+ISDN (Integrated Services Digital Network Terminal, 415, 17
+ISO authentication framework, 425, 28
+       certificates, 426
+       protocols, 426, 28
+Itoh, A., 318
+
+Jacobi symbol, 207, 8, 290
+Johnson, David, 197
+
+Kahn, David, 6, 11
+Kaliski, Burt, 259
+Karn method, 270
+Karn, Philip, 48, 270
+Kerberos protocol, 55
+       credentials, 419, 20
+       future, 424, 25
+       getting initial ticket, 421
+       getting server tickets, 421, 22
+       Kerberos model, 417, 18
+       licenses, 425
+       methodology, 419
+       requesting services, 422, 23
+       security, 424
+       software modules, 418, 19
+       version 4, 423, 24
+Key Certification Authority, 30
+Key distribution
+       anonymous, 80, 81
+       in large networks, 147
+       in MITRENET network, 414, 15
+Key Distribution Center (KDC), 30
+       session keys from, 42
+Key escrow system, 437, 38
+Key exchange
+       authentication protocols, 51, 56
+       COMSET (COMmunications SETup), 377, 78
+       with digital signature, 45, 46
+       encrypted.  See Encrypted key exchange (EKE)
+       interlock protocol, 44, 45, 49, 51
+       key and message broadcast, 46, 47, 57
+       key and message transmission, 46
+       man-in-the-middle attack, 43, 44, 49, 50
+       with public-key cryptography, 43
+       Shamir's three-pass protocol, 376, 77
+       with symmetric cryptography, 42, 43
+Key length
+       biotechnology, 138, 39
+       brute-force attacks, 130, 35
+       Chinese Lottery, 137, 38
+       DES, 236, 37
+       future security, 139
+       security of symmetric cryptosystem and, 129
+       software crackers, 235, 36
+       time and cost estimates for brute-force attack, 130, 35, 195
+       viruses, 137
+Key management
+       distributed, 153
+       generating keys, 140, 41, 144, 45
+       good keys, 144, 45
+       IBM secret-key management protocol, 413, 14
+       poor key choices, 142, 44
+       reduced keyspaces, 141, 42
+       software encryption and, 182, 83
+Key notarization, 414
+Key transformation, DES, 226
+Key-encryption key, 146, 151
+Keyboard latency for real random sequence generators, 370
+Keys
+       and security, 2, 4
+       ANSI X9.17 standard, 145
+       backup, 149
+       complement keys, 234
+       compromised, 150
+       Data Exchange Key (DEK), 433
+       DES with independent subkeys, 241
+       destroying, 152
+       determining length by counting coincidences, 13
+       error detection, 148
+       generating good, 144, 45
+       generating random, 144.  See also random numbers
+       generating using coin flipping, 78
+       generating, 140, 45
+       Interchange Key (IK), 433
+       introduction, 2, 3
+       key crunching, 144
+       key-encryption key, 146
+       keystream generator and, 170, 71
+       lifetime of, 150, 51
+       master and master terminal, 413
+       master key, 146
+       pass phrase and, 145
+       poor choices for, 142, 44
+       reduced keyspaces, 141, 42
+       ROM, 148, 49
+       semi-weak keys, 233
+       session, 42
+       software and hardware implementations, 148
+       storing, 148, 49
+       symmetric cryptosystems, 26, 27
+       transferring, 145, 47
+       transmitting messages and, 46
+       verifying, 147, 48
+       weak DES, 232, 34
+Keyspace, 2
+Keystream generator, 169, 72
+Khufu and Khafre, 257, 59
+Kilian, Joe, 74, 97
+Klein, Daniel, 48
+Knapsack algorithm, 277, 81
+       creating public key from private, 278, 79
+       decryption, 279, 80
+       encryption, 279
+       one-way hash functions, 337
+       patents, 281
+       practical implementations, 280
+       security, 280
+       superincreasing, 278
+       variants, 280, 81
+Known-plaintext attack, 5
+Knudson, Lars, 255, 256
+Knuth, D., 201, 203, 211
+Koblitz, Neal, 275, 317
+Konheim, Alan, 237
+Korzhik, V. I., 316
+Kranakis, Evengelos, 200
+KryptoKnight, 425
+Kurosawa, T., 318
+
+L'Ecuyer, Pierre, 349
+LaGrange interpolating polynomial scheme, 383, 84
+Lai, Xuejia, 260, 264, 266, 340, 341, 343, 345
+LaMacchia, Brian, 307, 381
+Language, rate and redundancy of, 190, 91
+Large numbers used in cryptography, 15, 16
+Lawsuits and patents, 447, 48
+Legendre symbol, 206
+Lehmann prime number algorithm, 215
+Length, maximal, of LSFRs, 351
+Lenstra, Arjen, 212, 306, 309
+Lexar Corporation, 237
+Lidl, Rudolph, 318
+Lifetime of keys, 150, 51
+Linear algorithms, 194
+linear congruential generators, 347, 51
+Linear cryptanalysis, 241
+Linear feedback shift registers (LFSR), 351, 55
+Linear sieve, 217
+Link-by-link encryption, 178, 79, 180
+Linking protocols, 63, 64
+Logarithms, discrete
+       in finite field, 216, 18
+       problem, 153, 317, 395
+       zero knowledge proofs, 401, 3
+LOKI, 255, 57
+LOKI double-block hash function, 342
+LOKI single-block hash function, 339
+Low exponent attack against RSA, 287, 88
+LSFR.  See Linear feedback shift registers
+Lu-Lee cryptosystem, 280
+Luby-Rackoff method, 270, 71
+LUCIFER, 220, 236, 244, 45
+
+MAC (Message Authentication Code), 345
+Macintosh system 7, 148
+Madryga, 245, 47
+Mail systems
+       digital certified mail, 103, 4
+       MITRENET, 414, 15
+       privacy-enhanced mail (PEM), 428, 36
+Man-in-the-middle attack, 43, 44, 49, 50
+Manasse, 212
+Manipulation detection code (MDC), 28
+MASKs, 253
+Massey, James, 260, 340, 343, 364, 367, 439
+Master key, 146, 413
+Master terminal key, 413
+Mathematical theory.  See Information theory
+Matsui, Mitsuru, 241, 252
+Matsumoto-Imai algorithm, 318
+Matyas, S. M., 413
+Maximal length generator, 347
+Mauborgne, Major Joseph, 13
+Maurer, Ueli, 367
+McCurley, Kevin, 275, 304
+McEliece algorithm, 316
+MD2, 333
+MD4, 329
+MD5, 329, 33
+       chaining variables, 330
+       description of, 329, 32
+       security, 332, 33
+MDC-4, 343, 44
+Mechanical encryption devices, 11
+Meet-in-the-middle attack, 166
+Memory management, 152, 183
+Mental poker
+       anonymous key distribution, 80, 81
+       attacks against poker protocols, 80
+       introduction, 78
+       with three players, 78, 79
+Merchants, cheating, 119, 22
+Merkle, Ralph, 166, 167, 257, 59, 273, 277, 324, 329, 344
+Merkle-Hellman knapsack algorithm, 277, 81
+Merritt, Michael, 110, 378, 380, 424
+Message Authentication code (MAC), 345
+Message Digest, 28, 329
+Message digest cipher (MDC), 271, 72
+Message Integrity Check (MIC), 429
+Message security protocol (MSP), 436
+Messages
+       broadcasting keys and, 46, 47, 57
+       information theory, 189, 93
+       introduction, 1, 2
+Metal insulator semiconductor capacitor (MISC), 370
+Meyer, C. H. W., 232, 338, 413
+Meyer, Joseph A., 453
+Meyer-Schilling hash function, 344
+Micali, Silvio, 80, 82, 100, 295, 386, 398, 406, 407
+Miller, V. S., 275, 317
+Minimum, disclosure proof, 84
+MITRENET, 414, 15
+Miyaguchi hash function, 339, 40
+Miyaguchi, Shoji, 249
+MMB (Modular Multiplication-based Block cipher), 266, 68
+(m,n)-threshold scheme, 59, 383
+Modular arithmetic, 198, 200
+       greatest common divisor, 200, 1
+       inverses in modular arithmetic, 201, 3
+       prime numbers, 200
+Modular reduction, 198
+Moore, J. H., 288
+Motorola, 306, 7
+Muller, Winfried, 318
+Multiple DES, 241
+Multiple encryption, 165, 69
+       double encryption, 165, 66
+       doubling block length via, 167, 69
+       encrypt-decrypt-encrypt (EDE) mode, 166, 67
+       meet-in-the-middle attack, 166
+       multiple algorithms for, 168
+       triple encryption, 166, 67
+       with multiple algorithms, 168
+Multiple keys, public-key cryptography, 56, 58, 381
+Multiple signatures, 36, 296, 298, 99
+Multiplexer generator, 359
+Multiplier, 347
+Multispeed inner-product generator, 363
+Mutual authentication, 49, 51
+
+N-Hash one-way hash function, 326, 28
+N-party identification, 296
+National Bureau of Standards (NBS), 219, 21
+National Computer Security Center (NCSC), 440, 41
+National Institute of Standards and Technology (NIST), 218, 304,441, 44
+National Security Agency, 130, 184, 85, 439, 40
+       and DES,  219, 23, 232, 236, 37, 273, 74
+       and DSS, 312, 13
+       Skipjack, 269, 70, 437
+Needham, 52, 177
+Needham and Schroeder protocol, 52, 54
+Networks
+       factoring algorithms on, 212, 13
+       IBM secret-key management protocol, 413, 14
+       key distribution in, 147
+Neumann, John von, 39
+NewDES, 247, 49
+New South Wales, University of, 256
+Niederreiter cryptosystem, 280
+Niederreiter, Harald, 318
+Niemi cryptosystem, 280
+Nippon Telephone and Telegraph, 326
+Nobauer, Wilfried, 318
+Noninteractive zero-knowledge proofs, 90, 91
+NP problems, 196, 98
+NP-complete problems, 197, 98, 277
+NTT Japan, 249, 252, 314
+Number Field Sieve, (NFS), 211, 217
+Number Theory, 198, 211
+       Blum integers, 208
+       Chinese remainder theorem, 204, 5
+       Euler totient function, 203, 4
+       Fermat's little theorem, 203
+       Galois field, computing in, 209, 10, 276
+       generators, 208, 9
+       GF(2^n), computing in, 210, 11, 276
+       Jacobi symbol, 207, 8, 290
+       Legendre symbol, 206
+       modular arithmetic, 198, 200
+       Primative polynomials mod 2, 353, 56
+       quadratic residues and nonresidues, 206
+       solving for coefficients, 203
+Numbers, relatively prime, 200
+Numbers and nonuniform distributions, 372, 74
+Nurmi, Hannu, 109
+
+Oblivious transfer
+       algorithm, 404
+       fair cryptosystems, 82, 83
+       introduction, 97, 98
+Octway-Rees protocol, 54
+Odlyzko, Andrew, 307, 381
+Office of Technology Assessment, 223
+Ohta, Kazuo, 123, 319
+Ohta-Okamoto identification scheme, 296
+Okamoto 92 algorithm, 316, 17
+Okamoto, Tatsuaki, 123, 314, 319
+Omaa, Arto, 109
+One-key algorithms, 3
+One-time pads
+       overview, 13, 16
+       security of, 7
+One-time tape, 366
+One-way functions
+       abreast Davies-Meyer, 343
+       bit commitment using 73
+       coin flipping using, 75, 76
+       Davies-Meyer, 338, 39, 340, 41
+       equal block and key sizes, 340
+       LOKI double-block, 342
+       LOKI single-block, 339
+       MDC-4, 343, 44
+       Miyaguchi, 339, 40
+       Preneel-Bosselaers-Govaerts-Vandewalle, 341
+       prime numbers and , 213
+       public-key cryptography, 27, 28
+       Quisquater-Girault, 341, 42
+       tandem Davies-Meyer, 342, 43
+       trap-door, 28
+       using block Algorithms as one-way hash functions, 338, 44
+One-way hash functions, 28, 29, 270, 72
+       background, 321, 24
+       birthday attack, 322
+       choosing best, 345
+       design overview, 323, 24
+       diffusing randomness, 372
+       HAVAL, 336, 37
+       Karn, 270
+       key-dependent, 345, 46
+       length of, 323
+       Luby-Rackoff, 270, 71
+       MAC, 345
+       MD2, 333
+       MD4, 329
+       MD5, 329, 33
+       Message Digest, 329
+       message digest cipher (MDC), 271, 72
+       N-Hash, 326, 28
+       RIPE-MD, 336
+       Secure Hash Algorithm (SHA), 308, 333, 36
+       Snefru, 324, 25
+       using public-key algorithms, 344
+       using symmetric block algorithms, 338, 44
+Ong-Schnorr-Shamir algorithm, 299, 300, 387, 88
+Open Computing Security Group, 425
+Opponents, 4
+Orange Book, 440
+Outerbridge, Richard, 167
+Output feedback (OFB) mode, 162
+       DES, 231
+       error propagation, 162
+       security problems, 162
+       stream ciphers, 172, 73
+Output feedback with a non-linear function (OFBNLF), 164
+
+P problems, 196
+Padding, 158, 59
+       triple encryption with, 167
+Painvin, Georges, 10
+Parallel zero-knowledge proofs, 89
+Pass phrase, 145
+Passive attacks, 25
+Passive cheaters, 25
+Passwords, authentication, 47, 51
+Patents, 447, 48
+       CA-1.1, 268, 69
+       Diffie-Hellman, 276
+       Digital Signature Algorithm (DSA), 313, 14
+       ElGamal, 302
+       ESIGN, 315
+       FEAL, 252
+       Fiat-Shamir signature scheme, 296
+       IDEA, 266
+       knapsacks, 281
+       LOKI, 256
+       Lucifer, 245
+       Pohlig-Hellman algorithm, 289
+       REDOC, 254, 55
+       RSA algorithm, 288
+       Schnorr algorithm, 304
+Pederson, Torben, 395
+PEM public-key protocol, 153
+Perfect secrecy, 191
+Period of cypher, 10
+Periodic keystream generators, 171, 72
+Permutations
+       DES, 227, 30
+       generating random, 374, 75
+Permuted choice, 227
+PES (Proposed Encryption Standard), 260
+Pfitzmann, Brigit, 69
+Pfleeger, Charles, 80
+Pieprzyk, Josef, 336
+Pieprzyk cryptosystem, 280
+PINs, 221, 381
+Plaintext
+       introduction, 1, 2
+       pairs, characteristics of, 238
+Plaintext block chaining (PCB) mode, 164
+Plaintext feedback (PFB) mode, 164
+Playfair cipher, 10
+Pless generator, 359
+Pohlig, S. C., 217
+Pohlig-Hellman algorithm, 289
+Poker.  See Mental poker
+Policy Certification Authorities (PCAs), 430
+Pollard, J. M., 300
+Pollard's Monte Carlo Algorithm, 211
+Polyalphabetic substitution cyphers, 9, 10
+Polygram substitution cipher, 9, 10
+Polynomial time algorithms, 194
+Pomerance, Carl, 212
+Price, W. L., 414
+Preliminary Message Security Protocol (PMSP), 436
+Preneel, Bart, 323, 340, 341, 345
+Preneel-Bosselaers-Govaerts-Vandewalle hash function, 341
+Pretty Good Privacy (PGP), 153, 436, 37
+Prevention, secret sharing with, 387
+Primative polynomials mod 2, 353, 56
+Prime numbers, 200, 213, 16
+       Lehmann prime number algorithm, 215
+       Rabin-Miller, 214, 15
+       Solvay-Strassen, 214
+       strong primes, 215, 16
+Primitives, 208
+Principle square root, 208
+Privacy-enhanced mail (PEM), 428, 36
+       certificates, 430
+       messages, 430, 34
+       PEM documents, 429
+       RIPEM, 435, 36
+       security, 434
+       TIS-PEM, 434, 35
+Private keys
+       compromised, 150
+       creating public from, knapsack algorithm, 278, 79
+       fair cryptosystems, 82, 386, 398, 99
+       introduction, 4
+       lifetime of, 151
+Private keys.  See Secret keys
+Probabilistic encryption, 406, 8
+Problems
+       complexity classes, 196, 97
+       complexity of, 195, 97
+       discrete logarithm, 317, 395
+       hard, 196, 319
+       mathematical classes of, 196, 98
+       tractable and intractable, 195, 96
+       undecidable, 196
+Proof-of-identity protocols, 49, 301
+Proofs
+       broadcast interactive proofs, 91
+       minimum-disclosure proof, 84
+       Zero-knowledge, 84, 91
+Propagating cipher block chaining (PCBC) mode, 163, 64, 418
+Protocols
+       adjudicated, 23, 24
+       arbitrated, 21, 23
+       attacks against, 24, 25
+       basic zero-knowledge, 85, 87
+       cryptographic, 20
+       distributed protocols, 64, 65
+       example company, 21
+       interactive, 86
+       interlock, 44, 45, 49, 51
+       introduction to, 19, 25
+       ISO authentication framework, 425, 28
+       Kerberos protocol, 55
+       linking protocols, 63, 64
+       Needham and Schroeder protocol, 52, 54
+       Otway-Rees protocol, 54
+       proof-of-identity, 49
+       purpose of, 20, 21
+       secret-key identification (SKID), 50, 51
+       self-enforcing, 24
+       simplistic voting, 105, 6
+       SPX protocols, 55, 56
+       steps involved in, 20
+       Wide-Mouth Frog protocol, 51, 52
+       Yahalom protocol, 52
+Pseudo-random.  See also Random numbers
+       key crunching, 144
+       sequence generation, 15, 39, 41
+       sequence generators, bit commitment using, 73, 74
+       unpredictable numbers, 41
+Pseudo-random sequence generators.  See also Real random sequence generators
+       combining linear congruential generators, 349, 51
+       linear congruential generators, 347, 51
+       linear feedback shift registers (LFSR), 351, 55
+       modified LFSRs, 356
+       Shamir's pseudo-random number generator, 365
+PSPACE-complete problems, 197
+Public algorithms, 183, 84
+Public-Key algorithms
+       as hash functions, 344
+       attacks against, 274, 75
+       Cade, 318
+       cellular automata, 317
+       choosing, 320
+       compared to symmetric, 31
+       Diffie-Hellman, 275, 77
+       Digital Signature Algorithm (DSA), 304, 14
+       ElGamal, 300, 2
+       elliptic curve cryptosystems, 317, 318
+       ESIGN, 314, 15
+       fair, 83, 386, 398, 99
+       Feige-Fiat-Shamir, 291, 96
+       Guillou-Quisquater, 297, 99
+       hard problems, 319
+       introduction, 3, 4, 273, 74
+       Knapsack algorithms, 277, 81
+       Matsumoto-Imai, 318
+       McEliece, 316
+       Okamoto, 92, 316, 17
+       Ong-Schnorr-Shamir, 299, 300
+       Pohlig-Hellman, 289
+       Rabin, 289, 91
+       RSA, 281, 88
+       Schnorr, 302, 4
+       security, 274, 75, 319
+       Yagisawa, 318
+Public key cryptography
+       attacks against, 30, 31
+       coin flipping using, 76, 77
+       communications using, 29, 31
+       generating keys for, 144, 45
+       key exchange, 42, 47
+       multiple-key, 56, 58
+       one-way functions and, 27, 28
+       one-way hash functions, 34, 35, 39
+       prime numbers and, 213, 16
+       signing documents, 33, 34
+       user identification with, 48, 49
+Public Key Distribution Center, 414, 15
+Public Key Partners (PKP), 276, 288, 289
+Public keys, 35, 36.  See also Keys; Public-Key algorithms
+       certificates, 153
+       creating from private, knapsack algorithm, 278, 79
+       database, 43
+       introducers and distributed key management, 153
+       introduction, 4
+       management, 152, 53
+       one-way functions and, 27, 28
+       security, 30
+PURPLE, Japanese diplomatic code, 6
+
+Q-code cryptosystems, 8
+Quadratic algorithms, 194
+Quadratic residues and nonresidues, 206
+Quadratic Sieve, 211
+Quantum cryptography, 408, 10
+Queensland University of Technology, 247
+Quisquater, Jean-Jacques, 85
+Quisquater-Girault hash function, 341, 42
+
+Rabin algorithm, 289, 91, 435
+Rabin, Michael, 86, 404
+Rabin-Miller prime number algorithm, 214, 15
+Rackoff, C., 270
+Rainbow Books, 441
+RAND tables, 368, 69
+Random noise, 370
+Random numbers.  See also Pseudo-random
+       crypotographically, 40
+       generating, 14, 15, 39, 41, 144
+       keystream generators, 170
+Random permutations, generating, 374, 75
+Randomized stream ciphers, 367
+Rate of language, 190, 91
+RC2 and RC4, 259, 60, 364
+Real random sequence generators, 368, 72.  See also Pseudo-random sequence generators
+       biases and correlations, 371, 72
+       diffusing randomness, 372
+       measuring keyboard latency, 370
+       RAND tables, 368, 69
+       random noise, 370, 71
+       using computer clocks, 369, 70
+Real, world random numbers, 41
+Receipts, resending message as, 37, 38
+Receiver, 1
+REDOC, 252, 55
+Redundancy of language, 190, 91
+Regan, Ronald and NSDD, 145, 222
+Related-key cryptanalysis, 240, 41
+Relatively prime numbers, 200
+Relativized cryptography, 192
+Research and Development in Advanced Communication Technologies in Europe (RACE), 336, 446
+Resend attacks, 39
+Residues in modular arithmetic, 198, 203
+Restricted algorithms, 2
+Ribenboim, Paulo, 200
+Richter, Manfield, 370
+RIPEM, 435, 36
+RIPE-MAC, 345, 446
+RIPE-MD one-way hash function, 336
+RIPE project, secret-key identification (SKID), 50, 51, 343, 446
+Rivest, Ron, 12, 100, 259, 282, 329, 332, 35
+Riorden, Mark, 435
+Robotron, 237
+ROM keys, 148, 49
+Rotor machines, 11
+Rounds, DES, 224, 237
+RSA (Rivest, Shamir, and Adleman) algorithm, 281, 88
+       attacks against poker protocols, 80
+       common modulus attack, 287
+       digital signatures and, 33
+       encrypted key exchange (EKE), 379
+       in hardware, 285
+       introduction, 12
+       low exponent attack against RSA, 287, 88
+       multiple public-key cryptography, 381
+       patents, 288
+       restrictions on, 288
+       security, 282, 85
+       speed of, 285, 86, 306
+       as standard, 288
+       zero-knowledge proof of ability to break, 403
+RSA Data Security, Inc. (RSADI), 259, 60, 305, 364, 444, 45
+RSA generator, 365
+Rueppel, Ranier, 345, 357, 358, 363, 364
+
+Salomaa, Arto, 399
+Salt, 47, 48
+Santean, Lila, 109, 399
+S-boxes, 228, 29, 237, 38, 242
+Scherbius, Arthur, 11
+Schnorr, C. P., 299, 337, 367
+Schnorr algorithm, 302, 4
+Schroeder, 52, 177
+Sci.crypt, 445
+Scott, Robert, 247
+Seberry, Jennifer, 336
+Secrecy, ideal, 192
+Secrecy, perfect, 191
+Secret broadcasting, 382, 83
+Secret-key algorithms, 3
+Secret-key identification protocols (SKID), 50, 51
+Secret keys
+       compromised, 150
+       database of, 30, 33
+       introduction, 4
+Secret sharing
+       advanced threshold schemes, 385, 86
+       all-or-nothing disclosure (ANDOS), 83, 84, 399, 401
+       Asmuth-Bloom, 385
+       backup keys, 149
+       with cheaters, 60, 386, 87
+       Karnin-Greene-Hellman, 385
+       LaGrange interpolating polynomial scheme, 383, 84
+       (m,n)-threshold scheme, 59, 383
+       with prevention, 387
+       without revealing shares, 386
+       schemes for, 59, 61
+       shadows, 59
+       simultaneous exchange, 104, 5
+       threshold scheme, 59
+       without Trent, 60, 61
+       vector scheme, 384
+Secret splitting, 58, 59
+Secure algorithm
+       introduction, 7
+Secure Data Network System (SDNS), 436
+Secure Hash Algorithm (SHA), 333, 36
+       description of, 334, 35
+       and DSS, 308
+       security, 335, 36
+Secure Hash Standard (SHS), 323
+Secure multiparty computation
+       protocols, 114, 16, 404, 6
+       secure circuit evaluation, 116, 17
+Security
+       of CA-1.1, 268
+       cheating, 25
+       cryptosystems, 7, 191
+       DES, 232
+       DSA, 311, 13
+       ESIGN algorithm, 315
+       hardware and software encryption, 181, 83
+       Kerberos, 424
+       key length and future security, 139, 40
+       and keys, 2, 4
+       keystream generators and, 170
+       knapsack algorithm, 280
+       MD5, 332, 33
+       of MMB, 267, 68
+       multiple encryption, 165, 69
+       network, 178, 80
+       PEM, 434
+       problems with OFB, 162
+       pseudo-random sequences and, 40, 41
+       public-key algorithms, 274, 75, 319
+       restricted algorithms, 2
+       of REDOC II, 253, 54
+       of REDOC III, 254
+       RSA, 282, 85
+       Secure Hash Algorithm (SHA), 308, 335, 36
+Self-decimated generators, 362, 63
+Self-enforcing protocols, 24
+Semi-weak keys, 233
+Sender
+       introduction, 1
+       unconditional, and recipient untraceability, 125
+Sequence, superincreasing, 278
+Session keys, 42, 418
+Shadows, 59, 383
+Shamir, Adi, 12, 60, 91, 234, 237, 238, 240, 43, 244, 252, 254, 
+       255, 259, 260, 277, 280, 282, 295, 299, 324, 325, 326, 383
+Shamir's pseudo-random number generator, 365
+Shamir's three-pass protocol, 376, 77
+Shannon, Claude Elmwood, 189, 193
+Shares, secret sharing without revealing, 386
+Shift registers, 351
+Shifting identities problem, 93
+Shimizu, Akihiro, 249
+Shmuley, Z., 275
+Shroyer, Les, 306
+Signatures.  See Digital signatures
+Signing contracts, simultaneous
+       with arbitrators, 99
+       without arbitrator, (face-to-face), 99, 100
+       without arbitrator, (not face-to-face), 100, 1
+       without arbitrator, (using cryptography), 101-3
+Signing documents
+       and timestamps, 34, 39
+       with public-key cryptography, 33, 35
+       with symmetric cryptosystems and arbitrator, 31, 33
+Simmons, Gustavus, 67, 318, 387
+Simple substitution cypher, 8
+Simultaneous exchange of secrets, 104, 5
+Single-key algorithm, 3
+Smart card applications, 296, 297, 309
+Smith, Peter, 318
+Snefru one-way hash function, 324, 25
+Software
+       brute-force attacks, 135, 36
+       DES implementation, 231
+       encryption, 148, 182, 83
+Software Publishers Association (SPA), 260
+Solvay-Strassen prime number algorithm, 214
+Soviet Union, 237
+Space complexity of algorithms, 194
+Speed
+       DES, 231
+       DES compared to RSA, 286, 306
+       of IDEA, 263, 64
+       of RSA, 285, 86
+SPX protocols, 55, 56
+Square roots modulo N, 213, 289
+Square roots, coin flipping using, 396
+Standards.  See Data Encryption Standard (DES), RSA algorithm
+Stereotyped beginnings and endings, 155
+Stern, 349
+Store-and-forward network, 46, 47
+Storing keys, 148, 49
+Stornetta, W. Scott, 62
+Straight permutation, 230
+Stream algorithms, 3
+Stream ciphers, 168, 77, 356, 67
+       alternating stop-and-go generator, 360, 61
+       Beth-Piper stop-and-go generators, 359
+       bilateral stop-and-go generator, 361
+       Blum-Mitcali generator, 365
+       BlumBlumShub (BBS) generator, 365, 66, 407
+       cellular automaton generator, 363
+       complexity, theoretic approach, 365, 66
+       crypt(1), 364
+       Geffe generator, 358, 59
+       Gollmann cascade, 360
+       I/p generator, 363, 64
+       information theory approach, 366, 67
+       insertion attack, 174
+       introduction, 3
+       keystream generators, 169, 72
+       MAC, 345, 46
+       multiplexer generator, 359
+       multispeed inner-product generator, 363
+       Pless generator, 359
+       randomized, 367
+       RC4, 364
+       RSA generator, 365
+       self-synchronous, 172, 174, 75
+       self-decimated generators, 362, 63
+       Shamir's pseudo-random number generator, 365
+       summation generator, 364
+       synchronous, 172
+       system-theoretic approach, 357, 64
+       threshold generator, 361, 62
+       using block ciphers as, 175, 76
+       vs. block ciphers, 176, 77
+Stream ciphers.  See also pseudo-random sequence generators
+Strong algorithms, 7
+Strong primes, 215, 16
+Subliminal channels
+       applications of, 68
+       DES, 313
+       DSA, 390, 92
+       ElGamal, 388, 89
+       ESIGN, 389, 90
+       Ong-Schorr-Shamir, 387, 88
+       protocols, 66, 68
+       subliminal-free signatures, 68
+Substitution, 8, 10, 193
+       S-box substitution, DES, 228, 29
+Summation generator, 364
+Sumoto, T., 270
+Superincreasing knapsack, 278
+Superincreasing sequence, 278
+Superpolynomial algorithms, 194
+Swap files, 152, 183
+Symmetric algorithms
+       compared to public-key, 31
+       introduction, 3, 4
+Symmetric cryptography
+       bit commitment using, 72
+       communications using, 26, 27
+       key exchange with, 42, 43
+       keys and, 26, 27
+       security of, 129, 30
+       signing documents with arbitrator, 31, 33
+       vs. public-key cryptography, 177, 78
+Symposium on the theory of Computing (STOC), 91
+Synchronous stream ciphers, 172, 74
+       counter mode, 172, 173
+       introduction, 172
+       output feedback mode, 172, 73
+
+Tandem Davies-Meyer hash function, 342, 43
+Tap sequence, 351
+TCP/IP networks, 417
+TEMPEST, 181
+Threshold generators, 361, 62
+Threshold scheme, 59, 385
+Ticket-Granting Server (TGS), 419
+Ticket-Granting Service (TGS), 419
+Ticket Granting Ticket (TGT), 421
+Tickets, 419
+Time complexity of algorithms, 194
+Time estimates for brute-force attack, 130, 35, 195
+Timestamping
+       arbitrated solution, 62, 63
+       distributed protocols, 64, 65
+       document signing and, 34, 39
+       linking protocols, 63, 64
+       services, 61, 65
+TIS-PEM, 434, 35
+Tractable problems, 195
+Traffic-flow security, 178
+Transferring keys, 145, 47
+Transposition ciphers, 10
+Trap-door one-way functions, 28
+Trial Division, 212
+Triple encryption, 166, 67
+Trusted Information Systems.  See Privacy-Enhanced Mail (PEM)
+Trusted parties, 21
+Tsujii, S., 318
+Tuchman, W. L., 166, 232, 413
+Turing, Alan, 11, 193, 196
+Turing machine, 195
+Turkin, A. I., 316
+
+U.S. export rules, 447, 54
+U.S. government cryptosystems
+       Clipper and Capstone chips, 181, 269, 436, 437, 38
+       DES (Data Encryption Standard), 12
+Unconditionally secure algorithm, 7
+Unconditionally secure multiparty protocols, 125, 26
+Undecidable problems, 196
+Undeniable digital signatures, 68, 69, 392, 95
+Unicity distance, 192
+Unicity point, 192
+UNIX
+       CRYPT(3), 242
+       Crypt Breakers Workbench (CBW), 364
+       encryption operations, 148
+       generating random values, 369, 70
+       Kerberos, 417, 25
+       ROT13, 9, 10
+       salt, 48
+       TIS-PEM, 434, 35
+Unpredictable to left/right, 366
+Untraceability, unconditional sender and recipient and, 125
+User identification, with public-key cryptography, 48, 49
+
+Van Oorschot, Paul, 167
+Variants, DES, 241, 43
+Vector scheme, 384
+Verifying keys, 147, 48
+Vernam, Gilbert, 13
+Vigenere cipher
+       classical cryptography, 10
+       simple XOR, 12, 13
+Viruses, 137
+Voting.  See Elections, secure
+
+Waidner, Michael, 69
+Waterloo, University of, 337
+Wayner, Peter, 66
+Weak DES keys, 232, 34
+Weizmann Institute in Israel, 291
+Well, coin flipping into, 77
+Wichmann, B. A., 349
+Wide-Mouth Frog protocols, 51, 52
+Wiener, Michael, 167, 287
+Windows NT, 148
+Wolfram, Steve, 337, 363
+Wood, Michael, 252, 254
+Woollven, Jack, 345
+Work factor, breaking algorithms, 7
+World War I ciphers, 10
+World War II ciphers, 11
+
+X.509 protocols, 425
+XOR algorithm, 12, 13
+Xuejia, Lai, 260
+
+Yagisawa algorithm, 318
+Yahalom protocol, 52
+Yamagishi, Atsuhiro, 252
+Yang, Shouboa, 393
+Yung, Moti, 69
+Yuval, G., 322
+
+Zenith video scrambling, 2
+Zero knowledge identification algorithm, 297
+Zero-knowledge proofs of identity
+       chess grandmaster problem, 91, 93
+       introduction, 91, 93
+       shifting identities problem, 93
+Zero-knowledge proofs of knowledge
+       basic protocol, 85, 87
+       convincing third parties, 89, 90
+       Cut and choose technique, 85, 86
+       discrete logarithm, proofs of, 401, 3
+       Feige-Fiat-Shamir algorithm, 291, 96
+       generalities, 91
+       graph isomorphism, 88, 89
+       Hamiltonian cycle, 87, 88
+       introduction, 84
+       minimum-disclosure proofs, 84
+       noninteractive proofs, 90, 91
+       parallel proofs, 89
+       RSA, ability to break, 403
+Zheng, Yuliang, 270, 336
+Zippel, 280
+
+
+

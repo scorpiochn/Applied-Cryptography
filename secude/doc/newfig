@@ -1,0 +1,53 @@
+\begin{figure}
+\framebox[2.95cm][c]{\rule[-0.5cm]{0cm}{0.9cm}X.400}
+\hspace*{0.4cm}
+\framebox[2.9cm][c]{\rule[-0.5cm]{0cm}{0.9cm}PEM}
+\hspace*{0.4cm}
+\framebox[2.8cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Key Managm.}
+\hspace*{0.4cm}
+\framebox[2.5cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Other Appl.}
+\vs{0.3cm}
+{\bf
+$|$ -- X400-IF -- $|$ \hspace*{0.2cm} $|$ -- PEM-IF -- $|$ \hspace*{0.25cm} $|$ -- KM-IF -- $|$
+}
+\vs{0.3cm}
+\framebox[2.95cm][c]{\rule[-0.5cm]{0cm}{0.9cm}X.400 Support}
+\hspace*{0.4cm}
+\framebox[2.9cm][c]{\rule[-0.5cm]{0cm}{0.9cm}PEM Support}
+\hspace*{0.4cm}
+\framebox[2.8cm][c]{\rule[-0.5cm]{0cm}{0.9cm}KM Support}
+\vs{0.3cm}
+{\bf
+$|$ -- -- -- -- -- -- -- -- -- -- AF-IF -- -- -- -- -- -- -- -- -- -- $|$
+}
+\vs{0.3cm}
+\framebox[5.5cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Local Certificate Handling}
+\hspace*{0.4cm}
+\framebox[3.65cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Directory Access}
+\hspace*{0.4cm}
+\framebox[3.4cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Other Functions}
+\vs{0.3cm}
+{\bf
+$|$ -- -- -- -- -- -- -- -- -- -- -- -- -- -- Secure-IF -- -- -- -- -- -- -- -- -- -- -- -- -- -- $|$
+}
+\vs{0.3cm}
+\framebox[13.6cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Technology Dependent Security Functions}
+\vs{0.3cm}
+{\bf 
+$|$ -- -- CC-IF -- -- -- $|$
+}
+\vs{0.3cm}
+\framebox[3.8cm][c]{\rule[-0.5cm]{0cm}{0.9cm}CC-Environment}
+\hspace*{4.25cm}
+\framebox[2.5cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Crypto-SW}
+\hspace*{0.2cm}
+\framebox[2.5cm][c]{\rule[-0.5cm]{0cm}{0.9cm}SW-CC}
+%\vs{0.5cm}
+%\caption{Interface Structure}
+\label{bild1}
+\\[1em]
+%\label{fig-isw-sm}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+Software Modules Interface Structure}
+\end{figure}

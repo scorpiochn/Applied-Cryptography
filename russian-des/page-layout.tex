@@ -1,0 +1,39 @@
+% page-layout.tex
+
+		% Page Structure of the Document
+
+%     The plain.tex \plainoutput routine will surrounded with one or
+% two bells and whistles, but not modified as such.  It is thus
+% renamed
+
+	\let\plainplainoutput=\plainoutput
+
+% so that it can be called in the new
+
+\def\plainoutput
+{\ifodd\pageno \hoffset=\oddhoffset\else \hoffset=\evenhoffset\fi
+ \plainplainoutput \global\firstpagefalse}%
+
+% The first page of the document is handled differently from any
+% of the others, so the page routine needs a flag to distinguish it.
+
+		\newif\iffirstpage 
+
+% The head and foot lines make provision for five fields running
+% from far left through center to far right.
+
+\headline={\llap{\farlefthead\kern 10pt}%
+	   \rlap{\lefthead}\hss\clap{\centerhead}\hss\llap{\righthead}%
+	   \rlap{\kern 10pt\farrighthead}}%
+\footline={\llap{\farleftfoot\kern 10pt}%
+	   \rlap{\leftfoot}\hss\clap{\centerfoot}\hss\llap{\rightfoot}%
+	   \rlap{\kern 10pt\farrightfoot}}%
+
+% To support two sided printing, the \hoffset varies from odd to even
+% pages.  These two values are given the names:
+
+	\newskip\oddhoffset
+	\newskip\evenhoffset
+
+ \def\farlefthead{}\def\farrighthead{}%
+ \def\farleftfoot{}\def\farrightfoot{}%

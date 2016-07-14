@@ -1,0 +1,150 @@
+\section{Operation of Encryption Keys}
+\markboth{Operation Encryption}{Operation Encryption}
+\thispagestyle{myheadings}
+\label{ope}
+
+\subsection{One Extra Pair of Keys for Encryption and Decryption}
+\label{ope-epk}
+
+Decryption of an encrypted text means to apply one's private key
+to an unreadable text. In order to prevent users from ``signing''
+unreadable texts blindly,
+users are provided by {\em two different pairs of keys}:
+one pair for signature and verification; the other pair for
+encryption and decryption.
+
+The public encryption key is certified by the same authority which
+issues the signature certificate to the user. Therefore,
+the encryption user certificate is combined with the same
+forward certification path to make up an
+{\em encryption recipient certificate}
+(X.509 type ``certificates'').
+
+A signature originator certificate is distinguished from
+an encryption recipient certificate by the object identifiers
+of their public key infos.
+The standards (X.509, Annex H, \cite{cci4}) define
+object identifiers for {\em signature algorithms}
+and for {\em encryption algorithms}, respectively.
+See paragraph \ref{ds-ca} above for reference.
+
+\subsection{Security Requirements}
+\label{ope-sr}
+
+The application of a wrong encryption key is not that dangerous,
+in that the main effect will be, that nobody in the world is able
+to decrypt the text. In that case, the recipient might provide
+the sender with the correct public encryption key.
+However, one must be aware of intruders
+who try to trigger information by offering masqueraded
+encryption recipient certificates.
+This is encountered by certificate checks:
+before encrypting a text for a partner,
+a user checks the encryption recipient certificate at an
+appropriate security level.
+
+\subsection{Change of Keys}
+\label{ope-ck}
+
+\subsubsection{Old and New Decryption Key}
+\label{ope-ondk}
+
+In order to avoid confusion by a change of encryption keys,
+every user has not only one, but {\em two}
+private decryption keys on his smartcard
+(DecryptionSKnew and DecryptionSKold are described
+in paragraph \ref{decsk} above):
+
+\begin {center}
+\begin {tabular}{|c|c|c|}
+\hline
+{\em issuer} & {\em serial no}& {\em key} \\ \hline
+$<issuer>_{Cert-old}$ & $<serial-no>_{Cert-old}$ & $B_{Sold}$    \\ \hline
+$<issuer>_{Cert-new}$ & $<serial-no>_{Cert-new}$ & $B_{Snew}$    \\ \hline
+\end {tabular}
+\end {center}
+ 
+\label{fig-ope-ondk}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: Private decryption keys}
+\\
+{\footnotesize $<issuer>_{Cert-old}$ denotes the issuer name of the
+old decryption certificate;
+$<serial-no>_{Cert-old}$ denotes the serial number of the
+old decryption certificate;
+$B_S$ denotes the private (``secret'') key
+of the user $B$, in this case for the purpose of decryption}
+\\[1em]
+A sender of an encrypted message should inform the recipient,
+which public encryption key he used,
+in order to enable the recipient to apply his correct private decryption key.
+There is only one unique way to do that without using redundant
+message encoding.
+That is, by sending the issuer name and the serial number
+of the public encryption certificate along with the encrypted message.
+The recipient has to map that information on his respective private
+decryption key.
+Therefore, the smartcard table for the old and
+new private decryption key is organized this way.
+Also, this allows the user to store more than two decryption keys,
+and even cross-certificate mappings for the keys.
+\\
+In case of confusion, the recipient can ask the sender
+for the encryption recipient certificate in order to check it;
+he can (and should) also provide the sender by the correct certificate.
+
+\subsubsection{Reencrypting Stored Encrypted Texts}
+\label{ope-set}
+
+When receiving a new pair of decryption keys and a new
+encryption recipient certificate,
+the user has to decrypt all of his stored encrypted texts
+by applying the old decryption key,
+and then to encrypt them again
+by applying the new encryption key, which he reads from the new certificate.
+In general, this applies not for the complete texts, but only for
+the DES-keys, by which the texts are symmetrically encrypted.
+The DES-keys will not change, such that the texts themselves
+need not be reencrypted.
+
+\subsubsection{Steps to Change Keys}
+\label{ope-sck}
+
+User keys are created by the users themselves.
+In case of a change of a pair of encryption and decryption keys,
+on the smartcard
+the expired secret decryption key will switch its status from
+``new'' to ``old'', while the newly created secret decryption
+key will be stored with the status ``new''.
+The public encryption key would be included in a prototype
+certificate which is sent to the user-CA with request of
+updating and signing the certificate.
+After reception of the signed certificate the user
+replaces the old encryption key certificate on his smartcard
+by this new one. The old one is not needed any more
+(``EncrCertificate'', see \ref{enccert}).
+Now, the user sends his new encryption certificate
+to all his important communication parnters.
+He also reencrypts all his locally stored encrypted texts (see \ref{ope-set}).
+
+\subsection{The Smartcard Table
+``Trusted Public Encryption Keys''}
+\label{ope-tpvk}
+
+In order to support confidential communication between partners without
+use of directories and without repeated checks of certificates,
+users maintain tables of trusted public encryption keys
+on their smartcards.
+The users can read and write the lines of their smartcard tables.
+
+Before adding a new public key to that list, the respective
+encryption recipient certificate is to be checked at security level 3.
+After that, the certificate is thrown away and will not be used any more.
+
+There is no security risk with the late update of such an entry.
+When using an old encryption key, the partner is able to decrypt the
+text anyway, in that he keeps one old decryption key on his smartcard.
+If the encryption key applied is even older, the recipient will not
+be able to decrypt the text, and no person in the world would be able,
+either. This is the occasion to provide the partner with the actual
+encryption key.

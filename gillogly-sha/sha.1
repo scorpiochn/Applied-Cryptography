@@ -1,0 +1,35 @@
+.TH SHA 1 "30 Apr 1993"
+.SH NAME
+sha \- Secure Hash Algorithm
+.SH SYNOPSIS
+.B "sha [-vt] [\fIfilename\fB]..."
+.SH DESCRIPTION
+.I Sha
+calculates the NIST Secure Hash Algorithm defined in FIPS 180.
+For each file in the list it
+produces 160 bits of hash, formatted as 40 hex digits.  The "-v" flag
+causes
+.I sha
+to print the filename as well as the hash.  The "-t" flag suppresses
+the spaces between 32-bit groups.  If no file is specified, it processes
+the standard input.
+.PP
+NIST suggests using the Secure Hash Algorithm as a message digesting function,
+producing a message-dependent fixed-size block that may be securely signed
+with a digital signature system such as NIST's DSS.  Quoting from the
+draft standard, "The SHA is designed to have the following properties:
+it is computationally infeasible to recover a message corresponding to
+a given message digest, or to find two different messages which produce
+the same message digest."
+.PP
+It may also be used as an ordinary file checksum.
+
+.SH "SEE ALSO"
+sum(1), sha_file(3), FIPS 180
+
+.SH BUGS
+NIST defines SHA for arbitrary bit strings.  This implementation operates
+only at the byte level.
+
+.SH AUTHOR
+Jim Gillogly

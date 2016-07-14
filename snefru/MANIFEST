@@ -1,0 +1,22 @@
+   File Name		Archive #	Description
+-----------------------------------------------------------
+ HISTORY                    1	Revision history.
+ MANIFEST                   1	This shipping list.
+ Makefile                   1	Make control file.
+ README                     1	Installation notes, etc.
+ TestArticle                1	Sample input to regression test.
+ checkhash.1                1	Manual page for checkhash.
+ checkhash.c                1	Check if an article matches its checksum.
+ hash512.c                  2	Fast code to hash 512 bytes at a time.
+ hashn.c                    1	Hash 2^N bytes at a time.
+ hashnews.1                 1	Manual page for hashnews.
+ hashnews.c                 1	Put a Snefru checksum in a news article.
+ patchlevel.h               1	Misteak recorder
+ pipeit.c                   1	Routines to call Snefru as a filter.
+ sboxes.c                   4	The S boxes.
+ snefru.1                   1	Manual page for Snefru.
+ snefru.c                   1	Main driver to hash some input.
+ snefru.h                   1	Header file for the package.
+ testboxes.c1               3	Program to test the S boxes, part 1.
+ testboxes.c2               2	Program to test the S boxes, part 2.
+ tests.sh                   1	Script to perform regression tests.

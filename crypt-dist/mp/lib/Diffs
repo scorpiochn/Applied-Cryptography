@@ -1,0 +1,79 @@
+diff -cr ./.Ignore.all lib/.Ignore.all
+*** ./.Ignore.all	Tue Nov 24 15:06:05 1992
+--- lib/.Ignore.all	Tue Aug 11 18:02:19 1992
+***************
+*** 1,5 ****
+- No-proto
+- lib
+  libamp.a
+  mp_add.o
+  mp_add_int.o
+--- 1,3 ----
+Only in .: Diffs
+Only in lib: Makefile
+Common subdirectories: ./No-proto and lib/No-proto
+Only in lib: O-cc
+Only in lib: O-gcc
+diff -cr ./amp.h lib/amp.h
+*** ./amp.h	Tue Nov 24 15:09:49 1992
+--- lib/amp.h	Sun Nov 22 19:54:08 1992
+***************
+*** 23,29 ****
+  
+  /* This should be defined as 1 if trickery like (p == (amp*)1)
+  works correctly. Otherwise, define it as 0 */
+! #define MP_ADDR_KLUDGE 1
+  
+  #if __alpha
+  typedef unsigned int	mp_int;	/* MP_BITS-bit unsigned integer */
+--- 23,29 ----
+  
+  /* This should be defined as 1 if trickery like (p == (amp*)1)
+  works correctly. Otherwise, define it as 0 */
+! #define MP_ADDR_KLUDGE 0
+  
+  #if __alpha
+  typedef unsigned int	mp_int;	/* MP_BITS-bit unsigned integer */
+Only in lib: core
+Only in lib: files
+Only in .: lib
+Only in lib: libamp.a
+Common subdirectories: ./libdir and lib/libdir
+Only in lib: mm1
+diff -cr ./mp_cmp.c lib/mp_cmp.c
+*** ./mp_cmp.c	Sun Nov 22 18:02:50 1992
+--- lib/mp_cmp.c	Sun Nov 22 19:14:13 1992
+***************
+*** 1,10 ****
+  #define MP_PRIVATE 1
+  #include "amp.h"
+  
+  mp_cmp(amp *a, amp *b)
+  
+  {
+-   int	r;
+    mp_remove_zeros(a);
+    mp_remove_zeros(b);
+  
+--- 1,10 ----
+  #define MP_PRIVATE 1
+  #include "amp.h"
+  
++ int
+  mp_cmp(amp *a, amp *b)
+  
+  {
+    mp_remove_zeros(a);
+    mp_remove_zeros(b);
+  
+***************
+*** 21,26 ****
+--- 21,27 ----
+    }
+  }
+  
++ int
+  mp_cmp_internal(amp *a, amp *b)
+  
+  {
+Only in lib: mp_div.c.saved

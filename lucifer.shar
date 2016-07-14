@@ -1,0 +1,389 @@
+Path: msuinfo!midway!linac!pacific.mps.ohio-state.edu!cis.ohio-state.edu!zaphod.mps.ohio-state.edu!rpi!ghost.unimi.it!vince
+From: vince@ghost.unimi.it (David Vincenzetti)
+Newsgroups: sci.crypt
+Subject: Lucifer
+Summary: Two C implementations of the famous cipher
+Keywords: cipher security crypt lucifer devil
+Message-ID: <1991Jun24.193503.4409@ghost.unimi.it>
+Date: 24 Jun 91 19:35:03 GMT
+Organization: Computer Science Dep. - Milan University
+Lines: 376
+
+
+	Here it is. So many people, actually _too_ many, asked me
+the sources of the Lucifer cipher. One sent me another C implementation
+that I called Lucifer_cbc. It should be carefully investigated
+for trap doors and other nasties, I do not have time for that.
+Anyway, lucifer.c was taken from a well known ftp site (use Archie).
+--
+David Vincenzetti - Deptt. of CS, Univ. of Milan, ITA - vince@ghost.unimi.it
+
+#---------------------------------- cut here ----------------------------------
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+# it by saving it into a file and typing "sh file".  To overwrite existing
+# files, type "sh file -c".  You can also feed this as standard input via
+# unshar, or by typing "sh <file", e.g..  If this archive is complete, you
+# will see the following message at the end:
+#		"End of shell archive."
+# Wrapped by vince@ghost on Mon Jun 24 21:27:39 1991
+# Contents:  lucifer.c lucifer_cbc.c
+# Existing files will not be overwritten.
+# Error checking via sum(1) will be performed.
+# Files are compressed using compress(1).
+
+overwrite_check()
+{
+	echo Ok to overwrite existing file $1 \? \\c
+	read answer
+	case "$answer" in
+	[yY]*)	echo Proceeding;;
+	*)	echo Aborting; exit 1;;
+	esac
+	rm -f $1
+	if test -f $1
+	then
+		echo Error: could not remove $1, aborting
+		exit 1
+	fi
+}
+
+test "${1}" != "-c"
+overwrite_opt=$?
+LANG=""; export LANG
+PATH=/bin:/usr/bin:$PATH; export PATH
+
+if sum -r </dev/null >/dev/null 2>&1
+then
+	sumopt='-r'
+else
+	sumopt=''
+fi
+
+if test -f lucifer.c -a $overwrite_opt -eq 0
+then
+	overwrite_check lucifer.c
+fi
+[ -d `dirname lucifer.c` ] || mkdir -p `dirname lucifer.c`
+
+rm -f /tmp/uud$$
+(echo "begin 777 /tmp/uud$$\n \nend" | uudecode) >/dev/null 2>&1
+if [ -f /tmp/uud$$ ]
+then
+	rm -f /tmp/uud$$
+	unpacker=uudecode
+else
+	echo Compiling unpacker for non-ascii files
+	pwd=`pwd`; cd /tmp
+	cat >unpack$$.c <<-'EOF'
+	#include <stdio.h>
+	#define DEC(c)	(((c) - ' ') & 077)
+	main()
+	{
+		int n;
+		char dest[128], a,b,c,d;
+
+		scanf("begin %o ", &n);
+		gets(dest);
+
+		if (freopen(dest, "w", stdout) == NULL) {
+			perror(dest);
+			exit(1);
+		}
+
+		while ((n=getchar()) != EOF && (n=DEC(n))!=0)  {
+			while (n>0) {
+				a = DEC(getchar());
+				b = DEC(getchar());
+				c = DEC(getchar());
+				d = DEC(getchar());
+				if (n-- > 0) putchar(a << 2 | b >> 4);
+				if (n-- > 0) putchar(b << 4 | c >> 2);
+				if (n-- > 0) putchar(c << 6 | d);
+			}
+			n=getchar();
+		}
+		exit(0);
+	}
+	EOF
+	cc -o unpack$$ unpack$$.c
+	rm unpack$$.c
+	cd $pwd
+	unpacker=/tmp/unpack$$
+fi
+
+echo x - lucifer.c '[compressed]'
+$unpacker <<'@eof'
+begin 600 lucifer.c
+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
+KQCR(Z'8= 7>QPA!T!P(B4 40(R)ZL90NT0);4 9\0 9=@'AB]Y>.]W.5!X<,
+ 
+end
+@eof
+uncompress <lucifer.c >/tmp/compress$$
+mv /tmp/compress$$ lucifer.c
+set `sum $sumopt <lucifer.c`; if test $1 -ne 12063
+then
+	echo ERROR: lucifer.c checksum is $1 should be 12063
+fi
+
+chmod 600 lucifer.c
+
+if test -f lucifer_cbc.c -a $overwrite_opt -eq 0
+then
+	overwrite_check lucifer_cbc.c
+fi
+[ -d `dirname lucifer_cbc.c` ] || mkdir -p `dirname lucifer_cbc.c`
+echo x - lucifer_cbc.c '[compressed]'
+$unpacker <<'@eof'
+begin 600 lucifer_cbc.c
+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
+EEU(WQ"J,;) -W]216IB/24-31.L<) 8(I$XA045@="JO.IV&">@.
+ 
+end
+@eof
+uncompress <lucifer_cbc.c >/tmp/compress$$
+mv /tmp/compress$$ lucifer_cbc.c
+set `sum $sumopt <lucifer_cbc.c`; if test $1 -ne 2404
+then
+	echo ERROR: lucifer_cbc.c checksum is $1 should be 2404
+fi
+
+chmod 600 lucifer_cbc.c
+
+rm -f /tmp/unpack$$
+echo shar: End of shell archive.
+exit 0
+-- 
+David Vincenzetti - Deptt. of CS, Univ. of Milan, ITA - vince@ghost.unimi.it

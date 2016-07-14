@@ -1,0 +1,7 @@
+for j in config hutlib alodes mp; do ( cd $j; make ); done
+for j in tables lib prog; do ( cd $j; make ); done
+for j in lib prog; do ( cd $j; make ); done
+cc -g -O -Ilibdir  -c share-secret.c
+
+uopt: Warning: file not optimized; use -g3 if both optimization and debug wanted
+cc -g -Llibdir  -o share-secret share-secret.o  -lamp -ldes -lhut

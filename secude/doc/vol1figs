@@ -1,0 +1,2 @@
+dviselect -i vol1.dvi -o bii.dvi 7:8,11:12,15:16,43:46 
+dvips bii.dvi | lpr

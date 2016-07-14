@@ -1,0 +1,1052 @@
+SecuDE-4.1       with X.500, Strong Authentication, Smartcard Support       (c)1993 GMD Darmstadt
+
+
+General User Utilities:
+=======================
+
+
+sign:  Sign Files
+
+
+Description:
+
+'sign' signs the given <files>. It uses algorithms and keys according
+to the parameter -k and -a (default: SKnew/SignSK). For each
+file in <files> it produces file.sig (containing the signature) and, if
+-C is given, file.ctf (containing the user certificate and the forward
+certification path).
+
+
+usage:
+
+sign [-CvVWUth] [-p <pse>] [-c <cadir>] [-k <key>] [-a <alg>] [-H <hashinput>] [<files>]
+
+with:
+
+-C               Produce .ctf files containing user certificate and forward certification
+                 path for each file to be signed. Otherwise, produce only .sig files
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only)
+-U               Show time used for cryptographic algorithms
+-t               Control malloc/free behaviour
+-h               Write this help text
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+-k <key>         PSE-object or key reference of signature key. Default: SKnew/SignSK
+-a <signalg>     Signature algorithm. Default: md5WithRsaTimedate (RSA) or dsaWithSHA (DSS),
+                 depending on the signature key
+-H <hashinput>   PSE-object or key reference of hash input (sqmodn only)
+<files>          Filenames
+
+************************************************************************************************
+
+
+verify: Verify Signatures of Files
+
+
+Description:
+
+'verify' verifies the given <files>. It uses algorithms and keys according
+to the parameter -k and -a (default: Cert/SignCert). For each
+file in <files> it expects file.sig (containing the signature) and
+optionally file.ctf (containing the user certificate and the forward
+certification path). If file.ctf does not exist, the verification will
+only succeed if the file was signed by oneself.
+
+
+usage:
+
+verify [-DRvFVWtTUh] [-p <pse>] [-c <cadir>] [-d <dsa>] [-A <authlevel>] [-k <key>] 
+       [-f <fcpath>] [<files>]
+
+with:
+
+-D               Retrieve missing certificates from the Directory (X.500 or .af-db)
+-F               Consider own FCPath as trusted
+-R               Consult certificate revocation lists for all cerificates which
+                 are in the certification path
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only)
+-t               Control malloc/free behaviour
+-T               Perform each public key RSA operation in the smartcard  terminal
+                 instead with the software in the workstation (the latter is default)
+-U               Show time used for cryptographic algorithms
+-h               Write this help text
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+-d <dsa>         name of the DSA to be accessed for retrieving certificates
+                 and certificate revocation lists
+-A <authlevel>   Level of authentication used for binding to the X.500 Directory
+                 It may be SIMPLE or STRONG (default: environment variable AUTHLEVEL, or NONE, if
+                 this does not exist). STRONG implies the use of signed DAP operations
+-k <key>         PSE-object (containing either a certificate or a key) or key reference 
+                 of verification key. Default: Cert/SignCert
+-f <fcpath>      name of PSE-object which contains the Forward Certification Path
+<files>          Filenames
+
+************************************************************************************************
+
+
+encrypt:  Encrypt Files
+
+
+Description:
+
+'encrypt' encrypts the given <files>. It uses algorithms and keys according
+to the parameter -k or -w or -r or -w. Not more than one of these parameters
+must be given (default: key and alg from PSE-object Cert/EncCert). For each
+file in <files> it encrypts from file to file.enc and removes file.
+'encrypt' also works as a filter from stdin to stdout.
+
+
+usage:
+
+encrypt [-DnxvVWtTU] [-k <key>] [-r <recipient>] [-w <pw>] [-e <deskey>] 
+        [-E <encalg>] [-p <pse>] [-c <cadir>] [-d <dsa>] [-A <auth-level>]
+        [<files>]
+
+with:
+
+(not more than one of the parameters -k, -e, -w and -r must be given. If none of these four
+ parameters is given, the file is symmetrically (default: desCBC) encrypted with a newly 
+ generated DES key, and the DES key is asymmetrically encrypted with the own encryption key
+ (Cert/EncCert). This is called the hybrid method.)
+
+-k <object/ref>  PSE-object (containing either a certificate or a key) or key reference 
+                 of encryption key. Default: Cert/EncCert. If this key is an asymmetric
+                 key, the hybrid method is used.
+-e <key>         DES key for desCBC encryption.
+-x               If given, <key> of parameter -e must be a 16 character string
+                 denoting the key in a [0-9, A-F] notation. Otherwise it must be
+                 an 8 character string comprising the key itself.
+-w               8 character password which is transformed into a DES key with a
+                 one-way function, for desCBC encryption.
+-r               Intended recipient (alias allowed). Search encryption key of this recipient
+                 in EKList/PKList. If not given, encrypt with own encryption key. This
+                 implies the hybrid method
+-n               Don't use the hybrid method in case of an asymmetric key. Do asymmetric
+                 encryption of the whole file (not recommendable for larger files)
+-D               Search public encryption key in the Directory if it cannot
+                 be found in EKList/PKList of the PSE
+-d <dsa>         Name of the DSA to be accessed for retrieving the public encryption key
+-A <auth_level>  Level of authentication in case of X.500 Directory access. <auth-level>
+                 may be SIMPLE or STRONG (default: environment variable AUTHLEVEL, or NONE, if
+                 this does not exist). STRONG implies the use of signed DAP operations
+-E <encalg>      Use algorithm encalg instead of desCBC for the file encryption. <encalg>
+                 must be a symmetric algorithm
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only)
+-t               Control malloc/free behaviour
+-T               Perform each public key RSA operation in the smartcard  terminal
+                 instead of employing the software in the workstation (the latter is the default)
+-U               Show time used for cryptographic algorithms
+-h               Write this help text
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+<files>          Filenames
+
+************************************************************************************************
+
+
+decrypt:  Decrypt Files
+
+
+Description:
+
+'decrypt' decrypts the given <files>. It uses algorithms and keys according
+to the parameter -k or -w or -r or -w. Not more than one of these parameters
+must be given (default: key and alg from PSE-object SKnew/DecSKnew). For each
+file in <files> it decrypts from file.enc to file and removes file.enc.
+'decrypt' also works as a filter from stdin to stdout.
+
+
+usage:
+
+decrypt [-nxvVWtU] [-k <key>] [-w <pw>] [-e <deskey>] 
+        [-E <encalg>] [-p <pse>] [-c <cadir>] [<files>]
+
+with:
+
+(not more than one of the parameters -k, -e and -w must be given. If none of these three
+ parameters is given, the file is symmetrically (default: desCBC) decrypted with the key from 
+ <file>.sig which will be asymmetrically decrypted before with the own decryption key
+ (SKnew/DecSKnew). This is called the hybrid method.)
+
+-k <object/ref>  PSE-object (containing a KeyInfo) or key reference 
+                 of decryption key. Default: SKnew/DecSKnew. If this key is an asymmetric
+                 key, the hybrid method is used.
+-e <key>         DES key for desCBC decryption.
+-x               If given, <key> of parameter -e must be a 16 character string
+                 denoting the key in a [0-9, A-F] notation. Otherwise it must be
+                 an 8 character string comprising the key itself.
+-w               8 character password which is transformed into a DES key with a
+                 one-way function, for desCBC decryption.
+-n               Don't use the hybrid method in case of an asymmetric key. Do asymmetric
+                 decryption of the whole file
+-E <decalg>      Use algorithm decalg instead of desCBC for the file decryption. <decalg>
+                 must be a symmetric algorithm
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only)
+-t               Control malloc/free behaviour
+-U               Show time used for cryptographic algorithms
+-h               Write this help text
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+<files>          Filenames
+
+************************************************************************************************
+
+
+pem  Privacy Enhancement for Internet Electronic Mail
+
+usage:
+
+pem [ scan | mic-clear | mic-only | encrypted | crl | clr-rr | certify ]
+    [-i <inputfile>] [-o <outputfile>] [-p <psename>] [-c <cadir>] [-m|M 1..200]
+    [-u <update>] [-r <name1 ...> ] [-y <name1 ...> ] [-CnFNOhvVWRDTt] [-d <dsaname>]
+    [-H <mic-alg>] [-S <micenc-alg>] [-E <msgenc-alg>] [-K <dekenc-alg>]
+
+with:
+
+scan             read PEM any Proc-Type, write clear body and/or update
+                 PSE and/or CA-database according to -u (default)
+mic-clear        read text file, write PEM Proc-Type MIC-CLEAR
+mic-only         read text file, write PEM Proc-Type MIC-ONLY
+encrypted        read text file, write PEM Proc Type ENCRYPTED according to -r
+crl              write PEM Proc-Type CRL according to -y
+crl-rr           write PEM Proc-Type CRL-RETRIEVAL-REQUEST according to -y
+certify          read PEM Proc-Type MIC-CLEAR or MIC-ONLY, check whether it is certification
+                 request, sign Prototype-certificate, write certification reply
+-i <inputfile>   inputfile (default: stdin)
+-o <outputfile>  outputfile (default: stdout)
+-p <psename>     PSE name (default: .pse)
+-c <cadir>       name of CA-directory (default: .ca)
+-m <level>       depth of multi PEM body, which is to be de-enhanced (only if pem scan)
+-M <level>       depth of multi PEM body, up to which is to be de-enhanced (only if pem scan)
+-u <update>      mode for updating the PSE or CA-database after scanning a PEM-msg
+                 (ask, yes, no, cadb, pse (default: ask))
+-r <recipients>  DNames or alias-names of recipients (only if pem encrypted)
+-y <issuers>     DNames or alias-names of issuers of CRLs or CRL-RRs (only if pem crl or pem clr-rr)
+-C               generate PEM-header with Originator-Certificate and all Issuer-Certificates
+                 (default: generate PEM-header with Originator-ID-Asymmetric)
+-n               don't insert Key-Info header field for originator (only if pem encrypted)
+-N               use of non-PEM conformant algorithms allowed
+-O               RFC 1422 DName subordination not required
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only
+-F               consider own FCPath as trusted
+-R               consult CRLs during validation process
+-D               retrieve missing certificates or CRLs from the Directory (X.500 or .af-db)
+-d <dsaname>     name of the DSA to be initially accessed (default: locally configured DSA)
+-A <authlevel>   level of authentication used for binding to the X.500 Directory
+-H <mic-alg>     MIC algorithm (default: RSA-MD5)
+-S <micenc-alg>  MIC encryption algorithm (default: RSA)
+-E <msgenc-alg>  Message encryption algorithm (default: DES-CBC) (only if pem encrypted)
+-K <dekenc-alg>  DEK encryption algorithm (default: RSA) (only if pem encrypted)
+-t               enable memory checking
+-T               verification of signature is to be done by the smartcard terminal
+
+************************************************************************************************
+
+
+hsh:  Hash Filter
+
+
+Description:
+
+'hsh' reads <file> and writes its hash value to <hash>. It uses the algorithm
+given with parameter -a <alg>. <alg> is the name of an algorithm of type HASH.
+
+
+usage:
+
+hsh [-vh] [-a <alg>] [-H <hashinput>] [-p <pse>] [-c <cadir>] [<file> [<hash>] ]
+
+with:
+
+-a <alg>         Name of a hash algorithm (default: md5
+-H <hashinput>   PSE-object or key reference of hash input (sqmodn only)
+-p <psename>     PSE name, if <hashinput> is PSE-object (sqmodn only)
+-c <cadir>       CA directory, if <hashinput> is PSE-object (sqmodn only)
+-v               verbose
+-h               Write this help text
+<file>           Filename of file to be hashed. Stdin, if omitted
+<hash>           File where hash value shall be written. Stdout, if omitted
+
+************************************************************************************************
+
+
+encode  Encode File to RFC 1421 or [0-9,A-F] ASCII Represenation
+
+usage:
+
+encode [-hvVW] [file] {encodedfile]
+
+with:
+
+-r               RFC 1421 encoding style (default)
+-x               [0-9,A-F] encoding style
+-i <n>           insert newlines after n characters (default 64)
+-h               write this help text
+-v               verbose
+
+************************************************************************************************
+
+
+decode  decode RFC 1421 or [0-9,A-F] encoded ASCII file to file
+
+usage:
+
+decode [-hvVW] [encodedfile] [file]
+
+with:
+
+-r               RFC 1421 encoding style (default)
+-x               [0-9,A-F] encoding style
+-h               write this help text
+-v               verbose
+
+************************************************************************************************
+
+
+algs  Information about algorithms
+
+usage:
+
+algs [-UGvVth] [-a] [<name>] [-s] [<keyword>] [-k] [<k1> <k2> ... ] [-l] [<quantity>]
+
+with:
+
+-a <name>        Selects a single algorithm with name <name>
+-s <keyword>     Selects groups of algorithms. Either one of the AlgTypes (SYM_ENC, ASYM_ENC,
+                 HASH, SIG) which selects all algorithms of the given type, or a string
+                 which is contained in an algorithm name.
+-U               Show performance times of algorithms for sign, verify, encrypt, decrypt
+                 and hash, depending on the algorithm type:
+                 Signature algorithms: Total, asymmetric encryption and hash time for
+                           signing and verifying a given quantity with different
+                           keysizes (parameter -k). Asymmetric keys are generated
+                           and stored in PSE $(TOP)/lib/.testkeys afterwards if not available
+                 Asymetric Encryption algorithms: Encryption and decryption of a block
+                           with different keysizes (parameter -k). Asymmetric keys are generated
+                           and stored in PSE $(TOP)/lib/.testkeys afterwards if not available
+                 Symmetric Encryption algorithms: Encryption of a 100 K quantity
+                 Hash algorithms: Hashing of a given quantity
+-G               Show key generation times of asymmetric algorithms with
+                 different keysizes (parameter -k). Needs time!
+-k <k1> <k2> ... Use keysizes k1, k2, ... (default: 512, 640, 756, 1024)
+-l <quantity>    Quantity to be signed or hashed in K bytes (default: 100)
+-v               verbose
+-V               Verbose
+-t               Control malloc/free behaviour
+-h               Write this help text
+
+************************************************************************************************
+
+
+secxlock  Locks the local X display using strong authentication with your PSE
+
+usage:
+
+secxlock [-h] [-p <pse>] [-c <cadir>]
+
+with:
+
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+-h               Write this help text
+
+************************************************************************************************
+
+
+Utilities to Create and Maintain your Personal Security Environment (PSE)
+=========================================================================
+
+
+psecreate: Create User PSE
+
+
+Description:
+
+'psecreate'  creates a User PSE with one or two asymmetric keypairs on it,
+whose public keys are held within self-signed prototype certificates.
+
+
+usage:
+
+psecreate [-hqtvVW] [-p <pse>] [-s <signalg>] [-k <keysize>] [-e <encalg>] [-k <keysize>] [Name]
+
+with:
+
+-p <pse>         PSE name (default: Environment variable PSE or .pse)
+-s <signalg>     Signature algorithm (default: rsa)
+-k <keysize>     Keysize of RSA signature key
+-e <encalg>      Encryption algorithm (default: rsa)
+-k <keysize>     Keysize of RSA encryption key
+-q               create PSE that contains two RSA keypairs (default: one RSA keypair only)
+-h               write this help text
+-t               control malloc/free behaviour
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<Name>           Intended owner of the generated User PSE
+
+************************************************************************************************
+
+
+sectool: Maintain your PSE
+aliastool: Maintain your aliases (Alias sub-tool of sectool)
+directorytool: Access Directory (Directory sub-tool of sectool)
+
+
+Description:
+
+'sectool' is, like psemaint,  a maintenance program which can be used by both
+certification authority administrators and users for the purpose
+of maintaining their PSEs. This includes moving information (e.g. keys,
+certificates, revocation lists etc.) from Unix files or a X.500 Directory
+into the PSE and vice versa, generating keys, changing PINs, displaying
+the content of the PSE, and maintaining the user's aliases. In contrast
+to psemaint, which is line-oriented, sectool is an OpenWindows tool.
+
+
+usage:
+
+sectool [-tADvVWh] [-p <pse>] [-c <cadir>] [-d <dsa name>]
+aliastool [-tDvVWh] [-p <pse>] [-c <cadir>] [-d <dsa name>]
+directorytool [-tADvVWh] [-p <pse>] [-c <cadir>] [-d <dsa name>]
+with:
+
+-p <psename>        PSE name (default: environment variable PSE or .pse)
+-c <cadir>          Name of CA-directory (default: environment variable CADIR or .ca)
+-t                  control malloc/free behaviour
+-v                  verbose
+-V                  Verbose
+-W                  Grand Verbose (for testing only)
+-d <dsa name>       Name of the DSA to be initially accessed (default: locally configured DSA)
+-A <authlevel>      Level of authentication used for X.500 Directory access
+                    <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                    (default: environment variable AUTHLEVEL or 'No authentication')
+                    STRONG implies the use of signed DAP operations
+
+************************************************************************************************
+
+
+psemaint: Maintain PSE
+
+
+Description:
+
+'psemaint' is a maintenance program which can be used by both
+certification authority administrators and users for the purpose
+of maintaining their PSEs. This includes moving information (e.g. keys,
+certificates, revocation lists etc.) from Unix files or a X.500 Directory
+into the PSE and vice versa, generating keys, changing PINs and displaying
+the content of the PSE.
+
+
+usage:
+
+psemaint [-htvACFRDTVW] [-p <pse>] [-c <cadir>] [-a <issueralg>] [-f <notbefore>] [-l <notafter>]
+         [-i <inputfile>] [-d <dsa name>] [-A <authlevel>] [cmd]
+with:
+
+-p <psename>        PSE name (default: environment variable PSE or .pse)
+-c <cadir>          Name of CA-directory (default: environment variable CADIR or .ca)
+-i <inputfile>      Scriptfile containing the commands to be executed by 'psemaint'
+-a <issueralg>      CA's signature algorithm (default: md2WithRsaEncryption)
+-f <notbefore>      First date on which the certificate is valid
+                    (evaluated by 'certify' command within 'psemaint')
+-l <notafter>       Last date on which the certificate is valid
+                    (evaluated by 'certify' command within 'psemaint')
+-F                  consider own FCPath as trusted
+-R                  consult PEM revocation lists during verification
+-C                  show list of commands available with 'psemaint'
+-D                  access Directory (X.500 or .af-db)
+-T                  perform each public key RSA operation in the smartcard  terminal
+                    instead of employing the software in the workstation (the latter is the default)
+-h                  write this help text
+-t                  control malloc/free behaviour
+-v                  verbose
+-V                  Verbose
+-W                  Grand Verbose (for testing only)
+-d <dsa name>       Name of the DSA to be initially accessed (default: locally configured DSA)
+-A <authlevel>      Level of authentication used for X.500 Directory access
+                    <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                    (default: environment variable AUTHLEVEL or 'No authentication')
+                    STRONG implies the use of signed DAP operations
+<cmd>               Single command that shall be executed by 'psemaint'
+                    (otherwise, commands can be provided interactively
+                    or are read from file <inputfile> (see option -i))
+
+************************************************************************************************
+
+
+instpkroot: Install Public Root Information on PSE
+
+
+Description:
+
+'instpkroot' reads file <pkroot> or stdin, if <pkroot> is omitted,
+and installs its content as PSE object PKRoot on the indicated PSE.
+A PKRoot information that already exists on the target PSE will be overwritten.
+
+
+usage:
+
+instpkroot [-htvVW] [-p <pse>] [-c <cadir>] [pkroot]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<pkroot>         File containing public root information (or stdin, if omitted)
+
+************************************************************************************************
+
+
+instfcpath: Install Forward Certification Path on PSE
+
+
+Description:
+
+'instfcpath' reads file <fcpath> or stdin, if <fcpath> is omitted,
+and installs its content as PSE object FCPath on the indicated PSE.
+A FCPath information that already exists on the target PSE will be overwritten.
+
+
+usage:
+
+instfcpath [-htvVW] [-p <pse>] [-c <cadir>] [fcpath]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<fcpath>         File containing FCPath (or stdin, if omitted)
+
+************************************************************************************************
+
+
+instcert: Install Certificate on PSE
+
+
+Description:
+
+'instcert' reads file <cert> or stdin, if <cert> is omitted, and installs its
+content on the PSE.
+
+
+usage:
+
+instcert [-aehrtvVWHD] [-p <pse>] [-c <cadir>] [-d <dsa name>] [-A <authlevel>] [cert]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-e               consider certificate as ENCRYPTION certificate (default: SIGNATURE certificate)
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+-D               store certificate in Directory (X.500 or .af-db)
+-r               replace existing certificate in .af-db Directory
+-H               install certificate as hierarchy certificate
+                 (default: add certificate to set of cross certificates)
+-d <dsa name>    Name of the DSA to be initially accessed (default: locally configured DSA)
+-a               store certificate as cACertificate attribute value (default: userCertificate)
+-A <authlevel>   Level of authentication used for X.500 Directory access
+                 <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                 (default: environment variable AUTHLEVEL or 'No authentication')
+                 STRONG implies the use of signed DAP operations
+<cert>           File containing the certificate (or stdin, if omitted)
+
+************************************************************************************************
+
+
+genkey: Generate Key and Prototype Certificate
+
+
+Description:
+
+'genkey' generates an asymmetric keypair and installs the secret component on the PSE.
+The public component of the keypair is wrapped into a self-signed prototype certificate
+which is stored on the PSE and written to the file <proto> or stdout, if <proto> is omitted.
+
+
+usage:
+
+genkey [-hrtvVW] [-p <pse>] [-c <cadir>] [-a <issueralg>] [-s <signalg>] [-k <keysize>]
+       [-e <encalg>] [-k <keysize>] [proto]
+
+with:
+
+-p <pse>           PSE name (default: environment variable PSE or .pse)
+-c <cadir>         Name of CA-directory (default: environment variable CADIR or .ca)
+-a <issueralg>     Issuer algorithm associated with the signature of the prototype certificate
+                   (default: md2WithRsaEncryption)
+-s <signalg>       Signature algorithm (default: rsa)
+-k <keysize>       Keysize of RSA signature key
+-e <encalg>        Encryption algorithm (default: rsa)
+-k <keysize>       Keysize of RSA encryption key
+-r                 replace a previously generated secret key
+-h                 write this help text
+-t                 control malloc/free behaviour
+-v                 verbose
+-V                 Verbose
+-W                 Grand Verbose (for testing only)
+<proto>            File containing the resulting prototype certificate (or stdout, if omitted)
+
+************************************************************************************************
+
+
+getkey: Build Prototype Certificate
+
+
+Description:
+
+'getkey' creates a prototype certificate from a public key previously
+stored on the PSE, and writes its content to file <proto> or stdout,
+if <proto> is omitted.
+
+
+usage:
+
+getkey [-ehstvVW] [-p <pse>] [-c <cadir>] [proto]
+
+with:
+
+-p <pse>           PSE name (default: Environment variable PSE or .pse)
+-c <cadir>         Name of CA-directory (default: Environment variable CADIR or .ca)
+-s                 build prototype certificate from public signature key (default)
+-e                 build prototype certificate from public encryption key
+-h                 write this help text
+-t                 control malloc/free behaviour
+-v                 verbose
+-V                 Verbose
+-W                 Grand Verbose (for testing only)
+<proto>            File containing the resulting prototype certificate (or stdout, if omitted)
+
+************************************************************************************************
+
+
+pkadd: Download Public Key into Cache
+
+
+Description:
+
+'pkadd' retrieves the certificates of owner 'Name' from the Directory
+and downloads the requested public key information into the cache of
+trusted public keys (PKList or EKList) in the indicated PSE.
+
+
+usage:
+
+pkadd [-aehitvVW] [-p <pse>] [-c <cadir>] [-d <dsa name>] [-A <authlevel>] [Name]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-e               consider ENCRYPTION certificates only
+                 (default: consider SIGNATURE certificates only)
+-h               write this help text
+-i               let user specify certificate whose public key is to be downloaded
+-t               control malloc/free behaviour
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+-d <dsa name>    Name of the DSA to be initially accessed (default: locally configured DSA)
+-a               read cACertificate attribute (default: userCertificate)
+-A <authlevel>   Level of authentication used for X.500 Directory access
+                 <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                 (default: environment variable AUTHLEVEL or 'No authentication')
+                 STRONG implies the use of signed DAP operations
+<Name>           Owner of the certificate whose public key is downloaded into the cache
+
+************************************************************************************************
+
+
+pkdel  Remove Public Key from Cache
+
+
+Description:
+
+'pkdel' deletes entries from the cache of trusted public keys (PKList or
+EKList). It either deletes all entries of the given <owner>, or the one entry
+that is uniquely identified by its <issuer> and <serial> combination.
+
+
+usage:
+
+pkdel [-ehtvVW] [-p <pse>] [-c <cadir>] [-o <owner>] [-i <issuer>] [-n <serial>]
+
+with:
+
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: Environment variable CADIR or .ca)
+-o <owner>       Owner of public key
+-i <issuer>      Issuer of public key
+-n <serial>      Serial number of public key
+-e               remove public key from cache of public ENCRYPTION keys (EKList)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+
+************************************************************************************************
+
+
+pklist: Print Cache of Trusted Public Keys
+
+
+Description:
+
+'pklist' prints out the content of the cache of trusted public keys
+(PKList or EKList) of the indicated PSE.
+
+
+usage:
+
+pklist [-ehtvVW] [-p <pse>] [-c <cadir>]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-e               print cache of trusted public ENCRYPTION keys (EKList)
+                 (default: PKList)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+
+************************************************************************************************
+
+
+showdir: Retrieve and Show Security Attributes from Directory
+
+
+Description:
+
+'showdir' reads a security attribute from the directory entry of 'Name'
+and prints its contents in an appropriate format.
+
+
+usage:
+
+showdir [-aehtvVW] [-p <pse>] [-c <cadir>] [-o <attributeType>] [-d <dsa name>] [-A <authlevel>] [Owner's Name].
+
+with:
+
+-p <psename>        PSE name (default: environment variable PSE or .pse)
+-c <cadir>          Name of CA-directory (default: environment variable CADIR or .ca)
+-e                  consider ENCRYPTION certificates only
+-o <attributeType>  Attribute whose value is requested (default: certificate)
+                    supported attribute types:
+                    'cert' (certificate),
+                    'cross' (cross certificate pair), and
+                    'rev' (PEM revocation list)
+-h                  write this help text
+-t                  control malloc/free behaviour
+-v                  verbose
+-V                  Verbose
+-W                  Grand Verbose (for testing only)
+-d <dsa name>       Name of the DSA to be initially accessed (default: locally configured DSA)
+-a                  read cACertificate attribute (default: userCertificate)
+-A <authlevel>      Level of authentication used for X.500 Directory access
+                    <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                    (default: environment variable AUTHLEVEL or 'No authentication')
+                    STRONG implies the use of signed DAP operations
+<Name>              Name of directory entry to be accessed
+
+************************************************************************************************
+
+
+show  Show ASN.1-coded SecuDE Object in Suitable Form
+
+usage:
+
+show [-hvVW] [file (containing ASN.1 code)]
+
+with:
+
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+
+************************************************************************************************
+
+
+Utilities for the Operation of Certification Authorities (X.509)
+================================================================
+
+
+cacreate: Create CA PSE (CA command)
+
+
+Description:
+
+'cacreate' creates a CA PSE with one or two asymmetric keypairs on it,
+whose public keys are held within self-signed prototype certificates.
+In addition, an empty PEM revocation list is created.
+
+
+usage:
+
+cacreate [-hqtvDVW] [-p <pse>] [-c <cadir>] [-a <issueralg>] [-s <signalg>] [-k <keysize>]
+         [-e <encalg>] [-k <keysize>] [-n <serial>] [-u <nextupdate>]
+         [-f <notbefore>] [-l <notafter>] [-d <dsa name>] [-A <authlevel>] [CA-Name]
+
+with:
+
+-p <psename>       PSE name (default: environment variable CAPSE or .capse)
+-c <cadir>         Name of CA-directory (default: environment variable CADIR or .ca)
+-a <issueralg>     Issuer algorithm associated with the signature of the prototype certificate(s)
+                   (default: md2WithRsaEncryption)
+-s <signalg>       Signature algorithm (default: rsa)
+-k <keysize>       Keysize of RSA signature key
+-e <encalg>        Encryption algorithm (default: rsa)
+-k <keysize>       Keysize of RSA encryption key
+-n <serial>        Initial value of the serial number to be used by the CA
+-D                 store self-signed certificate(s) in Directory (X.500 or .af-db)
+-u <nextupdate>    Time and date of next scheduled update of PEM revocation list
+-f <notbefore>     First date on which self-signed certificate is valid
+                   (is only evaluated if option -r was supplied)
+-l <notafter>      Last date on which self-signed certificate is valid
+                   (is only evaluated if option -r was supplied)
+-q                 create PSE that contains two RSA keypairs (default: one RSA keypair only)
+-t                 control malloc/free behaviour
+-h                 write this help text
+-v                 verbose
+-V                 Verbose
+-W                 Grand Verbose (for testing only)
+-d <dsa name>      Name of the DSA to be initially accessed (default: locally configured DSA)
+-A <authlevel>     Level of authentication used for X.500 Directory access
+                   <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                   (default: environment variable AUTHLEVEL or 'No authentication')
+                   STRONG implies the use of signed DAP operations
+<CA-Name>          Intended owner of the generated CA PSE
+
+************************************************************************************************
+
+
+certify: Certify Public Key (CA command)
+
+
+Description:
+
+'certify' reads a prototype certificate from file <proto> or stdin, if
+<proto> is omitted, and transforms it into a 'valid' certificate.
+It replaces the 'issuer' and 'serialnumber' fields of the prototype
+certificate by its CA values (taken from its CA PSE), and replaces
+the signature appended to the prototype certificate by its own signature.
+The resulting certificate is written to file <cert> or stdout, if <cert>
+is omitted.
+
+
+usage:
+
+certify [-htvVW] [-p <pse>] [-c <cadir>] [-a <issueralg>] [-f <notbefore>] [-l <notafter>] [proto [cert]]
+
+with:
+
+-p <psename>       PSE name (default: environment variable CAPSE or .capse)
+-c <cadir>         Name of CA-directory (default: environment variable CADIR or .ca)
+-a <issueralg>     CA's signature algorithm (default: md2WithRsaEncryption)
+-f <notbefore>     First date on which the certificate is valid
+-l <notafter>      Last date on which the certificate is valid
+-t                 control malloc/free behaviour
+-h                 write this help text
+-v                 verbose
+-V                 Verbose
+-W                 Grand Verbose (for testing only)
+<proto>            File containing the prototype certificate (or stdin, if omitted)
+<cert>             File containing the resulting certificate (or stdout, if omitted)
+
+************************************************************************************************
+
+
+revoke: Revoke Certificate (CA command)
+
+
+usage:
+
+revoke [-htvVWD] [-p <pse>] [-c <cadir>] [-d <dsa name>] [-A <authlevel>]
+
+with:
+
+-p <psename>     PSE name (default: .capse)
+-c <cadir>       name of CA-directory (default: .ca)
+-t               enable memory checking
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+-D               store updated revocation list in Directory (X.500 or .af-db)
+-d <dsa name>    name of the DSA to be initially accessed (default: locally configured DSA)
+-A <authlevel>   level of authentication used for binding to the X.500 Directory
+
+************************************************************************************************
+
+
+getpkroot  Extract Public Root Information from CA PSE (CA command)
+
+
+Description:
+
+'getpkroot' extracts the the PSE object PKRoot from the CA's PSE
+and writes its content to the file <pkroot> or stdout, if <pkroot>
+is omitted.
+
+
+usage:
+
+getpkroot [-htvVW] [-p <pse>] [-c <cadir>] [pkroot]
+
+with:
+
+-p <psename>     PSE name (default: environment variable CAPSE or .capse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<pkroot>         File containing public root information (or stdout, if omitted)
+
+************************************************************************************************
+
+
+getfcpath: Extract Forward Certification Path from CA PSE (CA command)
+
+
+Description:
+
+'getfcpath' adds the CA's hierarchy and cross certificates to the CA's
+own forward certification path (FCPath), and writes the extended FCPath
+to the file <fcpath> or stdout, if <fcpath> is omitted.
+
+
+usage:
+
+getfcpath [-htvVW] [-p <pse>] [-c <cadir>] [fcpath]
+
+with:
+
+-p <psename>     PSE name (default: environment variable CAPSE or .capse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<fcpath>         File containing the extended FCPath (or stdout, if omitted)
+
+************************************************************************************************
+
+
+gen_pse  Creating and updating of PSE's
+
+usage:
+
+gen_pse            [-i script][-c cadir][-p capse][-H home][-u userunixname]
+                   [-a issueralg][-s signalg][-e encalg][-k keysize]
+                   [-f notbefore][-l notafter][-x nameprefix]
+                   [-P subjectpse][-C caname][-g serialnumber]
+                   [-d dsaname] [-n][-vrDqth][namesuffix]
+                   
+-i <script>        Name of a script file where these options can be set for more than one creation
+-c <cadir>         Name of CA-directory (default: environment variable CADIR or .ca)
+-p <capse>         CA's PSE name (default: environment variable CAPSE or .capse)
+-H <home>          Path of all home-directories
+-u <userunixname>  Unixname of the owner of a PSE to create/update
+-a <issueralg>     Algorithm to sign certificates with
+-s <signalg>       Algorithm of signature key to create/update
+-e <encalg>        Algorithm of encryption key to create/update
+-k <keysize>       Keysize of key to generate
+-f <notbefore>     First date on which the certificate is valid
+-l <notafter>      Last date on which the certificate is valid
+-x <nameprefix>    First part of the name associated to the PSE
+-P <subjectpse>    Name of PSE to create/update (default: environment variable PSE or .pse)
+-C <caname>        Create a CA with CA-directory name <caname>
+-g <serialnumber>  If a CA is created a serialnumber to start with can be specified
+-d <dsaname>       The name of the dsa
+-n                 Read the name of the dsa from PSE
+-v                 Verbose
+-r                 Replace an existing PSE in case of creation
+-D                 Store generated certificates in X500 directory
+-q                 Create two different key pairs for signature and encryption
+-t                 Check malloc/free behaviour
+-h                 Write this help text
+                   
+<namesuffix>      Second part of the name associated to the PSE
+
+************************************************************************************************
+
+
+Test
+====
+
+create_TestTree          Create a test certification tree and test users 
+ 
+usage: 
+ 
+create_TestTree [-v] [-p] [-D] [-t] [-q] 
+ 
+with: 
+ 
+-v       verbose 
+-p       use PEM RFC 1424 certification procedures, 
+         otherwise use KM utilities for certification 
+-D       enter certificates into Directory (X.500 or .af-db), 
+-t       Enable checking of malloc/free behaviour 
+-q       create PSEs with separate key pairs for SIGNATURE/ENCRYPTION purposes, 
+         otherwise create 'one key pair' PSEs
+ 
+This shell-script creates, for test purposes, the following tree of 
+certification authorities and users: 
+ 
+                         Root-CA 
+                 /                       \ 
+         ORG-1-CA                        ORG-2-CA 
+         /       \                       /       \ 
+ ORG-1-User-1 ORG-1-User-2       ORG-2-User-1 ORG-2-User-2 
+ 
+ 
+It creates the directory TestTree under the home directory and the following directories 
+under TestTree: 
+ 
+Root-CA          CA directory of the root ca, CA-PSE is .capse, PIN = test 
+ORG-1-CA         CA directory of the ca ORG-1-CA under Root-CA, CA-PSE is .capse, PIN = test 
+ORG-2-CA         CA directory of the ca ORG-2-CA under Root-CA, CA-PSE is .capse, PIN = test 
+ORG-1-User-1     PSE of user ORG-1-User-1 under ca ORG-1-CA, PIN = test 
+ORG-1-User-2     PSE of user ORG-1-User-2 under ca ORG-1-CA, PIN = test 
+ORG-2-User-1     PSE of user ORG-2-User-1 under ca ORG-2-CA, PIN = test 
+ORG-2-User-2     PSE of user ORG-2-User-2 under ca ORG-2-CA, PIN = test
+ 
+create_test_tree needs about 100 sec on a Sun SPARC10-41
+
+************************************************************************************************
+

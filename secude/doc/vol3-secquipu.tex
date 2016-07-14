@@ -1,0 +1,342 @@
+\section{Secured QUIPU}
+This section describes how to configure, generate, and install
+a security-enhanced ISO Development Environment that provides a secured version of
+QUIPU-8.0, the OSI Directory. 
+\\ [1em]
+QUIPU-8.0 has been enhanced with the security functionality provided by SecuDE-4.1, and 
+incorporates both a secured DSA and DUA (DISH). It provides for strongly authenticated DAP access
+to the Directory.
+\\ [1em]
+Strongly authenticated DAP provides for strong authentication of the directory user
+to the Directory and data integrity of the operation argument. In addition to this, it 
+provides for strong authentication of the responding DSA to the initiating user
+(thereby giving the user confidence that he has connected to the intended Directory Service)
+and data integrity of the operation result (thereby giving the user confidence in the
+integrity of the information returned from the Directory).
+\\ [1em]
+We have integrated the QUIPU/SecuDE interface hooks into ISODE-8.0 as a compile option.
+The files into which we have inserted the SECUDE compile options do all form part
+of the {\em libdsap} library. Therefore, it would have been sufficient to distribute
+just them, and not the whole of ISODE. However, as the affected files are dispersed
+over many nested directories, we found it easier to distribute the whole of ISODE.
+\\ [1em]
+In the following, it is assumed that you have already generated the SecuDE-4.1 library,
+compiled with the X500 and STRONG flags. 
+A description of how this is done is provided by the SecuDE installation guide
+({\bf README} file in the top-level directory and {\bf CONFIG.make} file in the config/ directory of your SecuDE installation).
+
+
+\subsection{Configuration}
+Go to the config/ directory of your security-enhanced ISODE installation, edit the makefile 
+skeleton of your choice, and go to the {\bf STRONG AUTHENTICATION} section.
+\\ [1em]
+First, uncomment the following lines:
+\bvtab
+\1 SECUDETOP  $=$  /usr/local/secude \\
+\1 SECUDELIBDIR  $=$  \$(SECUDETOP)/lib \\
+\1 LIBSECUDE  $=$  \$(SECUDELIBDIR)/libsecude.a \\
+\1 LSECUDE  $=$  -lsecude \\
+\1 LM  $=$  -lm \\
+\1 LIBSEC  $=$  \$(LSECUDE) \$(LM) \\
+\1 SECUDEINCDIR  $=$  \$(SECUDETOP)/src/include \\
+\1 DFLAGS  $=$  \$(DSECUDE) \$(DAFDB) \$(DEDB\_ENCRYPT) \\
+\1 AFDBFILE  $=$  \$(SECUDETOP)/.af-db/ \\
+\1 DAFDB  $=$  -DAFDBFILE$=$$\backslash$``\$\{AFDBFILE\}$\backslash$'' \\
+\1 DSECUDE  $=$  -DSECUDE 
+\evtab
+Second, assign to the {\bf SECUDETOP} variable the absolute pathname of the top-level directory 
+of your SecuDE-4.1 installation.
+\\ [1em]
+Third, set AFDBFILE to the pathname of the .af-db directory of your SecuDE installation, e.g.
+\bvtab
+\1 AFDBFILE  $=$  \$(SECUDETOP)/.af-db/
+\evtab
+In the {\em .af-db} directory of your SecuDE installation, the file {\em .af-alias} is used as a 
+database for transforming (DSA) alias names into (DSA) distinguished names 
+(see par.~\ref{dsaaliases}: {\em Alias Names for DSAs}).
+\\ [1em]
+If you are interested in the security feature described in par.~\ref{encryptedb}:
+{\em Encryption of your DSA's Database}, you should in addition uncomment the following line:
+\bvtab
+\1 DEDB\_ENCRYPT  $=$  -DEDB\_ENCRYPT
+\evtab
+You may uncomment the above line at a later time, if for the time being there is no requirement
+for cryptographically protecting your DSA's database.
+In case that you uncomment the above line at a later time, you have to switch to the quipu/ directory 
+of your ISODE installation, re-compile the files
+{\bf dsa.c}, {\bf entry\_dump.c}, and {\bf parse2.c}, and then re-install QUIPU:
+\bvtab
+\1 cd config \\
+\1 touch dsa.c entry\_dump.c parse2.c \\
+\1 ./make inst-quipu
+\evtab
+
+
+\subsection{Generation and Installation}
+Generate and install the basic system and the QUIPU software in the same manner as described in the
+ISODE documentation.
+
+
+\subsection{New Object Identifiers}
+SecuDE-4.1 supports the revoction list format adopted 
+by PEM, in order to avoid the deficiencies inherent to the ISO 9594-8 format,
+and derive benefit from the {\em next update} indication offered by the PEM format. 
+\\ [1em]
+For this reason, it is required that the Object Identifier tables in the ETCDIR directory
+of your security-enhanced ISODE installation are adapted to this definition of revocation lists.
+\\ [1em]
+The relevant definitions, which were agreed upon within the European PASSWORD project, have been 
+added to the files {\bf oidtable.at.local}, 
+{\bf oidtable.gen.local}, and {\bf oidtable.oc.local} in the dsap/ directory of your 
+security-enhanced ISODE installation, and will automatically be appended to the Object Identifier 
+tables in the corresponding ETCDIR directory when your software is
+installed. 
+
+
+\subsection{Personal Security Environment for your DSA}
+Any DSA which supports the SecuDE approach to strong authentication
+must own a PSE, where all its security-critical data are securely 
+stored.
+\\ [1em]
+Please observe that your DSA will consider only information (e.g., cached
+public keys, revocation lists, cross certificate pairs) which was
+stored on its PSE before your DSA started. Any data which are stored on your
+DSA's PSE while your DSA is running will not be considered by your DSA - unless
+you stop your DSA and then re-start it.
+\\ [1em]
+A DSA manger has to perform the following actions in order to equip
+its DSA with the ability to verify and produce digitally-signed 
+information:
+\be
+\m Generate a PSE on behalf of your DSA (see commands {\em psecreate} or {\em genpse}).
+   It is required that the name of your DSA's PSE exactly matches with your DSA's distinguished name.
+   \\ [1em]
+   Example: Assuming that your DSA's distinguished name is ``C=DE; CN=foobar'', you may generate a PSE
+   for your DSA by calling the {\em psecreate} command as follows:
+   \bvtab
+   \1 {\bf psecreate} -v -p C=DE@CN=foobar ``C=DE; CN=foobar''\\
+   \evtab
+
+\m Let the authorized CA certify your DSA's public key, and install the resulting certificate
+   on your DSA's PSE (see the SecuDE commands {\em getkey}, {\em certify}, and {\em instcert}, or 
+   follow the certification request/reply mechanism defined by PEM (RFC 1424), which is realized by
+   the SecuDE utility {\em pem}).
+
+\m Initialize your DSA's PKList by downloading any public keys trusted by your DSA
+   (see commands {\em psemaint} or {\em pkadd}).
+\ee
+
+If you want your DSA to consult revocation lists during the verification of a digital 
+signature, you have to provide a {\bf crl} flag to the ros.quipu command:
+\bvtab
+\1 {\bf ros.quipu} {\bf -crl}
+\evtab
+Please observe that any revocation lists which are to be considered
+by your DSA must have alredy been stored on the DSA's PSE, before the
+DSA starts.
+\\ [1em]
+If a revocation list stored on your DSA's PSE is out-of-date, you have
+to download the most recent version of that revocation list onto your 
+DSA's PSE and then re-start your DSA.
+\\ [1em]
+In order that your DSA is able to strongly authenticate a user who
+belongs to a different certification tree, make sure that your DSA's
+Root-CA and the authenticating user's Root-CA have cross-certified each other, 
+and download the relevant cross-certificate pair onto your DSA's PSE.
+
+
+\subsection{Encryption of your DSA's Database}
+\label{encryptedb}
+On the basis of GMD's secured X.500 software, you may now protect your DSA's EDB database
+by symmetrically encrypting it. Encryption (DES-CBC) is applied to each (MASTER, SLAVE, or
+CACHE) EDB file which is part of your DSA's database.
+\\ [1em]
+The DES key used for encryption/decryption is stored in the object {\bf EDBKey} on your DSA's PSE.
+\\ [1em]
+Up to now, DSAs could only protect any (sensitive) data by enforcing access control
+and authentication policy measures (realized by the {\em accessControlList} and {\em authPolicy} 
+attributes, respectively).
+However, all information (except the user password) was stored in cleartext in the DSA's 
+UNIX database and was therefore insufficiently protected against disclosure.
+\\ [1em]
+Storing a DSA's database in an encrypted form avoids the risk that any (sensitive) data
+held by the DSA may be read by unauthorised users who have duped the system's 
+UNIX access control.
+\\ [1em]
+If you want to protect your DSA's database by encrypting it, you should perform the
+actions as listed below:
+\be
+\m Make sure that the line
+\bvtab
+\1 DEDB\_ENCRYPT $=$ -DEDB\_ENCRYPT
+\evtab
+in the file CONFIG.make in the config/ directory of your security-enhanced ISODE installation
+has been uncommented. If this is not the case, uncomment it now, switch to the quipu/ directory 
+of your ISODE installation, re-compile the files
+{\bf dsa.c}, {\bf entry\_dump.c}, and {\bf parse2.c}, and then re-install QUIPU:
+\bvtab
+\1 cd config \\
+\1 touch dsa.c entry\_dump.c parse2.c \\
+\1 ./make inst-quipu
+\evtab
+
+\m Access your DSA's PSE, generate a symmetric key (DES-CBC), and store it in the
+PSE object {\bf EDBKey} (see {\em psemaint} command).
+
+\m Encrypt all EDB files belonging to your DSA's database with the symmetric key
+generated in 3:
+\bvtab
+\1 {\bf encrypt} -p C=DE@CN=foobar -k EDBKey $<$ EDB $>$ tmp \\
+\1 mv tmp EDB
+\evtab
+
+\m On (re-)starting your DSA, provide an {\bf encrypted} flag to the ros.quipu command:
+\bvtab
+\1 {\bf ros.quipu} {\bf -encrypted}
+\evtab
+\ee
+If you are no longer interested in having your DSA's database cryptographically protected,
+you simply have to stop your DSA, decrypt its EDB files, and then re-start your DSA as usual.
+For decrypting your DSA's EDB files, invoke the {\em decrypt} command as follows:
+\bvtab
+\1 {\bf decrypt} -p C=DE@CN=foobar -k EDBKey $<$ EDB $>$ tmp \\
+\1 mv tmp EDB
+\evtab
+
+
+\subsection{Authentication Data}
+Your authentication data required for simple and strong authentication to the
+Directory are securely stored on your PSE. Thus, the {\em username}, {\em password}, {\em certificate}, 
+and {\em secret\_key} information of your {\em .quipurc} file is no longer needed.
+
+
+\subsection{Simple Authentication during Bind}
+If you wish that your authentication data required for simple authentication (i.e.,
+your distinguished name and password) are retrieved from your PSE, you have to invoke the
+DISH command as follows:
+\bvtab
+\1 {\bf dish} -simple -{\bf pse}name,
+\evtab
+followed by the location of your PSE. (If your PSE resides
+at the default place (i.e., {\bf .pse} in your HOME directory), or {\bf PSE} has been 
+defined in your local environment, parameter {\em psename} is not needed.)
+\\ [1em]
+In case of a certification authority initiating a simple authentication request
+to the Directory, the DISH command should have the following form:
+\bvtab
+\1 {\bf dish} -simple -{\bf ca}dir,
+\evtab
+followed by the CA directory in which the CA's PSE (.capse) resides.
+\\ [1em]
+Your X.500 password will automatically be stored on your PSE (PSE object {\bf QuipuPWD})
+after you have successfully bound to the Directory for the first time, using simple
+authentication.
+
+
+\subsection{Strong Authentication during Bind}
+If you wish to strongly authenticate yourself to the Directory, you have to supply
+to the DISH command line the following (additional) parameters:
+\bi
+\m {\em {\bf str}ong}, indicating that strong authentication is to be performed;
+\m {\em {\bf pse}name}, followed by the location of your PSE. (If your PSE resides
+at the default place (i.e., {\bf .pse} in your HOME directory), or {\bf PSE} has been 
+defined in your local environment, parameter {\em psename} is not needed.)
+\ei
+In case of a certification authority initiating a strong authentication request
+to the Directory, the additional parameters that have to be supplied to the DISH
+command are as follows:
+\bi
+\m {\em {\bf str}ong}, indicating that strong authentication is to be performed;
+\m {\em {\bf cad}ir}, followed by the CA directory in which the CA's PSE (.capse) resides.
+\ei
+To try to strongly bind to any of the DSAs listed in your {\em dsaptailor} file, invoke DISH as
+described above, with a {\bf -call} flag; e.g., dish {\bf -call bonsai -strong} will try
+to strongly connect to the DSA {\em bonsai} running at the University of London
+Computer Centre. If the connection and mutual authentication is successful, an appropriate message
+and the prompt {\bf Dish -$>$} will be returned. If the connection or mutual
+authentication fails, however, the program will exit with an appropriate error message.
+\\ [1em]
+If the name following the {\em -call} flag is a private keyword that refers to a DSA, it is
+required that keyword and corresponding distinguished name are stored as an entry in your
+system-wide alias database {\em .af-alias} in the {\em .af-db} directory of your SecuDE
+installation (see par.~\ref{dsaaliases}: {\em Alias Names for DSAs}).
+
+
+\subsection{SIGNED Operations}
+The DAP operations into which we have incorporated strong authentication are those
+assigned by X.511 for that purpose, i.e. Bind, Read, Compare, Search, List, AddEntry, 
+RemoveEntry, ModifyEntry, and ModifyRDN.
+\\ [1em]
+If you wish to protect your operation argument by your digital signature, you have
+to provide the additional {\bf strong} flag to the command line, e.g.:
+\bvtab
+\1 {\bf list} @C=DE@o=GMD@l=Darmstadt -{\bf str}ong 
+\evtab
+SIGNED operation results are only supported in the case of the Read, Compare, Search, and List
+operations.
+A user may indicate its request that an operation result be digitally protected by using
+the {\bf protecresult} flag, e.g.:
+\bvtab
+\1 {\bf list} @C=DE@o=GMD@l=Darmstadt -strong -{\bf pro}tecresult
+\evtab
+
+
+\subsection{Directory Authorization}
+DSAs that are based on the GMD's secured X.500 will enforce the following authentication policy 
+on a per entry basis:
+\bi
+
+\m They will refuse a requested operation, if the level of security associated with the
+   requestor's credentials is inconsistent with the level of protection requested, e.g.
+   simple credentials were supplied while strong credentials were required
+   (inappropriate authentication).
+   The minimum level of authentication required to bind to your DSA over DAP can be
+   specified by assigning to the {\em authentication} option in the {\em quiputailor} file of your 
+   security-enhanced ISODE installation one of the values {\em none}, {\em dn}, {\em simple}, 
+   {\em protected}, or {\em strong} (see {\em The ISO Development Environment: User's Manual}, 
+   Volume 5, section 14.3).
+
+\m They will refuse a requested operation, if the requestor does not have the right
+   to carry out the requested operation (insufficient access rights). This is
+   enforced by the QUIPU attribute {\em accessControlList}. Unfortunately, the attribute {\em authPolicy}
+   could not be considered.
+\ei
+
+
+\subsection{Alias Names for DSAs}
+\label{dsaaliases}
+According to X.511, the DSA to which a user wants to strongly authenticate itself
+must be identified by its complete distinguished name.
+\\ [1em]
+Make sure that any DSAs that are listed in your {\em dsaptailor} file and to which you may
+wish to strongly bind, are represented in your SYSTEM alias database
+({\em .af-alias}) (or at least in your own USER alias database) by their symbolic keyword and 
+distinguished name.
+It is required that the keyword by which a specific DSA is represented in your 
+SecuDE alias database, exactly matches with the DSA's keyword in your {\em dsaptailor} file.
+\\ [1em]
+Example: If you wish to strongly bind for the first time to the DSA which is locally referred
+to by the keyword {\em bonsai} in your {\em dsaptailor} file, you should find out the DSA's full
+distinguished name (which in this case is 
+``C=GB; O=University College London; OU=Computer Science; CN=DSA''),
+and then store the pair ({\em bonsai}, ``C=GB; O=University College London; OU=Computer Science; CN=DSA'') in your alias database in the following manner:
+\begin{quote}
+{\small bonsai : C=GB; O=University College London; OU=Computer Science; CN=DSA}
+\end{quote}
+(You may fill your own USER alias database by calling the {\em addalias} command available with
+{\em psemaint}.)
+\\ [1em]
+Any subsequent strong authentication requests to {\em bonsai} may be invoked as follows:
+\begin{quote}
+{\bf dish} -call bonsai -strong,
+\end{quote}
+with {\em bonsai} being mapped onto ``C=GB; O=University College London; OU=Computer Science; CN=DSA'',
+which will be inserted into the BindToken and then sent to the intended DSA.
+\\ [1em]
+The error message {\em Cannot transform alias ``xyz'' into a Distinguished Name} indicates that you
+should add the entry (xyz, Distinguished Name of xyz) to your SecuDE alias database.
+
+
+\subsection{More Help Installing GMD Secure X.500}
+Contact the SecuDE discussion list {\bf secude@darmstadt.gmd.de}. Bug reports (and fixes) are
+welcome.

@@ -1,0 +1,397 @@
+                              RSAREF(TM):
+          A Cryptographic Toolkit for Privacy-Enhanced Mail
+
+                           RSA Laboratories
+               (A division of RSA Data Security, Inc.)
+                            March 3, 1992
+
+
+This document copyright (C) 1992 RSA Laboratories, a division of RSA
+Data Security, Inc. License is granted to reproduce, copy, post, or
+distribute in any manner, provided this document is kept intact and
+no modifications, deletions, or additions are made.
+
+
+WHAT IS IT?
+
+RSAREF is a cryptographic toolkit designed to facilitate rapid
+deployment of Internet Privacy-Enhanced Mail (PEM) implementations.
+RSAREF represents the fruits of RSA Data Security's commitment to the
+U.S. Department of Defense's Advanced Research Projects Agency
+(DARPA) to provide free cryptographic source code in support of a PEM
+standard. RSA Laboratories offers RSAREF in expectation of PEM's
+forthcoming publication as an Internet standard.
+
+Part of RSA's commitment to DARPA was to authorize Trusted
+Information Systems of Glenwood, MD, to distribute a full PEM
+implementation based on RSAREF. That implementation will be available
+this spring.
+
+RSAREF supports the following PEM-specified algorithms:
+
+     o    RSA encryption and key generation, as defined by RSA
+            Laboratories' Public-Key Cryptography Standards (PKCS)
+
+     o    MD2 and MD5 message digests
+
+     o    DES (Data Encryption Standard) in cipher-block chaining mode
+
+RSAREF is written in the C programming language as a library that can
+be called from an application program. A simple PEM implementation
+can be built directly on top of RSAREF, together with message parsing
+and formatting routines and certificate-management routines. RSAREF
+is distributed with a demonstration program that shows how one might
+build such an implementation.
+
+The name "RSAREF" means "RSA reference." RSA Laboratories intends
+RSAREF to serve as a portable, educational, reference implementation
+of cryptography.
+
+
+WHAT YOU CAN (AND CANNOT) DO WITH RSAREF
+
+The license at the end of this note gives legal terms and conditions.
+Here's the layman's interpretation, for information only and with no
+legal weight:
+
+     1.   You can use RSAREF in personal, noncommercial applications,
+          as long as you follow the interface described in the RSAREF
+          documentation. You can't use RSAREF in any commercial
+          (moneymaking) manner of any type, nor can you use it to
+          provide services of any kind to any other party. For
+          information on commercial licenses of RSAREF-compatible
+          products, please contact RSA Data Security.
+
+     2.   You can distribute programs that interface to RSAREF,
+          but you can't distribute RSAREF itself. Everyone must
+          obtain his or her own copy of RSAREF. (However, free
+          licenses to redistribute RSAREF are available. For
+          information, please send electronic mail to
+          <rsaref-administrator@rsa.com>.)
+
+     3.   You can modify RSAREF as required to port it to other
+          operating systems and compilers, as long as you give a copy
+          of the results to RSA Laboratories. You can't otherwise
+          change RSAREF.
+
+     4.   You can't send RSAREF outside the United States, or give it
+          to anyone who is not a United States citizen and doesn't
+          have a "green card." (These are U.S. State and Commerce
+          Department requirements, because RSA and DES are
+          export-controlled technologies.)
+
+The restrictions on the distribution of RSAREF are the consequence of
+export-control law. Similar constraints are placed on those
+redistributing RSAREF under free license from RSA Laboratories.
+Without the export-control law, RSAREF would be available by
+anonymous FTP.
+
+
+HOW TO GET IT
+
+To obtain RSAREF, read the license at the end of the note and return
+a copy of the "acknowledgement and acceptance" paragraph by
+electronic mail to <rsaref-administrator@rsa.com>.
+
+RSAREF is distributed by electronic mail in a UNIX(TM) "uuencoded"
+TAR format. When you receive it, store the contents of the message in
+a file, and run your operating system's "uudecode" and TAR programs.
+
+For example, suppose you store the contents of your message in the
+file 'contents'. You would run the commands:
+
+     uudecode contents             # produces rsaref.tar
+     tar xvf rsaref.tar
+
+RSAREF includes about 60 files organized into the following
+subdirectories:
+
+     doc       documentation on RSAREF and RDEMO
+     install   makefiles for various operating systems
+     rdemo     RDEMO demonstration program
+     source    RSAREF source code and include files
+     test      test scripts for RDEMO
+
+
+USERS' GROUP
+
+RSA Laboratories maintains the electronic-mail users' group
+<rsaref-users@rsa.com> for discussion of RSAREF applications, bug
+fixes, etc. To join the user's group, send electronic mail to
+<rsaref-users-request@rsa.com>.
+
+
+REGISTRATION
+
+RSAREF users who register with RSA Laboratories are entitled to free
+RSAREF upgrades and bug fixes as soon as they become available and a
+50% discount on selected RSA Data Security products. To register,
+send your name, address, and telephone number to
+<rsaref-registration@rsa.com>.
+
+
+INNOVATION PRIZES
+
+RSA Laboratories will award cash prizes for the best applications
+built on RSAREF. If you'd like to submit an application, or want to
+be on the review panel, please send electronic mail to
+<rsaref-administrator@rsa.com>.
+
+
+PUBLIC-KEY CERTIFICATION
+
+RSA Data Security offers public-key certification services conforming
+to forthcoming PEM standards. For more information, please send
+electronic mail to <pem-info@rsa.com>.
+
+
+OTHER QUESTIONS
+
+If you have questions on RSAREF software, licenses, export
+restrictions, or other RSA Laboratories offerings, send electronic
+mail to <rsaref-administrator@rsa.com>.
+
+
+AUTHORS
+
+RSAREF was written by the staff of RSA Laboratories with assistance
+from RSA Data Security's software engineers. The DES code is based on
+an implementation that Justin Reyneri did at Stanford University. Jim
+Hwang of Stanford wrote parts of the arithmetic code under contract
+to RSA Laboratories.
+
+
+ABOUT RSA LABORATORIES
+
+RSA Laboratories is the research and development division of RSA Data
+Security, Inc., the company founded by the inventors of the RSA
+public-key cryptosystem. RSA Laboratories reviews, designs and
+implements secure and efficient cryptosystems of all kinds. Its
+clients include government agencies, telecommunications companies,
+computer manufacturers, software developers, cable TV broadcasters,
+interactive video manufacturers, and satellite broadcast companies,
+among others.
+
+RSA Laboratories draws upon the talents of the following people:
+
+Len Adleman, distinguished associate - Ph.D., University of
+  California, Berkeley; Henry Salvatori professor of computer
+  science at University of Southern California; co-inventor of
+  RSA public-key cryptosystem; co-founder of RSA Data Security, Inc.
+
+Taher Elgamal, senior associate - Ph.D., Stanford University;
+  director of engineering at RSA Data Security, Inc.; inventor of
+  Elgamal public-key cryptosystem based on discrete logarithms
+
+Martin Hellman, distinguished associate - Ph.D., Stanford University;
+  professor of electrical engineering at Stanford University;
+  co-inventor of public-key cryptography, exponential key exchange;
+  IEEE fellow; IEEE Centennial Medal recipient
+
+Burt Kaliski, chief scientist - Ph.D., MIT; former visiting assistant
+  professor at Rochester Institute of Technology; author, Public-Key
+  Cryptography Standards; general chair, CRYPTO '91
+
+Cetin Koc, associate - Ph.D., University of California, Santa
+  Barbara; assistant professor at University of Houston
+ 
+Ron Rivest, distinguished associate - Ph.D., Stanford University;
+  professor of computer science, MIT; co-inventor, RSA public-key
+  cryptosystem; co-founder, RSA Data Security, Inc.; member, National
+  Academy of Engineering; director, International Association for
+  Cryptologic Research; program co-chair, ASIACRYPT '91
+
+ADDRESSES
+
+RSA Laboratories                   RSA Data Security, Inc.
+10 Twin Dolphin Drive              100 Marine Parkway
+Redwood City, CA  94065            Redwood City, CA  94065
+USA                                USA
+
+(415) 595-7703                     (415) 595-8782
+(415) 595-4126 (fax)               (415) 595-1873 (fax)
+
+PKCS, RSAREF and RSA Laboratories are trademarks of RSA Data
+Security, Inc. All other company names and trademarks are not.
+
+----------------------------------------------------------------------
+                           RSA LABORATORIES
+                      PROGRAM LICENSE AGREEMENT
+
+RSA LABORATORIES, A DIVISION OF RSA DATA SECURITY, INC. ("RSA"), IS
+WILLING TO LICENSE THE "RSAREF" PROGRAM FOR YOUR USE ONLY ON THE
+TERMS AND CONDITIONS SET FORTH BELOW. YOUR ACKNOWLEDGEMENT AND
+ACCEPTANCE OF THESE TERMS AND CONDITIONS BY RETURN ELECTRONIC
+TRANSMISSION IS REQUIRED PRIOR TO DELIVERY TO YOU OF THE RSAREF
+PROGRAM.
+
+1.   LICENSE. RSA is willing to grant you a non-exclusive,
+     non-transferable license for the "RSAREF" program (the
+     "Program") and its associated documentation, subject to all of
+     the following terms and conditions, but only:
+
+     a.   to use the Program on any computer in your possession, but
+          on no more than one computer at any time;
+
+     b.   to make one copy of the Program for back-up purposes only;
+
+     c.   to incorporate the Program into other computer programs only
+          through interfaces described in the RSAREF Library
+          Reference (the file "rsaref.txt" which accompanies the
+          Program) (any such incorporated portion of the Program to
+          continue to be subject to the terms and conditions of this
+          license) both solely for your own personal or internal use
+          or to create Application Programs; and
+
+     d.   to modify the Program for the purpose of porting the Program
+          to any other operating systems and compilers, but only on
+          the conditions that: (i) you do not alter any Program
+          interface, except with the prior written consent of RSA;
+          and (ii) you provide RSA with a copy of the ported version
+          of the Program by electronic mail.
+
+     "Application Programs" are programs which interface with the
+     Program but which do not incorporate all or any portion of the
+     Program, whether in source code or object code form.
+
+2. LIMITATIONS ON LICENSE.
+
+     a.   RSA owns the Program and its associated documentation and
+          all copyrights therein. YOU MAY NOT USE, COPY, MODIFY OR
+          TRANSFER THE PROGRAM, IN EITHER SOURCE CODE OR OBJECT CODE
+          FORM, ITS ASSOCIATED DOCUMENTATION, OR ANY COPY,
+          MODIFICATION OR MERGED PORTION THEREOF, IN WHOLE OR IN
+          PART, EXCEPT AS EXPRESSLY PROVIDED IN THIS AGREEMENT OR
+          WITH THE PRIOR WRITTEN CONSENT OF RSA. WITHOUT LIMITING THE
+          GENERALITY OF THE FOREGOING, YOU MAY NOT PLACE THE PROGRAM
+          ON ANY ELECTRONIC BULLETIN BOARD SYSTEM (BBS) OR MAKE THE
+          PROGRAM AVAILABLE THROUGH ANY FILE TRANSFER PROTOCOL (FTP).
+          YOU MUST REPRODUCE AND INCLUDE RSA'S COPYRIGHT NOTICES ON
+          ANY COPY OR MODIFICATION, OR ANY PORTION THEREOF, OF THE
+          PROGRAM AND ITS ASSOCIATED DOCUMENTATION.
+
+     b.   The Program is to be used only in connection with a single
+          computer. You may physically transfer the Program from one
+          computer to another, provided that the Program is used in
+          connection with only one computer at any given time. You
+          may not transfer the program electronically from one
+          computer to another over a network except in connection
+          with your own personal or internal use of the Program. You
+          may not distribute copies of the Program or its associated
+          documentation. IF YOU TRANSFER POSSESSION OF ANY COPY,
+          MODIFICATION OR MERGED PORTION OF THE PROGRAM, WHETHER IN
+          SOURCE CODE OR OBJECT CODE FORM, OR ITS ASSOCIATED
+          DOCUMENTATION TO ANOTHER PARTY, EXCEPT AS EXPRESSLY
+          PROVIDED FOR IN THIS LICENSE, YOUR LICENSE SHALL BE
+          AUTOMATICALLY TERMINATED.
+
+     c.   The Program is to be used only for non-commercial purposes.
+          You may not use the Program to provide services to others
+          for which you are compensated in any manner. You may not
+          license, distribute or otherwise transfer the Program or
+          any part thereof in any form, whether you receive
+          compensation or not.
+
+     d.   You may not translate the Program into any other computer
+          language.
+
+     e.   You may not incorporate the Program into other programs
+          through interfaces other than the interfaces described in
+          the RSAREF Library Reference.
+
+3.   NO WARRANTY OF PERFORMANCE. THE PROGRAM AND ITS ASSOCIATED
+     DOCUMENTATION ARE LICENSED "AS IS" WITHOUT WARRANTY AS TO THEIR
+     PERFORMANCE, MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR
+     PURPOSE. THE ENTIRE RISK AS TO THE RESULTS AND PERFORMANCE OF
+     THE PROGRAM IS ASSUMED BY YOU. SHOULD THE PROGRAM PROVE
+     DEFECTIVE, YOU (AND NOT RSA OR ITS DISTRIBUTOR) ASSUME THE
+     ENTIRE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+4.   LIMITATION OF LIABILITY. EXCEPT AS EXPRESSLY PROVIDED FOR IN
+     SECTION 5 HEREINUNDER, NEITHER RSA NOR ANY OTHER PERSON WHO HAS
+     BEEN INVOLVED IN THE CREATION, PRODUCTION, OR DELIVERY OF THE
+     PROGRAM SHALL BE LIABLE TO YOU OR TO ANY OTHER PERSON FOR ANY
+     DIRECT, INCIDENTAL OR CONSEQUENTIAL DAMAGES, INCLUDING BUT NOT
+     LIMITED TO ANY DAMAGES FOR LOST DATA, RE-RUN TIME, INACCURATE
+     INPUT, WORK DELAYS OR LOST PROFITS, RESULTING FROM THE USE OF
+     THE PROGRAM OR ITS ASSOCIATED DOCUMENTATION, EVEN IF RSA HAS
+     BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+5.   PATENT INFRINGEMENT INDEMNITY. RSA shall indemnify and hold you
+     harmless from any and all liability, damages, costs or expenses
+     (including reasonable attorneys' fees) which you may incur as
+     the result of any claim that the unmodified Program infringes a
+     United States patent in the field of cryptography. RSA shall
+     have no obligation to you pursuant to this Section 5 unless: (i)
+     you give RSA prompt written notice of the claim; (ii) RSA is
+     given the right to control and direct the investigation,
+     preparation, defense and settlement of the claim; and (iii) the
+     claim is based on your use of the unmodified Program in
+     accordance with this license. THIS SECTION 5 SETS FORTH RSA'S
+     ENTIRE OBLIGATION AND YOUR EXCLUSIVE REMEDIES CONCERNING CLAIMS
+     FOR PROPRIETARY RIGHTS INFRINGEMENT.
+
+     NOTE: PORTIONS OF THE PROGRAM PRACTICE METHODS DESCRIBED IN AND
+     ARE SUBJECT TO U.S. PATENTS #4,218,582 AND #4,405,829, ISSUED TO
+     LELAND STANFORD JR. UNIVERSITY AND MASSACHUSETTS INSTITUTE OF
+     TECHNOLOGY RESPECTIVELY. EXCLUSIVE LICENSING RIGHTS ARE HELD BY
+     PUBLIC KEY PARTNERS OF SUNNYVALE, CALIFORNIA.
+
+6.   RESTRICTIONS ON FOREIGN RESHIPMENT. THIS LICENSE IS EXPRESSLY
+     MADE SUBJECT TO ANY LAWS, REGULATIONS, ORDERS, OR OTHER
+     RESTRICTIONS ON THE EXPORT FROM THE UNITED STATES OF AMERICA OF
+     THE PROGRAM OR OF ANY INFORMATION ABOUT THE PROGRAM WHICH MAY BE
+     IMPOSED FROM TIME TO TIME BY THE GOVERNMENT OF THE UNITED STATES
+     OF AMERICA. YOU MAY NOT EXPORT OR REEXPORT, DIRECTLY OR
+     INDIRECTLY, THE PROGRAM OR INFORMATION PERTAINING THERETO.
+
+7.   TERM. The license granted hereunder is effective until
+     terminated. You may terminate it at any time by destroying the
+     Program and its associated documentation together with all
+     copies, modifications and merged portions thereof in any form.
+     It will also terminate upon the conditions set forth elsewhere
+     in this Agreement or if you fail to comply with any term or
+     condition of this Agreement. You agree upon such termination to
+     destroy the Program and its associated documentation, together
+     with all copies, modifications and merged portions thereof in
+     any form.
+
+8.   GENERAL
+
+     a.   You may not sublicense the Program or its associated
+          documentation or assign or transfer this license. Any
+          attempt to sublicense, assign or transfer any of the
+          rights, duties or obligations hereunder shall be void.
+
+     b.   This agreement shall be governed by the laws of the State of
+          California.
+
+     c.   Address all correspondence regarding this license to RSA's
+          electronic mail address <rsaref-administrator@rsa.com>, or
+          to
+
+               RSA Laboratories
+               ATTN: RSAREF Administrator
+               10 Twin Dolphin Drive
+               Redwood City, CA  94065
+               USA
+
+     d.   TO RECEIVE THE PROGRAM AND ITS ASSOCIATED DOCUMENTATION BY
+          ELECTRONIC TRANSMISSION, YOU MUST TRANSMIT THE FOLLOWING
+          ACCEPTANCE AND ACKNOWLEDGMENT TO RSA'S ELECTRONIC MAIL
+          ADDRESS <rsaref-administrator@rsa.com>:
+
+ACKNOWLEDGMENT AND ACCEPTANCE
+
+I acknowledge that I have read the RSAREF Program License Agreement
+and understand and agree to be bound by its terms and conditions,
+including without limitation its restrictions on foreign reshipment
+of the Program and information related to the Program. The electronic
+mail address to which I am requesting that the program be transmitted
+is located in the United States of America and I am a United States
+citizen or a permanent resident of the United States. The RSAREF
+License Agreement is the complete and exclusive agreement between RSA
+Laboratories and me relating to the Program, and supersedes any
+proposal or prior agreement, oral or written, and any other
+communications between RSA Laboratories and me relating to the
+Program.

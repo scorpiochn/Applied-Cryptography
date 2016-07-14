@@ -1,0 +1,922 @@
+\section{ASN.1 Definitions of Object Structures}
+\label{asn1}
+\markboth{ASN.1 Definitions}{ASN.1 Definitions}
+\thispagestyle{myheadings}
+
+Both information which is exchanged via communication protocols,
+and data which are stored locally in PSE objects 
+(PSE:Personal Secure Environment, like smartcards),
+are formatted according to the
+Basic Encoding Rules of ASN.1.
+During procession, however,
+they are stored in C-structures
+defined by the {\em Secure-IF}, the {\em AF-IF} and the 
+{\em X400-IF} specifications.
+Encoding and decoding between the ASN.1-structures
+of the protocol elements or the PSE objects 
+and the internal C-structures
+are performed by {\em e\_*} and {\em d\_*} functions
+provided at the {\em Secure-IF}, the {\em AF-IF} 
+and the {\em X400-IF} interface.
+In this section the ASN.1 structures
+of the protocol and storage objects are defined.
+The encoding- and decoding functions are mentioned, too.
+
+\subsection{Object Identifiers}
+\label{asn1-oid}
+
+The specification of the following object identifiers
+is according to the ISO standards 8824 and 6523.
+ISO 8824-1987: Specification of Abstract Syntax Notation One (ASN.1),
+ISO 6523-1984: Data interchange --
+Structure for the identification of organizations. The following specifications 
+are made for the DFN (Deutsches ForschungsNetz).
+Since DFN is not an ISO identified organisation
+we provisionally adopt an organizational code for {\em DFN}
+due to ISO 6523, paragraph 5.2, in that an unassigned
+international designator code ``9997'' for an
+organisation ``44'' under ISO is assumed.
+If DFN becomes an ISO identified organization, or if 
+DFN security policies and DFN security procedures will be
+embedded into a larger international context, 
+both the designator code and the organization code for DFN
+shall change.
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+ICD & 9997 & -- -- not yet assigned \\
+Organization Code & dfn(44) & -- -- not definitive \\
+Organization Name & DFN & \\
+ & & \\
+\end {tabular}
+\end {center}
+}
+
+With these intermediate definitions
+the object identifiers used within SecuDe
+can be specified.
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+id-dfn ::= &
+\multicolumn{2}{l}{\{ iso(1) identified-organization(3) icd(9997) dfn(44) \}
+-- -- organization} \\
+ & & \\
+id-dfn-specs ::= & \{ id-dfn 0 \} & -- -- specifications \\
+id-dfn-mods ::=  & \{ id-dfn 1 \} & -- -- modules \\
+id-dfn-sp ::= & \{ id-dfn 2 \} & -- -- security policies \\
+id-dfn-aid ::= & \{ id-dfn 3 \} & -- -- algorithm identifiers \\
+id-dfn-attr ::= & \{ id-dfn 4 \} & -- -- attribute types \\
+ & & \\
+id-dfn-sosi ::= & \{ id-dfn-specs 0 \} & -- specification of security interfaces \\
+ & & \\
+id-dfn-secc ::= & \{ id-dfn-mods 0 \} & -- secure cryptography module \\
+id-dfn-secs ::= & \{ id-dfn-mods 1 \} & -- secure storage module \\
+id-dfn-afl ::= & \{ id-dfn-mods 2 \} & -- local authentication framework module \\
+id-dfn-afd ::= & \{ id-dfn-mods 3 \} & -- directory authentication framework module \\
+id-dfn-pem ::= & \{ id-dfn-mods 4 \} & -- privacy enhanced mail module \\
+id-dfn-x400 ::= & \{ id-dfn-mods 5 \} & -- secure x.400 module \\
+id-dfn-x500 ::= & \{ id-dfn-mods 6 \} & -- secure x.500 module \\
+id-dfn-km ::= & \{ id-dfn-mods 7 \} & -- key management module \\
+ & & \\
+id-dfn-ssp ::= & \{ id-dfn-sp 0 \} & -- simple security policy for mail \\
+\end {tabular}
+\end {center}
+}
+
+The object identifiers for algorithm identifiers are defined
+in X.509, Annex H.
+The object identifier for a message token and an asymmetric token
+are defined in X.411, Annex A.
+{\small
+\begin {center}
+\begin {tabular}{lll}
+algorithm ::= & \{ 2 5 8 \} & -- -- from X.501, Annex B \\
+encryptionAlgorithm ::= & \{ algorithm 1 \} & ::= \{ 2 5 8 1 \} \\
+hashAlgorithm ::= & \{ algorithm 2 \} & ::= \{ 2 5 8 2 \} \\
+signatureAlgorithm ::= & \{ algorithm 3 \} & ::= \{ 2 5 8 3 \} \\
+ & & \\
+id-tok ::= & \{ 2 6 3 6 \} & \\
+id-tok-asymmetricToken ::= & \{id-tok 0 \} & ::= \{ 2 6 3 6 0 \} \\
+\end {tabular}
+\end {center}
+}
+
+The object identifiers of attribute types are defined
+in X.520.
+{\small
+\begin {center}
+\begin {tabular}{lll}
+attributeType ::=          & \{ 2 5 4 \} & -- -- from X.501, Annex B \\
+commonName ::=             & \{ attributeType 3 \}  & ::= \{ 2 5 4 3 \}  \\
+surname ::=                & \{ attributeType 4 \}  & ::= \{ 2 5 4 4 \}  \\
+countryName ::=            & \{ attributeType 6 \}  & ::= \{ 2 5 4 6 \}  \\
+organizationName ::=       & \{ attributeType 10 \} & ::= \{ 2 5 4 10 \} \\
+organizationalUnitName ::= & \{ attributeType 11 \} & ::= \{ 2 5 4 11 \} \\
+localityName ::=           & \{ attributeType 7 \}  & ::= \{ 2 5 4 7 \}  \\
+stateOrProvinceName ::=    & \{ attributeType 8 \}  & ::= \{ 2 5 4 8 \}  \\
+streetAddress ::=          & \{ attributeType 9 \}  & ::= \{ 2 5 4 9 \}  \\
+title ::=                  & \{ attributeType 12 \} & ::= \{ 2 5 4 12 \}  \\
+serialNumber ::=           & \{ attributeType 5 \}  & ::= \{ 2 5 4 5 \}  \\
+businessCategory ::=       & \{ attributeType 15 \} & ::= \{ 2 5 4 15 \}  \\
+description      ::=       & \{ attributeType 13 \} & ::= \{ 2 5 4 13 \}  \\
+userCertificate ::=        & \{ attributeType 36 \} & ::= \{ 2 5 4 36 \} \\
+cACertificate ::=          & \{ attributeType 37 \} & ::= \{ 2 5 4 37 \} \\
+authorityCrl ::=   & \{ attributeType 38 \} & ::= \{ 2 5 4 38 \} \\
+certificateCrl ::= & \{ attributeType 39 \} & ::= \{ 2 5 4 39 \} \\
+revokedCertificateList ::= & \{ id-dfn-attr 0 \} & ::= \{ 1 3 9997 44 4 0 \} \\
+oldCertificateList ::=     & \{ id-dfn-attr 1 \} & ::= \{ 1 3 9997 44 4 1 \}
+\end {tabular}
+\end {center}
+}
+
+\subsection{Algorithm Identifiers}
+\label{asn1-algid}
+ 
+The format of an algorithm identifier
+is defined in the Directory Authentication Framework
+X.509, Annex H.
+It consists of an object identifier and a parameter,
+which is of any type, defined by the object identifier.
+Object identifier definitions are taken from X.509,
+NIST OIW, EWOS, and TeleTrusT Germany.
+See paragraph \ref{algid} for the algorithm identifiers
+and their default parameters defined within SecuDE.
+\\ [1em]
+Encoding/Decoding: e\_AlgId(), d\_AlgId().
+
+\subsection{Name Format}
+\label{asn1-name}
+ 
+The X.500 recommendations on the directory specify
+names for the purpose of unique identification of the directory objects
+(X.501, Directory Information Model).
+For example, names are assigned to human users.
+Also, issuer and subject of a certificate are identified by their names.
+The name format is defined in
+X.501, Annex C.
+{\small
+\begin {center}
+\begin {tabular}{ll}
+DistinguishedName & ::= RDNSequence              \\
+RDNSequence  & ::= {\bf SEQUENCE OF} RelativeDistinguishedName \\
+ & \\
+RelativeDistinguishedName & ::= {\bf SET OF} AttributeValueAssertion \\
+ & \\
+AttributeValueAssertion   &
+   ::= {\bf SEQUENCE} \{ AttributeType, AttributeValue \} \\
+ & \\
+AttributeType  &  ::= {\bf OBJECT IDENTIFIER} \\
+AttributeValue &  ::= {\bf ANY} -- -- defined by AttributeType
+\end {tabular}
+\end {center}
+}
+The directory attribute {\em DistinguishedName}
+is a sequence of {\em RelativeDistinguishedName}
+which in turn is a set of attributeType/attributeValue pairs.
+Within SecuDe
+only a limited set of attribute types is used to construct relative distinguished names,
+these are:
+countryName, organizationalName, organizationalUnitName, commonName, surname,
+title, serialNumber, localityName, streetAddress, and businessCategory.
+All other attribute types would be ignored.
+\\ [1ex]
+SecuDE handles two representations of distinguished names. One is the {\em DName}
+data type which is a C-structure corresponding to the ASN.1 notation below. 
+{\small
+\bvtab
+\2 typedef struct \{                            \\
+\4        RDName       \3 *element\_IF\_2;      \\
+\4        DName        \3 *next;                \\
+\2 \} DName;                                    \\ [1em]
+\2 typedef struct \{                            \\
+\4        AVA          \3 *member\_IF\_0;       \\
+\4        RDName       \3 *next;                \\
+\2 \} RDName;                                   \\ [1em]
+\2 typedef struct \{                            \\ 
+\4        ObjId  \3 *element\_IF\_0;      \\
+\4        PElement     \3 *element\_IF\_1;      \\
+\2 \} AVA;                                      \\
+\evtab
+}
+The second which is used at the SecuDE utility interface is the {\em Name} data type.
+This is a printable character string representation
+of a distinguished name in the form
+\bc
+{\small keyword=value \% keyword=value ... ; keyword=value \% keyword = value ...; ...}
+\ec
+keyword is a name for an attribute type. 
+The ';' delimiter separates the RDN members of the DN, i. e. each 
+keyword=value \% keyword=value ... expression denotes one relative distinguished name.
+The '\%' delimiter separates the attributes within one RDN.
+The following keywords, representing X.520 defined attributes,  are possible:
+{\small
+\bvtab
+C   \2 countryName \\
+O   \2 organizationName  \\
+OU  \2 organizationalUnitName \\
+S   \2 surname \\
+CN  \2 commonName \\
+L   \2 localityName \\
+SP  \2 stateOrProvinceName \\
+ST  \2 streetAddress \\
+T   \2 title \\
+SN  \2 serialNumber \\
+BC  \2 businessCategory \\
+D   \2 description 
+\evtab
+}
+RDNs must be ordered top down. Letter cases are not significant for names, 
+as well as spaces may be used inside and outside the names. \\ [1ex]
+Example: \\
+{\small
+C=DE; O=gmd; OU=I2 \% CN=Institut fuer TeleKooperationsTechnik; CN=Wolfgang Schneider} 
+\\ [1em]
+Encoding/Decoding: e\_DName(), d\_DName(), 
+which transform between the C-structure DName and the ASN.1 DER code.
+There are other name transformation functions which transform between
+the printable representation {\em Name} and the C-structure {\em DName}: \\
+aux\_Name2DName(), aux\_DName2Name() (see AUX\_NAME(3X)). \\ [1ex]
+
+\subsection{Some Directory Attributes}
+\label{asn1-x500}
+
+In X.501, Directory Information Model (7.2.3), a directory attribute
+is defined to consist of an {\em attribute type},
+which identifies the class of information given by an attribute,
+and the corresponding {\em attribute values(s)}, which are the
+particular instances of that class appearing in the entry
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+Attribute &
+   ::= {\bf SEQUENCE} \{ AttributeType, SET OF AttributeValue \} \\
+ & \\
+AttributeType  &  ::= {\bf OBJECT IDENTIFIER} \\
+AttributeValue &  ::= {\bf ANY} -- -- defined by AttributeType
+\end {tabular}
+\end {center}
+}
+
+In the following subsections, some attribute values are described.
+
+\subsubsection{Certificate}
+\label{asn1-cert}
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+
+Certificate ::= & \multicolumn{2}{l} {{\bf SIGNED SEQUENCE} \{ } \\
+  & version [0]          & INTEGER DEFAULT 0,          \\
+  & serialNumber         & INTEGER,                    \\
+  & signature            & AlgorithmIdentifier,        \\
+  & issuer               & Name,                       \\
+  & validity             & Validity,                   \\
+  & subject              & Name,                       \\
+  & subjectPublicKeyInfo & SubjectPublicKeyInfo \}     \\
+\end {tabular}
+\end {center}
+}
+ 
+{\em Certificate} is defined by X.509, Annex G.
+{\em Algorithm\-Identifier} is defined in X.509, Annex G,
+as a SEQUENCE of an Object Identifier and a parameters type
+which depends on the algorithm.
+{\em Name} is defined in X.501, Annex C,
+as a SEQUENCE of Relative Distinguished Names,
+which are sets of Attribute-Value-Assertions.
+{\em Validity} is defined in X.509, Annex G,
+as a SEQUENCE of the UTCTimes {\em notBefore} and {\em notAfter}.
+\\[1ex]
+{\em SubjectPublicKeyInfo} is defined by X.509, Annex G.
+The substructure of the public key BitString is defined by
+X.509, Annex C, C.3.
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+
+SubjectPublicKeyInfo  ::= & {\bf SEQUENCE} \{ & \\
+  & algorithm         & AlgorithmIdentifier,    \\
+  & subjectPublicKey  & BIT STRING \}           \\
+  & \multicolumn{2}{l} {-- --} \\
+  & \multicolumn{2}{l} {-- -- the BitString of subjectPublicKey}    \\
+  & \multicolumn{2}{l} {-- -- contains the ASN.1 encoding of a sequence of} \\
+  & \multicolumn{2}{l} {-- -- the RSA-modulus n and the public RSA-exponent e:    }   \\
+  & \multicolumn{2}{l} {-- --} \\
+  & -- -- SEQUENCE \{ & n INTEGER,   \\
+  & -- --             & e INTEGER \}
+\end {tabular}
+\end {center}
+}
+
+See also X.509, Annex G, for the SIGNED MACRO,
+which is replaced by the following MACRO:
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+SIGNED MACRO   ::= & & \\
+BEGIN              & & \\
+TYPE NOTATION  ::= & type(ToBeSigned)     & \\
+VALUE NOTATION ::= & type(VALUE           & \\
+		   & SEQUENCE \{          & \\
+		   & ToBeSigned,          & \\
+		   & AlgorithmIdentifier, & \\
+ & \multicolumn{2}{l} {-- -- of the algorithm used to generate}  \\
+ & \multicolumn{2}{l} {-- -- the signature}                      \\
+		   & BitString \}          & \\
+ & \multicolumn{2}{l} {-- -- where the BIT STRING is the result} \\
+ & \multicolumn{2}{l} {-- -- of the encryption of the value}     \\
+ & \multicolumn{2}{l} {-- -- of the hash of ToBeSigned}          \\
+ & ) & \\
+END & &
+\end {tabular}
+\end {center}
+}
+ 
+Encoding/Decoding: e\_Certificate(), d\_Certificate().
+
+
+\subsubsection{Black Lists}
+\label{asn1-blists}
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+revokedCertificateList & \multicolumn{2}{l} {::= {\bf SIGNED SEQUENCE} \{ } \\
+  & signature     & AlgorithmIdentifier,        \\
+  & issuer        & Name,                       \\
+  & list          & {\bf SEQUENCE OF} RCLEntry, \\
+  & lastUpdate    & UTCTime,                    \\
+  & nextUpdate    & UTCTime \}                  \\
+  &               &                             \\
+RCLEntry & \multicolumn{2}{l} {::= {\bf SEQUENCE} \{ }  \\
+  & subject        & CertificateSerialNumber,   \\
+  & revocationDate & UTCTime \}
+\end {tabular}
+\end {center}
+}
+
+The attributes ``CertificateRevocationList'' and ``AuthorityRevocationList''
+are defined in X.509, Annex G. They are not used within SecuDe.
+SecuDe uses the
+{\em Revoked Certificate List} defined by
+RFC 1114 instead.
+\\[1ex]
+Encoding/Decoding: e\_Crl(), d\_Crl().
+
+\subsubsection{Old Certificates}
+\label{asn1-oldcerts}
+
+This attribute is not defined in X.500. Its purpose within SecuDE
+is to support old signatures.
+
+{\small
+\begin {center}
+\begin {tabular}{ll}
+OldCertificateList & ::=  {\small\bf SEQUENCE OF SEQUENCE} \{        \\
+		   & serialNumber     CertificateSerialNumber,       \\
+		   & crossCertificate Certificate \}
+\end {tabular}
+\end {center}
+}
+
+Encoding/Decoding: e\_OCList(), d\_OCList().
+
+\subsection{X.400 Security Extension Elements}
+\label{asn1-x400}
+ 
+Volume 1: Principles of Security Operations, of this project description
+gives a comprehensive overview over the ASN.1 formats of the
+X.400 extension elements. It also suggests e certain selection
+of security extension elements and their subfields.
+This paragraph summarizes the selected extension elements
+and also omits the unused subfields.
+
+This way, the following paragraphs define the simple DFN security policy
+identified by the identifier id-dfn-ssp.
+
+\subsubsection{Originator Certificate}
+\label{asn1-origcert}
+
+{\small
+\btab
+\1 originator-certificate ::= {\bf SEQUENCE} \{ \\
+\2         type \3         [0] INTEGER, -- -- 15 \\
+\2         criticality \3  [1] BitString, -- -- 2 for delivery \\
+\2         value \3        [2] Certificates \} \\
+\\
+\etab
+}
+
+The protocol data units of both, Certificates and Certificate is defined in
+X.509, Annex G.
+
+\subsubsection{Security Label}
+\label{asn1-seclab}
+
+{\small
+\btab
+\1 message-security-label ::= {\bf SEQUENCE} \{ \\
+\2         type \3         [0] INTEGER, -- -- 20 \\
+\2         criticality \3  [1] BitString, -- -- 2 for delivery \\
+\2         value \3        [2] SecurityLabel \} \\
+\\
+\1 SecurityLabel ::= {\bf SET} \{ \\
+\2         security-policy-identifier \3 OBJECT IDENTIFIER, -- -- id-dfn-ssp \\
+\2         security-classification \3 Enumerated, -- -- unmarked/restricted \\
+\2         privacy-mark \3            Printable String -- -- ``a'',``b'',``c'' \\
+\2         \}
+\\
+\etab
+}
+
+The simple security policy of {\em DFN} for electronic mail,
+identified by the
+object identifier {\em id-dfn-ssp} (see paragraph \ref{asn1-oid}),
+defines two security classifications for messages,
+one called {\em unmarked}, the other one {\em restricted}.
+For unmarked messages, no further security element is included
+at message composition, and no security element is evaluated
+at message reception.
+Restricted messages allow for three different privacy marks:
+{\em authentic}, {\em confidential}, or {\em both, authentic and confidential}.
+These three privacy marks are represented by the one-character
+printable strings ``a'', ``c'', or ``b'', respectively.
+
+It shall be allowed that a security classification says {\em confidential}.
+This shall be regarded as equivalent with the classification
+{\em restricted} and the privacy mark set to ``c''.
+If, additionally, the privacy mark is set to ``a'' or ``b'',
+the message shall be provided with the integrity service as well.
+
+There is no further security category.
+
+\subsubsection{Message Token}
+\label{asn1-token}
+
+The X.400 message token consists
+mainly of the two portions ``signed data'' and ``encrypted data''.
+The ``recipient name'' and the encrypted ``content confidentiality key''
+allow for message content encryption on a per-recipient base.
+
+{\small
+\btab
+\1 message-token ::= {\bf SEQUENCE} \{ \\
+\2 type  \3 [0] INTEGER, -- -- 16 \\
+\2 value \3 [2] MessageToken \} \\
+\\
+\1 MessageToken ::= {\bf SEQUENCE} \{ \\
+\2 token-type-identifier \3 [0] OBJECT IDENTIFIER, \\
+\2                       \3 -- -- id-tok-asymmetricToken \\
+\2 token \3 [1] AsymmetricToken \} \\
+\\
+\1 AsymmetricToken ::= {\bf SIGNED SEQUENCE} \{  \\
+\2 signature-algorithm-id. \3 AlgorithmIdentifier, -- -- Hash with RSA \\
+\2 recipient-name \3 ORAddressAndOrDirectoryName, \\
+\2 time  \3 UTCTime, \\
+\2 signed-data \3 [0] TokenData, \\
+\2 encryption-algorithm-id. \3 [1] AlgorithmIdentifier, -- -- RSA \\
+\2 encrypted-data \3 [2] ENCRYPTED TokenData \} \\
+\\
+\etab
+}
+{\small
+\btab
+\1 TokenData ::= {\bf SEQUENCE} \{ \\
+\2 type  \3 [0] INTEGER, -- -- 1 for ``bind token'' \\
+\2 value \3 [1] BitString \} -- -- Random Number \\
+\\
+\1 TokenData ::= {\bf SEQUENCE} \{ \\
+\2 type  \3 [0] INTEGER, -- -- 2 for ``signed'' \\
+\2 value \3 [1] MessageTokenSignedData  \} \\
+\\
+\1 TokenData ::= {\bf SEQUENCE} \{ \\
+\2 type  \3 [0] INTEGER, -- -- 3 for ``encrypted'' \\
+\2 value \3 [1] MessageTokenEncryptedData  \} \\
+\\
+\etab
+}
+{\small
+\btab
+\1 MessageTokenSignedData ::= {\bf SEQUENCE} \{ \\
+\2 content-confidentiality-algo- \\
+\2 rithm-identifier        \3 [0] Algorithm Identifier, -- -- DES \\
+\2 message-security-label  \3 [2] SecurityLabel, \\
+\2 message-sequence-number \3 [4] INTEGER OPTIONAL \\
+\2 \} -- -- signed by the originator of the message \\
+\\
+\1 MessageTokenEncryptedData ::= {\bf SEQUENCE} \{ \\
+\2 content-confidentiality-key  \3 [0] BIT STRING -- -- DES-key \\
+\2 \} -- -- encrypted for the recipient of the message \\
+\\
+\etab
+}
+
+ORAddressAndOrDirectoryName is defined in X.411, Fig. 2.
+
+\subsubsection{Message Confidentiality Elements}
+\label{asn1-conf}
+
+The X.400 extension element
+{\em content confidentiality algorithm identifier}
+is related to an encryption algorithm
+by which the content of a confidential message is encrypted.
+
+{\small
+\btab
+\1 content-confidentiality-algorithm-identifier ::= {\bf SEQUENCE} \{ \\
+\2         type  \3 [0] INTEGER, -- -- 17 \\
+\2         value \3 [2] AlgorithmIdentifier \} \\
+\\
+\etab
+}
+
+In practice this should be the algorithm identifier of
+the symmetric algorithm.
+The symmetric key used to encrypt and decrypt the message content
+is encrypted inside the message token encrypted data:
+
+{\small
+\btab
+\1 content-confidentiality-key ::= [0] {\bf BitString} \\
+\\
+\etab
+}
+In case of the DES algorithm, for example, the BitString contains the 64 bits of the DES-key,
+whereby the parameter of the DES algorithm identifier
+is either omitted or is an OctetString containing 8 octets
+of an initialization vector.
+
+\subsubsection{Message Integrity Elements}
+\label{asn1-integrity}
+
+The X.400 extension element
+{\em message origin authentication check}
+contains a signature of the algorithm identifier
+by which the signature of the message content is performed,
+of the message content,
+and of the security label.
+
+{\small
+\btab
+\1 message-origin-authentication-check ::= {\bf SEQUENCE} \{ \\
+\2         type  \3 [0] INTEGER, -- -- 19 \\
+\2         criticality  \3 [1] BitString, -- -- 2 for delivery \\
+\2         value \3 [2] MessageOriginAuthenticationCheck \} \\
+\\
+\1 MessageOriginAuthenticationCheck ::= {\bf SIGNATURE SEQUENCE} \{ \\
+\2 algorithm-identifier \3   AlgorithmIdentifier, -- -- Hash with RSA \\
+\2 content \3                Content, \\
+\2 message-security-label \3 SecurityLabel \} \\
+\2 -- -- signed by the originator of the message
+\etab
+}
+
+The X.400 extension element
+{\em message integrity check}
+is not used in this context.
+
+\subsubsection{Bind Parameter Strong Credentials}
+\label{asn1-cred}
+
+{\small
+\btab
+\1 StrongCredentials ::= {\bf SET} \{ \\
+\2 bind-token \3 [0] Token \} \\
+\\
+\1 Token ::= {\bf SEQUENCE} \{ \\
+\2 token-type-identifier \3 [0] OBJECT IDENTIFIER, \\
+\2                       \3 -- -- id-tok-asymmetricToken \\
+\2 token \3 [1] AsymmetricToken \} \\
+\\
+\1 AsymmetricToken ::= {\bf SIGNED SEQUENCE} \{  \\
+\2 signature-algorithm-id. \3 AlgorithmIdentifier, -- -- Hash with RSA \\
+\2 recipient-name \3 ORAddressAndOrDirectoryName, \\
+\2 time  \3 UTCTime, \\
+\2 signed-data \3 [0] TokenData \} \\
+\\
+\1 TokenData ::= {\bf SEQUENCE} \{ \\
+\2 type  \3 [0] INTEGER, -- -- 1  \\
+\2 value \3 [1] BitString \} -- -- Random Number \\
+\\
+\etab
+}
+
+ORAddressAndOrDirectoryName is defined in X.411, Fig. 2.
+\\ [1em]
+Before the first association,
+two partner agents exchange their user certificates
+and verify them completely up to a commonly
+trusted certification authority.
+Therefore, the user certificates need not to be exchanged
+during the bind operation.
+For partner authentication,
+the signature of a token is verified by a trusted public key
+already known to the verifier.
+Also, the recipient name, time and random number are checked
+for validity.
+The random number of the responder shall be the same
+as the random number of the initiator of an association.
+
+\subsubsection{Bind Parameter Security Context}
+\label{asn1-context}
+
+{\small
+\btab
+\1 SecurityContext ::= {\bf SET} \{ SecurityLabel \} \\
+\\
+\1 SecurityLabel ::= {\bf SET} \{ \\
+\2   security-policy-identifier \3 OBJECT IDENTIFIER -- -- id-dfn-ssp \\
+\2   \}
+\etab
+}
+
+The security context demands for strong partner authentication
+with the strong credentials described in paragraph \ref{asn1-cred} above.
+\\
+In an extended version,
+the security classification {\em confidential} indicates
+that all parameters of the subsequent operations of this association
+are encrypted.
+The encryption key will be transferred
+within the bind token encrypted data
+in the strong credentials
+from the initiator to the responder of the association.
+
+\subsection{ASN.1 Structures of the PSE Objects}
+\label{asn1-sw-cc}
+
+\subsubsection{KeyBits}
+\label{asn1-KeyBits}
+
+Key information data will be encoded as BitStringS,
+like in Subject\-Public\-Key\-Info, or in SubjectPrivateKeyInfo
+(see \ref{asn1-SignatureSK} and \ref{asn1-DecryptionSKnew} below).
+However, the bitstrings themselves will have a substructure
+as ASN.1-type SEQUENCE of two integers:
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+KeyBits ::= & \multicolumn{2}{l} {{\bf SEQUENCE} \{} \\
+	    & part1 & INTEGER    \\
+	    & part2 & INTEGER \}
+\end {tabular}
+\end {center}
+}
+
+In case of a secret RSA-key,
+the BitString of subjectPrivateKey
+contains the ASN.1 encoding of a sequence of
+the factors p and q of the RSA-modulus n.
+In case of a public RSA-key,
+which is going to be transferred inside of certificates,
+the BitString of subjectPublicKey
+contains the ASN.1 encoding of a sequence of
+the RSA-modulus n and the public RSA-exponent e,
+as it is defined by X.509, Annex C, C.3.
+The corresponding C-structure is a structure of two
+C-structures OctetString.
+\\[1ex]
+Encoding/Decoding: e\_KeyBits() and d\_KeyBits()
+control the substructures of key information BitStrings.
+These substructures are {\em only}
+used {\em internally} by the interface functions
+{\em sec\_encrypt, sec\_decrypt, sec\_sign, sec\_verify}.
+An application programmer will not need to handle them.
+
+\subsubsection{Name}
+\label{asn1-Name}
+                
+{\em Name} is defined in X.501, Annex C, as a SEQUENCE of Relative
+Distinguished Names, which are sets of Attribute Value Assertions (see~\ref{asn1-name}).
+The object {\em Name} denotes the owner of the PSE.
+
+\subsubsection{SignSK}
+\label{asn1-SignatureSK}
+
+{\small
+\begin {center}
+SignSK ::= SubjectPrivateKeyInfo
+\end {center}
+}
+
+{\em SubjectPrivateKeyInfo} is defined to have the same format as
+{\em SubjectPublicKeyInfo}, cf. X.509, Annex G.
+However, note the substructure of the private key BIT STRING.
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+SubjectPrivateKeyInfo ::= & {\bf SEQUENCE} \{ & \\
+  & algorithm         & AlgorithmIdentifier,    \\
+  & subjectPrivateKey & BitString \}           \\
+  & \multicolumn{2}{l} {-- --} \\
+  & \multicolumn{2}{l} {-- -- the BitString of subjectPrivateKey}   \\
+  & \multicolumn{2}{l} {-- -- contains the ASN.1 encoding of a sequence of} \\
+  & \multicolumn{2}{l} {-- -- the factors p and q of the RSA-modulus n:}   \\
+  & \multicolumn{2}{l} {-- --} \\
+  & -- -- SEQUENCE \{ & p INTEGER,   \\
+  & -- --             & q INTEGER \}
+\end {tabular}
+\end {center}
+}
+ 
+Encoding/Decoding: e\_KeyInfo(), d\_KeyInfo().
+
+\subsubsection{DecSKnew}
+\label{asn1-DecryptionSKnew}
+
+{\small
+\begin{center}
+DecSKnew ::= SubjectPrivateKeyInfo
+\end{center}
+}
+
+{\em SubjectPrivateKeyInfo} is defined in {\em SignSK}
+(see \ref{asn1-SignatureSK} above).
+\\[1ex]
+Encoding/Decoding: e\_KeyInfo(), d\_KeyInfo().
+
+\subsubsection{DecSKold}
+\label{asn1-DecryptionSKold}
+
+As {\em DecSKnew} (see \ref{asn1-DecryptionSKnew} above).
+
+\subsubsection{SignCert}
+\label{asn1-SignCertificate}
+
+{\small
+\begin{center}
+SignCert ::= Certificate
+\end{center}
+}
+
+For the definition of {\em Certificate} see under 
+directory attribute {\em Certificate} in~\ref{asn1-cert}.
+\\ [1em]
+Encoding/Decoding: e\_Certificate(), d\_Certificate().
+
+\subsubsection{EncCert}
+\label{asn1-EncrCertificate}
+
+As {\em SignCert} (see \ref{asn1-SignCertificate} above).
+
+\subsubsection{Certificate Sets}
+\label{asn1-certificateset}
+{\small
+\bc
+        SignCSet ::= {\bf SET OF} Certificate \\
+        EncCSet ::= {\bf SET OF} Certificate
+\ec
+}
+For each type of certificate exists one certificate set collecting all
+certificates which have been issued for the same public key. \\ [1ex]
+Encoding/Decoding: e\_CertificateSet(), d\_CertificateSet()
+
+\subsubsection{FCPath}
+\label{asn1-FCPath}
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+FCPath ::= & \multicolumn{2}{l} {
+		 {\bf SEQUENCE OF} CrossCertificates} \\[1ex]
+CrossCertificates ::= & \multicolumn{2}{l} {{\bf SET OF} Certificate}
+\end {tabular}
+\end {center}
+}
+
+{\em FCPath} is an element of {\em Certificates} (note the plural).
+{\em Certificates} is defined in X.509, Annex G,
+as a SEQUENCE of a user certificate and a forward certification path.
+The forward certification path is a SEQUENCE of cross certificates,
+which are SETs of 1-level certificates.
+One cross certificate per SET is supposed to be
+the hierarchy certificate of the path.
+The data of the PSE object {\em FCPath}
+can be composed both with the data of
+{\em SignCert} or of
+{\em EncCert} in order to build an
+n-level originator certificate of ASN.1-type {\em Certificates}.
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+Certificates ::= & {\bf SEQUENCE} \{  & \\
+  & certificate          & Certificate,                \\
+  & certificationPath    & FCPath    \\
+  &                      & OPTIONAL \} \\[1ex]
+\end {tabular}
+\end {center}
+}
+
+Encoding/Decoding: e\_FCPath(), d\_FCPath().
+
+\subsubsection{PKRoot}
+\label{asn1-PKRoot}
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+PKRoot ::= & {\bf SEQUENCE} \{ &    \\
+  & cA                & Name,                 \\
+  & serialNew         & INTEGER,              \\
+  & keyNew            & SubjectPublicKeyInfo, \\
+  & serialOld         & INTEGER,              \\
+  & keyOld            & SubjectPublicKeyInfo \}
+\end {tabular}
+\end {center}
+}
+ 
+{\em Name} is defined in X.501, Annex C,
+as a SEQUENCE of Relative Distinguished Names,
+which are sets of Attribute-Value-Assertions.
+{\em SubjectPublicKeyInfo} is defined by X.509, Annex G
+(see {\em Certificate} in \ref{asn1-cert} above).
+\\[1ex]
+Encoding/Decoding: e\_PKRoot(), d\_PKRoot().
+
+\subsubsection{PKList}
+\label{asn1-PKList}
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+PKList ::= {\bf SET OF} & {\bf SEQUENCE} \{ & \\
+ & version [0]     & INTEGER DEFAULT 0,       \\
+ & serialNumber    & INTEGER,                 \\
+ & signature       & AlgorithmIdentifier,     \\
+ & issuer          & Name,                    \\
+ & validity        & Validity,                \\
+ & partner         & Name,                    \\
+ & verificationKey & SubjectPublicKeyInfo \}
+\end {tabular}
+\end {center}
+}
+ 
+Compare the definition of {\em Certificate} in~\ref{asn1-cert} above. A PKList is defined
+as a set of {\em ToBeSigned} values of certificates. \\ [1ex] 
+The {\em verificationKey} is supposed to have the value
+of the currently valid public verification key of the {\em partner}.
+Before adding it to this list, it should be verified through
+the full certification path.
+\\[1ex]
+Encoding/Decoding: e\_PKList(), d\_PKList().
+
+\subsubsection{EKList}
+\label{asn1-EKList}
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+EKList ::= & {\bf SET OF SEQUENCE} \{ &  \\
+ & version [0]     & INTEGER DEFAULT 0,       \\
+ & serialNumber    & INTEGER,                 \\
+ & signature       & AlgorithmIdentifier,     \\
+ & issuer          & Name,                    \\
+ & validity        & Validity,                \\
+ & partner         & Name,                    \\
+ & encryptionKey   & SubjectPublicKeyInfo \}
+\end {tabular}
+\end {center}
+}
+ 
+{\em EKList} has the same format as {\em PKList}
+(see \ref{asn1-PKList} above).
+However,
+the {\em encryptionKey} is supposed to have the value
+of the currently valid public encryption key of the {\em partner}.
+Before adding it to this list, it should be verified through
+the full certification path.
+\\[1ex]               
+
+Encoding/Decoding: e\_PKList(), d\_PKList().
+
+\subsubsection{Toc}
+\label{asn1-TOC}
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+Toc ::= & {\bf SEQUENCE} \{ &  \\
+  & owner         & PrintableString, \\
+  & create        & UTCTime,  \\
+  & update        & UTCTime,  \\
+  & PSE\_Objects   & objects \} \\ \\ \\
+PSE\_Objects ::= & {\bf SET OF} PSE\_Object & \\ \\ \\
+PSE\_Object ::= & {\bf SEQUENCE} \{ &  \\
+  & name          & PrintableString, \\
+  & create        & UTCTime,  \\
+  & update        & UTCTime \}
+\end {tabular}
+\end {center}
+}
+ 
+Encoding/Decoding: e\_PSEToc(), d\_PSEToc().

@@ -1,0 +1,5 @@
+div.asm:include asmtoken.h
+
+mult.asm:include asmtoken.h
+
+shift.asm:include asmtoken.h

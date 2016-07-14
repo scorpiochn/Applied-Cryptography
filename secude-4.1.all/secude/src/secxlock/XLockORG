@@ -1,0 +1,53 @@
+xlock.x.mode: rotor
+xlock.x.font: -b&h-lucida-bold-r-normal-sans-24-*-*-*-*-*-iso8859-1
+xlock.x.background: grey70
+xlock.x.foreground: black
+xlock.x.welcome: Willkommen zu Polikom.
+xlock.x.password: Password: 
+xlock.x.info: Bitte Smartcard einfuehren und PIN eingeben.
+xlock.x.picture:/vol/cebit/orgwis/data/bilder/karten/Schloss.xwd
+!Xlock.picture:/tmp/schloss
+xlock.x.validate: Ihre Smartcard wird ueberprueft ...
+xlock.x.invalid: Sie sind kein berechtigter Polikom-Benutzer.
+xlock.x.greet: Guten Tag %s, Ihr Polikom-Arbeitsplatz wird aktiviert.
+xlock.x.nice: 10
+xlock.x.timeout: 30
+xlock.x.mono: off
+xlock.x.nolock: off
+xlock.x.remote: off
+xlock.x.allowroot: off
+xlock.x.enablesaver: off
+xlock.x.allowaccess: off
+xlock.x.echokeys: off
+xlock.x.usefirst: off
+xlock.x.verbose: off
+xlock.x.hop.delay: 0
+xlock.x.hop.batchcount: 1000
+xlock.x.hop.saturation: 1
+xlock.x.qix.delay: 30000
+xlock.x.qix.batchcount: 64
+xlock.x.qix.saturation: 1
+xlock.x.image.delay: 2000000
+xlock.x.image.batchcount: 8
+xlock.x.image.saturation: 0.3
+xlock.x.life.delay: 1000000
+xlock.x.life.batchcount: 100
+xlock.x.life.saturation: 1
+xlock.x.swarm.delay: 10000
+xlock.x.swarm.batchcount: 100
+xlock.x.swarm.saturation: 1
+xlock.x.rotor.delay: 10000
+xlock.x.rotor.batchcount: 4
+xlock.x.rotor.saturation: 0.4
+xlock.x.pyro.delay: 15000
+xlock.x.pyro.batchcount: 40
+xlock.x.pyro.saturation: 1
+xlock.x.flame.delay: 10000
+xlock.x.flame.batchcount: 20
+xlock.x.flame.saturation: 1
+xlock.x.worm.delay: 10000
+xlock.x.worm.batchcount: 20
+xlock.x.worm.saturation: 1
+xlock.x.blank.delay: 5000000
+xlock.x.blank.batchcount: 1
+xlock.x.blank.saturation: 1

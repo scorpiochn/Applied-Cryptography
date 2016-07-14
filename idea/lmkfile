@@ -1,0 +1,15 @@
+# This file will compile IDEA with the Lattice C compiler on any AMIGA
+# for faster code uncomment the fitting CFLAGS line
+
+idea:	idea.o crypt.o
+	blink FROM LIB:c.o+idea.o+crypt.o TO idea LIB LIB:lc.lib LIB:amiga.lib
+
+crypt.o:        crypt.h crypt.c
+        lc $(CFLAGS) crypt.c
+
+idea.o:         idea.c crypt.h
+	lc $(CFLAGS) idea.c
+
+CFLAGS = -O -mta -casu -h
+#CFLAGS = -O -mt2 -casu -hbcd
+#CFLAGS = -O -mt3 -casu -hbcd

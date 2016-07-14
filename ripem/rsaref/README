@@ -1,0 +1,10 @@
+The "rsaref" directory tree here is largely a copy of the March
+1992 RSAREF 1.0 distribution.  There have been some performance
+enhancements (as noted in the code), but the functionality is
+identical.
+
+See ../doc/rsaref-license.txt for the most recent (December 1992)
+version of the RSAREF License Agreement.  It is more liberal
+than the one included here in the README.old file.
+
+/mrr

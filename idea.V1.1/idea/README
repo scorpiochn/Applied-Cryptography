@@ -1,0 +1,59 @@
+RESTRICTIONS FOR V1.1
+=====================
+
+UNIX:         No restrictions.
+
+MS-DOS:       MS-DOS pipes (|) can not be used to concatenate several user 
+              commands 'idea'. The pipes are treated as a text-streams and not 
+              as a binary-streams. Therefore they can not transmit encrypted 
+              data.
+
+VMS:          VMS translates all upper-case letters given on the command-line 
+              to lower-case letters. Therefore the options 'K' and 'H' are not 
+              accessible. Note that also key-strings are mapped to there 
+              lower-case representation.
+
+
+FILES ON DISKETTE
+=================
+
+idea.c        implementation of IDEA (International Data Encryption Algorithm)
+idea.h        interface to 'idea.c'
+idea_cmd.c    implementation of user command 'idea' (for UNIX, MS-DOS, VMS, ..)
+Makefile      describes, how to build user command 'idea'
+
+idea.ps       description of IDEA (dissertation of Xuejia Lai, chapter 3 only)
+byte_ord.ps   description of byte-ordering used for IDEA
+idea_cmd.txt  description of user command 'idea'
+manl/idea.l   UNIX manual page of user command 'idea' (troff-format of 
+              'idea_cmd.txt')
+
+test1         used to check correctness of user command 'idea'.
+              output of 'test1' is 'out' and should be identical to 'Examples'.
+              type 'make test' to run this test
+in            sample input data used by 'test1'
+dumphex.c     little program used by 'test1'
+
+Examples      examples of encrypted data
+README        this documentation
+
+
+INSTALLATION
+============
+
+Change the type definitions in 'idea.h' to the representations in your computer
+  typedef int            int32;       /* signed 32-bit integer (or larger)   */
+  typedef unsigned int   u_int32;     /* unsigned 32-bit integer (or larger) */
+  typedef unsigned short u_int16;     /* unsigned 16-bit integer (or larger) */
+  typedef char           u_int8;      /* unsigned 8-bit integer              */
+
+Comment this definition 'idea.h' if you have neither a ANSI-C nor a C++ compiler
+  #define ANSI_C
+
+Modify 'Makefile' to call your compiler (C, ANSI-C or C++).
+  CC = acc
+
+Execute the following commands:
+  man -M . idea                       display the man page of idea (UNIX)
+  man -t -M . idea                    print the man page of idea (UNIX)
+  make                                compile and link the application (general)

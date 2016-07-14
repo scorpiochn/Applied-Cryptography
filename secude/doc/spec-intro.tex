@@ -1,0 +1,155 @@
+\section{Introduction}
+\label{if}
+\markboth{Introduction}{Introduction}
+\thispagestyle{myheadings}
+
+The security techniques used within SecuDE are essentially based on
+\be
+\m application of {\em asymmetric} and {\em symmetric encryption} in order to guarantee
+   confidentiality and authenticity of user information,
+\m {\em personal secure storage} of security relevant information (particularly of keys),
+\m application of {\em X.500ff}-defined {\em certification} techniques and -formats in order to
+   guarantee authenticity of keys and other security relevant information.
+\ee
+The following sections 
+contain ASN.1 definitions of necessary security related objects and
+describe basic functions in terms of C-language procedure calls. 
+The latter constitute a basic set of modules
+which are intended to support {\em security applications},
+in that they provide {\em security application programming interfaces}.
+The applications {\em X.400} (Electronic Mail) and {\em PEM} (Privacy Enhanced Mail, RFC111x)
+are based on these functions. The modules comprise the interfaces {\em Secure-IF},
+{\em AF-IF}, {\em X400-IF}, and {\em PEM-IF} as shown in Fig.~\ref{bild1}. 
+This interface structure was chosen for the following reasons: \\ [1ex]
+Security applications should be independent of underlying technology, i.e. it should
+not make any difference for the security functionality in an application whether 
+cryptographic algorithms are realized
+in software or hardware chips or in external devices like smartcards or smartcard readers,
+nor should it make a difference how and where security relevant information like keys 
+are stored. They need an interface which largely hides the implications of particular
+technology and which is oriented on user required security characteristics
+in order to support migrations to advanced technologies. For this purpose
+we defined the interface {\em Secure-IF} which is described in chapter~\ref{sec-if}. 
+Secure-IF provides {\em Cryptographic Functions} 
+and {\em Personal Secure Storage} (PSE) in a technology independent form. \\ [1ex]
+{\em Personal Secure Storage} can be realized by various methods. The highest level of
+security against unallowed manipulation of security relevant information requires
+hardware support. By current standards, {\em smartcards} are appropriate means to
+store security relevant personal data because they combine the two aspects
+\bi
+\m security against eavesdropping through hardware properties and
+\m mobility and portability of personal information.
+\ei
+However, smartcard technology
+is currently developing fast, and standardisation in this area is not stable
+yet. For this reason, we provide a software substitute of the PSE (SW-PSE). 
+We assume that all security relevant functions are
+performed by software (e.g. in work stations, PC's or main frames) and that all
+security relevant information is stored on disks or other background memory
+of the systems. Protection mechanisms as they are offered by smartcards are to
+be modelled by means of file encryption and electronic signatures.
+The software PSE is described in chapter~\ref{sw-sc}. \\  [1ex]
+Later versions, however, will be characterized by a move of security functionality
+into specialized hardware, and also smartcards will be used. In this case it
+makes sense to define an interface for a smartcard environment application ({\em SCA-IF}).
+This interface is supposed to serve security devices, consisting of smartcard
+readers and multifunctional smartcards, which perform all security functions
+like encryption and decryption of information, signing messages, and verifying
+electronic signatures. The interface {\em SCA-IF}, however, is currently not part of the
+current specification of SecuDE. \\ [1ex]
+In addition, a key pool is assumed where keys (which means the key itself plus additional
+information like algorithm identifier) can be stored and restored 
+by means of key references. The basic idea is
+to have a protected area (or an external security device) for keys which does not allow
+to pass secret keys through the Secure-IF in plaintext to the outside world. 
+Instead, keys are handled only via
+key references and may be moved through the Secure-IF to the application program
+only in encrypted form. The Secure-IF supports this kind of key handling.
+\\ [1em]
+
+\begin{figure}
+\framebox[2.95cm][c]{\rule[-0.5cm]{0cm}{0.9cm}X.400}
+\hspace*{0.4cm}
+\framebox[2.9cm][c]{\rule[-0.5cm]{0cm}{0.9cm}PEM}
+\hspace*{0.4cm}
+\framebox[2.8cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Key Managm.}
+\hspace*{0.4cm}
+\framebox[2.5cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Other Appl.}
+\vs{0.3cm}
+{\bf
+$|$ -- X400-IF -- $|$ \hspace*{0.2cm} $|$ -- PEM-IF -- $|$ \hspace*{0.25cm} $|$ -- KM-IF -- $|$
+}
+\vs{0.3cm}
+\framebox[2.95cm][c]{\rule[-0.5cm]{0cm}{0.9cm}X.400 Support}
+\hspace*{0.4cm}
+\framebox[2.9cm][c]{\rule[-0.5cm]{0cm}{0.9cm}PEM Support}
+\hspace*{0.4cm}
+\framebox[2.8cm][c]{\rule[-0.5cm]{0cm}{0.9cm}KM Support}
+\vs{0.3cm}
+{\bf
+$|$ -- -- -- -- -- -- -- -- -- -- AF-IF -- -- -- -- -- -- -- -- -- -- $|$
+}
+\vs{0.3cm}
+\framebox[5.5cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Local Certificate Handling}
+\hspace*{0.4cm}
+\framebox[3.65cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Directory Access}
+\hspace*{0.4cm}
+\framebox[3.4cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Other Functions}
+\vs{0.3cm}
+{\bf
+$|$ -- -- -- -- -- -- -- -- -- -- -- -- -- -- Secure-IF -- -- -- -- -- -- -- -- -- -- -- -- -- -- $|$
+}
+\vs{0.3cm}
+\framebox[13.6cm][c]{\rule[-0.5cm]{0cm}{0.9cm}PSE and Cryptography (technology dependent)}
+\vs{0.3cm}
+{\bf 
+$|$ -- -- SCA-IF -- -- $|$
+}
+\vs{0.3cm}
+\framebox[3.8cm][c]{\rule[-0.5cm]{0cm}{0.9cm}SCA-Environment}
+\hspace*{4.25cm}
+\framebox[2.5cm][c]{\rule[-0.5cm]{0cm}{0.9cm}Crypto-SW}
+\hspace*{0.2cm}
+\framebox[2.5cm][c]{\rule[-0.5cm]{0cm}{0.9cm}SW-PSE}
+%\vs{0.5cm}
+%\caption{Interface Structure}
+\label{bild1}
+\\[1em]
+%\label{fig-isw-sm}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+Software Modules Interface Structure}
+\end{figure}
+
+Security of the applications X.400 and PEM is based on certification procedures and formats
+as defined in this specification in accordance to {\em CCITT X.500ff} and clarified in
+{\em Vol. 1: Principles of Security Operations}. An essential part here 
+is the {\em Authentication Framework} X.509. For this functionality we defined the 
+Local certificate Handling Module with the interface
+{\em AF-IF} (AF stands for Authentication Framework) which is described in chapter~\ref{af-if}. 
+It can be expected, however, that
+the functionality defined by {\em AF-IF} is not limited to the purpose of Electronic Mail, but that
+it is useful for a wide range of applications. On the other hand, one can imagine other
+applications, e.g. using ECMA certification methods, which use {\em Secure-IF} directly. \\ [0.5cm]
+The interface {\em PEM-IF} was defined for the purpose of the application {\em Privacy Enhanced 
+Mail}. It comprises functions which are necessary in the context of RFC 1421 - 1423.
+{\em PEM-IF} is described in chapter~\ref{pem-if}. 
+\\ [1em]
+The interface {\em X400-IF} was defined for the purpose of the application
+{\em Electronic Mail} due to the {\em CCITT X.400-1988}
+recommendations.
+It comprises functions which enable an X.400 programmer
+to add X.400 security elements into an existing X.400 implementation.
+\\[1em]
+Naturally, a security system based on asymmetric cryptography
+depends on a well organized {\em key management} (KM) infrastructure
+including certification authorities, users and directories.
+For this purpose, the KM module is intended, comprising
+functions to generate keys and certificates,
+and other functions to support the secure exchange of security informations
+such as keys and certificates. The KM module is not defined yet.
+\\[1em]
+Chapter~\ref{aux-if} descibes a collection of useful auxiliary functions mostly destined for the
+handling of octetstrings, object identifiers, algorithm identifiers, and PEM-specific
+transformations. Some of them are of internal use only, and the application programmer will
+not need to handle them, but they are mentioned here for completeness.

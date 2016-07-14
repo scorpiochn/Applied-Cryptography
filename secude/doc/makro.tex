@@ -1,0 +1,225 @@
+%
+% Definition eigener Makros fuer SECUDE
+%
+% einbetten mit \input{spec-makro}
+%
+\def\parname{\parbox[t]{3.3cm}}
+\def\pardescript{\parbox[t]{11.6cm}}
+\def\firstbox{\parbox[t]{5.3cm}}
+\def\secondbox{\parbox[t]{9.6cm}}
+\def\parba{\parbox[t]{4cm}}
+\def\parbe{\parbox[t]{11cm}}
+\newcommand{\speconly}[1]{#1}
+\newcommand{\manonly}[1]{}
+\def\nopagenumbering{
+        \pagestyle{empty}
+        \pagenumbering{alph}
+        \setcounter{page}{0}
+        \thispagestyle{empty}
+}
+\def\bi{\begin{itemize}}
+\def\ei{\end{itemize}}
+\def\bc{\begin{center}}
+\def\ec{\end{center}}
+\def\be{\begin{enumerate}}
+\def\ee{\end{enumerate}}
+\def\bd{\begin{deflist}}
+\def\ed{\end{deflist}}
+\def\bv{\begin{verbatim}}
+\def\ev{\end{verbatim}}
+\def\bquote{\begin{quote}}
+\def\equote{\end{quote}}
+\def\m{\item}
+\def\n{\newpage}
+\def\ka{\raisebox{.4ex}{{\tiny $<\!\!\!<$}}}
+\def\kz{\raisebox{.4ex}{{\tiny $>\!\!\!>$}}}
+\def\marker#1{\marginpar{\rule[0cm]{1mm}{#1}}}
+\def\pf{\-{--\raisebox{.25ex}{{\scriptsize $>$}}}}
+\def\btab{
+        \begin{tabbing}
+        aaaaaaaa \= aaaaaaaa \= aaaaaaaa \= aaaaaaaa \= aaaaaaaa \= aaaaaaaa \= aaaaaaaa \= aaaaaaaa \= aaaaaaaa \= aaaaaaaa \= \kill
+}
+\def\bvtab{
+        \begin{tabbing}
+        aaaa \= aaaa \= aaaa \= aaaa \= aaaa \= aaaa \= aaaa \= aaaa \= aaaa \= aaaa \=aaaa \=aaaa \= \kill
+}
+\def\etab{\end{tabbing}}
+\def\evtab{\end{tabbing}}
+\def\1{\>}
+\def\2{\> \>}
+\def\3{\> \> \>}
+\def\4{\> \> \> \>}
+\def\5{\> \> \> \> \>}
+\def\6{\> \> \> \> \> \>}
+\def\7{\> \> \> \> \> \> \>}
+\def\8{\> \> \> \> \> \> \> \>}
+\def\9{\> \> \> \> \> \> \> \> \>}
+\def\blankpage{
+        \nopagenumbering
+        \newpage
+        \btab
+        \etab
+        \newpage
+}
+\newcommand{\hll}[1]{}
+\newcommand{\hl}[1]{\vs{0.5cm} {\bf #1} \\ [1ex]}
+\newcommand{\nm}[3]{#3}
+\def\addtotoc#1{}
+\def\vs#1{
+        \mbox{} \vspace{#1} \\
+}
+\def\ifnot#1#2{
+        \def\firstpar{#1}
+        \def\secondpar{#2}
+        \ifx\firstpar \secondpar \else \secondpar \\ \fi
+}
+\def\eline#1{
+        \def\fpar{#1}
+        \def\spar{}
+        \ifx\fpar \spar \else \fpar \\ [1cm]\fi
+}
+\def\secudetitlepage#1#2{
+        \title{ {\Huge\bf  SecuDE} \\ [1.5cm]
+                {\Large\bf #1} \\ [0.5cm] 
+                {\large \eline{#2}}
+                {\large Version 4.1} \\ [2cm]
+        }
+        \author{
+                \authors{}
+                GMD \\
+                Institut f{\"u}r TeleKooperationsTechnik (I2) \\
+                Darmstadt, Germany \\ [5cm] 
+        }
+        \date{
+                \today \\ [1cm]
+                {\normalsize Copyright \copyright 1993 by Gesellschaft f{\"u}r Mathematik und Datenverarbeitung (GMD)}
+        }
+        \nopagenumbering
+        \maketitle
+        \parindent0em
+        \newpage
+        \conditions{}
+        {\small
+        Other volumes available within this documentation: \\ [1ex]
+	\ifnot{#1}{Overview}
+	\ifnot{#1}{Vol. 1: Principles of Security Operations}
+	\ifnot{#1}{Vol. 2: Security Commands, Functions and Interfaces}
+ 	\ifnot{#1}{Vol. 3: Security Applications' Guide}
+        }
+        \newpage
+	\pagenumbering{roman}
+        \preface{}
+	\cleardoublepage
+}
+
+\def\conditions{
+        Copyright \copyright Gesellschaft f{\"u}r Mathematik und Datenverarbeitung (GMD), 1993
+        \\ [1cm]
+        {\footnotesize
+        Permission to use, copy, modify, and distribute this software and its documentation
+        for any purpose and without fee is hereby granted, provided that this notice and the
+        reference to this notice appearing in each software module be retained unaltered, and 
+        that the name of GMD or any contributor shall not be used in advertising or publicity 
+        pertaining to distribution of the software without specific written prior permission. 
+        It is the responsibility of the users of this software to comply with national or 
+        international export and import regulations, or with licence rights from third parties.
+        \\ [1em]
+        GMD AND ALL CONTRIBUTORS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+        ALL IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS. IN NO EVENT SHALL GMD OR ANY
+        CONTRIBUTOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+        WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
+        NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+        PERFORMANCE OF THIS SOFTWARE. \\ [8cm]
+        }
+}
+
+\def\preface{
+	{\Large\bf Preface}
+	\\ [1cm]
+        SecuDE has been developed by GMD for the R \& D community as a research tool to
+        promote the construction of trustworthy systems, particularly in the context of OSI.
+        The initial sponsorship came from the Deutsches Forschungsnetz (DFN), project 
+        {\em Secure DFN}, which was made possible by grants from the Ministry of Research 
+        and Technology of Germany. 
+        \\ [1em]
+	The SecuDE documentation was prepared by R{\"u}diger Grimm, Jan L{\"u}he and 
+        Wolfgang Schneider.
+        \\ [1em]
+	The following people contributed to the software development of SecuDE: 
+
+	R{\"u}diger Grimm, Stephan Kolletzki, Jan L{\"u}he, Rolf-Dieter Nausester, 
+        J{\"o}rg Reichelt, Wolfgang Schneider, Thomas Surkau and Ursula Viebeg contributed 
+        to SecuDE in general. 
+	The arithmetic package and the RSA and DSA software were written by Achim Jung, 
+        Wolfgang Bott, Rolf-Dieter Nausester, Thomas Surkau and Stephan Thiele. 
+        The STARCOS smartcard package and its integration into SecuDE was done by Levona 
+        Eckstein, Helga Parslow, Ursula Viebeg and Zhou Anmin.
+	\\ [1em]
+        The SecuDE package includes parts of ISODE Release 8.0 ASN.1 and QUIPU tools, 
+        Phil Karn's DES Package, MD2, MD4 and MD5 software from RSA Data Security Inc., 
+        and a SHA implementation from Peter C. Gutman and Colin Plumb (pgut1@cs.aukuni.ac.nz). 
+        \\ [1em]
+        Comments are welcome and should be addressed to: 
+
+        \parba {Postal Address:}
+        \parbe {
+                GMD, Institut f{\"u}r TeleKooperationsTechnik (I2) \\
+                Dolivostr. 15 \\
+                6100 Darmstadt \\
+                Germany \\
+        }
+        \parba {Telephone:}
+        \parbe {
+                +49-6151-869-719 or -718
+        }
+        \parba {Fax:}
+        \parbe {
+                +49-6151-869-785 \\
+        }
+        \parba {E-Mail:}
+        \parbe {
+                Internet-Address: \\
+                schneider@darmstadt.gmd.de \\
+                luehe@darmstadt.gmd.de \\ [1ex]
+                X.400-Address: \\
+                C=DE; ADMD=DBP; PRMD=GMD; OU=Darmstadt; S=Schneider
+        }
+	\newpage
+	{\Large\bf How to Get SecuDE}
+	\\ [1em]	
+        The most recent version of SecuDE can be obtained by 
+	\bi
+        \m ANONYMOUS FTP from internet address {\em ftp.darmstadt.gmd.de} (141.12.50.1), 
+        \m FTAM (User-Id {\em anon}) from X.25 address 262 45050363363.
+	\ei 
+        cd to the pub/secude directory to find 
+	\bi
+        \m three .ps.Z files comprising compressed postscript files of the available
+           documentation,
+        \m the file secude-x.y.all.tar.Z comprising a tar'ed and compressed directory 
+           of everything including program sources and documentation sources (latex),
+        \m the file secude-x.y.src.tar.Z comprising the program sources only,
+        \m the file secude-x.y.doc.tar.Z comprising the documentation sources only.
+	\ei
+	x.y is currently 4.1.
+	\\ [1cm]
+	{\Large\bf Electronic Mail Distribution List}
+	\\ [1em]
+	For electronic mail discussions about SecuDE use the Internet address
+	
+	{\em secude@darmstadt.gmd.de}
+	
+	To get added to the list send an informal mail to {\em secude-request@darmstadt.gmd.de}. 
+	\\ [1cm]	
+	{\Large\bf Restrictions}
+	\\ [1em]
+	The SecuDE package contains cryptographic software for both authentication and
+        encryption purposes. This type of software might be subject to national or
+        international export or import regulations. It contains also software which
+	implements the RSA algorithm. The RSA algorithm is patented in USA.
+	
+	Those who obtain the SecuDE software via public network access are advised to get
+        acquainted with the respective regulations and licence conditions for that
+	environment where they intend to use the software. It is their responsibility
+	not to get in conflict with such regulations.
+}

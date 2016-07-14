@@ -1,0 +1,18 @@
+    In order to prepare the russian-des directory to be sent by
+email start in its superior directory and type to the shell:
+
+	tar -covf russian-des.tar russian-des
+
+this will produce a tar file entitled `russian-des.tar' of
+approximately 82K bytes.  Now type:
+
+	compress russian-des.tar
+
+which will produce a file entitled `russian-des.tar.Z' of approximately
+34K bytes.  Finally type:
+
+	uuencode russian-des.tar.Z russian-des.tar.Z > russian-des.tar.Z.uuenc
+
+which will produce the file `russian-des.tar.Z.uuenc' of about 47K
+bytes.
+

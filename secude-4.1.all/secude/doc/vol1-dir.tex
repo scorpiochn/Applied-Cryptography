@@ -1,0 +1,677 @@
+\section{Directory Services}
+\markboth{Directory Services}{Directory Services}
+\thispagestyle{myheadings}
+\label{ds}
+The use of public key cryptography makes it necessary that one knows 
+and trusts other's public keys. Public Directories like X.500 Directories
+may play a supporting role here. Users and certification authorities
+(if they are involved) have the following requirements when they use security
+services on the basis of public key cryptography:
+\bi
+\m Users have the requirement to make their certificates publicly
+available and to have access to certificates of others and revocation lists
+in order to find out whether a certificate in question is still valid or
+has been revoked.
+\m Certification authorities have the requirement to make their certificates and revocation
+lists publicly available to a distributed community.
+\m Certification authorities have the requirement to exchange cross certificates 
+   with other certification authorities and make
+   them publicly available.
+\ei
+Therefore the integration of public Directories (in particular X.500 Directories)
+into the security infrastructure is a vital part of SecuDE.
+
+A public Directory appears not only as information provider as part of the public security 
+infrastructure, but also as user of security services in order to
+protect its stored information from unauthorized access and to protect its 
+communication. Security policies in case of the globally distributed X.500 Directory
+must aim at three major goals:
+\be
+\m Protect the information base of the Directory.
+\m Protect the internal and external communication of the Directory
+   via DAP and DSP.
+\m Protect the resources of the Directory.
+\ee
+These needs were the motivation for the development of the {\em Authentication
+Framework} (X.509) as part of the X.500 Directory standard where {\em strong authentication} 
+methods on the basis of digital signatures and certified key-to-name bindings
+are being applied in order to protect the X.500 Directory. The certification procedures
+and formats of X.509 are applicable in any context where public key cryptography is used. 
+They play a central role in SecuDE. X.509 certificate
+formats have been adopted, for instance, in the Internet PEM environment.
+
+\subsection{System Description}
+The X.500 Directory is an OSI application which has been developed
+jointly by CCITT and ISO. The CCITT version is specified in the
+X.500 series of Recommendations; the ISO version is known as
+International Standard 9594.
+
+The directory is a system holding information about various entities
+(referred to as {\em objects}) and providing users with services for
+accessing the information. Examples of entities likely to be
+represented in the directory are countries, organizations,
+organizational subdivisions, people, etc.
+The information held on a particular person may include the
+person's name, postal address, telephone number, and electronic mail
+address; the information about a particular organization may
+comprise that organization's name, address, telephone number, and
+telex number.
+The information held in the directory is used to facilitate communication
+between entities.
+The complete set of information to which the directory provides
+access is known as the {\em Directory Information Base} (DIB).
+\\ [1em]
+The directory can be used to support the following services:
+\\ [1em]
+{\bf Look-up}
+
+The directory supports human users in obtaining, among other things,
+telephone and address information of organizations and other users.
+\\ [1em]
+{\bf Message Handling Support}
+
+The directory can be used in message handling (based on CCITT's
+X.400 standard) where it provides the mapping of user-friendly names
+(supplied to the directory) onto machine oriented O/R addresses
+(returned from the directory). The directory also provides the means
+by which two MHS functional entities (two MTAs, or a UA and a MTA)
+may establish the identity of each other.
+\\ [1em]
+{\bf Support of Authentication Process}
+
+The directory meets the needs for authentication and other security
+services (e.g. content confidentiality, content integrity) as it is the
+place from where communicating peers can obtain
+knowledge on each other. The directory provides two approaches to
+authentication:
+\bi
+\m The {\em simple authentication} approach relies on the directory holding
+a password for any user that wishes to be able to authenticate itself
+to a service.
+\m The {\em strong authentication} approach is based on public-key
+cryptography; here the directory acts as a repository of {\em public keys}
+within {\em certificates}.
+\ei
+A certificate can be revoked by being added to a
+{\em revocation list}.
+It is of vital importance that certificates and revocation lists be
+easily available to a distributed community; this is achieved by placing
+them in a X.500 Directory.
+\\ [1ex]
+The need for authentication may be uni- or bilateral: In the first case
+a user may wish to authenticate itself to an application in order
+to be permitted to carry out some action; in the latter case two
+communicating entities (applications and/or users) may wish to establish
+the identity of each other.
+(The directory itself requires its users to
+authenticate themselves before enabling them to access confidential
+information or to modify some of the directory information.)
+
+
+\subsubsection{The Directory Model}
+
+The directory is comprised of a set of one or more application
+processes known as {\em Directory System Agents} (DSAs). In case
+of the directory being composed of more than one DSA, it is said to
+be {\em distributed}. In a distributed directory each DSA holds
+only a fragment of the total directory information.
+\\ [1ex]
+Each DSA provides zero, one, or more {\em access points} to the directory
+at which users may interact with the directory. A user accesses the
+directory by means of an application process known as a {\em Directory
+User Agent} (DUA), running in the user's system.
+The interaction between a DUA and a DSA is carried out by means of a
+directory protocol called {\em Directory Access Protocol} (DAP).
+\\ [1ex]
+A basic feature of a distributed directory is that a user
+should potentially be able to access any directory information
+(subject to access control) irrespective of the access point at which
+his request originates and without knowledge of the physical location
+of the required information. It is required that the distribution
+of the directory information among multiple DSAs be hidden from the
+user, thereby giving the user the impression that each DSA holds
+the whole of the DIB. This is achieved by each DSA (holding
+a fragment of the DIB) having some knowledge about the location
+of the rest of the DIB.
+\\ [1ex]
+As a consequence, a DUA need only have direct access to a single DSA to
+which it can submit the user's request: If that DSA cannot
+satisfy the request, it will be able to locate the DSA holding
+the requested information and either return that knowledge to the
+requestor or pass on the request to the appropriate DSA. (The former
+mode of interaction is known as {\em referral}, the latter one
+is known as {\em chaining}.) The interaction between two DSAs is
+defined by the {\em Directory System Protocol} (DSP).
+
+
+\subsubsection{The Information Model}
+
+The information model describes the logical structure of the DIB; in
+this context the physical distribution of the DIB across multiple DSAs
+is not considered.
+
+The DIB is composed of {\em entries}, each representsing one
+(directory) object and containing the information on that object.
+An entry is structured as a set of {\em attributes}, each with an
+{\em attribute type} and one or more {\em attribute values}.
+
+The DIB is hierarchically structured by arranging its entries
+in a tree, known as the {\em Directory Information Tree} (DIT).
+The DIT reflects the hierarchical relationship commonly found
+among objects. For example, a person works for a department,
+which belongs to an organization, which has its head office
+in some country. As a consequence, objects representing countries
+will be found close to the root of the DIT, whereas entries representing
+people or application processes will be located in the leaves of the DIT.
+
+The DIT provides a means of assigning each entry a {\em Distinguished
+Name} (DN) which unambiguously identifies that entry; this means that
+no two entries may have the same DN.
+Naming is accomplished by assigning a {\em Relative Distinguished Name}
+(RDN) to each entry. The RDN of an entry is made up of specially
+nominated attribute values (the {\em distinguished values}) of the
+entry.
+
+The DN of an entry is then defined as being the sequence of RDNs of the
+entry and of all its superiors in descending order from the root.
+
+The second hierarchy which rules the DIB is that of the object classes.
+An object class represents a family of objects which share certain
+characteristics. Every object belongs to at least one object class.
+An object class defines which attributes must be present ({\em mandatory}
+attributes) and which attributes may be present ({\em optional}
+attributes) in an entry of the object class.
+
+Example:
+
+The object class {\em person} defines the attributes {\em commonName}
+and {\em surname} as being mandatory and the attributes {\em description},
+{\em seeAlso}, {\em telephoneNumber}, and {\em userPassword} as being
+optional in an entry of that object class.
+
+An object class may be a {\em subclass} of another object class. In
+this case the members of the subclass share all the characteristics
+of the {\em superclass} and additional characteristics possessed
+by none of the members of the superclass. As a consequence, an object
+belonging to a particular object class does not only contain
+the mandatory attributes of that object class, but also the
+mandatory attributes of all the superclasses of that object class.
+(The same applies to the optional attributes.)
+
+\subsection{The Directory as part of the Security Infrastructure}
+
+The Directory also has to serve as a provider of public security information as part 
+of the security infrastructure. Therefore, a DSA shall support
+\bi
+\m storage of attribute type UserCertificate as defined in X.500-88,
+
+\m object class strongAuthenticationUser as defined in X.500-88,
+
+\m storage of attribute type CrosscertificatePair as defined in X.500-88,
+
+\m storage of attribute type CertificateRevocationList as defined in RFC 1422 
+  (PEM CRL format),
+
+\m storage of attribute type CaCertificate as defined in X.500-88,
+
+\m object class certificationAuthority which is similarly defined as in X.500-88
+  with the difference that the RFC 1422 CertificateRevocationList
+  attribute type must be present instead of the X.500-88 defined
+  CertificateRevocationList and AuthorityRevocationList.
+\ei
+
+\subsubsection{Object Classes ``Strong Authentication User''
+and ``Certification Authority''}
+\label{ds-oc}
+
+Due to X.500, X.520, X.521, X.509 \cite{cci3} \cite{cci4}:
+
+A {\em certification authority} is represented in the directory
+by an object of class ``organization + certi\-fica\-tion\-Au\-tho\-rity'' or
+of the class ``organizational\-Unit + certi\-fica\-tion\-Au\-tho\-rity''.
+The additive object class ``certification\-Au\-tho\-ri\-ty''
+provides the additional attributes
+``CACertificate'', ``Certi\-ficate\-Re\-vo\-cation\-List'',
+``Autho\-rity\-Re\-vo\-cation\-List'' and, optional,
+``Cross\-Certi\-ficate\-Pair'' (cf. X.521, Annex A).
+
+A {\em user} of security oriented services is represented in the directory
+by an object of class
+``person + strongAuthenticationUser''.
+The additive object class ``strong\-Authen\-tica\-tion\-User''
+provides one additional attribute:
+``UserCertificate''.
+(cf. X.521, Annex A).
+
+Within SecuDe a root certification authority
+has an additional directory attribute, which is not defined by X.500.
+It is called ``Old Certificates'' and is supposed to support users
+in verifying old signatures
+created by keys which are out of use.
+It contains a list of cross certificates in which the root
+certification authority crosscertifies its old public signature
+keys by its currently valid signature key.
+
+\subsubsection{Certificate Attributes}
+\label{ds-ca}
+
+The attribute ``UserCertificate'' ( and ``CACertificate'', respective)
+(cf. X.509, Annex G)
+is a 1-level certificate. Within SecuDe
+it has multiple value:
+Each user and each certification authority has {\em two}
+unique hierarchy certificates, both issued by the certification
+authority at the next level above,
+the first one certifying
+the public signature key, the other one certifying
+the public encryption key.
+By evaluating the object identifiers in the algorithm identifiers
+of the subjectPublicKeyInfo the respective certificate and its
+certified public key is recognized.
+
+``CrossCertificatePair'' (cf. X.509, Annex G)
+is an optional attribute of a certification authority.
+Within SecuDe
+only the ``Forward Certificate'',
+which is the first element of the SEQUENCE in this attribute,
+is filled.
+It has {\em multiple value}
+and contains all cross certificates by which other
+certification authorities certify the owner's
+public signature key.
+The distinguishing part of the multiple cross certificate value
+is the issuer's name.
+The second element of the SEQUENCE,
+``Reverse Certificate'', is missing.
+
+\subsubsection{Black Lists}
+\label{ds-bl}
+
+A CA must be able to revoke a certificate which it is the issuer
+of prior to its expiration time. There are many reasons for a CA
+to revoke a certificate:
+\bi
+\m The user's secret key is assumed to be compromised whereby the
+corresponding public component is invalidated.
+\m The user's affiliation has changed whereby the distinguished
+name contained in the certificate's "subject" field is invalidated.
+\m The user is no longer to be certified by the CA.
+\m The CA's certificate is assumed to be compromised.
+\m The user has violated the CA's security policy.
+\ei
+
+A CA can mark a certificate which it issued as "invalid" by adding
+it to the list of revoked certificates.
+
+Information relative to certificate revocation is propagated by
+means of revocation lists, so-called "black lists".
+Revocation lists are made publicly available by being placed in
+the directory. Each CA is responsible for maintaining its
+revocation lists held within its directory entry.
+
+Two users wishing to authenticate and having learned each others'
+certificates from the certification path must check the validity
+of the received certificates by determining if any of the
+certificates establishing the certification path is contained in the
+black list of its respective issuer.
+
+A user who checks a certificate at security level 3 (see~\ref{sl}),
+asks the respective ``revocation list'' from the directory entry of the
+issuing certification authority.
+The directory will return the complete list.
+The user verifies the valid time interval as well as
+the signature of the list and looks then for
+the pair of attributes
+{\em Issuer + Serial Number}. If it is in the list,
+the certificate is invalid.
+Otherwise the user resumes with the verification of the certificate.
+Note, that the pair of attributes {\em Issuer + Serial Number}
+uniquely and universally identifies a certificate.
+\\ [1em]
+There are two different formats and semantics for revocation lists:
+one defined by the standard (X.509), the other one defined by
+PEM (RFC 1422). In the following, the characteristics and deficiencies
+of both definitions are explained.
+
+{\bf Certificate Revocation according to X.509}
+
+X.509 defines two revocation lists to be maintained by each CA:
+\be
+\m In its CRL ("CertificateRevocationList"), a CA includes all user
+certificates it issued which have been revoked.
+\m In its ARL ("AuthorityRevocationList"), the CA includes all
+CA certificates it issued which have been revoked.
+\ee
+An ARL may
+also contain references to CA certificates issued by CAs other
+than the list maintainer; this facility enables two CAs to publish,
+by bilateral agreement, each others' revocations, that is, each CA
+signs a sequence of both its own revocations and those of its
+partner CA. This might be helpful to the clients of both CAs as it
+reduces the number of their directory accesses when consulting
+black lists.
+
+Both lists are certified by their maintaining CA.
+
+ARLs and CRLs are stored differently in the directory: The former list
+is held as attribute of type "CertificateRevocationList" within the
+directory entry of the responsible CA, the latter as attribute of
+type "AuthorityRevocationList". Both attributes are mandatory within
+an entry belonging to the object class "Certification Authority"
+(the object class "Certification Authority" is used in defining
+directory entries for objects which act as certification authorities);
+the consequence of this is that both lists must exist in the directory,
+even if they are empty.
+
+There is no syntactic difference between these two lists. Their
+underlying syntax is defined as follows:
+
+\begin {center}
+\begin {tabular}{lll}
+CertificateList & \multicolumn{2}{l} {::= {\bf SIGNED SEQUENCE} \{ } \\
+  & signature     & AlgorithmIdentifier,        \\
+  & issuer        & Name,                       \\
+  & lastUpdate    & UTCTime,                    \\
+  & revokedCertifiactes   & RevokedCertificates \\ 
+ \} &               &                             \\
+RevokedCertificates & \multicolumn{2}{l} {::= {\bf SIGNED SEQUENCE OF SEQUENCE} \{ }  \\
+  & signature     & AlgorithmIdentifier,        \\
+  & issuer        & Name,                       \\
+  & userCertificate        & SerialNumber,   \\
+  & revocationDate & UTCTime OPTIONAL \\
+ \} & & \\
+\end {tabular}
+\end {center}
+\label{fig-ds-blx509}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: X.509-type ``Revoked Certificate List''}
+\\ [1em] 
+
+The current definition of the CertificateList syntax is incorrect
+for two reasons:
+\be
+\m The type SIGNED SEQUENCE OF SEQUENCE of the "revokedCertificates"
+component is syntactically incorrect: As the latter SEQUENCE
+comprises an algorithm identifier, SEQUENCE OF SEQUENCE identifies
+several (different) algorithm identifiers to compute a single
+signature. It is unclear which algorithm identifier will be used
+by SIGNED.
+\m The CertificateList syntax prescribes exactly two signatures
+which are applied in a nested manner: the innermost signature is
+applied to the sequence of revoked certificates, where each revoked
+certificate is defined as a sequence of several information, among
+them an issuer and a serial number which identify a certificate
+universally. The outer signature applies to the revocation list as a
+whole.
+\ee
+This makes no sense as it would enable any CA to revoke certificates
+signed by any other CA: If a compromised CA wanted to revoke a CA
+certificate which it is not the issuer of, it would simply have to
+add the issuer and serial number of that certificate to the sequence
+of entries in its ARL and then sign that sequence. A directory user
+consulting the ARL of the compromised CA would then not be able to
+determine whether the CA certificate in question has indeed been revoked
+by its issuer; in order to be on the safe side the directory user would
+have to access the issuer's ARL.
+For this reson, each individual revoked certificate is to be signed by its
+issuer before being added to a black list (at least in the case of an
+ARL): It is a SIGNED SEQUENCE.
+
+This deficiency of the CertificateList syntax as specified in the
+standard is the subject of a Defect Report (Defect Report 9594/033)
+where it is classified as an error.
+
+
+There are two possible solutions for correcting the faulty type
+SIGNED SEQUENCE OF SEQUENCE: change it to either SEQUENCE OF SIGNED
+SEQUENCE or SET OF SIGNED SEQUENCE. If one considers the certificate
+list an UNORDERED list of revoked certificates, SET OF SIGNED SEQUENCE
+is appropriate.
+
+However, the SEQUENCE OF SIGNED SEQUENCE solution should be given
+preference for the following reason: The SIGNED macro defines a
+signature to be applied to the BER code of ToBeSigned.
+If the ToBeSigned contains a Set-of type, its BER code may be
+varying, as a Set-of type does not specify an order in which
+its components shall be encoded. A revocation list represents a
+SIGNED quantity. After a revocation list whose revoked certificates
+are arranged in a SET has been exchanged several times among
+applications in a distributed environment, its BER code of
+ToBeSigned will very probably be different from that which was
+originally signed by the issuing CA. As a consequence, that
+revocation list could not be verified, though it would not have
+been manipulated.
+
+In order to enable the validation of a SIGNED type (containing a
+Set-of type as a component) in a distributed environment, a
+distinguished encoding is required. According to X.509, a
+distinguished encoding of a SIGNED data value is obtained by
+applying the Basic Encoding Rules defined in X.209 with the restriction
+that the components of a Set-of type (that is, the revoked certificates)
+shall be encoded in ascending order of their octet value.
+
+In order to save a CA from having to order the entries of
+its revocation list according to their octet value, it would be
+much more convenient for a CA to arrange its revoked certificates
+in a SEQUENCE rather than in a SET, that is, to use the type
+SEQUENCE OF SIGNED SEQUENCE for the "revokedCertificates" component
+of a black list. The revoked certificates could then be ordered
+according to their revocation date.
+\\ [1em]
+Redundancy in case of the X.509-CertificateList syntax
+
+The mechanism for certificate revocation described in the current
+version of X.509 (1988) is not correctly reflected by the
+accompanying format for CertificateRevocationList: The format for
+CRLs as specified in X.509 associates an issuer distinguished name
+which each revoked certificate, even though the text states that a
+CRL contains entries for only a single issuer. As the issuer of a CRL
+always corresponds to the issuer of each individual revoked certificate
+contained in that CRL, the name of the issuing CA need appear only
+once in the list: serial numbers in the subsequent entries are to be
+interpreted with respect to the issuer whose name appears in the list's
+outer SEQUENCE.
+
+The inclusion of an issuer name with each revoked certificate is
+reasonable for authority revocation only where the replication of this
+field provides a mechanism for a CA to announce in its ARL the revocation
+of a CA certificate it has not issued.
+
+Not only the provision of an issuer name with each revoked certificate
+in a CRL, but also the appearance of an algorithm identifier in each
+CRL entry is superfluous: If the revoked certificates contained in a CRL
+are meant to be SIGNED quantities, the algorithm identifier associated
+with their signature will always correspond to the algorithm identifier
+which appears in the list's outer SEQUENCE.
+Moreover, there is no need for the revoked certificates in a CRL being
+signed; the signature applied to the CRL's outer SEQUENCE is sufficient,
+whereas the signatures applied to each revoked certificate just make the
+size of a CRL grow immensely, with no further benefit derived from them.
+
+The inconsistency between the description of CRL management in the
+text and the accompanying format for CRLs as specified in X.509 is
+the subject of a Defect Report (Defect Report 9594/057). There it is
+suggested to define two syntaxes for supporting two mechanisms
+(the CertificateRevocationList mechanism and the AuthorityRevocationList
+mechanism) with different requirements: a "UserCertificateList" syntax
+for CRLs and an "AuthorityCertificateList" syntax for ARLs.
+The "UserCertificateList" syntax removes the superfluous issuer name
+and algorithm identifier from CRL entries.
+
+
+{\bf Certificate Revocation according to PEM}
+
+In contrast to X.509, PEM does not distinguish between a
+CertificateRevocationList mechanism and an AuthorityRevocationList
+mechanism: In order to simplify the management of revocation lists,
+it uses CRLs for revocation both of user and of CA certificates.
+
+The format of a revocation list for use in the PEM environment is a
+deviation from the format specified in X.509 (1988), though it is
+derived from it.
+
+PEM defines its CertificateRevocationList syntax as follows (see RFC
+1422):
+
+\begin {center}
+\begin {tabular}{lll}
+CertificateRevocationList & \multicolumn{2}{l} {::= {\bf SIGNED SEQUENCE} \{ } \\
+  & signature     & AlgorithmIdentifier,        \\
+  & issuer        & Name,                       \\
+  & lastUpdate    & UTCTime,                    \\
+  & nextUpdate    & UTCTime                     \\
+  & revokedCertifiactes          & {\bf SEQUENCE OF} CRLEntry OPTIONAL, \\
+\}  &               &                             \\
+CRLEntry & \multicolumn{2}{l} {::= {\bf SEQUENCE} \{ }  \\
+  & userCertificate        & SerialNumber,   \\
+  & revocationDate & UTCTime \\
+ \} & & \\
+\end {tabular}
+\end {center}
+\label{fig-ds-blpem}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: RFC 1422-type ``Revoked Certificate List''}
+\\ [1em]
+ 
+As reflected by this syntax, PEM does not see a need to have a
+revocation list issued by other than the issuer of the certificates
+contained in that revocation list. Therefore, the PEM format does not
+provide a facility to include in a revocation list certificates from
+other issuers: The "revokedCertificates" component of a PEM
+revocation list is a SEQUENCE of ordered pairs, in which the first
+element is the serial number of the revoked certificate and the
+second element is the time and date of the revocation for that
+certificate. The serial number is to interpreted with respect to
+the issuer whose name appears only once in the list's outer SEQUENCE.
+
+There is only one signature applied to a PEM revocation list; the
+signature's associated algorithm identifier is specified in the
+"signature" field in the list's outer SEQUENCE.
+
+As an enhancement to the CertificateList format defined in the
+standard, the CRL format adopted by PEM provides a "next update"
+field containing time and date values which specify the next scheduled
+date of issue of a CRL. By means of the "next update" field a CA
+informs the directory users of when next to access its
+"CertificateRevocationList" directory attribute in order to
+maintain the most current version of its revocation list.
+
+It is a CA's responsibility to issue a new CRL when the next
+scheduled issue date arrives, even if there are no changes in the list
+of entries. (In that case, only the values of the "last update" and
+"next update" fields are to be changed.)
+
+The omission of the "next update" field (as in the case of X.509)
+presents a problem as it does not allow a directory user to determine
+whether a given CRL is the most current list available from its issuing
+CA or whether it is already "out of date". As a consequence, a directory
+user must access this attribute constantly in order to have any confidence
+in its currency.
+
+\subsubsection{``Old Certificates'' of Root Certification Authority}
+\label{ds-roc}
+
+{\bf Definition of Attribute ``OldCertificates''}
+\label{ds-doc}
+
+A recipient of a digital signature is able to verify the originator
+certificate only if he knows a
+public key of one, at least of the highest,
+of the issuing certification authorities
+(i.e. he needs a table of trusted public keys on his smartcard).
+Changing keys might make old signatures unverifyable.
+
+In order to allow users to verify old signatures
+the root certification authority
+crosscertifies all its old public keys by its currently valid key.
+These cross-certificates are made public as directory attribute
+called ``old certificates'', which is not defined in X.500.
+
+\begin {center}
+\begin {tabular}{ll}
+OldCertificates    & ::= {\small\bf ATTRIBUTE WITH ATTRIBUTE-SYNTAX} \\
+		   & OldCertificateList                              \\
+		   &                                                 \\
+OldCertificateList & ::=  {\small\bf SEQUENCE OF SEQUENCE} \{        \\
+		   & serialNumber     CertificateSerialNumber,       \\
+		   & crossCertificate Certificate \}
+\end {tabular}
+\end {center}
+
+\label{fig-ds-doc}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: Directory attribute ``OldCertificates''}
+
+{\bf Values of the Table}
+\label{ds-vt}
+
+This is an example of a root certification authority
+with an currently valid signature key number 5.
+Up to date there were only five old signature keys with the numbers 0-4.
+
+\begin {center}
+\begin {tabular}{|c|c|}
+\hline
+{\em Serial Number} & {\em Cross Certificate} \\
+\hline
+5000000 & $CA_{S4}$\ka$CA_{P5}$\kz  \\ \hline
+4000000 & $CA_{S5}$\ka$CA_{P4}$\kz  \\ \hline
+3000000 & $CA_{S5}$\ka$CA_{P3}$\kz  \\ \hline
+2000000 & $CA_{S5}$\ka$CA_{P2}$\kz  \\ \hline
+1000000 & $CA_{S5}$\ka$CA_{P1}$\kz  \\ \hline
+0000000 & $CA_{S5}$\ka$CA_{P0}$\kz  \\ \hline
+\end {tabular}
+\end {center}
+ 
+\label{fig-ds-vt}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: Directory table ``Old Certificates''}
+\\
+{\footnotesize $CA_{S5}$\ka$CA_{P3}$\kz denotes a cross certificate
+by which the root CA certifies its old public key No. 3 by its
+currently valid
+signature key No.5, etc.}
+
+{\bf The Query Algorithm of the Table}
+\label{ds-qa}
+
+Key entry is the left column ``Serial Number''.
+A recipient of an originator certificate recognizes
+that the highest certificate is old by the key number of the certificate
+serial number compared to the key number of the public root-CA-key
+on his smartcard.
+He would read top-down through the list until
+the originator root certificate serial number is greater than or equal with
+the table's serial number. He would append the cross certificate of
+that respective line to the originator certificate
+and is now able to verify the extended originator certificate
+completely.
+
+Note the first line of the table: It enables users to update
+their smartcards after a change of certification keys of the root-CA.
+
+This algorithm would lead to no result,
+if the serial number of the first line in the directory table
+is older (i.e. smaller) than the serial number of {\em PKROOT-new}
+on the recipient's smartcard (see paragraph \ref{pkroot}).
+This indicates an error either on the smartcard
+or in the directory table.
+Either case can only be resolved by the certification authority.
+Also, if a user has stored a very old root key on his smartcard
+(serial no of PKRoot-new + 1 {\em smaller than} serial no
+of first line of directory table),
+this algorithm would have no result.
+In this case, the user should ask for an actual value
+of the root keys, possibly from his user certification authority.
+
+{\bf Updating the Table}
+\label{ds-ut}
+
+Whenever a root certification authority changes its
+signature keys, its first step is to update the directory attribute
+``Old Certificates''.
+In every line the cross certificate in the right column is replaced
+by a new cross certificate which certifies the same old key,
+however by its new key.
+The table gets an additional first line.
+

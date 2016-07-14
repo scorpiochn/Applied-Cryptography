@@ -1,0 +1,168 @@
+#
+#    Copyright (C) 1991, GMD Darmstadt
+#
+#                         NOTICE
+#
+#    Acquisition, use, and distribution of this module 
+#    and related materials are subject to restrictions 
+#    mentioned in each volume of the documentation.
+#
+
+Arithmetic Package for Long Integers
+====================================
+
+this package implements an arithmetic on long integer numbers. It includes
+the following modules:
+
+interface.h:	- interface definitions and useful macros
+
+lnutil.c	- some functions for machine independent conversions between
+		  external and internal representations of long numbers.
+
+bool.c		- boolean functions on long integers (XOR)
+
+comp.c		- logical functions on long integers (compare)
+
+modarit.c	- the modulus arithmetic on long integers (madd, msub, mmult,
+		  mdiv, mexp, mexp2)
+
+and machine architecture and system dependent directories which implement
+the basic interface for the arithmetic on long integers:
+
+std		- standard "C" interface which should work on any computer, (but
+		  slow)
+mc68apollo	- apollo workstation (SysV, mc68xxx)
+mc68munix	- pcs cadmus (SysV, mc68xxx)
+mc68sun		- Sun-3 (SunOS, mc68xxx)
+sparc		- Sun-4 (SunOS, SPARC)
+ms-dos		- ibm-pc (DOS, intel)
+sun386		- Sun386 (SunOS, 80386)
+
+representation of long integers:
+--------------------------------
+
+external:	the external representation of long integers follows the
+		definition of ASN.1 Basic Encoding Rules (ISO8425). I.e.
+		integers are represented in either octet or bit strings
+		with high order bits/octets first.
+
+internal:	a long integer can be viewed from C program language as
+		struct long_integer {
+			unsigned int	len;
+			unsigned int	val[MAXLGTH];
+		};
+		len defines the number of words used for representing the
+		long integer in the array val[]. The integer value '0' is
+		represented as (len==0). The least significant word is stored
+		first.
+
+
+interface.h:
+------------
+needs the compile definition WLNGxx (xx one of {16,32}) wordsize in bits
+
+MAXLGTH		- const value of the standard long integer size in words.
+MAXGENL		- const value of the long integer size for rsa key pair
+		  generation
+WLNG		- the word size in bits (derived from WLNGxx)
+WBYTES		- the number of bytes in a word
+SWBYTES		- the shift size to get the number of bytes from number of words
+SWBITS		- the shift size to get the number of bits from number of words
+HSBIT		- highest significant bit mask
+HSBYTE		- highest significant byte mask
+L_NUMBER	- typedef struct long integer (s.a.)
+LZ_EINS		- long integer value 1
+LZ_ZWEI		- long integer value 2
+LZ_FERMAT5	- long integer value 5th fermat number (F4=2^2^4)
+trans(S,D)	- assignment of long integers (D:=S)
+normalize(L)	- normalize long integer (reduce leading zero words)
+inttoln(i,L)	- produce long integer from integer
+lntoint(L)	- high significant word of L
+lngofln(L)	- word count of long integer
+lntoINTEGER(L,I)- store long integer in an octetstring
+INTEGERtoln(I,L)- load long integer from octetstring
+
+
+
+lnutil:
+-------
+
+lngtouse(L)	- (int) function which gives the useable bitsize of a long
+		  integer
+
+intlog2(L)	- (int) function which gives the integer part of the logarithm
+		  base 2 of L
+
+bitstoln(B,L,off,bits) - extracts from a given bitstring B the bits from offset
+		  off with size bits and loads it into the long integer L
+
+lntobits(L,B,bits) - appends the contents of the long integer L to the bitstring
+		  B with almost size bits and stripping high order bits resp
+		  expanding to size bits
+
+octetstoln(O,L,off,octs) - extracts from a given octetstring O the octets from
+		  offset off with size octs and loads it into the long integer L
+
+lntoctets(L,O,octs) - appends the contents of the long integer L to the
+		  octetstring O with almost size octs and stripping high order
+		  octets resp expanding to size octs
+
+lz_eins		- the long integer of value 1
+lz_zwei		- the long integer of value 2
+lz_fermat5	- the long integer of value F4
+
+
+
+bool.c:
+-------
+
+xor(A,B,X)	- the logical exclusive or on two long integers A, B gives
+		  result long integer X
+
+
+comp.c:
+-------
+
+comp(A,B)	- (int) function signum(ABS(A-B))
+
+
+
+modarit.c:
+----------
+
+madd(A,B,S,N)	- addition of two long integers A, B modulo long integer N gives
+		  result long integer S
+
+msub(A,B,D,N)	- subtraction of two long integers A, B modulo long integer N
+		  gives result long integer D
+
+mmult(A,B,P,N)	- multiplication of two long integers A, B modulo long integer N
+		  gives result long integer P
+
+mdiv(A,B,Q,N)	- division of two long integers A, B modulo long integer N gives
+		  result long integer Q
+
+mexp(B, P, X, N)- exponentiation of long integer base B to the power of long
+		  integer P modulo long integer N gives result long integer X
+
+mexp2(P, X, N)	- equivalent procedure as mexp(lz_zwei,P,X,N)
+
+
+
+basic arithmetic: (std)
+-----------------
+
+add(A,B,S)	- addition of long integers A, B gives result long integer S
+
+sub(A,B,D)	- subtraction of long integers A, B gives result long integer D
+		  the result is undefined if B>A
+
+mult(A,B,P)	- multiplication of long integers A, B gives result long integer
+		  P
+
+div(A,B,Q,R)	- division of long integers A, B gives long integer quotient Q
+		  and residual long integer R; if R is equivalent to Q only
+		  the residual is returned
+
+shift(A,s,X)	- shifts long integer A by s bits (left if s>0, right if s<0)
+		  and gives result X

@@ -1,0 +1,55 @@
+# This is a MAKEFILE for Turbo C++ MAKE
+
+# extension for object files
+O = obj
+
+# commands
+CC = tcc
+LIB = tlib
+ASM = tasm
+
+# name of temporary library script
+TEMPFILE = $(TEMP)\temp.mak
+
+# standard include directory
+STDINCDIR = c:\tc\include
+
+# The location of the common source directory.
+SRCDIR = ..\source\#
+SRCLIB = rsaref.lib
+
+# The places to look for include files (in order).
+INCL =  -I. -I$(SRCDIR) -I$(STDINCDIR)
+
+# Normal C flags.
+CFLAGS =  -ml -f-  $(INCL) -c -DPROTOTYPES=1
+LFLAGS =
+
+# Debugging C flags.
+#CFLAGS =  -ml -O- $(INCL) -c -DPROTOTYPES=1
+#LFLAGS = /codeview /map /stack:26000
+
+
+# The location of the demo source directory.
+RDEMODIR = ..\rdemo\#
+
+$(SRCLIB) : desc.$(O) digit.$(O) digitas.$(O) md2c.$(O) md5c.$(O) nn.$(O) prime.$(O)\
+  rsa.$(O) r_encode.$(O) r_enhanc.$(O) r_keygen.$(O) r_random.$(O)\
+  r_stdlib.$(O)
+  if NOT EXIST $. $(LIB) $.
+  $(LIB) $.  -+ desc.$(O)
+  $(LIB) $.  -+ digit.$(O)
+  $(LIB) $.  -+ digitas.$(O)
+  $(LIB) $.  -+ md2c.$(O)
+  $(LIB) $.  -+ md5c.$(O)
+  $(LIB) $.  -+ nn.$(O)
+  $(LIB) $.  -+ prime.$(O)
+  $(LIB) $.  -+ rsa.$(O)
+  $(LIB) $.  -+ r_encode.$(O)
+  $(LIB) $.  -+ r_enhanc.$(O)
+  $(LIB) $.  -+ r_keygen.$(O)
+  $(LIB) $.  -+ r_random.$(O)
+  $(LIB) $.  -+ r_stdlib.$(O)
+
+
+!include "$(SRCDIR)targets.mak"

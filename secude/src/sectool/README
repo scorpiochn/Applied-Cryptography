@@ -1,0 +1,40 @@
+
+    SecuDE Release 4.1 (GMD)
+
+
+    Copyright (C) 1993, GMD Darmstadt
+
+                         NOTICE
+
+    Acquisition, use, and distribution of this module 
+    and related materials are subject to restrictions 
+    mentioned in each volume of the documentation.
+
+
+
+
+    	SECTOOL 2.1 (Demo version)
+
+
+   Needed Libraries:
+
+	- You need following standard X libs: libxview (XView toolkit), libolgx (Open Look), libX (X11R5)
+	- and, of course, all that SecuDE 4.1 stuff.
+
+
+   Functions that are available:
+
+	- Alias services (start from SecTool-window via Alias-button or as subtool with "sectool -A"
+	- Online help for Alias services
+
+	- for PSE: Check, Show/Reset error stack, Ret show properties
+	- for single PSE objects: Show/Create/Delete objects, Show via double click
+	- for PKList/EKList objects: Add/Delete (EKList panels will only appear for a two-keypair-PSE)
+	  
+
+   Functions that are not available:
+
+	- I think there's enough inside to call it a Public Domain Demo... I'll continue after my holyday.
+
+
+

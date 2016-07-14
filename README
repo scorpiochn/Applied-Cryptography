@@ -1,0 +1,421 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+
+FULL Contents of Bruce Schneier's Applied Cryptography Disks.
+
+I would like to publicly thank Marc Vauclair <vauclair@vvcomp.be>,
+the one who translated the whole book of Bruce from English to
+French (to be published soon), for submitting many files to this
+archive.
+
+Mon Jan 29 09:22:32 MET 1996
+Also, I publicly thank *ANONYMOUS, ITAR does-not-work (I used to
+use another word (su**s), but I have been told I am being too heavy)*
+for submitting many other files to this archive.
+
+
+David Vincenzetti
+vince@dsi.unimi.it
+
+- - -------------------------------------------------------------------------
+
+
+ASSORTED.ZIP  -  Assorted simple cryptography and statistics
+     programs, written by Thomas Strong, Jr. in 1993.
+ + ASSORTED.ZIP
+
+BBC.ZIP  -  Big Block Cipher: uses 256K blocks, three random
+     number generators, two substitution tables, cipher-text
+     feedback, and transpositions.  Written by Peter Boucher. 
+     Unknown security.
+ + boucher-big-block-cipher.tar.gz
+
+BIGNUM.ZIP - Bignum class, written in Borland C++ by Bruce Bowen.
+ + bignum.tar.Z
+
+BLOWFISH.ZIP - The Blowfish algorithm, written by Bruce Schneier
+     in 1994.
+ + schneier-blowfish.c.gz
+
+CA1_1.ZIP  -  CA algorithm, written by Howard Gutowitz in 1992.
+ + ca_1.1.tar.gz
+
+CBW.ZIP  -  Crypt Breaker's Workbench.  Program to help
+     cryptanalyze messages encrypted with crypt(1), written by
+     Robert W. Baldwin in 1986.
+ + cbw.tar.gz
+
+CRPT-POL.ZIP - "Cryptography: Policy and Technology," report by
+     Hoffman, Ali, Heckler, and Hoybechts, of 1 Dec 93.
+ + cryptpol.gz
+
+CRYPT1.ZIP  -  UNIX crypt(1) command:  a one-rotor machine
+     designed along the lines of Enigma, but considerably
+     trivialized.
+ + ucb-crypt.1.c.gz
+ + bin-crypt.c.gz
+
+CRYPT3.ZIP  -  UNIX crypt(3) command, written by Tom Truscott and
+     copyright 1989, 1991 by the University of California.
+ + CRYPT3.ZIP
+ + crypt3.c
+
+DES-BARR.ZIP  -  DES implementation, fast, written by David A.
+     Barrett in 1991.
+ + des-barr.zip
+
+DES-BISH.ZIP  -  Implementation of DES front end; does ECB, CBC,
+     CFB, OFB.  Does not include actual DES code.  By Matt
+     Bishop.
+ + des-bish.zip
+
+DES-KARN.ZIP  -  DES implementation, written by Phil Karn in
+     1987.
+   contained in the secude package:
+ + secude-4.1.all.tar.gz
+
+DES-KOON.ZIP  -  DES implementation, fast but large, written by
+     David G. Koontz in 1991.
+ + des-koon.zip
+
+DES-LEVY.ZIP  -  DES implementation, fast and portable, by Stuart
+     Levy in 1988.
+ + pfdes.tar.gz
+
+DES-LOUK.ZIP  -  DES implementation, fast, with main program and
+     C function library for arbitrary precision integer
+     arithmetic.  Written by Antti Louko in 1992.
+ + des-dist.tar.gz
+ + DES-hut.tar.gz
+
+DES-MITC.ZIP  -  DES implementation, written by D.P. Mitchell in
+     1983.
+ + des-mitc.zip
+
+DES-OSTH.ZIP  -  DES implementation with several utility programs
+     and many useful extra functions, runs on UNIX, written by
+     Stig Ostholm, 1990.
+ + DES-OSTH.ZIP
+
+DES-OUTE.ZIP  -  DES algorithm, fast and compact, written by
+     Richard Outerbridge in 1991.  Supports double and triple
+     DES. Includes portable C version, and optimized 680x0
+     version.
+ + d3des.tar.gz
+
+DES-YOUN.ZIP  -  DES implementation, one of the fastest around,
+     written by Eric Young in 1992.
+ + libdes-3.0.tar.gz
+   You might also want to combine the key setting routines of DES-YOUN
+     with the en/decryption routines in the package DESCORE by
+     Dana How that was posted to comp.sources.misc as volume 29,
+     issue 128, see also
+ + descore.shar.gz
+
+ENIGMA.ZIP  -  Software simulation of the German Enigma machine,
+     written by Henry Tieman.
+ + enigna.c
+   See also:
+ + enigma-modification-peake.c
+
+ESCROW.ZIP -  A Proposed Federal Information Processing Standard
+     for an Escrowed Encryption Standard (EES), NIST, 30 Jul
+     1993.
+ + ESCROW.ZIP
+
+EXAMPLES.ZIP  -  Code examples from APPLIED CRYPTOGRAPHY.
+ + EXAMPLES.ZIP
+
+FEAL8.ZIP  -  FEAL-8 algorithm, written in 1989.
+ + feal8.tar.gz
+
+FEALNX.ZIP  -  FEAL-NX algorithm, written by Peter Pearson in
+     1992.
+ + fealnx.tar.gz
+
+FIPS171.ZIP  -  FIPS PUB 171, Key Management Using ANSI X9.17,
+     dated 27 April 1992.
+ + fips171.txt
+
+FIPS180.ZIP  -  FIPS PUB 180, Secure Hash Standard, dated 11 May
+     1993.
+ + fips180.txt
+
+FIPS181.ZIP  -   FIPS PUB 181, Automated Password Generator, dated
+     5 October 1993, with C source code.
+ + fips181.txt
+
+FIPS185.ZIP  -  FIPS PUB 185, Escrowed Encryption Standard, dated
+     8 Febuary 1994.
+ + fips185.txt
+
+FREQ.ZIP  -  Program to count the frequency of every letter in a
+     file, written by Peter Boucher.
+ + boucher-chi-square-frequency-analysis.c.gz
+
+GOST.ZIP  -  The Soviet GOST algorithm (without the correct S-
+     boxes), written by Colin Plumb in 1993.
+ + gost-spec.tar.gz
+ + gost-spec2.ps
+
+GRENBOOK.ZIP  -  Draft 4.0 of the Green Book, the European
+     computer security specification, dated 18 Oct 1993.
+ + green-book-4.0.txt.gz
+
+HASHES.ZIP  -  MD5 and SHA, optimized for speed by Colin Plumb in
+     1993.
+ + HASHES.ZIP
+
+HAVAL.ZIP  -  HAVAL algorithm.
+ + haval.tar.gz
+
+HILL.ZIP  -  Hill cipher.
+ + hill.gz
+
+I-HAT.ZIP  -    C code for various cryptographically-useful
+     statistical analysis functions:  Kullback's information
+     measure for a 2-way contingency table, Gamma and repeated
+     functions (Poisson, chi-square, etc.), Pearson's chi-square,
+     etc.  By Doug Gwyn, 1991.
+
+ + i-hat.zip
+
+IDEA_C.ZIP  -  IDEA algorithm in C, optimized for speed by Colin
+     Plumb in 1993.
+ + idea-from-pgp.tar.gz
+ + idea.V1.1.tar.Z
+ + idea.lha
+ + idea.tar.gz
+ + idea22a.zip
+
+IDEA68K.ZIP  -  IDEA algorithm in 68000 assembly, written by
+     Colin Plumb in 1993.
+ + IDEA68K.ZIP
+
+IDEA8086.ZIP  -  IDEA algorithm in 8086 assembly, written by
+     Colin Plumb in 1993.
+ + idea-8086.asm
+
+ISOMORPH.ZIP  -  Utility that prints isomorphs, written by Paul
+     Leyland.
+ + isomorph.c
+
+INDEX.ZIP  -  Index to APPLIED CRYPTOGRAPHY.
+ + index
+
+ITAR.ZIP  -  Imported and Exported Defense Articles and Services,
+     Vol. 57, No. 89, Pari II, 56 FR 19666, 7 May 1992.  By the
+     Department of State.
+ + itar9307.zip (contains both the WordPerfect and an ASCII version
+   of the document)
+
+KERBEROS.ZIP -  Kerberos RFC (1510), dated Sep 1993.
+ + rfc1510.gz
+
+KHUFU.ZIP  -  This archive contains KHUFU.C, a hack
+     implementation of the Khufu algorithm written by Rayan
+     Zachariassen in 1989.  It also contains PRSBOX.H, PRSBOX.C,
+     and MAKEFILE, a program to print S-boxes written by Landon
+     Curt Noll in 1989.
+ + khufu.tar.gz
+
+LCRNG.ZIP  -  Linear congruential random number generator.
+ + linear-rng.tar.gz
+
+LCRNG-T.ZIP  -  Simple block transposition cipher based on a
+     linear congruential random number generator, written by R.A.
+     O'Keefe.
+ + okeefe.tar.gz
+ + okeefe_encrypt.tar.gz
+
+LOKI.ZIP  -  LOKI89 and LOKI91, written by Leslie Condie in 1992.
+ + loki-3.0.tar.gz
+
+LUCIFER1.ZIP  -  LUCIFER algorithm written by Jonathan M. Smith
+     in 1991.
+ + lucifer-smith.c.gz
+
+LUCIFER2.ZIP  -  LUCIFER algorithm written by Graven Cyphers.
+ + lucifer.shar.gz
+ + lucifer-outerbridge-5.0.tar.gz
+ + lucifer-outerbridge.c.gz
+
+MD-RFC.ZIP  -  Internet RFCs (Requests for Comment) for MD2, MD4,
+     and MD5.
+ + rfc1319.txt.gz
+ + rfc1320.txt.gz
+ + rfc1321.txt.gz
+
+MD4.ZIP  -  MD4 algorithm, written by RSA Data Security, Inc.
+ + md4.txt.gz
+
+MD4-DOS.ZIP  -  MD4 algorithm, fast DOS implementation by Jouka
+     Holopainen.
+ + MD4-DOS.ZIP
+
+MD5-KARN.ZIP  -  Optimization of RSA's MD5 code for 80386,
+     written by Phil Karn in Feb 1992.
+   for the original MD5 code see:
+ + MD5.tar.gz
+ + karn-md5-cipher.tar.gz
+ + md5.zip
+   also contained in the secude package
+
+MIMIC.ZIP  -  Peter Wayner's Mimic function.
+ + mimic-two.ps.gz
+
+NEWDE.ZIP  -  NewDE algorithm, a DES variant used in the
+     Macintosh program StuffIt (versions 1.51 and 2.0); written
+     by Richard Outerbridge in 1991.
+ + newde.tar.gz
+
+NEWDES.ZIP  -  NewDES algorithm, written by Mark Riordan in 1990.
+ + newdes.tar.gz
+
+NHASH.ZIP  -  N-Hash algorithm, written in 1993.
+ + nhash.c
+
+NSEA.ZIP  -  Nonpatented Simple Encryption Algorithm, written by
+     Peter Gutmann.
+ + nsea.tar.gz
+ + nsea.zip
+
+PEM-RFC.ZIP  -  Internet RFCs (Requests for Comment) for the
+     Privacy Enhanced Mail standard:  RFC1421, RFC1422, RFC1423,
+     and RFC1424.
+ + rfc1421.txt.gz
+ + rfc1422.txt.gz
+ + rfc1423.txt.gz
+ + rfc1424.txt.gz
+
+PGP.ZIP  -  A list of places to download PGP from.
+   many sites, e.g. ftp.dsi.unimi.it:/pub/crypt/PGP/...
+                    black.ox.ac.uk:/src/security/...
+   If you have access to the World Wide Web (WWW), get a list from
+   http://www.mantis.co.uk/pgp/pgp.html
+
+PKC.ZIP  -  Public-Key Cryptography, a 162-page tutorial written
+     by James Nechvatal of NIST in 1991.
+ + pubcrypt.zip
+
+PLAYFAIR.ZIP  -  Playfair algorithm, written by Paul Leyland in
+     1993.
+ + playfair.c
+
+PPSC.ZIP  -  Pass-Phrase Stream Cipher, written by Peter Boucher
+     in 1992.
+ + PPSC.ZIP
+
+PRNGXOR.ZIP  -  Source code that illustrates polyalphabetic
+     substitution with a running key stream, written by Carl
+     Ellison in 1993.
+ + tran-and-prngxor.shar.gz
+ + tran-and-prngxor.tar.gz
+ + pittner-prng-cipher-3.c.gz
+ + pittner-prng-cipher.c.gz
+
+PRV-ANMT.ZIP - "Privacy and Anonymity on the Internet":
+     comprehensive summary by L. Detweiler in 1993.
+   This is regularly posted to sci.crypt, alt.privacy, and some other
+      newsgroups.
+
+RANDOM1.ZIP  -  Random number generator that uses phase noise in
+     PC crystals to generate random bits, written by Nico E de
+     Vries in 1992.
+ + RANDOM1.ZIP
+
+RANDOM2.ZIP  -  Schematic for cheap hardware random bit
+     generator.
+ + RANDOM2.ZIP
+
+REDOC2.ZIP  -  REDOC2 algorithm written by Michael Wood.
+ + redoc2.c.gz
+
+REDOC3.ZIP  -  REDOC3 algorithm, written by Michael Wood.
+ + redoc3.c.gz
+
+RIPE-MD.ZIP  -  RIPE-MD function, written by the RIPE project in
+     1992.
+ + ripe-md.tar.gz
+
+RIPEM12A.ZIP  -  Mark Riordan's Privacy Enhanced Mail, Version
+     1.2a, current as of April 1994.
+ + ripem-1.2a-0.tar.Z
+
+RSA-FAQ.TXT - RSA Data Security's Frequently Asked Questions
+     about Cryptography file.  Version 2.0, last updated 20 Sep
+     1993.
+ + rsa-faq.txt
+
+RSAREF20.ZIP  -  RSA Data Security Inc.'s reference
+     implementation of RSA.  Includes code for DES and MD5.
+     Bignum package can be easily modified to do El Gamal,
+     Diffie-Hellman, DSA, etc.  Version 2.0.
+ + rsaref.tar.gz
+ + rsaref2.tar.gz
+
+SCICRYPT.ZIP  -  The Frequently-Asked Questions file for the
+     Internet newsgroup, sci.crypt.
+ + sci.crypt-FAQ.gz
+ + sci.crypt.faq.gz
+
+SHA.ZIP  -  Secure Hash Algorithm, written by Peter Gutmann in
+     1992.
+ + SHS.tar.gz
+      (this first one contains a file with the Peter
+      Gutmann implementation)
+ + gillogly-sha.tar.gz
+ + sha.tar.gz
+ + shs.zip
+
+SHARING.ZIP  -  Code to implement a threshold scheme, written by
+     Peter Pearson in 1993.
+ + sharing.tar.gz
+
+SNEFRU.ZIP  -  Snefru algorthm, written by Ralph Merkle in 1989.
+ + snefru.tar.gz
+ + snefru2.5a.tar.gz
+
+SPLAY.ZIP  -  Compression and encryption in C based on splay
+     trees.
+ + splay.tar.gz
+
+TIS-PEM.ZIP  -  The Frequently Asked Questions file about the TIS
+     implementation of PEM.  Last updated 29 Oct 93.  Includes
+     where to get a copy.
+ + tispem.FAQ
+
+TRNSPOSE.ZIP  -  Cipher that does a transposition of a 8192 byte
+     block, based on a random number generator, by William
+     Setzer.
+ + setzer-trans.tar.gz
+
+VIGENERE.ZIP  -  A program that encrypts using Viegnere,
+     Beauford, or Variant Beauford ciphers.  Written by Leisa
+     Condie in Dec 1992.
+ + vigenere.c
+
+VIGSOLVE.ZIP  -  Program to solve Vigenere cipher, by Mark
+     Riordan in 1991.
+ + solve-vigenere-4.tar.gz
+ + solve-vigenere.tar.gz
+
+WPCRACK.ZIP  -  Program to break WordPerfect's encryption,
+     written by Ron Dippold in 1991.
+ + wpcrack.tar.gz
+
+ZIP.ZIP  -  The encryption algorithm used in the PKZIP 2.04g
+     and zip 2.0.1 compression programs.  The algorithm was designed by
+     Roger Schlafly.
+ + ZCRYPT23.ZIP
+ + zcrypt21.zip
+- - -------------------------------------------------------------------------
+
+-----BEGIN PGP SIGNATURE-----
+Version: 2.6.2
+
+iQCVAgUBMQyFC24Xs0h0l78VAQGOMwP/UoNeLuKNvWDN5pjip1T1nB0iMTwjPslT
+Ut5NEwP840LA1jN499fnrt2+buv/ijYgDmlWcrZXzMKOBCriu3DPMnBU1ztl/X78
+Wxqg65diVTL7axRND2cCfTodgrdGq/JDJ6cdgxbNGdeWL3nZ7cPmzFNuVhOrYzaz
+DVG8nb0Kgrk=
+=nEHr
+-----END PGP SIGNATURE-----

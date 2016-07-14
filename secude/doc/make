@@ -1,0 +1,67 @@
+#!/bin/sh
+set -e
+for par do case $par in
+	clean)
+		rm -f *.aux *.log *.toc *.bak *% manual.tex [0-9]*.tex core;;
+	all)
+		./make overview
+		./make vol1
+		./make vol2
+		./make vol3;;
+        vol2)
+                if [ ! -r manual.tex ]
+		then
+	                ./manual
+	                textest vol2.tex manual.tex
+		fi
+                if [ -r vol2.toc ]
+                then 
+                        latex vol2.tex
+                else
+                        latex vol2.tex
+                        latex vol2.tex
+                        latex vol2.tex
+                fi
+                dvips   vol2.dvi  -o  vol2.ps &
+		xdvi -s 4 -S 15 vol2.dvi & ;;
+	*:*)
+		dviselect -i vol2.dvi -o zw.dvi $par
+		dvips zw.dvi -o zw.ps
+		xdvi -s 4 -S 15 zw.dvi;;  
+        vol1)
+                textest $par*.tex
+                if [ -r $par.toc ]
+                then 
+                        elatex $par.tex
+                else
+                        elatex $par.tex
+                        elatex $par.tex
+                        elatex $par.tex
+                fi
+                dvips   $par.dvi -o $par.ps &
+		xdvi -s 4 -S 15 $par.dvi & ;;
+        vol3)
+                textest $par*.tex
+                if [ -r $par.toc ]
+                then 
+                        elatex $par.tex
+                else
+                        elatex $par.tex
+                        elatex $par.tex
+                        elatex $par.tex
+                fi
+                dvips   $par.dvi -o $par.ps &
+		/usr/local/tex2.95/bin/xdvi -s 4 -S 15 $par.dvi & ;;
+        overview)
+                textest $par*.tex
+                if [ -r $par.toc ]
+                then 
+                        elatex $par.tex
+                else
+                        elatex $par.tex
+                        elatex $par.tex
+                        elatex $par.tex
+                fi
+                dvips   $par.dvi -o $par.ps &
+		/usr/local/tex2.95/bin/xdvi -s 4 -S 15 $par.dvi & ;;
+esac done

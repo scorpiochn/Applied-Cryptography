@@ -1,0 +1,1 @@
+des-fun.o ecb-encrypt.o:	des-fun.h

@@ -1,0 +1,37 @@
+    The tar file `russian-des.tar.Z.uuenc' should be about 47K bytes
+in length.  It can be unpacked into the directory `russian-des' which
+will appear as a subdirectory of the directory in which the following
+commands are given.
+
+	(If you are working in Emacs, write a keyboard macro that
+	 picks up the current line, executes it as a shell command,
+	 and moves down seven lines.  Then call it three times.)
+
+(a) Type:
+
+	uudecode russian-des.tar.Z.uuenc
+
+    which will produce a file called `russian-des.tar.Z' 
+    of about 34K bytes.
+
+(b) Type:
+
+	uncompress russian-des.tar.Z
+
+    which will replace `russian-des.tar.Z' with a file called
+    `russian-des.tar' of about 82K bytes.
+
+(c) Type:
+
+	tar -xpvf russian-des.tar
+
+    which will produce a directory called `russian-des'
+    in the directory from which you are operating.
+
+    It may now be necessary to change the ownership of the files to
+yourself.
+
+    The directory russian-des contains a READ.ME file, which
+in turn contains an explanation of the contents of the directory
+and instructions for TeXing and printing the document.
+

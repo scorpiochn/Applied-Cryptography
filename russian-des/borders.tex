@@ -1,0 +1,49 @@
+%borders.tex - % Macros for placing white or black borders around boxes
+
+% To \border something is to put whitespace around it; to \frame
+% something is to put blackspace around it.
+
+% In full generality it is possible to surround something with white or
+% black areas whose dimensions vary with direction.  At present these
+% functions are called fourborder and fourframe: #1 is the object;
+% #2 is the upper vertical  dimension;  #3  is  the  lower  vertical
+% dimension; #4 is the left horizontal dimension; #5 is the right
+% horizontal dimension.  Positive arguments place the frame outside
+% the box being framed, negative ones place it inside. 
+
+\def\fourborder#1#2#3#4#5%
+   {\vbox{\vskip #2\hbox{\hskip #4#1\hskip #5}\vskip #3}}
+
+\def\fourframe#1#2#3#4#5%
+   {\vbox{\ifdim#2>0pt{\hrule height #2 depth 0pt}\else 
+		      {\hrule height -#2 depth 0pt\vskip #2}\fi
+	  \hbox{\ifdim#4>0pt {\vrule width #4}\else
+			     {\vrule width -#4 \hskip #4}\fi
+		#1%
+		\ifdim#5>0pt {\vrule width #5}\else 
+			     {\hskip #5\vrule width -#5}\fi}%
+	  \ifdim#3>0pt {\hrule height 0pt depth #3}\else 
+		       {\vskip #3 \hrule height -#3 depth 0pt}\fi}}
+
+
+% The most common forms of both bordering and framing have fourfold
+% symetry and the basic functions \border and \frame thus take two
+% arguments: and object and a dimension.
+
+\def\border#1#2{\fourborder{#1}{#2}{#2}{#2}{#2}}
+
+\def\frame#1#2{\fourframe{#1}{#2}{#2}{#2}{#2}}
+
+% It is also convenient to put something into a (white) box of given
+% dimensions and this function, \trim, takes three arguments: #1 is
+% the object; #2 is the vertical  dimension; #3  is the horizontal 
+% dimension.
+
+	\def\trim#1#2#3{\vbox to #2{\vctr{\hbox to #3{\ctr{#1}}}}}
+
+% Finally there is the special case of \boxit --- whose effect is the
+% same as that of \boxit in the TeXbook --- which has only the 
+% object as argument as its border and frame dimensions are fixed.
+
+\def\boxit#1{\frame{\border{#1}{3pt}}{.4pt}}
+

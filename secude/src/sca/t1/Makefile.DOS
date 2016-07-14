@@ -1,0 +1,100 @@
+#########################################################################
+#                                                                       #
+#  Projectname          :       STAPAC                                  #
+#                                                                       #
+#  Date                 :       November 1991                           #
+#                                                                       #
+#  Author               :       L. Eckstein                             #
+#                                                                       #
+#  Filename             :       makefile                                #
+#                                                                       #
+#  Description          :       this makefile generates the t1-         #
+#                               object                                  #
+#                                                                       #
+#  DFLAGS      =         -DTRACE -DDOS for DOS                          #
+#  DFLAGS      =         -DTRACE -DSUN for BSD                          #
+#  DFLAGS      =         -DTRACE -DSUN -DSYSV for System V              #
+#                                                                       #
+#########################################################################
+SYSTEM    =  DOS             #
+TRACE     =  TRACE
+
+CC        =  cl
+AS        =  ml
+AR        =  lib
+
+
+
+OPT        =  -c
+
+DEFINES   =  -D$(SYSTEM) -D$(TRACE)
+T1OBJ   = t1.obj
+SIOBJ   = siofunc.obj
+OBJS    = $(T1OBJ) $(SIOBJ)
+
+
+!IF "$(SM)"==""
+!   ERROR  call nmake with SM=L (for LARGE-Model) or SM=M (for MEDIUM-Model)!
+!ENDIF
+
+
+!   IF ("$(SM)"!="L") && ("$(SM)"!="M")      # Small- und Compact-Modell haben
+!   ERROR  L or M must be great letter!
+!ENDIF
+
+
+
+INCL       =  ..\include
+
+IFLAGS     =  -I$(INCL)
+DFLAGS     =  $(DEFINES)
+CFLAGS     =  $(OPT)  $(DFLAGS) $(IFLAGS) /A$(SM) /Zi /Od
+LFLAGS     =  $(AFLAGS)
+
+
+
+LIBDIR     =  ..\..\lib
+#create library for medium or large model
+LIBT1      =  $(LIBDIR)\$(SM)libt1.lib
+
+
+.c.obj :
+        $(CC) $(CFLAGS) $*.c
+
+
+
+.asm.obj :
+        $(AS) $(OPT) $*.asm
+
+
+
+all:   aus1    $(OBJS)
+
+aus1:
+        @ echo ---------------------------------------------------------------
+        @ ECHO                Makefile.t1
+        @ ECHO SYSTEM    = $(SYSTEM)
+        @ ECHO TRACE     = $(TRACE)
+        @ echo     Compile  $(OBJS)
+        @ echo ---------------------------------------------------------------
+
+
+inst-all: aus2  lib
+
+aus2:
+        @ echo ---------------------------------------------------------------
+        @ echo $(OBJS)
+        @ echo will be installed in the library $(SM)LIBT1.LIB
+        @ echo ---------------------------------------------------------------
+
+lib:
+        $(AR) $(LIBT1) -+$(T1OBJ) -+$(SIOBJ);
+
+
+clean:
+        @ ECHO ---------------------------------------------------------------
+        @ ECHO $(OBJS)
+        @ ECHO will be deleted
+        @ ECHO ---------------------------------------------------------------
+        @ DEL *.obj
+        @ DEL *.bak

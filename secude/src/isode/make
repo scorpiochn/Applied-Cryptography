@@ -1,0 +1,15 @@
+: run this script through /bin/sh
+
+M=/bin/make
+if [ -f /usr/bin/make ]; then
+    M=/usr/bin/make
+fi
+
+for par do
+	if [ $par = "-DSECISODE" ]
+	then
+		exec $M MODULE=isode -f ../config/CONFIG.make -f Makefile -f ../config/Makefile $1
+	fi
+done
+
+

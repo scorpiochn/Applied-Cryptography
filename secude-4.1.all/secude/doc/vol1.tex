@@ -1,0 +1,34 @@
+\documentstyle[11pt,dina4,twoside]{article}
+\marginparsep5mm
+\input{makro}
+\def\authors{
+        edited by Wolfgang Schneider \\ \\
+}
+%\includeonly{vol1-intro}
+
+\begin{document}
+\secudetitlepage{Vol. 1: Principles of Security Operations}{}
+\parindent0em
+\parskip 1ex
+\pagestyle{plain}
+\pagenumbering{roman}
+\tableofcontents
+\include{vol1-figs}
+\newcounter{Abb}
+\cleardoublepage
+\pagenumbering{arabic}
+\pagestyle{myheadings}
+\thispagestyle{myheadings}
+
+\include{vol1-intro}
+\include{vol1-sig}
+\include{vol1-ca}
+\include{vol1-dir}
+\include{vol1-opsig}
+\include{vol1-openc}
+\include{vol1-lev}
+\include{vol1-sc}
+\include{vol1-imp}
+\include{vol1-lit}
+
+\end{document}

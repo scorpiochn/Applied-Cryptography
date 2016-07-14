@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+#  Makes a compressed tar-file of either secude or secude/doc or secude/src
+#  in the directory /netnews/ftp/pub/secude (for anonymous ft).
+#
+#  Call maketarz only in the secude directory.
+#  maketarz [ all | src | doc ]
+#
+#
+cd ..
+ds=`pwd` 
+dt=$2
+dzr=${dt:=/libra/ftp/pub/secude}
+cd $dzr
+dz=`pwd`
+target=$dz/secude-4.1.$1.tar.Z
+cd $ds
+case $1 in
+        all) echo "making" $target "from" "$ds/secude"; tar cf - secude | compress > $target;;
+        src) echo "making" $target "from" "$ds/secude/src and $ds/secude/lib"; tar cf - secude/src secude/lib secude/bin | compress > $target;;
+        doc) echo "making" $target "from" "$ds/secude/doc"; tar cf - secude/doc | compress > $target;;
+esac

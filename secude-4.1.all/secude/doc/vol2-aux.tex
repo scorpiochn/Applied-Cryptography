@@ -1,0 +1,1149 @@
+\subsection{Zoning, Text Transformations}
+\nm{3X}{aux\_enchex}{Zoning, Text Transformations}
+\label{aux_encdec}
+\hl{Synopsis}
+
+\#include $<$secure.h$>$
+ 
+OctetString  {\bf *aux\_enchex} {\em (text)} \\
+OctetString {\em *text};
+
+OctetString  {\bf *aux\_dechex} {\em (hexa)} \\
+OctetString {\em *hexa};
+
+OctetString  {\bf *aux\_encap} {\em (text)} \\
+OctetString {\em *text};
+
+OctetString  {\bf *aux\_decap} {\em (ap)} \\
+OctetString {\em *ap};
+
+OctetString  {\bf *aux\_encrfc} {\em (text)} \\
+OctetString {\em *text};
+
+OctetString  {\bf *aux\_decrfc} {\em (pren)} \\
+OctetString {\em *pren};
+
+OctetString  {\bf *aux\_rfc2hex} {\em (pren)} \\
+OctetString {\em *pren};
+
+OctetString  {\bf *aux\_hex2rfc} {\em (hexa)} \\
+OctetString {\em *hexa};
+
+OctetString  {\bf *aux\_hex2ap} {\em (hexa)} \\
+OctetString {\em *hexa};
+
+OctetString  {\bf *aux\_ap2hex} {\em (ap)} \\
+OctetString {\em *ap};
+
+OctetString  {\bf *aux\_rfc2ap} {\em (pren)} \\
+OctetString {\em *pren};
+
+OctetString  {\bf *aux\_ap2rfc} {\em (ap)} \\
+OctetString {\em *ap};
+\hl{Description}
+All zoning and transformation functions transform the character string
+of the input OctetString
+and return the result in a newly created OctetString which
+can be freed by aux\_free\_OctetString().
+
+{\bf aux\_enchex} encodes the content of {\em text}
+into a hexadecimal {\em 0--9 A--F} representation.
+The returned OctetString has the length
+$(text$\pf $noctets)*2$ .
+
+{\bf aux\_dechex} decodes the hexadecimal {\em 0--9 A--F}
+representation in {\em hexa}
+into the original octets.
+The returned OctetString has the length
+$(hexa$\pf $noctets)/2$ .
+
+{\bf aux\_encap} encodes the content of {\em text}
+into a hexadecimal {\em A--P} representation.
+The returned OctetString has the length
+$(text$\pf $noctets)*2$ .
+
+{\bf aux\_decap} decodes the hexadecimal {\em A--P}
+representation in {\em ap}
+into the original octets.
+The returned OctetString has the length
+$(ap$\pf $noctets)/2$ .
+
+{\bf aux\_encrfc} encodes the content of {\em text}
+according to the encoding rules of RFC 1421
+resulting in a ``printable encoding''. \\
+The length of the returned OctetString is at most
+$(text$\pf $noctets)*4/3+4$ .
+
+{\bf aux\_decrfc} decodes the ``printable encoding'' in {\em pren}
+according to the encoding rules of RFC 1421. \\
+The length of the returned OctetString is at most
+$(pren$\pf $noctets)*3/4+1$ .
+
+{\bf aux\_rfc2hex, aux\_hex2rfc, aux\_hex2ap, aux\_ap2hex,
+aux\_rfc2ap,} and {\bf aux\_ap2rfc}
+transform between the three different printable encodings of
+octet strings. ``2'' stands for ``to'' and gives the direction
+of the transformation, e.g.
+{\em aux\_hex2rfc} transforms the hexadecimal {\em 0--9, A--F}
+representation of two printable characters per one octet
+into the printable encoding according to RFC 1421 of
+four printable characters per three octets. Etc.
+
+\subsection{OctetString Handling}
+\nm{3X}{aux\_octetstring}{OctetString Handling}
+\label{aux_ostringhand}
+\hl{Synopsis}
+
+\#include $<$secure.h$>$
+ 
+OctetString {\bf *aux\_create\_OctetString} {\em (text)} \\
+char {\em *text};
+
+OctetString {\bf *aux\_new\_OctetString} {\em (length)} \\
+int {\em length};
+
+void {\bf aux\_free\_OctetString} {\em (ostr)} \\
+OctetString {\em **ostr};
+
+RC {\bf aux\_append\_OctetString} {\em (to, append)} \\
+OctetString {\em *to, *append};
+
+RC {\bf aux\_append\_char} {\em (to, append)} \\
+OctetString {\em *to};    \\
+char {\em *append};
+
+RC {\bf aux\_searchitem} {\em (ostr, item, pos)} \\
+OctetString {\em *ostr};    \\
+char {\em *item};    \\
+unsigned int {\em *pos};
+
+RC {\bf *aux\_cmpitem} {\em (msgbuf, item, pos)}  \\
+OctetString {\em *msgbuf};    \\
+char {\em *item};    \\
+int {\em pos};
+
+OctetString {\bf *aux\_file2OctetString} {\em (filename)} \\
+char {\em *filename};
+
+int {\bf aux\_OctetString2file} {\em (ostr, filename[, flag])} \\
+OctetString {\em *ostr};    \\
+char {\em *filename};
+int {\em flag};
+\hl{Description}
+{\bf aux\_create\_OctetString} creates an OctetString with length {\em strlen(text)} $+$ 1
+and character string {\em text}.
+hex'00' denotes end of {\em text}.
+
+{\bf aux\_new\_OctetString} creates an OctetString with length {\em length}. The octets
+are set to zero.
+
+{\bf aux\_free\_OctetString} frees both 
+{\em *ostr}\pf octets and the struct OctetString {\em **ostr} itself.
+The pointer {\em *ostr} is set to NULL on return.
+See also paragraph \ref{aux_free} for all aux\_free* functions.
+
+{\bf aux\_append\_OctetString} appends the octets of {\em append} to the octets
+of {\em to}
+and adds {\em append\pf noctets} to {\em to\pf noctets}.
+{\em append} remains unchanged.
+If {\em to} doesn't exist or the allocation of new space fails,
+a negative integer is returned, otherwise 0.
+If {\em append} doesn't exist or has length 0, {\em to}
+remains unchanged, too, and the returncode is also 0.
+
+{\bf aux\_append\_char} appends the character string {\em append} to the octets
+of {\em to} and adds {\em strlen(append)} to {\em to\pf noctets}.
+{\em append} remains unchanged.
+hex'00' denotes end of {\em append}.
+If {\em to} doesn't exist or the allocation of new space fails,
+a negative integer is returned, otherwise 0.
+If {\em append} doesn't exist or has length 0, {\em to}
+remains unchanged, too, and the returncode is also 0.
+
+{\bf aux\_searchitem}
+searches in the OctetString {\em ostr} for a character string equal to
+{\em item}. The search begins at position {\em *pos}.
+If the search is successful, {\em *pos} gives the position
+of the first octet behind the first
+{\em item} found in {\em ostr}, and the return code is 0.
+If the search is not successful, -1 is returned.
+
+{\bf aux\_cmpitem} returns 0, if the sequence of octets in {\em msgbuf}
+starting at position {\em pos} and ending at position
+$pos+strlen(item)$
+is equal to the sequence of characters in {\em item}.
+aux\_cmpitem returns 1, if they are not equal.
+
+{\bf aux\_file2OctetString} reads the file {\em filename} into
+an OctetString, which it creates and returns. If {\em filename}
+is NULL or has zero length, it reads from stdin.
+On error it returns the NULL pointer.
+
+{\bf aux\_OctetString2file} writes the content of the OctetString
+{\em ostr} into the file {\em filename},
+which it opens according to {\em flag}:
+ 
+0: no overwrite (file must not exist), \\
+1: overwrite (file must exist), \\
+2: create or overwrite, \\
+3: append (file must exist), \\
+4: create or append.
+ 
+If {\em filename} is NULL or has zero length, it writes
+to stdout ({\em flag} has no meaning in this case).
+ 
+Returncode 0 indicates success, -1 indicates an error.
+
+\subsection{Printing Af-Objects, Sec-Objects and Pem-Objects}
+\nm{3X}{aux\_fprint}{Printing af-objects, sec-objects and pem-objects}
+\label{aux_printostring}
+\hl{Synopsis}
+
+\#include $<$stdio.h$>$ \\
+\#include $<$secure.h$>$ \\ [1em]
+void {\bf aux\_fprint\_OctetString} {\em (file, ostr)} \\
+FILE {\em *file}; \\
+OctetString {\em *ostr};
+
+void {\bf aux\_fprint\_BitString} {\em (file, bstr)} \\
+FILE {\em *file}; \\
+BitString {\em *bstr};
+
+void {\bf aux\_xdump} {\em (buffer, len, addrtype)}  \\
+void {\bf aux\_fxdump} {\em (dump\_file, buffer, len, addrtype)}  \\
+char {\em *buffer}; \\
+int  {\em len, addr\_type}; \\
+FILE*{\em dump\_file};
+
+{\bf aux\_fprint\_PSESel} {\em (file, pse)} \\
+FILE {\em *file}; \\
+PSESel {\em *pse};
+
+{\bf aux\_fprint\_PSEToc} {\em (file, psetoc)} \\
+FILE {\em *file}; \\
+PSEToc {\em *psetoc};
+
+{\bf aux\_fprint\_KeyBits} {\em (file, keybits)} \\
+FILE {\em *file}; \\
+KeyBits {\em *keybits};
+
+{\bf aux\_fprint\_KeyInfo} {\em (file, keyinfo)} \\
+FILE {\em *file}; \\
+KeyInfo {\em *keyinfo};
+
+{\bf aux\_fprint\_AlgId} {\em (file, algid)} \\
+FILE {\em *file}; \\
+AlgId {\em *algid};
+
+{\bf aux\_fprint\_ObjId} {\em (file, objid)} \\
+FILE {\em *file}; \\
+ObjId {\em *objid};
+\\ [1em]
+\#include $<$stdio.h$>$ \\
+\#include $<$af.h$>$ \\ [1em]
+{\bf aux\_fprint\_ToBeSigned} {\em (file, tobesigned)} \\
+FILE {\em *file}; \\
+ToBeSigned {\em *tobesigned};
+
+{\bf aux\_fprint\_Certificate} {\em (file, certificate)} \\
+FILE {\em *file}; \\
+Certificate {\em *certificate};
+
+{\bf aux\_fprint\_CertificateSet} {\em (file, certset)} \\
+FILE {\em *file}; \\
+SET\_OF\_Certificate {\em *certset};
+
+{\bf aux\_fprint\_Certificates} {\em (file, certificates)} \\
+FILE {\em *file}; \\
+Certificates {\em *certificates};
+
+{\bf aux\_fprint\_FCPath} {\em (file, fcpath)} \\
+FILE {\em *file}; \\
+FCPath {\em *fcpath};
+
+{\bf aux\_fprint\_PKRoot} {\em (file, pkroot)} \\
+FILE {\em *file}; \\
+PKRoot {\em *pkroot};
+
+{\bf aux\_fprint\_PKList} {\em (file, pklist)} \\
+FILE {\em *file}; \\
+PKList {\em *pklist};
+
+{\bf aux\_fprint\_Crl} {\em (file, crl)} \\
+FILE {\em *file}; \\
+Crl {\em *crl};
+
+{\bf aux\_fprint\_RevCert} {\em (file, revcert)} \\
+FILE {\em *file}; \\
+RevCert {\em *revcert};
+
+{\bf aux\_fprint\_PemCrl} {\em (file, pemcrl)} \\
+FILE {\em *file}; \\
+PemCrl {\em *pemcrl};
+
+{\bf aux\_fprint\_RevCertPem} {\em (file, revcertpem)} \\
+FILE {\em *file}; \\
+RevCertPem {\em *revcertpem};
+
+{\bf aux\_fprint\_CrlSet} {\em (file, crlset)} \\
+FILE {\em *file}; \\
+CrlSet {\em *crlset};
+
+{\bf aux\_fprint\_CrlPSE} {\em (file, crlpse)} \\
+FILE {\em *file}; \\
+CrlPSE {\em *crlpse};
+
+{\bf aux\_fprint\_OCList} {\em (file, oclist)} \\
+FILE {\em *file}; \\
+OCList {\em *oclist};
+
+{\bf aux\_fprint\_IssuedCertificate} {\em (file, isscert)} \\
+FILE {\em *file}; \\
+IssuedCertificate {\em *isscert};
+
+{\bf aux\_fprint\_SET\_OF\_IssuedCertificate} {\em (file, isscertset)} \\
+FILE {\em *file}; \\
+SET\_OF\_IssuedCertificate {\em *isscertset};
+
+{\bf aux\_fprint\_SET\_OF\_Name} {\em (file, nameset)} \\
+FILE {\em *file}; \\
+SET\_OF\_Name {\em *nameset};
+
+{\bf aux\_fprint\_CertificatePairSet} {\em (file, cpairset)} \\
+FILE {\em *file}; \\
+SET\_OF\_CertificatePair {\em *cpairset};
+
+{\bf aux\_fprint\_VerificationResult} {\em (file, verifresult)} \\
+FILE {\em *file}; \\
+VerificationResult {\em *verifresult};
+\\ [1em]
+\#include $<$stdio.h$>$ \\
+\#include $<$pem.h$>$ \\ [1em]
+{\bf aux\_fprint\_PemInfo} {\em (file, peminfo)} \\
+FILE {\em *file}; \\
+PemInfo {\em *peminfo};
+
+\hl{Description}
+
+{\bf aux\_xdump} writes the input {\em buffer} in a
+``dump format'' (hexadecimal {\em 0--9, A--F}) to {\em stdout}.
+{\bf aux\_fxdump} writes the input {\em buffer} in a
+``dump format'' (hexadecimal {\em 0--9, A--F}) to {\em dump\_file}.
+If {\em addrtype} is set to 0, xdump will print relative addresses,
+otherwise absolute adresses.
+{\em len} gives the length of the input {\em buffer}.
+
+{\small
+\begin{verbatim}
+adress   hexadecimal format                        text
+000 000  00000000 00000000  00000000 00000000     |................|
+000 010  etc. until end of the buffer (len)
+\end{verbatim}
+}
+
+The {\bf aux\_fprint\_*} functions print the given structures in a suitable
+format to the given file pointer {\em file}. {\bf aux\_fprint\_OctetString}
+and {\bf aux\_fprint\_BitString} print a dump-format with relative addresses. 
+The print format of KeyInfos
+containing RSA keys can be controlled by means of the external variable
+\bc
+{\small
+char print\_keyinfo\_flag;
+}
+\ec
+If this flag is set to ALGID (this is the default), the AlgId of the KeyInfo
+is printed. If it is set to DER, the DER code contained in BitString subjectkey  
+is printed. If it is set to KEYBITS, the decoded DER code of
+subjectkey which shows the two integer components of the key is printed. These three
+flags can be OR'ed to get any combination.
+
+\subsection{Copy and Compare}
+\nm{3X}{aux\_cpy}{Copy and Compare}
+\label{aux_cpy}
+\hl{Synopsis}
+
+\#include $<$secure.h$>$
+ 
+ObjId {\bf *aux\_cpy\_ObjId} {\em (oid)} \\
+ObjId {\em *oid};
+
+int {\bf aux\_cpy2\_ObjId} {\em (dup\_oid, oid)} \\
+ObjId {\em *dup\_oid, *oid};
+
+int {\bf aux\_cmp\_ObjId} {\em (oid1, oid2)} \\
+ObjId {\em *oid1, *oid2};
+
+AlgId {\bf *aux\_cpy\_AlgId} {\em (aid)} \\
+AlgId {\em *aid};
+
+int {\bf aux\_cpy2\_AlgId} {\em (dup\_aid, aid)} \\
+AlgId {\em *dup\_aid, *aid};
+
+int {\bf aux\_cmp\_AlgId} {\em (aid1, aid2)} \\
+AlgId {\em *aid1, *aid2};
+
+KeyInfo {\bf *aux\_cpy\_KeyInfo} {\em (keyinfo)} \\
+KeyInfo {\em *keyinfo};
+
+int {\bf aux\_cpy2\_KeyInfo} {\em (dup\_keyinfo, keyinfo)} \\
+KeyInfo {\em *dup\_keyinfo, *keyinfo};
+
+int {\bf aux\_cmp\_KeyInfo} {\em (keyinfo1, keyinfo2)} \\
+KeyInfo {\em *keyinfo1, *keyinfo2};
+
+Certificate {\bf *aux\_cpy\_Certificate} {\em (certificate)} \\
+Certificate {\em *certificate};
+
+int {\bf aux\_cpy2\_Certificate} {\em (dup\_certificate, certificate)} \\
+Certificate {\em *dup\_certificate, *certificate};
+
+int {\bf aux\_cmp\_DName} {\em  (dname1, dname2)} \\
+DName {\em *dname1, *dname2};
+
+DName *{\bf aux\_cpy\_DName} {\em  (dname)} \\
+DName {\em *dname};
+
+int {\bf aux\_cpy2\_DName} {\em (dup\_dname, dname)} \\
+DName {\em *dup\_dname, *dname};
+
+RevCert *{\bf aux\_cpy\_RevCert} {\em  (revcert)} \\
+RevCert {\em *revcert};
+
+Crl *{\bf aux\_cpy\_Crl} {\em  (crl)} \\
+Crl {\em *crl};
+
+RevCertPem *{\bf aux\_cpy\_RevCertPem} {\em  (revcertpem)} \\
+RevCertPem {\em *revcertpem};
+
+PemCrl *{\bf aux\_cpy\_PemCrl} {\em  (pemcrl)} \\
+PemCrl {\em *pemcrl};
+
+CertificatePair *{\bf aux\_cpy\_CertificatePair} {\em  (cpair)} \\
+CertificatePair {\em *cpair};
+
+OCList *{\bf aux\_cpy\_OCList} {\em  (oclist)} \\
+OCList {\em *oclist};
+\hl{Description}
+{\bf aux\_cpy\_ObjId} creates a structure ObjId, copies the value
+of {\em oid} into it and returns it.
+                   
+{\bf aux\_cpy2\_ObjId} copies the value of {\em oid} into {\em dup\_oid}
+and returns 0 on success, -1 on error.
+
+{\bf aux\_cmp\_ObjId} returns 0 if {\em oid1} and {\em oid2} are equal,
+and 1 otherwise.
+
+{\bf aux\_cpy\_AlgId} creates a structure AlgId, copies the value
+of {\em aid} into it and returns it.
+
+{\bf aux\_cpy2\_AlgId} copies the value of {\em aid} into {\em dup\_aid}
+and returns 0 on success, -1 on error.
+
+{\bf aux\_cmp\_AlgId} returns 0 if {\em aid1} and {\em aid2} are equal
+(both in the Object Identifiers and parameters),
+and 1 otherwise.
+
+{\bf aux\_cpy\_KeyInfo} creates a structure KeyInfo, copies the value
+of {\em keyinfo} into it and returns it.
+
+{\bf aux\_cpy2\_KeyInfo} copies the value of {\em keyinfo} into {\em dup\_keyinfo}
+and returns 0 on success, -1 on error.
+
+{\bf aux\_cmp\_KeyInfo} returns 0
+if {\em keyinfo1} and {\em keyinfo2} are equal
+(in the Object Identifiers, parameters, and BitStrings of keys),
+and 1 otherwise.
+
+{\bf aux\_cpy\_Certificate} creates a structure Certificate, copies the value
+of {\em certificate} into it and returns it.
+
+{\bf aux\_cpy2\_Certificate} copies the value of {\em certificate} into {\em dup\_certificate}
+and returns 0 on success, -1 on error.
+
+{\bf aux\_cmp\_DName} compares the two DName *dname1 and *dname2.
+If they represent the same distinguished names,
+0 is returned, otherwise 1. \\
+The comparison is attribute-wise
+and regards upper and lower cases equal.
+
+{\bf aux\_cpy\_DName} copies {\em dname} into a newly generated and
+allocated DName structure which is returned. It returns NULLDNAME
+if {\em dname} is not a valid DName.
+
+{\bf aux\_cpy2\_DName} copies the value of {\em dname} into {\em dup\_dname}
+and returns 0 on success, -1 on error.
+
+{\bf aux\_cpy\_RevCert} creates a structure RevCert, copies the value
+of {\em revcert} into it and returns it.
+
+{\bf aux\_cpy\_Crl} creates a structure Crl, copies the value
+of {\em crl} into it and returns it.
+
+{\bf aux\_cpy\_RevCertPem} creates a structure RevCertPem, copies the value
+of {\em revcertpem} into it and returns it.
+
+{\bf aux\_cpy\_PemCrl} creates a structure PemCrl, copies the value
+of {\em pemcrl} into it and returns it.
+
+
+
+\subsection{Algorithm and Object Identifiers}
+\nm{3X}{aux\_algorithms}{Algorithms and Object Identifiers}
+\label{aux_aid}
+\hl{Synopsis}
+
+\#include $<$secure.h$>$ 
+
+char {\bf *aux\_ObjId2Name} {\em (oid)} \\
+ObjId {\em *oid};
+
+AlgId {\bf *aux\_ObjId2AlgId} {\em (oid)}  \\
+ObjId {\em *oid};
+
+ParmType {\bf aux\_ObjId2ParmType} {\em (oid)} \\
+ObjId {\em *oid};
+
+AlgType {\bf aux\_ObjId2AlgType} {\em (oid)}  \\
+ObjId {\em *oid};
+
+AlgEnc {\bf aux\_ObjId2AlgEnc} {\em (oid)}  \\
+ObjId {\em *oid};
+
+AlgHash {\bf aux\_ObjId2AlgHash} {\em (oid)}  \\
+ObjId {\em *oid};
+
+AlgMode {\bf aux\_ObjId2AlgMode} {\em (oid)}  \\
+ObjId {\em *oid};
+
+AlgSpecial {\bf aux\_ObjId2AlgSpecial} {\em (oid)}  \\
+ObjId {\em *oid};
+
+ObjId {\bf *aux\_Name2ObjId} {\em (name)}  \\
+char {\em *name};
+
+AlgId {\bf *aux\_Name2AlgId} {\em (name)}  \\
+char {\em *name};
+
+ParmType {\bf aux\_Name2ParmType} {\em (name)} \\
+char {\em *name};
+
+AlgType {\bf aux\_Name2AlgType} {\em (name)}  \\
+char {\em *name};
+
+AlgEnc {\bf aux\_Name2AlgEnc} {\em (name)}  \\
+char {\em *name};
+
+AlgHash {\bf aux\_Name2AlgHash} {\em (name)}  \\
+char {\em *oid};
+
+\hl{Description}
+These routines provide values associated to algorithms in the global
+algorithm list {\em alglist} (see SEC(5)).
+
+The parameter type ParmType is one of 
+\bi
+\m PARM\_NULL, indicating that the algorithm has no parameter,
+\m PARM\_INTEGER, indicating a parameter of type INTEGER,
+\m PARM\_OctetString, indicating a parameter of type OctetString.
+\ei
+The algorithm type AlgType is one of                                                   
+\bi
+\m SYM\_ENC, indicating a symmetric encryption algorithm,
+\m ASYM\_ENC, indicating an asymmetric encryption algorithm,
+\m HASH, indicating a hash algorithm,
+\m SIG, indicating a signature algorithm,
+\m OTHER, indicating other type of algorithm.
+\ei
+The algorithm encryption method AlgEnc is one of 
+\bi
+\m RSA, indicating RSA algorithm,
+\m DES, indicating DES algorithm,
+\m DES3, indicating DES3 algorithm,
+\m ELGAMAL, indicating ElGamal algorithm,
+\m NOENC, indicating other algorithms, e.g. hash algorithms,
+\ei
+The algorithm hash method AlgHash is one of 
+\bi
+\m SQMODN
+\m MD2
+\m MD4
+\m MD5
+\m SHS
+\m NOHASH, indicating other algorithms, e.g. encryption algorithms,
+\ei
+The algorithm mode AlgMode is one of 
+\bi
+\m ECB
+\m CBC
+\m NOMODE, indicating no modes are defined for this algorithm,
+\ei
+AlgMode is currently used only for DES algorithms.
+
+The algorithm specials AlgSpecial is one of 
+\bi
+\m WITH\_PADDING
+\m WITH\_PEM\_PADDING
+\m PKCS\_BT\_01
+\m PKCS\_BT\_02
+\m NOSPECIAL, indicating no special features are defined for this algorithm,
+\ei
+The padding features are defiend for DES algorithms. PKCS\_BT\_01 means PKCS\#1
+defined block encoding of block type 01. PKCS\_BT\_02 means PKCS\#1 defined block
+encoding of block type 02.
+
+Parameter {\em oid} denotes an algorithm's object identifier, parameter
+{\em name} denotes an algorithm's name. Valid algorithm names and object 
+identifiers can be found in INTRO(3X) under Algorithms.
+
+The above functions map between the indicated parameters.
+
+\subsection{Free Allocated Space}
+\nm{3X}{aux\_free}{Free allocated space}
+\label{aux_free}
+\hl{Synopsis}
+
+\#include $<$secure.h$>$ \\
+void {\bf aux\_free\_OctetString} {\em (ostr)} \\
+OctetString {\em **ostr};
+
+void {\bf aux\_free\_BitString} {\em (bstr)} \\
+BitString {\em **bstr};
+
+void {\bf aux\_free\_ObjId} {\em (oid)} \\
+ObjId {\em **oid};
+
+void {\bf aux\_free\_AlgId} {\em (aid)} \\
+AlgId {\em **aid};
+
+void {\bf aux\_free2\_AlgId} {\em (aid)} \\
+AlgId {\em *aid};
+
+void {\bf aux\_free\_PSEToc} {\em (psetoc)} \\
+PSEToc {\em **psetoc};
+
+void {\bf aux\_free2\_PSEToc} {\em (psetoc)} \\
+PSEToc {\em *psetoc};
+
+void {\bf aux\_free\_KeyBits} {\em (keybits)} \\
+KeyBits {\em **keybits};
+
+void {\bf aux\_free2\_KeyBits} {\em (keybits)} \\
+KeyBits {\em *keybits};
+
+void {\bf aux\_free\_KeyInfo} {\em (keyinfo)} \\
+KeyInfo {\em **keyinfo};
+
+void {\bf aux\_free2\_KeyInfo} {\em (keyinfo)} \\
+KeyInfo {\em *keyinfo};
+\\[1em]
+\#include $<$af.h$>$ 
+
+void {\bf aux\_free\_ToBeSigned} {\em (tbs)} \\
+ToBeSigned {\em **tbs};
+
+void {\bf aux\_free2\_ToBeSigned} {\em (tbs)} \\
+ToBeSigned {\em *tbs};
+
+void {\bf aux\_free\_Certificate} {\em (cert)} \\
+Certificate {\em **cert};
+
+void {\bf aux\_free2\_Certificate} {\em (cert)} \\
+Certificate {\em *cert};
+
+void {\bf aux\_free\_CertificateSet} {\em (certset)} \\
+SET\_OF\_Certificate {\em **certset};
+
+void {\bf aux\_free\_CrossCertificates} {\em (ccerts)} \\
+CrossCertificates {\em **ccerts};
+
+void {\bf aux\_free2\_CrossCertificates} {\em (ccerts)} \\
+CrossCertificates {\em *ccerts};
+
+void {\bf aux\_free\_FCPath} {\em (fcpath)} \\
+FCPath {\em **fcpath};
+
+void {\bf aux\_free\_PKRoot} {\em (pkroot)} \\
+PKRoot {\em **pkroot};
+
+void {\bf aux\_free\_PKList} {\em (pklist)} \\
+PKList {\em **pklist};
+
+void {\bf aux\_free\_Certificates} {\em (certs)} \\
+Certificates {\em **certs};
+
+void {\bf aux\_free\_DName} {\em (dname)} \\
+DName {\em **dname};
+
+void {\bf aux\_free2\_DName} {\em (dname)} \\
+DName {\em *dname};
+
+void {\bf aux\_free\_RevCert} {\em (revcert)} \\
+RevCert {\em **revcert};
+
+void {\bf aux\_free2\_RevCert} {\em (revcert)} \\
+RevCert {\em *revcert};
+
+void {\bf aux\_free\_Crl} {\em (crl)} \\
+Crl {\em **crl};
+
+void {\bf aux\_free2\_Crl} {\em (crl)} \\
+Crl {\em *crl};
+
+void {\bf aux\_free\_VerificationResult} {\em (verifresult)} \\
+VerificationResult {\em **verifresult};
+
+\hl{Description}
+The {\bf aux\_free\_*} {\em (parm)} functions free the respective members of {\em *parm}
+and {\em *parm} itself. The pointer {\em *parm} is set to NULL on return.
+
+The {\bf aux\_free2\_*} {\em (parm)} functions free the respective members of {\em parm}
+only.
+
+\subsection{ISODE Support}
+\nm{3X}{aux\_isode}{ISODE Support}
+\label{aux_isode}
+\hl{Synopsis}
+
+\#include $<$isode/psap.h$>$ \\
+\#include $<$secure.h$>$ \\
+\#include $<$IF-types.h$>$ 
+
+OctetString {\bf *aux\_PE2OctetString} {\em  (pe)} \\
+PE {\em pe};
+
+PE {\bf aux\_OctetString2PE} {\em (ostr)} \\
+OctetString {\em *ostr};
+\hl{Description}
+{\bf aux\_PE2OctetString}
+transforms the ISODE-defined presentation element pe, which
+in terms of ISODE represents an ASN.1 octetstring,
+into an OctetString, which contains the corresponding ASN.1 transfer
+protocol data stream.
+On success a pointer to the OctetString is returned.
+On error a null pointer is returned.
+The structure of an presentation element is defined in $<$isode/psap.h$>$.
+
+{\bf aux\_OctetString2PE}
+transforms the OctetString *ostr, which contains an ASN.1 transfer
+protocol data stream, into
+the corresponding ISODE-defined presentation element pe, which
+in terms of ISODE represents an ASN.1 octetstring.
+The presentation element is returned.
+On error the presentation element is the null element.
+The structure of an presentation element is defined in $<$isode/psap.h$>$.
+
+\subsection{Alias Name Mapping}
+\nm{3X}{aux\_alias}{Alias Name Mapping}
+\label{aux_alias}
+\hl{Synopsis}
+
+\#include $<$af.h$>$ 
+
+DName *{\bf aux\_alias2DName} {\em (alias)} \\
+char *{\em alias}; 
+
+Name *{\bf aux\_alias2Name} {\em (alias)} \\
+char *{\em alias}; 
+
+char *{\bf aux\_DName2alias} {\em (dname, type)} \\
+DName *{\em dname}; \\
+AliasType {\em type}; 
+
+char *{\bf aux\_Name2alias} {\em (name, type)} \\
+Name *{\em name}; \\
+AliasType {\em type}; 
+
+char *{\bf aux\_Name2aliasf} {\em (name, type, aliasf)} \\
+Name *{\em name}; \\
+AliasType {\em type}; \\
+AliasFile {\em aliasf};
+
+char *{\bf aux\_DName2aliasf} {\em (dname, type, aliasf)} \\
+DName *{\em dname}; \\
+AliasType {\em type}; \\
+AliasFile {\em aliasf};
+
+Name *{\bf aux\_search\_AliasList} {\em (name, pattern)} \\
+Name *{\em name}; \\
+char *{\em pattern};
+
+RC *{\bf aux\_add\_alias} {\em (alias, dname, aliasf, prior, writef)} \\
+char *{\em alias}; \\ 
+DName *{\em dname}; \\
+AliasFile {\em aliasf}; \\
+Boolean prior; \\
+Boolean writef;
+
+RC *{\bf aux\_add\_alias\_name} {\em (alias, name, aliasf, prior, writef)} \\
+char *{\em alias}; \\ 
+Name *{\em name}; \\
+AliasFile {\em aliasf}; \\
+Boolean prior; \\
+Boolean writef;
+
+RC *{\bf aux\_delete\_alias} {\em (alias, aliasf, writef)} \\
+char *{\em alias}; \\
+AliasFile {\em aliasf}; \\
+Boolean writef;
+
+void {\bf aux\_put\_AliasList} {\em (aliasf)} \\
+AliasFile {\em aliasf}; 
+
+Boolean *{\bf aux\_alias} {\em (alias)} \\
+char *{\em alias}; 
+
+Boolean *{\bf aux\_alias\_chkfile} {\em (alias, aliasf)} \\
+char *{\em alias}; \\
+AliasFile {\em aliasf};
+
+Name *{\bf aux\_next\_AliasList} {\em (name)} \\
+Name *{\em name};
+
+Name *{\bf aux\_alias\_nxtname} {\em (reset)} \\
+Boolean {\em reset};
+
+char *{\bf aux\_alias\_getall} {\em (name)} \\
+Name *{\em name};
+
+char *{\bf aux\_fprint\_alias2dname} {\em (file, pattern)} \\
+FILE *{\em file}; \\
+char *{\em pattern}; 
+
+char *{\bf aux\_fprint\_dname2alias} {\em (file, pattern)} \\
+FILE *{\em file}; \\
+char *{\em pattern};
+
+AliasList *{\bf d\_AliasList} {\em (ostr)} \\
+OctetString *{\em ostr};
+
+OctetString *{\bf e\_AliasList} {\em (alist, aliasf)} \\
+AliasList *{\em alist}; \\
+AliasFile *{\em aliasf};
+
+void {\bf aux\_free\_AliasList} {\em (alist)} \\
+AliasList **{\em alist};
+
+RC {\bf aux\_fprint\_AliasList} {\em (file, alist)} \\
+FILE *{\em file}; \\
+AliasList *{\em alist};
+
+\hl{Description}
+Alias names for distinguished names can be defined on a per user basis in either the PSE-object
+AliasList or in the file \$HOME/.af-alias, and on a per system basis in the file
+\$TOP/secude/.af-db/.af-alias. If the PSE-object AliasList exists, user-defined aliases
+are taken from there, otherwise user-defined aliases are taken from \$HOME/.af-alias.
+
+More than one alias name may be defined for one target name. The target name must be a
+distinguished name, either in the Name or in the DName form. The alias names are
+stored in an ASN.1 encoded OctetString which decodes into the internal structure
+\begin{verbatim}
+struct aliaslist {
+        struct aliases {
+                char          *aname; /* alias names */
+                AliasFile  aliasfile; /* SYSTEM or USER Alias File */
+                struct aliases *next;
+        } *a;
+        Name    *dname;               /* distinguished name */
+        struct aliaslist *next;
+};
+typedef struct aliaslist AliasList;
+typedef struct aliases Aliases;
+\end{verbatim}
+If the ASN.1 encoded OctetString is stored in the files \$HOME/.af-alias and \$TOP/secude/.af-db/.af-alias as signed file in order to protect its integrity.
+The signature is verified when reading these files and newly generated when
+writing these files. If the ASN.1 encoded OctetString is stored as PSE-object
+AliasList, the PSE protection mechanism is used to protect its integrity.
+
+{\em type} is an enumerated data type which may have one
+of the values ANYALIAS, RFCMAIL, X400MAIL, or LOCALNAME. This allows to distinguish
+different types of aliases through their syntax. An RFCMAIL type is an alias name which
+contains a '@' character. An X400MAIL type is an alias which contains a '=' character.
+A LOCALNAME type is an alias which contains neither a '@' nor a '=' character (a login
+name, for instance).
+ANYALIAS just refers to the first alias which may be of any type.
+AliasFile is an enumerated data type which may have the values useralias
+or systemalias. useralias refers to the user alias file, systemalias refers
+to the system alias file.
+
+On the first call of a routine which transform aliases to DNames or vice versa, the user 
+alias file and the system alias file are read into an internal AliasList which
+consists of memory obtained through malloc(). The alias transformation
+routines return copies of this AliasList. The AliasList can be released
+with {\em aux\_free\_AliasList ((AliasList **)0)}. All Names, DNames and alias names returned by 
+the alias routines can be freed with the appropriate free routines. The alias routines 
+maintain an internal pointer to the ``current'' entry.  
+
+{\bf aux\_alias2Name} searches for {\em alias} in the AliasList
+and returns the corresponding target
+(a distinguished name in Name format). If {\em alias}
+is not found as alias entry, it returns {\em alias} itself. Since an alias name can be
+of the Name form (e.g. in the case of X.400 OR-names being aliases to DNames, see the second 
+example above), the comparison of alias names is done on the basis of the DName type to which
+the printable Name forms are transformed by {\em af\_alias2Name()}.
+Keywords which do not
+denote a SecuDE recognized DN attribute, like PRMD and ADMD in the example above,
+are ignored for this comparison. This allows to define X.400 OR-names as alias names
+for distinguished names.
+
+Since the return value of {\bf aux\_alias2Name} does not allow to distinguish whether
+{\em alias} is a defined alias name or not, the function {\bf aux\_alias} can be
+used to decide this. {\bf aux\_alias} returns TRUE is {\em alias} is in the AliasList,
+otherwise it returns FALSE. {\bf aux\_alias\_chkfile} does the same as aux\_alias
+except that it checks only alias from the given alias file.
+
+In the example above, af\_alias2Name("grimm") would return 
+
+"C=DE; O=gmd; OU=I2; CN=R. Grimm".
+\\ [1em]
+{\bf aux\_alias2DName} returns the corresponding DName if {\em alias} is found in
+the alias file. If {\em alias} is not found, 
+it returns the DName which is obtained
+through transforming {\em alias} itself to the DName type. If this fails, Null is
+returned.
+\\ [1em]
+{\bf aux\_DName2alias} returns the first alias name of type {\em type} given to {\em dname}.
+It returns Null if {\em dname} is not found as a target name in the alias list, 
+or it has no
+alias of the requested type. 
+\\ [1em]
+{\bf aux\_Name2alias} returns the first alias name of type {\em type} given to {\em name}.
+It returns Null if {\em name} is not found as a target name in the alias list, 
+or it has no
+alias of the requested type. 
+\\ [1em]
+{\bf aux\_Name2aliasf} is like aux\_Name2alias except that it looks only for aliases
+which are defined in the requested AliasFile, i.e. which are either system aliases
+or user aliases. 
+\\ [1em]
+{\bf aux\_DName2aliasf} is like aux\_Name2aliasf except that it handles a DName
+instead of a Name
+\\ [1em]
+{\bf aux\_add\_alias} adds the given {\em alias} and {\em dname} combination to
+the alias file indicated by {\em file}. {\em prior} $=$ TRUE, the new alias is
+chained to the first position, otherwise it is chained to the last position.
+If {\em writef} $=$ TRUE, the corresponding alias file is updated immediately.
+If {\em writef} $=$ FALSE, only the internal AliasList is changed. To update
+the corresponding alias file, {\bf aux\_put\_AliasList} {\em (file)} must be
+used. Aux\_add\_alias returns 0 on success. It returns 0, too, if the
+given combination exists already in the alias file. Otherwise, it returns -1.
+\\ [1em]
+{\bf aux\_add\_alias\_name} does the same as {\bf aux\_add\_alias} except that
+it handles a Name instead of a DName.
+\\ [1em]
+{\bf aux\_delete\_alias} deletes the given {\em alias} from the alias file (either from
+the USER alias file or from the SYSTEM alias file, depending where it came from).
+{\em writef} has the same meaning as above.
+\\ [1em]
+{\bf aux\_search\_AliasList} returns a name which contains {\em pattern} in any of
+its attributes. If the input parameter {\em name} is a string of length zero,
+it searches from the ``current'' position. At the end of the AliasList it starts
+again at the begin of the AliasList and searches at most until to the position
+which was ``current'' when aux\_search\_AliasList was called. If {\em name} is the 
+NULL pointer, ``current'' is set to the begin of the AliasList before the search starts.
+If {\em name} is a Name, it starts the search after this position. The AliasList
+is sorted in alphabetic order of the target which is a distinguished name in the Name form.
+\\ [1em]
+{\bf aux\_next\_AliasList} is like aux\_search\_AliasList except that it doesn't searh
+for a pattern but returns just the next name. 
+\\ [1em]
+{\bf aux\_alias\_nxtname} has its own ``current'' pointer which is independent of that
+of the other functions. It returns the next name after this ``current'' and increments
+its ``current''. In contrast to the other routines it does not wrap over the end of
+the AliasList, but returns a NULL pointer in case that the end of the AliasList
+is reached and sets its ``current'' to the begin of the AliasList. If{\em reset} is TRUE,
+it returns the first name of the AliasList and sets its ``current'' to top.
+\\ [1em]
+{\bf aux\_alias\_getall} returns all aliases of the given name in one character string.
+The aliases are separated by ':' characters.
+\\ [1em]
+{\bf aux\_fprint\_alias2dname} searches alias names which contain {\em pattern} and
+prints one line per hit of the form
+\bc
+{\em aliasname} - - -$>$ $<${\em distinguished name}$>$
+\ec
+to file pointer {\em file}.
+\\ [1em]
+{\bf aux\_fprint\_dname2alias} searches distinguished names which contain {\em pattern} and
+prints one line per hit of the form
+\bc
+$<${\em distinguished name}$>$ - - -$>$  {\em aliasname}
+\ec
+to file pointer {\em file}.
+
+The following routines are intended for SecuDE-internal use. {\bf d\_AliasList} decodes the
+given OctetString {\em ostr} into an AliasList structure. {\bf e\_AliasList} does the reverse
+process, whereby it encodes only those aliases of which the source is the same as the
+indicated AliasFile {\em aliasf}, i.e. it encodes only the user aliases if aliasf $=$ useralias,
+or only the system aliases if aliasf $=$ systemalias. {\bf aux\_free\_AliasList} frees
+the given {\em alist}, and {\bf aux\_fprint\_AliasList} prints the given {\em alist}
+to the given {\em file}.
+
+\subsection{UTCTime handling Functions}
+\nm{3X}{aux\_UTCTime}{UTCTime handling Functions}
+\label{aux_time}
+\hl{Synopsis}
+
+\#include $<$secure.h$>$
+
+extern Boolean aux\_localtime;
+
+UTCTime *{\bf aux\_current\_UTCTime} {\em ()}
+
+UTCTime *{\bf aux\_delta\_UTCTime} {\em (utctime)} \\
+UTCTime *{\em utctime}; 
+
+int {\bf aux\_interval\_UTCTime} {\em (utctime, notbefore, notafter)} \\
+UTCTime *{\em utctime}; \\ 
+UTCTime *{\em notbefore}; \\ 
+UTCTime *{\em notafter};
+
+int {\bf aux\_cmp\_UTCTime} {\em (utctime1, utctime2)} \\
+UTCTime *{\em utctime1}; \\
+UTCTime *{\em utctime2}; 
+
+char *{\bf aux\_readable\_UTCTime} {\em (utctime)} \\
+UTCTime *{\em utctime}; 
+
+\hl{Description}
+{\bf aux\_current\_UTCTime} returns the current time in UTCTime format. If
+{\em aux\_localtime} is TRUE, the time is generated as local time (plus
+or minus the time difference to GMT), otherwise it is generated as GMT.
+
+{\bf aux\_delta\_UTCTime} returns {\em utctime} plus 1 year, or NULL if
+{\em utctime} is invalid. The returned UTCTime is in the local time format
+if {\em aux\_localtime} is true and in the GMT format otherwise. 
+
+{\bf aux\_interval\_UTCTime} returns 0 if {\em utctime} is inside the interval
+between {\em notbefore} and {\em notafter} (including the boundaries), or 1 if
+it is outside. It returns -1 if one of the given UTCTimes is invalid.
+
+{\bf aux\_cmp\_UTCTime} returns 1 if {\em utctime1} is later than {\em utctime2}.
+It returns 2 if {\em utctime2} is later than {\em utctime1}. It returns 0
+if both times are equal. It returns -1 if one of the UTCTimes is invalid.
+
+{\bf aux\_readable\_UTCTime} returns {\em utctime} is printable character string
+as produced by {\em ctime()}, however without trailing newline character. It
+returns NULL is {\em utctime} is invalid.
+
+Input parameters in UTCTime format can be both in GMT or local time format. The
+format of output parameters in UTCTime format is controlled by {\em aux\_localtime}.
+Necessary memory is allocated by the called program and can be freed using
+{\em free()}.
+
+\subsection{Distinguished Name Handling}
+\nm{3X}{aux\_DName}{Distinguished Name Handling}
+\label{aux_name}
+\hl{Synopsis}
+
+\#include $<$isode/psap.h$>$ \\
+\#include $<$secure.h$>$ \\
+\#include $<$IF-types.h$>$ 
+
+DName *{\bf aux\_Name2DName} {\em (name)} \\
+char {\em *name};
+
+char *{\bf aux\_DName2Name} {\em (dname)} \\
+DName {\em *dname};
+
+int {\bf aux\_cmp\_DName} {\em  (dname1, dname2)} \\
+DName {\em *dname1, *dname2};
+
+int {\bf aux\_cmp\_Name} {\em  (name1, name2)} \\
+Name {\em *name1, *name2};
+
+int {\bf aux\_checkPemDNameSubordination} {\em  (sup, sub)} \\
+DName {\em *sup, *sub};
+
+\hl{Description}
+{\bf aux\_Name2DName} and {\em aux\_DName2Name} transform between
+the printable character string representation {\em Name} and the
+C-structure {\em DName} of distinguished names. 
+
+{\bf aux\_cmp\_DName} compares the two DName *dname1 and *dname2.
+If they represent the same distinguished names,
+0 is returned, otherwise 1. 
+
+{\bf aux\_cmp\_Name} compares the two Name *name1 and *name2 by
+transforming the printable character string representation {\em name1} 
+and {\em name2} into DName structure representations using
+{\em aux\_Name2DName()} and applying {\em aux\_cmp\_DName()}
+afterwards.
+If they represent the same distinguished names,
+0 is returned, otherwise 1.
+
+{\bf aux\_checkPemDNameSubordination} compares the two DName structures {\em *sup} and {\em *sub}.
+1 is returned, 
+if {\em sub} is subordinate to {\em sup} in the DIT, i.e., {\em sub} is constructed of exactly the same
+Relative Distinguished Name components as {\em sup}, with some additional Relative Distinguished Name
+components appended.
+If subordination is not detected, 0 is returned. -1 is returned in case of invalid parameters.\\
+This routine is useful in the context of the PEM trust model (RFC 1422), where 
+Organizational CAs are expected to sign certificates only if the subject distinguished
+name in the certificate is subordinate to their own distinguished name, thereby 
+documenting the subject's affiliation to the organization.
+
+\subsection{Error Handling}
+\nm{3X}{aux\_error}{Error Handling}
+\label{aux_error}
+\hl{Synopsis}
+
+\#include $<$af.h$>$ 
+
+
+extern struct ErrStack *err\_stack; 
+
+
+void {\bf aux\_add\_error} {\em (number, text, addr, addrtypr, proc)} \\
+int {\em number}; \\
+char {\em *text, *addr}; \\
+Struct\_No {\em addrtype}; \\
+char {\em *proc}; \\ [1em]
+void {\bf aux\_fprint\_error} {\em (file, last\_only)} \\
+FILE {\em *file}; \\
+int {\em last\_only}; \\ [1em]
+void {\bf aux\_free\_error} {\em ()} \\ [1em]
+int {\bf aux\_last\_error} {\em ()}
+\hl{Description}
+For error reporting purposes, SecuDE provides an error stack which collects all
+errors which occured during the processing of Secude functions. This stack is not
+intended to be exploited by normal users, but for the experienced user or programmer,
+who is rougly familiar with the program code, it provides some backtracing
+functionality in case of errors. The stack can be lengthy depending on the depth
+of nested function calls.  
+
+The error stack has the following form: 
+
+\bvtab
+\2 typedef struct \{ \\
+\4        int  \4            e\_number; \\
+\4        char \4           *e\_text;   \\
+\4        char \4           *e\_addr;   \\
+\4        Struct\_No   \4     e\_addrtype; \\
+\4        char \4           *e\_proc;   \\
+\4        struct ErrStack  \4 *next;   \\
+ \2 \} ErrStack; \\ 
+\evtab
+
+The error stack is ordered most recent first.
+ 
+The global variable {\em err\_stack}
+is the pointer to the error stack. $err\_stack = NULL$ indicates that no error occured so far.
+
+The error stack holds the following information per entry:
+
+{\em e\_number} is the corresponding error number (see INTRO(3)), {\em e\_text} is an additional
+explanatory text. {\em addr} can be either NULL or the address of a data element (i. e. 
+structure address) which is interesting in conjunction with the error. {\em addrtype} is the
+type of {\em addr} (see secure.h for appropriate values). {\em proc} is the name of the 
+routine where the error occured.
+\\ [1em]
+{\em aux\_add\_error()} adds an entry to the error stack. It allocates the necessary memory.
+\\ [1em]
+{\em aux\_fprint\_error()} prints the current error stack in suitable form to file pointer {\em file}.
+If {\em last\_only} is not NULL, only the most recent entry is printed.
+\\ [1em]
+{\em aux\_free\_error()} frees the error stack and sets err\_stack to NULL.
+\\ [1em]
+{\em aux\_last\_error()} returns the error number of the most recent error, or 0 if
+no error occured.
+

@@ -1,0 +1,341 @@
+\section{Signature and Certificate}
+\markboth{Signature and Certificate}{Signature and Certificate}
+\thispagestyle{myheadings}
+\label{sigandcert}
+
+\subsection{Digital Signature and Certification}
+\label{sc-dsc}
+
+The signature algorithm employed within
+SecuDe
+is a composition of a hash function followed by an RSA function
+\cite{riv1} \cite{ttt1} \cite{ttt2} \cite{ttt3}.
+The key used for signature is the signer's private key,
+The signer's public key which is used for the verification of the signature
+is certified by a certification authority.
+For encryption the DES algorithm is used,
+whereby, for the purpose of transfer, the secret DES-key is RSA-encrypted.
+For every user,
+the pair of RSA-keys used for encryption and decryption is
+different from the pair of RSA-keys used for signature and verification.
+Identification of algorithms and
+the model of certification are following the
+``Directory Authentication Framework'', X.509 \cite{cci4}.
+
+\subsection{Elements of a Digital Signature}
+\label{sc-eds}
+
+In SecuDe
+a Digital Signature goes always within a quadruplet
+({\em text, signature, creation date, ori\-gi\-na\-tor cer\-ti\-fi\-cate}).
+
+\subsubsection{Text and Signature}
+\label{sc-ts}
+
+The Digital Signature is a sequence of a signature algorithm identifier
+and a bitstring containing the result of RSA encryption
+of a hashed version of the text
+by applying the signer's private RSA key.
+The digital signature is a function of the algorithm used,
+of the signed text,
+and of the secret key (and hence of the owner of the secret key).
+
+\subsubsection{Creation Date}
+\label{sc-cd}
+
+Neither the algorithms of asymmetric encryption nor the Directory
+Authentication Framework demand
+a time or date value for the signature process.
+It is an additional request to link a signature with a date
+which is being interpreted as
+{\em creation date} of the signature.
+This specification does not say, {\em where} the date is to be got from.
+It just says, there must be a date.
+(In MHS-X.400 the date can always be taken from the envelope).
+The {\em default}-date is the date of signature verification.
+
+\subsubsection{Certificate and Certification Tree}
+\label{sc-cct}
+
+From the algorithmic point of view, a public key certificate is
+not a necessary part of a digital signature.
+A digital signature can be verified without certificate,
+if the public key is available by other means,
+for example from a public directory or a local smartcard.
+In order to verify a signature up to the verifier's point of trust,
+a trustworthy chain of certificates is required.
+That is,
+the first certificate of the chain certifies the public key of the signature,
+each other certificate of the chain certifies the public key
+of its preceding certificate,
+and the public key of the last certificate of the chain
+belongs to a certification authority which the verifier trusts.
+A trustworthy chain of certificates between a signer and a verifier
+is called a certification path.
+The complexity of the structure of all
+certification paths between any two users
+is comparable with the routing topology of store and forward
+mail systems.
+
+Within SecuDe a simple standard path through the
+X.509 certification trees is anticipated:
+all users either belong to {\em one tree},
+or there is one {\em cross certificate} between the paths
+between the users and their root certification authorities.
+
+\begin{center}
+\makebox[5.541in][l]{
+  \vbox to 2.680in{
+    \vfill
+    \special{psfile=vol1-fig2.ps}
+  }
+  \vspace{-\baselineskip}
+}
+\end{center}
+\label{fig-sc-cct}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: Two certification trees linked by cross certificates}
+ 
+\subsubsection{Originator Certificate (certificates)}
+\label{sc-oc}
+
+X.411 defines the originator certificate as
+X.509 type {\em certificates}, note the plural.
+Within SecuDe an originator certificate
+is used as follows:
+Every user owns one originator certificate,
+the lowest certificate of which is his user certificate and the
+highest certificate of which is signed by the root certification
+authority of his certification tree.
+
+The user certificate is the lowest certificate of the path
+between signer and the root certification authority of his
+certification tree. This means:
+The owner ({\em subject}) of the user certificate
+is the signer of the text.
+The {\em issuer} of
+the user certificate
+is the signer's certification authority.
+
+The levels of the forward certification path are the levels of the
+signer's certification tree.
+The very certification authority representing one level of the path
+between the signer and his root certification authority
+is the owner ({\em subject}) of all certificates at this level.
+At any level
+exactly one certificate is its {\em hierarchy certificate},
+i.e. its {\em issuer} is the certification authority at the next level above.
+All other certificates are cross certificates, i.e. their issuers
+are all different.
+
+The hierarchy certificate is mandatory, the cross certificates are optional.
+In the simplest case a SET OF \{certificate\} at one level contains
+exactly one certificate.
+
+The hierarchy certificate is identified from
+the cross certificates in the SET not by its position, but
+by the {\em name of issuer} which is the name of the subject
+of every certificate at the next level above.
+The purpose of cross certificates is to link different
+certification trees or to be short cuts within one certification tree.
+\newpage
+\begin{figure}
+\begin{center}
+\makebox[5.166in][l]{
+  \vbox to 4.750in{
+    \vfill
+    \special{psfile=vol1-fig3.ps}
+  }
+  \vspace{-\baselineskip}
+}
+\end{center}
+\label{fig-sc-oc}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: Originator-certificate of X.509-type
+``certificates''}
+\end{figure}
+
+\subsection{Certificate: Formats and Values}
+\label{sc-cfv}
+
+In the {\em Authentication Framework} X.509 \cite{cci4} the type
+{\em Certificate} is defined like this:
+
+\begin {center}
+\begin {tabular}{lll}
+Certificate ::= & {\bf SIGNED SEQUENCE} \{ & \\
+  & version [0]   & Version {\bf DEFAULT} 0, \\
+  & serialNumber  & CertificateSerialNumber, \\
+  & signature     & AlgorithmIdentifier,     \\
+  & issuer        & Name,                    \\
+  & validity      & Validity,                \\
+  & subject       & Name,                    \\
+  & subjectPublicKeyInfo & SubjectPublicKeyInfo \} \\
+\end {tabular}
+\end {center}
+\label{fig-sc-cfv}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: X.509-type ``Certificate''}
+\\[1ex]
+{\em Version} and {\em CertificateSerialNumber} (see below)
+are of type INTEGER,
+{\em issuer} is the issuing certification authority
+and {\em subject} is the owner of the certificate.
+{\em Validity} is a sequence of two elements of type UTCTime,
+{\em not\-Be\-fore} und {\em not\-Af\-ter} (see below).
+{\em SubjectPublicKeyInfo} contains
+the public key of the {\em subject}, while
+the {\em certificate} itself (SIGNED SEQUENCE!)
+is signed by its  {\em issuer}.
+In X.509 it is not specified, which signature the
+{\em AlgorithmIdentifier} of the field {\em signature} is related to.
+In SecuDe
+it is related to the certificate signature of the {\em issuer},
+which is therefore present twice: inside and outside of the
+SIGNED SEQUENCE.
+This will be considered on creation but not on evaluation of a certificate.
+
+\subsubsection{Name Format}
+\label{sc-nf}
+ 
+Issuer and subject of a certificate are identified by their names.
+The name format is defined in the Directory Information Model
+X.501 \cite{cci3}.
+The {\em directory attribute ``Name''}
+is a sequence of {\em ``Relative Distingushed Names''}
+such as a country name, organizational name or personal name.
+Within SecuDe
+only a limited set of attribute types is used to construct relative distinguished names,
+these are:
+countryName, organizationalName, organizationalUnitName, commonName, surname,
+title, serialNumber, localityName, streetAddress, and businessCategory.
+All other attribute types would be ignored.
+
+The {\em printable representation} of a name follows the pattern
+\bc
+{\small keyword=value \% keyword=value ... ; keyword=value \% keyword = value ...; ...}
+\ec
+keyword is a name for an attribute type. 
+The ';' delimiter separates the RDN members of the DN, i. e. each 
+keyword=value \% keyword=value ... expression denotes one relative distinguished name.
+The '\%' delimiter separates the attributes within one RDN.
+The following keywords, representing X.520 defined attributes,  are possible:
+{\small
+\bvtab
+C   \2 countryName \\
+O   \2 organizationName  \\
+OU  \2 organizationalUnitName \\
+S   \2 surname \\
+CN  \2 commonName \\
+L   \2 localityName \\
+SP  \2 stateOrProvinceName \\
+ST  \2 streetAddress \\
+T   \2 title \\
+SN  \2 serialNumber \\
+BC  \2 businessCategory \\
+D   \2 description
+\evtab
+}
+RDNs must be ordered top down. Letter cases are not significant for names, 
+as well as spaces may be used inside and outside the names.
+\\ [1ex]
+One of the authors' name would be represented as
+{\small
+C=DE; O=gmd; OU=I2 \% CN=Institut fuer TeleKooperationsTechnik; CN=Wolfgang Schneider} 
+
+\subsubsection{Certificate Serial Number}
+\label{sc-csn}
+ 
+The data element {\em certificate serial number} of a certificate
+contains an integer number. In the directory black lists
+this number in combination with the name of the issuer of a certificate
+identifies a certificate universally.
+As a consequence, a certification authority has to make sure,
+that serial numbers of all certificates issued by her are unique.
+A combination of time stamp values and random numbers,
+or continuously ascending numbers would fulfill this condition.
+Within SecuDe
+another approach is used:
+a certification authority would number its public keys
+and it would number all certificates signed by one signature key.
+The concatenation of these two numbers makes the certificate serial number.
+
+A certificate serial number has the decimal representation $xyyyyyy$.
+$x=0,\ldots$ is any (one or multi digit) number
+which is uniquely related to the signature key of the issuing certification
+authority used to sign this certificate.
+$yyyyyy=0,\ldots,999999$ is a number smaller than 1 million, which
+is uniquely related to the certificate,
+signed by the certification authority with key $x$.
+The first part $x$ is called {\em key number},
+the second part $yyyyyy$ is called {\em certificate number} of the
+certificate.
+
+For example, the certificate serial number 1083
+belongs to the 1083th certificate which was signed
+by the 0th signature key of its issuer.
+The certificate serial number 27080595
+belongs to the 80595th certificate which was signed
+by the 27th signature key of its issuer.
+
+\subsubsection{Validity}
+\label{sc-v}
+
+The data element {\em validity} consists of the two UTCTime elements
+{\em validity-notBefore} and {\em validity-notAfter}.
+Outside of this time interval a certified signature is invalid.
+However, a certificate, which is signed itself, does not indicate
+the date or time of its creation. Therefore, the time of the creation
+of a certificate's signature is unknown. It must be clarified,
+in which way the validity interval of a certificate is restricted
+by the validity interval of its signature, that is, by the validity interval
+of its superior certificate.
+In SecuDe the {\em validity} has this significance:
+
+\begin{itemize}
+\item  validities of certificates within one originator certificate
+are not {\em directly} related to one another, {\em but:}
+\item A signature is only valid,
+if its creation date is within the validity of every certificate
+of the originator certificate.
+Formally:
+\item The validity time frame of a signature is the intersection
+of all validity time frames of the originator certificate.
+\end{itemize}
+
+\subsubsection{validity-notBefore}
+\label{sc-vb}
+
+If a signature's creation date is earlier than
+the value of {\em validity-notBefore} of its certificate,
+it is to be regarded as invalid.
+The value of {\em validity-notBefore} is the creation date
+of the certified public key (not of the certificate!).
+It does not prevent from a manipulated signature creation date
+as long as it id placed later than the validity-notBefore value.
+However, this value can be of informational interest.
+
+\subsubsection{validity-notAfter}
+\label{sc-va}
+
+If a signature's creation date is later than
+the value of {\em validity-notAfter} of its certificate,
+it is to be regarded as invalid.
+The value of {\em validity-notAfter} marks the day
+of expiry of the certificate (not of the signature!).
+Note, that signatures created before validity-notAfter remain valid
+after the real date validity-notAfter has passed.
+A new certificate (validity-notAfter $>$ old validity-notAfter)
+may specify the same public key information in order to {\em extend}
+the validity of a signature key
+as long as the rules of the given security policy are obeyed.
+The same is true for certificates of encryption keys.
+
+The element {\em validity-notAfter}
+does not prevent from the manipulated backwards dating of a signature,
+as long as it is placed earlier than the validity-notAfter value.
+It does, however, prevent
+from the usage of expired signature keys.
+Therefore,
+it is strongly recommended to integrate the check of this
+value into the signature verification process.

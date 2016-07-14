@@ -1,0 +1,54 @@
+% list.tex - minimal implementation of single level lists
+
+% \list{(\letters)}
+%      \item Text of first item. More text 
+%	     of first item.
+%      \item Text of second item.
+%      \item Text of third item.
+%      \endlist
+
+% will produce
+
+%    (a) Text of first item.  More text
+%        of first item.
+%
+%    (b) Text of second item.
+%
+%    (c) Text of third item.
+
+% Using the functions
+
+\def\list	% which begins a list
+#1% form of the item markers
+{\par\begingroup \itemnumber=0 \parindent=0pt \parskip=4pt \curmark={#1}}%
+
+\def\endlist{\par\endgroup}	% which ends a list
+
+% and 
+
+\def\item{\par\indent \advance\itemnumber by 1
+	  \hangindent=1em \hangafter=0 
+	  \llap{\the\curmark\enspace}\ignorespaces}
+
+% which marks the end of one item and the beginning of the next.
+
+% The list mechanism requires one count to keep track of the
+% item number and one token for the item marker.
+
+	\newcount\itemnumber 
+	\newtoks\curmark
+
+% It also requires a variety of functions that indicate in a
+% convenient way the form of the item markers and several are 
+% given below.  These can be used alone or in combination with
+% constant text to make a variety of forms.
+
+\def\bullets{$\bullet$}
+\def\dashes{{\rm ---}}
+\def\dots{$\cdot$}
+\def\letters{\alph{\the\itemnumber}}
+\def\Letters{\Alph{\the\itemnumber}}
+\def\numbers{\the\itemnumber}
+\def\roman{\expandafter\romannumeral\the\itemnumber}
+\def\Roman{\uppercase\expandafter{\romannumeral\the\itemnumber}}
+

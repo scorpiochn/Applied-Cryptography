@@ -1,0 +1,555 @@
+Path: watmath!utgpu!jarvis.csri.toronto.edu!mailrus!ukma!gatech!bbn!bbn.com!rsalz
+From: rsalz@uunet.uu.net (Rich Salz)
+Newsgroups: comp.sources.unix
+Subject: v17i092:  Encrypt using Hill cipher
+Message-ID: <1484@fig.bbn.com>
+Date: 8 Feb 89 22:37:23 GMT
+Lines: 546
+Approved: rsalz@uunet.UU.NET
+
+Submitted-by: John Cowan <magpie.MASA.COM!cowan>
+Posting-number: Volume 17, Issue 92
+Archive-name: hill
+
+Hill provides file encryption using the Hill cipher.  In encryption mode,
+plaintext is read from the standard input and ciphertext is written to the
+standard output in accordance with a user-specified key.  Additional
+options allow compressing the plaintext and/or expressing the ciphertext
+in ASCII.  In decryption mode, the operations of encryption mode are
+reversed (provided the right key is supplied).
+
+#! /bin/sh
+# This is a shell archive, meaning:
+# 1. Remove everything above the #! /bin/sh line.
+# 2. Save the resulting text in a file.
+# 3. Execute the file with /bin/sh (not csh) to create the files:
+#	README
+#	hill
+#	hill.1
+#	hill0.c
+#	kappa.c
+#	makefile
+#	table.i
+export PATH; PATH=/bin:$PATH
+if test -f 'README'
+then
+	echo shar: will not over-write existing file "'README'"
+else
+sed 's/^X//' << \SHAR_EOF > 'README'
+^Xhill - encryption program using Hill cipher
+^X
+^XHill provides file encryption using the Hill cipher.
+^XIn encryption mode, plaintext is read from the standard input
+^Xand ciphertext is written to the standard output
+^Xin accordance with a user-specified key.
+^XAdditional options allow compressing the plaintext
+^Xand/or expressing the ciphertext in ASCII.
+^XIn decryption mode, the operations of encryption mode
+^Xare reversed (provided the right key is supplied).
+SHAR_EOF
+fi # end of overwriting check
+if test -f 'hill'
+then
+	echo shar: will not over-write existing file "'hill'"
+else
+sed 's/^X//' << \SHAR_EOF > 'hill'
+^X# Hill interface routine
+^Xcd /tmp
+^XTEMP=hill$$
+^XSED="sed s#junk#${TEMP}#"
+^Xtrap 'rm -f ${TEMP}*' 0 1 2 3
+^X# parse arguments
+^Xset -- `getopt cCpsued $*`
+^Xif [ $? != 0 ]
+^Xthen
+^X	echo "usage: $0 { -e | -d } [ { -c | -C | -p } ] [ -u ] [ key ]"
+^X	exit 1
+^Xfi
+^X# set internal flags
+^Xfor i in $*
+^Xdo
+^X	case $i in
+^X	-c | -C | -p)	REDUCTION=$i;	shift;;
+^X	-e | -d)		MODE=$i;	shift;;
+^X	-u)			UU=$i;		shift;;
+^X	--)			shift;		break;;
+^X	esac
+^Xdone
+^Xif [ x$MODE = x ]
+^Xthen
+^X	echo "$0: must specify -e to encode or -d to decode"
+^X	exit 1
+^Xfi
+^Xif [ x$1 = x ]
+^Xthen
+^X	HILL="hill0 $MODE"
+^Xelse
+^X	HILL="hill0 $MODE \"$1\""
+^Xfi
+^X# do the work
+^Xif [ $MODE = -e ]
+^Xthen
+^X	case ${REDUCTION}${UU} in
+^X	-c-u)	compact | $HILL >$TEMP
+^X		uuencode $TEMP $TEMP.uu junk
+^X		cat $TEMP.uu;;
+^X	-c)	compact | $HILL;;
+^X	-C-u)	compress | $HILL >$TEMP
+^X		uuencode $TEMP $TEMP.uu junk
+^X		cat $TEMP.uu;;
+^X	-C)	compress | $HILL;;
+^X	-p-u)	cat >$TEMP
+^X		pack $TEMP >/dev/null
+^X		$HILL <$TEMP.z >$TEMP
+^X		uuencode $TEMP $TEMP.uu junk
+^X		cat $TEMP.uu;;
+^X	-p)	cat >$TEMP
+^X		pack $TEMP >/dev/null
+^X		$HILL <$TEMP.z;;
+^X	-u)	$HILL >$TEMP
+^X		uuencode $TEMP $TEMP.uu junk
+^X		cat $TEMP.uu;;
+^X	*)	$HILL;;
+^X	esac
+^Xelse
+^X	case ${REDUCTION}${UU} in
+^X	-c-u)	$SED | uudecode
+^X		$HILL <$TEMP | uncompact;;
+^X	-c)	$HILL | uncompact;;
+^X	-C-u)	$SED | uudecode;
+^X		$HILL <$TEMP | uncompress;;
+^X	-C)	$HILL | uncompress;;
+^X	-p-u)	$SED | uudecode
+^X		$HILL <$TEMP >$TEMP.z
+^X		rm -f $TEMP
+^X		unpack $TEMP.z >/dev/null
+^X		cat $TEMP;;
+^X	-p)	$HILL >$TEMP.z
+^X		unpack $TEMP.z >/dev/null
+^X		cat $TEMP;;
+^X	-u)	$SED | uudecode
+^X		$HILL <$TEMP;;
+^X	*)	$HILL;;
+^X	esac
+^Xfi
+SHAR_EOF
+fi # end of overwriting check
+if test -f 'hill.1'
+then
+	echo shar: will not over-write existing file "'hill.1'"
+else
+sed 's/^X//' << \SHAR_EOF > 'hill.1'
+^X.TH HILL 1
+^X.SH NAME
+^Xhill \- encryption program using Hill cipher
+^X.SH SYNOPSIS
+^X.B hill
+^X[ -e | -d ]
+^X[ -c | -C | -p ]
+^X[ -u ]
+^X[ key ]
+^X.SH DESCRIPTION
+^X.I Hill
+^Xprovides file encryption using the Hill cipher.
+^XIn encryption mode,
+^Xplaintext is read from the standard input
+^Xand ciphertext is written to the standard output
+^Xin accordance with a user-specified
+^X.B key.
+^XAdditional options allow compressing the plaintext
+^Xand/or expressing the ciphertext in ASCII.
+^XIn decryption mode, the operations of encryption mode
+^Xare reversed (provided the right
+^X.B key
+^Xis supplied).
+^X.SH OPTIONS
+^X.TP
+^X.B \-e
+^XEncryption mode.
+^X.TP
+^X.B \-d
+^XDecryption mode.
+^X.TP
+^X.B \-c
+^XUse
+^X.I compact
+^Xor
+^X.I uncompact
+^Xfor compression or decompression
+^X(these programs must be on the search path
+^Xto use this option).
+^X.TP
+^X.B \-C
+^XUse
+^X.I compress
+^Xor
+^X.I uncompress
+^Xfor compression or decompression
+^X(these programs must be on the search path
+^Xto use this option).
+^X.TP
+^X.B \-p
+^XUse
+^X.I pack
+^Xor
+^X.I unpack
+^Xfor compression or decompression
+^X(these programs must be on the search path
+^Xto use this option).
+^X.TP
+^X.B \-u
+^XUse
+^X.I uuencode
+^Xafter encryption
+^Xor
+^X.I uudecode
+^Xbefore decryption
+^X(these programs must be on the search path
+^Xto use this option).
+^X.SH "SECURITY CONSIDERATIONS"
+^X.I Hill
+^Xprovides strong security against straight cryptanalysis
+^Xand acceptable security against probable-plaintext analysis.
+^XUse of the -c and -C options
+^Xactually improves security;
+^Xone of these options should be used
+^Xexcept where time is critical.
+^XUse of the -p option
+^Xdecreases security;
+^Xit should be used only where space is critical
+^Xand neither -C nor -c is available.
+^X.PP
+^XKeys must be at least 9 bytes long
+^X(the maximum length is 256 bytes)
+^Xand should be both long and hard to guess.
+^XAll security resides in the keys.
+^X.SH "TIME CONSIDERATIONS"
+^X.I Hill
+^Xencrypts at the rate of about 2 kilobytes per second
+^X(using a 16-byte key)
+^Xon an 8MHz IBM PC/AT running SCO Xenix.
+^XTime increases linearly in the length of the file
+^Xand in the square root of the key length.
+^X.SH "SPACE CONSIDERATIONS"
+^XEncrypted files increase in length by about 1%.
+^X.SH FILES
+^X/usr/bin/hill			script for pre/postprocessing
+^X.br
+^X/usr/bin/hill0			actual encryption program
+^X.br
+^XThese two files can be installed anywhere on the search path.
+^X.SH "MS-DOS VERSION"
+^XThe MS-DOS version of
+^X.I hill
+^Xhas the same capabilities,
+^Xexcept that only the
+^X.B \-e
+^Xand 
+^X.B \-d
+^Xoptions are supported.
+^X.SH "SEE ALSO"
+^X.IR pack (1),
+^X.IR compact (1),
+^X.IR compress (1) 
+SHAR_EOF
+fi # end of overwriting check
+if test -f 'hill0.c'
+then
+	echo shar: will not over-write existing file "'hill0.c'"
+else
+sed 's/^X//' << \SHAR_EOF > 'hill0.c'
+^X# include <stdio.h>
+^X# include "table.i"
+^X# ifdef DOS
+^X# include <fcntl.h>
+^X# include <io.h>
+^X# endif
+^X
+^X# ifdef DOS
+^X# define TTY "con"
+^X# else
+^X# define TTY "/dev/tty"
+^X# endif
+^X
+^X# define Over(x) for (x = 0; x < order; x++)
+^X# define Times(a,b) ((long)(a) * (long)(b) % 257)
+^X
+^Xint mode;
+^X
+^Xchar key[256];
+^Xint matkey[16][16];
+^Xint invec[16];
+^Xint outvec[16];
+^Xint order;
+^X
+^X
+^Xsetup(argc, argv)
+^Xint argc; char **argv;
+^X	{
+^X	FILE *tty;
+^X
+^X	if (strcmp(argv[1], "-e") == 0)
+^X		mode = 'e';
+^X	else if (strcmp(argv[1], "-d") == 0)
+^X		mode = 'd';
+^X	else {
+^X		fprintf(stderr, "usage: hill -e [key]\n   or: hill -d [key]\n");
+^X		exit(1);
+^X		}
+^X	if (argc > 2)
+^X		strcpy(key, argv[2]);
+^X	else {
+^X		tty = fopen(TTY, "r+");
+^X		setbuf(tty, NULL);
+^X		fprintf(tty, "Key? ");
+^X		fgets(key, sizeof(key), tty);
+^X		key[strlen(key) - 1] = 0;
+^X		fclose(tty);
+^X		}
+^X	}
+^X
+^Xmakemat()
+^X	{
+^X	int i, j, k;
+^X	int n = 0;
+^X	FILE *tty;
+^X
+^X	setorder();
+^X	Over(i) Over(j)
+^X		matkey[i][j] = key[n++];
+^X	for (i = 0; i < strlen(key); i++)
+^X		key[i] = 0;
+^X	square();
+^X	while ((k = invert()) != EOF)
+^X		matkey[k][k] = (matkey[k][k] + 1) % 257;
+^X	}
+^X
+^Xsetorder()
+^X	{
+^X	int n = strlen(key);
+^X
+^X	for (order = 0; order < 17; order++)
+^X		if (order*order > n) break;
+^X	order--;
+^X	if (order < 3) {
+^X		fprintf(stderr, "key size < 9\n");
+^X		exit(1);
+^X		}
+^X	}
+^X
+^Xsquare()
+^X	{
+^X	int result[16][16];
+^X	int i, j, k;
+^X
+^X	Over(i) Over(j)
+^X		result[i][j] = 0;
+^X	Over(i) Over(j) Over(k)
+^X		result[i][j] += Times(matkey[i][k], matkey[k][j]);
+^X	Over(i) Over(j)
+^X		matkey[i][j] = result[i][j] % 257;
+^X	}
+^X
+^Xint invert()
+^X	{
+^X	int matrix[16][16];
+^X	int inverse[16][16];
+^X	int i, j, k;
+^X	int t;
+^X	int pivot;
+^X
+^X	Over(i) Over(j) {
+^X		matrix[i][j] = matkey[i][j];
+^X		inverse[i][j] = 0;
+^X		}
+^X	Over(k)
+^X		inverse[k][k] = 1;
+^X
+^X	Over(k) {
+^X		if (matrix[k][k] == 0) {
+^X			for (i = k + 1; i < order; i++)
+^X				if (matrix[i][k]) {
+^X					Over(j) {
+^X						t = matrix[i][j];
+^X						matrix[i][j] = matrix[k][j];
+^X						matrix[k][j] = t;
+^X						t = inverse[i][j];
+^X						inverse[i][j] = inverse[k][j];
+^X						inverse[k][j] = t;
+^X						}
+^X					break;
+^X					}
+^X			if (i == order) return(k);
+^X			}
+^X
+^X		pivot = inverses[matrix[k][k]];
+^X		Over(j) {
+^X			matrix[k][j] = Times(matrix[k][j], pivot);
+^X			inverse[k][j] = Times(inverse[k][j], pivot);
+^X			}
+^X		Over(i) if (i != k) {
+^X			pivot = matrix[i][k];
+^X			Over(j) {
+^X				matrix[i][j] -= Times(pivot, matrix[k][j]);
+^X				if (matrix[i][j] < 0) matrix[i][j] += 257;
+^X				inverse[i][j] -= Times(pivot, inverse[k][j]);
+^X				if (inverse[i][j] < 0) inverse[i][j] += 257;
+^X				}
+^X			}
+^X		}
+^X
+^X	if (mode == 'd') Over(i) Over(j)
+^X		matkey[i][j] = inverse[i][j];
+^X	return(EOF);
+^X	}
+^X
+^X
+^Xint getvec()
+^X	{
+^X	int i;
+^X	int padf = 0;
+^X
+^X	Over(i)
+^X		if ((invec[i] = getchar()) == EOF) {
+^X			if (i == 0) return(0);
+^X			else if (padf) invec[i] = rand() % 257;
+^X			else { invec[i] = 256; padf++; }
+^X			}
+^X		else if (invec[i] == 255 && mode == 'd')
+^X			invec[i] += getchar();
+^X	return(i);
+^X	}
+^X
+^Xputvec()
+^X	{
+^X	int j;
+^X
+^X	Over(j)
+^X		switch(outvec[j]) {
+^X		case 256:
+^X			if (mode == 'd') return;
+^X			else putchar(255), putchar(1);
+^X			break;
+^X		case 255:
+^X			putchar(255);
+^X			if (mode == 'e') putchar(0);
+^X			break;
+^X		default:
+^X			putchar(outvec[j]);
+^X			}
+^X	}
+^X
+^Xmatmul()
+^X	{
+^X	int i, j, k;
+^X
+^X	Over(i) {
+^X		outvec[i] = 0;
+^X		Over(j)
+^X			outvec[i] += Times(invec[j], matkey[i][j]);
+^X		outvec[i] %= 257;
+^X		}
+^X	}
+^X
+^Xmain(argc, argv)
+^Xint argc; char **argv;
+^X	{
+^X	long tloc;
+^X
+^X# ifdef DOS
+^X;setmode(fileno(stdin), O_BINARY);
+^X	setmode(fileno(stdout), O_BINARY);
+^X# endif
+^X	time(&tloc);
+^X	srand((int) tloc);
+^X	setup(argc, argv);
+^X	makemat();
+^X	while(getvec()) {
+^X;	matmul();
+^X;	putvec();
+^X;;}
+^X	}
+SHAR_EOF
+fi # end of overwriting check
+if test -f 'kappa.c'
+then
+	echo shar: will not over-write existing file "'kappa.c'"
+else
+sed 's/^X//' << \SHAR_EOF > 'kappa.c'
+^X/* Kappa: utility program
+^X	Prints a table of character frequencies drawn from stdin.
+^X;The table appears in natural order.
+^X;Frequencies are per 1000 characters.
+^X*/
+^X
+^X# include <stdio.h>
+^X
+^Xlong table[256];
+^Xlong total;
+^X
+^Xmain()
+^X	{
+^X;int ch;
+^X	int i;
+^X	int lcmpr();
+^X
+^X	while ((ch = getchar()) != EOF) {
+^X;;table[ch]++;
+^X		total++;
+^X		}
+^X	printf("Total: %ld\n\n", total);
+^X	for (i = 0; i < 256; i++) {
+^X;;table[i] *= 1000;
+^X		table[i] /= total;
+^X		}
+^X	for (i = 0; i < 256; i++) {
+^X;;printf("%3.3ld ", table[i]);
+^X		if ((i + 1) % 16 == 0) putchar('\n');
+^X		if ((i + 1) % 128 == 0) putchar('\n');
+^X		}
+^X	}
+SHAR_EOF
+fi # end of overwriting check
+if test -f 'makefile'
+then
+	echo shar: will not over-write existing file "'makefile'"
+else
+sed 's/^X//' << \SHAR_EOF > 'makefile'
+^Xall: hill0 hill.exe kappa
+^Xhill0: hill0.c table.i
+^X	cc -o hill0 hill0.c
+^Xhill.exe: hill0.c table.i
+^X	cc -DDOS -dos -o hill.exe hill0.c
+^Xkappa: kappa.c
+^Xinstall: hill hill0
+^X	mv hill hill0 /usr/lbin
+SHAR_EOF
+fi # end of overwriting check
+if test -f 'table.i'
+then
+	echo shar: will not over-write existing file "'table.i'"
+else
+sed 's/^X//' << \SHAR_EOF > 'table.i'
+^Xint inverses[257] = { 0, 1, 129, 86, 193, 103, 43, 147, 225, 200, 180, 187, 
+^X150, 178, 202, 120, 241, 121, 100, 230, 90, 49, 222, 190, 75, 72, 89, 238, 101, 
+^X195, 60, 199, 249, 148, 189, 235, 50, 132, 115, 145, 45, 163, 153, 6, 111, 40, 
+^X95, 175, 166, 21, 36, 126, 173, 97, 119, 243, 179, 248, 226, 61, 30, 59, 228, 
+^X102, 253, 87, 74, 234, 223, 149, 246, 181, 25, 169, 66, 24, 186, 247, 201, 244, 
+^X151, 165, 210, 96, 205, 127, 3, 65, 184, 26, 20, 209, 176, 152, 216, 46, 83, 
+^X53, 139, 135, 18, 28, 63, 5, 215, 164, 177, 245, 188, 224, 250, 44, 218, 116, 
+^X124, 38, 113, 134, 159, 54, 15, 17, 158, 140, 114, 220, 51, 85, 255, 2, 172, 
+^X206, 37, 143, 117, 99, 240, 242, 203, 98, 123, 144, 219, 133, 141, 39, 213, 7, 
+^X33, 69, 12, 80, 93, 42, 252, 194, 229, 239, 122, 118, 204, 174, 211, 41, 105, 
+^X81, 48, 237, 231, 73, 192, 254, 130, 52, 161, 47, 92, 106, 13, 56, 10, 71, 233, 
+^X191, 88, 232, 76, 11, 108, 34, 23, 183, 170, 4, 155, 29, 198, 227, 196, 31, 9, 
+^X78, 14, 138, 160, 84, 131, 221, 236, 91, 82, 162, 217, 146, 251, 104, 94, 212, 
+^X112, 142, 125, 207, 22, 68, 109, 8, 58, 197, 62, 156, 19, 168, 185, 182, 67, 
+^X35, 208, 167, 27, 157, 136, 16, 137, 55, 79, 107, 70, 77, 57, 32, 110, 214, 
+^X154, 64, 171, 128, 256};
+SHAR_EOF
+fi # end of overwriting check
+#	End of shell archive
+exit 0
+
+-- 
+Please send comp.sources.unix-related mail to rsalz@uunet.uu.net.

@@ -1,0 +1,86 @@
+%
+% Makrodefinitionen fuer Unix Manual Page Format (SECUDE)
+%
+% einbetten mit \input{vol2-makro}
+%
+\input{makro}
+\hoffset-13mm 
+\textwidth=171mm
+\catcode`@=11
+\def\ps@myheadings{\let\@mkboth\@gobbletwo
+\def\@oddhead{\hbox{}\sl\rightmark\hfil\sl\leftmark\hbox{}}
+\def\@oddfoot{\hfil\rm\thepage}
+\def\@evenhead{\hbox{}\sl\rightmark\hfil\sl\leftmark\hbox{}}
+\def\@evenfoot{\rm \thepage\hfil}
+\def\sectionmark##1{}\def\subsectionmark##1{}}
+\newcounter{uxcmds}
+\def\addtotoc#1{
+        \addcontentsline{toc}{subsection}{#1}
+}
+\def\addtotocsmall#1{
+        \addcontentsline{toc}{subsubsection}{#1}
+}
+\def\ueins{1} \def\udrei{3X} \def\uvier{4} \def\ufuenf{5}
+\def\addsectiontotoc#1{
+        \def\firstp{#1}
+        \ifx \firstp \ueins \addtocontents{toc}{{\bf 1. Commands and Application Programs}} \def\ueins{} \fi
+        \ifx \firstp \udrei \addtocontents{toc}{{\bf 3. Subroutines}} \def\udrei{} \fi
+        \ifx \firstp \uvier \addtocontents{toc}{{\bf 4. File and Object Formats}} \def\uvier{} \fi
+        \ifx \firstp \ufuenf \addtocontents{toc}{{\bf 5. Miscellaneous Facilities}} \def\ufuenf{} \fi
+}
+\def\nm#1#2#3{
+        \newpage
+        \ifnum \c@uxcmds > 0 \equote \else
+        \pagenumbering{arabic} \pagestyle{myheadings} \setcounter{uxcmds}{1}\fi
+        \addsectiontotoc{#1}
+        \markboth{{\bf \uppercase{#2}(#1)}}{{\bf \uppercase{#2}(#1)}}
+        \addtotoc{#2}
+        \mbox{} \\
+        {\bf NAME} \bquote {\bf #2 --} #3
+}
+\def\qr#1#2{
+        \newpage
+        \ifnum \c@uxcmds > 0 \equote \else
+        \pagenumbering{arabic} \pagestyle{myheadings} \setcounter{uxcmds}{1}\fi
+        \addsectiontotoc{#1}
+        \markboth{{\bf \uppercase{#2}(#1)}}{{\bf \uppercase{#2}(#1)}}
+        \addtotoc{#2}
+        \mbox{} \\
+        \bquote 
+}
+\catcode`@=12
+\def\hl#1{\equote{\bf \uppercase{#1}}\bquote}
+\def\hll#1{\vs{0.1cm} {\large\bf #1} \\ [1em]}
+\def\subsection#1{}
+\def\subsubsection#1{}
+\def\n{} 
+\renewcommand{\speconly}[1]{}
+\renewcommand{\manonly}[1]{#1}
+\def\parba{\parbox[t]{4cm}}
+\def\parbe{\parbox[t]{15cm}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                     
+

@@ -1,0 +1,48 @@
+/* Implementation of NIST's Secure Hash Algorithm (FIPS 180)
+ * Lightly bummed for execution efficiency.
+ *
+ * Jim Gillogly 3 May 1993
+ *
+ * Compile: cc -O -o sha sha.c
+ *
+ * To remove the test wrapper and use just the nist_hash() routine,
+ * compile with -DONT_WRAP
+ *
+ * Usage: sha [-vt] [filename ...]
+ *
+ *      -v switch: output the filename as well
+ *      -t switch: suppress spaces between 32-bit blocks
+ *
+ *      If no input files are specified, process standard input.
+ *
+ * Output: 40-hex-digit digest of each file specified (160 bits)
+ *
+ * Synopsis of the function calls:
+ *
+ *   sha_file(char *filename, unsigned long *buffer)
+ *      Filename is a file to be opened and processed.
+ *      buffer is a user-supplied array of 5 or more longs.
+ *      The 5-word buffer is filled with 160 bits of non-terminated hash.
+ *      Returns 0 if successful, non-zero if bad file.
+ *
+ *   void sha_stream(FILE *stream, unsigned long *buffer)
+ *      Input is from already-opened stream, not file.
+ *
+ *   void sha_memory(char *mem, long length, unsigned long *buffer)
+ *      Input is a memory block "length" bytes long.
+ *
+ * Caveat:
+ *      Not tested for case that requires the high word of the length,
+ *      which would be files larger than 1/2 gig or so.
+ *
+ * Limitation:
+ *      sha_memory (the memory block function) will deal with blocks no longer
+ *      than 4 gigabytes; for longer samples, the stream version will
+ *      probably be most convenient (e.g. perl moby_data.pl | sha).
+ *
+ * Bugs:
+ *      The standard is defined for bit strings; I assume bytes.
+ *
+ * Copyright 1993, Dr. James J. Gillogly
+ * This code may be freely used in any application.
+ */

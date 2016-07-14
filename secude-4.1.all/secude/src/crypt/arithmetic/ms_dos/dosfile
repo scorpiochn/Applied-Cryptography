@@ -1,0 +1,6 @@
+/home/mueller/ux2pc add.asm add.dos
+/home/mueller/ux2pc div.asm div.dos
+/home/mueller/ux2pc mult.asm mult.dos
+/home/mueller/ux2pc shift.asm shift.dos
+/home/mueller/ux2pc sub.asm sub.dos
+/home/mueller/ux2pc asmtoken.h asmtoken.hdo

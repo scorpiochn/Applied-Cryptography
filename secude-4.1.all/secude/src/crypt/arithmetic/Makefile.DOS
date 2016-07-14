@@ -1,0 +1,92 @@
+#
+#  SecuDE Release 4.0.1 (GMD)
+#
+#
+#    Copyright (C) 1991, GMD Darmstadt
+#
+#                         NOTICE
+#
+#    Acquisition, use, and distribution of this module
+#    and related materials are subject to restrictions
+#    mentioned in each volume of the documentation.
+#
+CC        =  cl
+AR        =  lib
+
+
+
+OPT        =  -c
+
+BOOL    = bool.obj
+COMP    = comp.obj
+LNUT    = lnutil.obj
+MODA    = modarit.obj
+DOSEX   = dosext.obj
+SHIFT   = cshift.obj
+
+OBJS    =       \
+$(BOOL) $(COMP) \
+$(LNUT) $(MODA) \
+$(TRAC) $(DOSEX) $(SHIFT)
+
+
+!IF "$(SM)"==""
+!   ERROR  call nmake with SM=L (for LARGE-Model) or SM=M (for MEDIUM-Model)!
+!ENDIF
+
+
+!   IF ("$(SM)"!="L") && ("$(SM)"!="M")      # Small- und Compact-Modell haben
+!   ERROR  L or M must be capital letter!
+!ENDIF
+
+
+DFLAGS  = -DWLNG16  -DLITTLE_ENDIAN  -Di386 -DMS_DOS   # Wortlaenge  16
+
+IFLAGS   = -I. -I..\..\..\include
+
+
+CFLAGS     =  $(OPT)  $(DFLAGS) $(IFLAGS) /A$(SM) /Zi /Od /Gt128
+LFLAGS     =  /NOI
+
+
+
+LIBDIR     =  ..\..\..\..\lib
+#create library for medium or large model
+LIBCRYP      =  $(LIBDIR)\$(SM)libcryp.lib
+
+
+.c.obj :
+        $(CC) $(CFLAGS) $*.c
+
+
+
+all:   aus1    $(OBJS)
+
+aus1:
+        @ ECHO ---------------------------------------------------------------
+        @ ECHO     Compile  $(OBJS)
+        @ ECHO ---------------------------------------------------------------
+
+
+inst-all: aus2  lib
+
+aus2:
+        @ ECHO ---------------------------------------------------------------
+        @ ECHO $(OBJS)
+        @ ECHO will be installed in the library $(SM)LIBCRYP.LIB
+        @ ECHO ---------------------------------------------------------------
+
+lib:
+        $(AR) $(LIBCRYP) $(LFLAGS) -+$(BOOL) -+$(COMP);
+        $(AR) $(LIBCRYP) $(LFLAGS) -+$(LNUT) -+$(MODA);
+        $(AR) $(LIBCRYP) $(LFLAGS) -+$(DOSEX) -+$(SHIFT);
+
+
+clean:
+        @ ECHO ---------------------------------------------------------------
+        @ ECHO $(OBJS)
+        @ ECHO will be deleted
+        @ ECHO ---------------------------------------------------------------
+        @ DEL *.obj
+        @ DEL *.bak
+

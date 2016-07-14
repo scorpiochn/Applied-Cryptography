@@ -1,0 +1,14 @@
+INSTALLATION
+============
+
+Change the type definitions in 'crypt.h' to the representations in your computer
+  typedef int            int32;      /* signed 32-bit integer   */
+  typedef unsigned int   u_int32;    /* unsigned 32-bit integer */
+  typedef unsigned short u_int16;    /* unsigned 16-bit integer */
+  typedef char           u_int8;     /* unsigned 8-bit integer  */
+
+Execute the following commands:
+  man -M . idea                      display the man page of idea
+  man -t -M . idea                   print the man page of idea
+  cp manl/idea.l /usr/man/manl       copy the man page to your man directory
+  make                               compile and link the application

@@ -1,0 +1,74 @@
+gmdca@darmstadt.gmd.de : gmdca : C=DE; O=GMD; OU=CA
+daca@darmstadt.gmd.de : daca : C=DE; O=GMD; L=Darmstadt; OU=CA
+schneiw@darmstadt.gmd.de : schneiw : C=DE; O=GMD; L=Darmstadt; CN=Wolfgang Schneider
+scosine@darmstadt.gmd.de : scosine : C=DE; O=GMD; L=Darmstadt; CN=scosine
+bahr@darmstadt.gmd.de : bahr : C=DE; O=GMD; L=Darmstadt; CN=Knut Bahr
+basel@darmstadt.gmd.de : basel : C=DE; O=GMD; L=Darmstadt; CN=Heide Basel
+burkhard@darmstadt.gmd.de : burkhard : C=DE; O=GMD; L=Darmstadt; CN=Heinz-Juergen Burkhardt
+eckstein@darmstadt.gmd.de : eckstein : C=DE; O=GMD; L=Darmstadt; CN=Levona Eckstein
+ehmke@darmstadt.gmd.de : ehmke : C=DE; O=GMD; L=Darmstadt; CN=Horst Ehmke
+grimm@darmstadt.gmd.de : grimm : C=DE; O=GMD; L=Darmstadt; CN=Ruediger Grimm
+guergens@darmstadt.gmd.de : guergens : C=DE; O=GMD; L=Darmstadt; CN=Sigrid Guergens
+hampl@darmstadt.gmd.de : hampl : C=DE; O=GMD; L=Darmstadt; CN=Roswitha Hampl
+herda@darmstadt.gmd.de : herda : C=DE; O=GMD; L=Darmstadt; CN=Siegfried Herda
+hinsch@darmstadt.gmd.de : hinsch : C=DE; O=GMD; L=Darmstadt; CN=Elfriede Hinsch
+langeman@darmstadt.gmd.de : langeman : C=DE; O=GMD; L=Darmstadt; CN=Irmgard Langemann
+luehe@darmstadt.gmd.de : luehe : pordesch : C=DE; O=GMD; L=Darmstadt; CN=Jan Luehe
+parslow@darmstadt.gmd.de : parslow : C=DE; O=GMD; L=Darmstadt; CN=Helga Parslow
+raubold@darmstadt.gmd.de : raubold : C=DE; O=GMD; L=Darmstadt; CN=Eckart Raubold
+sabisch@darmstadt.gmd.de : sabisch : C=DE; O=GMD; L=Darmstadt; CN=Thomas Sabisch
+sauer@darmstadt.gmd.de : sauer : C=DE; O=GMD; L=Darmstadt; CN=Wiltrud Sauer
+steinkru@darmstadt.gmd.de : steinkru : C=DE; O=GMD; L=Darmstadt; CN=Werner Steinkrueger
+struif@darmstadt.gmd.de : struif : C=DE; O=GMD; L=Darmstadt; CN=Bruno Struif
+hsurkau@darmstadt.gmd.de : hsurkau : C=DE; O=GMD; L=Darmstadt; CN=Hedwig Surkau
+thiel@darmstadt.gmd.de : thiel : C=DE; O=GMD; L=Darmstadt; CN=Ulrich Thiel
+truoel@darmstadt.gmd.de : truoel : C=DE; O=GMD; L=Darmstadt; CN=Klaus Truoel
+vollmer@darmstadt.gmd.de : vollmer : C=DE; O=GMD; L=Darmstadt; CN=Stephan Vollmer
+winkler@darmstadt.gmd.de : winkler : C=DE; O=GMD; L=Darmstadt; CN=Marga Winkler
+wolf@darmstadt.gmd.de : wolf : C=DE; O=GMD; L=Darmstadt; CN=Christine Wolf
+jaegeman@darmstadt.gmd.de : jaegeman : C=DE; O=GMD; L=Darmstadt; CN=Annemarie Jaegemann
+nauseste@darmstadt.gmd.de : nauseste : C=DE; O=GMD; L=Darmstadt; CN=Rolf-Dieter Nausester
+balzer@darmstadt.gmd.de : balzer : C=DE; O=GMD; L=Darmstadt; CN=Dieter Balzer
+guenthi@darmstadt.gmd.de : guenthi : C=DE; O=GMD; L=Darmstadt; CN=Irmtraut Guenther
+guenthk@darmstadt.gmd.de : guenthk : C=DE; O=GMD; L=Darmstadt; CN=Klaus-Dieter Guenther
+lorenz@darmstadt.gmd.de : lorenz : C=DE; O=GMD; L=Darmstadt; CN=Fritz Lorenz
+ruehl@darmstadt.gmd.de : ruehl : C=DE; O=GMD; L=Darmstadt; CN=Jutta Ruehl
+sarbi@darmstadt.gmd.de : sarbi : C=DE; O=GMD; L=Darmstadt; CN=Heinz Sarbinowski
+schulze@darmstadt.gmd.de : schulze : C=DE; O=GMD; L=Darmstadt; CN=Guenter Schulze
+viebeg : viebeg@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Ursula Viebeg
+zhang@darmstadt.gmd.de : zhang : C=DE; O=GMD; L=Darmstadt; CN=Zhang Ying
+koletzki : koletzki@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Stephan Kolletzki
+reichelt : reichelt@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Joerg Reichelt
+bizer@darmstadt.gmd.de : bizer : C=DE; O=GMD; L=Darmstadt; CN=Johann Bizer
+bohrer : bohrer@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Peter Bohrer
+hammer@darmstadt.gmd.de : hammer : C=DE; O=GMD; L=Darmstadt; CN=Volker Hammer
+kumbruck@darmstadt.gmd.de : kumbruck : C=DE; O=GMD; L=Darmstadt; CN=Christel Kumbruck
+nagel@darmstadt.gmd.de : nagel : C=DE; O=GMD; L=Darmstadt; CN=Julius Nagel
+pordesch@darmstadt.gmd.de : pordesch : C=DE; O=GMD; L=Darmstadt; CN=Ulrich Pordesch
+schneim : schneim@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Michael Schneider
+pordesch@darmstadt.gmd.de : pordesch : schyguda : schyguda@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Georg Schyguda
+suess : suess@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Edeltraud Suess
+usauer : usauer@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Uschi Sauer
+zange : zange@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Karin Zange
+saege@darmstadt.gmd.de : saege : C=DE; O=GMD; L=Darmstadt; CN=Konrad Saege
+schraube@darmstadt.gmd.de : schraube : C=DE; O=GMD; L=Darmstadt; CN=Dietmar Schraube
+rossnagl : rossnagel@darmstadt.gmd.de : pordesch : pordesch@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=Alexander Rossnagel
+viebeg@darmstadt.gmd.de : viebeg : C=DE; O=GMD; OU=I2; CN=Ursula Viebeg
+pordesch : pordesch@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=.
+pordesch@darmstadt.gmd.de : pordesch : C=DE; O=GMD; L=Darmstadt; CN=J. Nagel
+schork@darmstadt.gmd.de : sarbipr : C=DE; O=GMD; L=Darmstadt; CN=Martin Schork
+S.Koletzki@darmstadt.gmd.de : kolletzki : C=DE; O=GMD; L=Darmstadt; CN=S. Kolletzki
+passwdsa : C=DE; CN=GMD-PASSWORD.DSA
+GMD-PASSWORD.DSA : C=DE; CN=GMD-PASSWORD.DSA
+e3xdsa : C=FR; O=e3x; OU=E3X-CA; CN=lindo-dsa
+vicuna : C=GB; CN=Vicuna
+giant : CN=Giant Tortoise
+toucan : C=GB; O=University College London; CN=toucan
+inca dove : CN=Inca Dove
+bonsai : c=GB; o=University College London; ou=Computer Science; cn=PASSWORD DSA
+surkau : surkau@darmstadt.gmd.dbp.de : C=DE; O=GMD; OU=I2; CN=Surkau, Thomas
+bauer@darmstadt.gmd.de : bauer : C=DE; O=GMD; L=Darmstadt; CN=Hans Bauer
+daca : daca@darmstadt.gmd.de : C=DE; O=Gesellschaft fuer Mathematik und Datenverarbeitung; L=Darmstadt
+schneiw@darmstadt.gmd.de : schneiw : C=DE; O=Gesellschaft fuer Mathematik und Datenverarbeitung; L=Darmstadt; CN=Wolfgang Schneider
+galvin : C=US; O=Trusted Information Systems; OU=Glenwood; CN=James M. Galvin
+schneiw : schneiw@darmstadt.gmd.de : C=DE; O=GMD; L=Darmstadt; CN=W. Schneider

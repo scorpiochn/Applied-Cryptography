@@ -1,0 +1,20 @@
+solve-vigenere.tar.Z contains a few simple programs for
+classical cryptanalysis.
+
+solvevig helps you break so-called Vigenere periodic substitution
+ciphers by trying all the words in a dictionary you supply.
+It has a lot of command line options, but it's not a cryptographically
+sophisticated program.  It will look at both single-letter
+& optionally digram frequencies.
+
+alfaonly is a very simple program that filters out all
+non-alphabetic characters and maps letters to lowercase,
+as preparation for input to builddig.
+
+builddig allows you to build and update tables of digram
+(two-letter pair) frequencies.  The resultant files can
+be used in solvevig, though solvevig does a pretty good
+job based in just single-letter frequencies.
+
+Mark Riordan    3 April 1993
+mrr@ripem.msu.edu

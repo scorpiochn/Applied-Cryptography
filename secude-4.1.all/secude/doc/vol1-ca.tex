@@ -1,0 +1,209 @@
+\section{The Duties of a Certification Authority (CA)}
+\markboth{Duties of a CA}{Duties of a CA}
+\thispagestyle{myheadings}
+\label{ca}
+
+\subsection{Certification Authorities}
+\label{ca-dfn}
+
+User-CAs sign user-certificates with their own private CA-keys.
+Their keys are certified by other (higher) CAs.
+This way CAs are structured within a certification tree hierarchy.
+On top of it there is a so called ``Root CA'', the public key of which
+is publicly well known and not certified.
+
+Within SecuDe
+a simple certification tree is proposed.
+On top of the tree there is one ``Root-CA'', e.g.:
+\begin{center}
+C=DE;O=dfn;OU=CA.
+\end{center}
+Its function is for example to certify other organization-wide CAs:
+\begin{center}
+C=DE;O=uni-xxx;OU=CA.
+\end{center}
+Those organization-wide CAs could be user-CAs and issue certificates
+to users within the organisation.
+
+%\begin{figure}
+\begin{center}
+\makebox[6.500in][l]{
+  \vbox to 1.847in{
+    \vfill
+    \special{psfile=vol1-fig5.ps}
+  }
+  \vspace{-\baselineskip}
+}
+\end{center}
+\label{fig-ca-dfn}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: Certification tree}
+%\end{figure}
+\\ [1em]
+
+The ``Root CA'' can certify user-certificates as well.
+It also cross-certifies to other CAs outside the own tree.
+One important cross-certification is to be established to the CA of the
+US-Internet
+\cite{rfc1}:
+\begin{center}
+C=US;O=RSA Data Security Inc.;OU=Internet Certifying Authority.
+\end{center}
+Other CAs below the Root CA can also cross-certify
+inside and outside the own tree.
+
+\subsection{The Duties of a user-CA}
+\label{ca-uca}
+
+A CA is said to be a user's user-CA if the user owns a certificate
+issued by this CA.
+User-CAs have the duty to supply their users with
+{\em all information}
+which they need in order
+to use the signature and encryption services.
+This includes
+
+\begin{itemize}
+\item
+sending name and new public keys of the ``Root-CA''
+in form of a trustworthy cross-certificate
+whenever a ``Root-CA'' changes (or changes keys),
+\item
+sending the forward certification path whenever any higher
+CA changes (or changes keys),
+\item
+maintenance of black lists of certificates
+which this CA had issued and revoked,
+\item
+maintenance of its directory entries,
+\item
+updating the user-certificate attributes in the directory entries of its
+users,
+\item
+issuing user-certificates.
+\end{itemize}
+
+It is {\em not} the user-CA to generate keys on behalf of their users.
+Users generate their own keys.
+Therefore, a user-CA cannot guarantee the quality or the uniqueness
+of user-keys. The significance of a user-certificate is this:
+
+\begin{itemize}
+\item
+the issuing CA knows that the certificate's owner uses this public key,
+\item
+the issuing CA proves the certificate's owner to be authentic,
+\item
+the issuing CA supplies the certificate's owner with the
+most actual key information about the certification tree.
+\end{itemize}
+
+\subsection{Creation of User-Keys}
+\label{ca-cuk}
+
+Enrollment to the
+signature and encryption services is a decentral act between a user
+and any CA of his choice.
+The user calls local functions in order to generate his
+``software-smartcard''.
+{\em The user generates his keys locally and sends a prototype
+certificate to his user-CA. After checking the prototype
+certificate, the user-CA will resend the signed certificate to the user}.
+The user-CA will also send all certificates and public keys
+of all CA's in the forward certification path of the user,
+with which the user will complete the initialization of his
+software-smartcard.
+
+This way of decentralized key generation has three advantages over the
+key generation at central authority stations.
+
+First, the whole process is decentralized and releases
+the central authorities from work. Users would go through
+the key generation process only very rarely.
+The argument, that the quality of keys cannot be {\em guaranteed
+by the central authorities}, is correct.
+However, the quality of the keys is in the interest of the users,
+they would hurt nobody but themselves if they play wrong
+and generate wrong or bad keys.
+The quality of keys could be guaranteed by the key generation
+software which might be well delivered by central authorities.
+
+Second, private keys, which are highly sensitive information,
+are never transferred through the network.
+
+Third, this way it is guaranteed that private keys do exist only once,
+namely in the hand of the users (i.e. in their smartcards).
+This is different with the key management in the
+``Privacy Enhanced Mail'' of the US-Internet \cite{rfc1},
+where local servers keep the key information on behalf of
+local users.
+This is also different with the
+Kerberos modell \cite{ste1},
+where symmetric encryption is used
+and where trusted authentication servers keep the symmetric keys
+on behalf of all users.
+
+The following procedure is taken from the
+specifications of the ``Privacy Enhanced Mail''
+of the US-Internet, Part IV \cite{rfc1}.
+In order to get a user-certificate from a CA,
+a user sends a {\em prototype certificate}
+containing all information which the user already knows
+and leaving all fields open which the user does not know:
+
+\begin{itemize}
+\item
+{\em version}: default 0.
+\item
+{\em serial number}: ``1'' (will be replaced by CA).
+\item
+{\em name of issuing CA}.
+\item
+{\em validity}: chosen by user, can be restricted by CA.
+\item
+{\em subject}: user's name.
+\item
+{\em subjectPublicKeyInfo}: algorithm identifier, parameter and
+bitstring of the public key generated by the user.
+\item
+{\em signature}: later, on the real certificate,
+the signature must be composed by the CA.
+Now, on the prototype certificate,
+the user applies the private key which he had just generated
+on the fields to be signed, and inserts the result, instead.
+\end{itemize}
+
+The prototype certificate is sent electronically to the CA of the user's
+choice. The user also sends a printed version of the prototype signature field
+by traditional paper mail
+to the CA in order to enable the CA to check the user's authentic
+identity.
+The CA will not be able to check the quality of the user's key.
+However, she will be able to check the integrity of the certificate fields.
+The CA will also be able to recognize
+that the user's public key is indeed paired with a private
+key in the hand of the user.
+The CA replaces the serial number and the validity time frame,
+signs the certificate with its private CA-key,
+and sends the certificate electronically back to the user.
+The CA will also send its electronic signature per paper mail
+in order to prove the certificate authentic.
+This happens with both certificates: the public verification key
+certificate and the public encryption key certificate.
+The CA includes the following information:
+
+\begin{itemize}
+\item both user certificates,
+\item the forward certification path (``FCPath''),
+\item the public keys of the ``Root-CA'' (``PKRoot''),
+\item a list of public verification keys of all CAs in the
+forward certification path (an initial value of ``PKList''),
+\item a list of public encryption keys of all CAs in the
+forward certification path (an initial value of ``EKList'').
+\end{itemize}
+
+Once a user is assigned to a CA he can change keys whenever he feels like.
+This happens the same way as described above.
+In order to extend a certificate's validation time the user will
+also generate a prototype certificate. It is up to the user
+if he changes keys in line with a new certificate.

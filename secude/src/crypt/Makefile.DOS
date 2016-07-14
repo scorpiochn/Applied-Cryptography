@@ -1,0 +1,153 @@
+#
+#  SecuDE Release 4.0.1 (GMD)
+#
+#
+#    Copyright GMD Darmstadt
+#
+#                         NOTICE
+#
+#    Acquisition, use, and distribution of this module
+#    and related materials are subject to restrictions
+#    mentioned in each volume of the documentation.
+#
+
+M = nmake
+TEST =
+
+
+all:    des_c md_c rsa_c arith_c assdos_c
+des_c:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake all
+        @ ECHO    Compile all C-Files in Directory DES
+        @ ECHO ******************************************************
+        cd des
+        $(M) all SM=L
+        cd ..
+md_C:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake all
+        @ ECHO    Compile all C-Files in Directory MD
+        @ ECHO ******************************************************
+        cd md
+        $(M) all SM=L
+        cd ..
+
+rsa_c:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake all
+        @ ECHO    Compile all C-Files in Directory RSA
+        @ ECHO ******************************************************
+        cd rsa
+        $(M) all SM=L
+        cd ..
+
+arith_c:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake all
+        @ ECHO    Compile all C-Files in Directory RSA\ARITHMETIC
+        @ ECHO ******************************************************
+        cd rsa\arithmetic
+        $(M) all SM=L
+        cd ..\..
+
+assdos_c:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake all
+        @ ECHO    Compile all C-Files in Directory RSA\ARITHMETIC\MS_DOS
+        @ ECHO ******************************************************
+        cd rsa\arithmetic\ms_dos
+        $(M) all SM=L
+        cd ..\..\..
+
+inst-all:  des_i md_i rsa_i arith_i assdos_i
+des_i:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake inst-all
+        @ ECHO    Store all DES-Objectfiles in Library
+        @ ECHO ******************************************************
+        cd des
+        $(M) inst-all SM=L
+        cd ..
+md_i:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake inst-all
+        @ ECHO    Store all MD-Objectfiles in Library
+        @ ECHO ******************************************************
+        cd md
+        $(M) inst-all SM=L
+        cd ..
+
+rsa_i:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake inst-all
+        @ ECHO    Store all RSA-Objectfiles in Library
+        @ ECHO ******************************************************
+        cd rsa
+        $(M) inst-all SM=L
+        cd ..
+
+arith_i:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake inst-all
+        @ ECHO    Store all RSA\ARITHMETIC-Objectfiles in Library
+        @ ECHO ******************************************************
+        cd rsa\arithmetic
+        $(M) inst-all SM=L
+        cd ..\..
+
+assdos_i:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake inst-all
+        @ ECHO    Store all RSA\ARITHMETIC\MS_DOS-Objectfiles in Library
+        @ ECHO ******************************************************
+        cd rsa\arithmetic\ms_dos
+        $(M) inst-all SM=L
+        cd ..\..\..
+
+clean:  des_cl md_cl rsa_cl arith_cl assdos_cl
+des_cl:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake vlean
+        @ ECHO    Delete all Objectfiles and BAK-Files in Directory DES
+        @ ECHO ******************************************************
+        cd des
+        $(M) clean SM=L
+        cd ..
+md_cl:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake clean
+        @ ECHO    Delete all Objectfiles and BAK-Files in Directory MD
+        @ ECHO ******************************************************
+        cd md
+        $(M) clean SM=L
+        cd ..
+
+rsa_cl:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake clean
+        @ ECHO    Delete all Objectfiles and BAK-Files in Directory RSA
+        @ ECHO ******************************************************
+        cd rsa
+        $(M) clean SM=L
+        cd ..
+
+arith_cl:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake clean
+        @ ECHO    Delete all Objectfiles and BAK-Files in Directory
+        @ ECHO    RSA\ARITHMETIC
+        @ ECHO ******************************************************
+        cd rsa\arithmetic
+        $(M) clean SM=L
+        cd ..\..
+
+assdos_cl:
+        @ ECHO ******************************************************
+        @ ECHO    CALL: STAPAC\SRC\CRYPT\nmake clean
+        @ ECHO    Delete all Objectfiles and BAK-Files in Directory
+        @ ECHO    RSA\ARITHMETIC\MS_DOS
+        @ ECHO ******************************************************
+        cd rsa\arithmetic\ms_dos
+        $(M) clean SM=L
+        cd ..\..\..

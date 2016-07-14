@@ -1,0 +1,92 @@
+for j in config hutlib alodes mp; do ( cd $j; make ); done
+cc -O -Ilibdir  -c config.c
+cc -Llibdir  -o config config.o  
+cc -O -Ilibdir  -c getline.c
+cc -O -Ilibdir  -c getpass.c
+cc -O -Ilibdir  -c next_field.c
+cc -O -Ilibdir  -c read-passwd.c
+cc -O -Ilibdir  -c strerror.c
+cc -O -Ilibdir  -c strsave.c
+cc -O -Ilibdir  -c xalloc.c
+ar ru libhut.a getline.o getpass.o next_field.o read-passwd.o strerror.o strsave.o xalloc.o
+ar: Warning: creating libhut.a
+ranlib libhut.a
+for j in tables lib prog; do ( cd $j; make ); done
+cc -O -Ilibdir  -c cbc-cksum.c
+cc -O -Ilibdir  -c cbc-encrypt.c
+cc -O -Ilibdir  -c des-bitrev.c
+cc -O -Ilibdir  -c des-data.c
+cc -O -Ilibdir  -c des-expand.c
+cc -O -Ilibdir  -c des-fun.c
+cc -O -Ilibdir  -c des-hash.c
+cc -O -Ilibdir  -c des-hex.c
+cc -O -Ilibdir  -c des-perms.c
+cc -O -Ilibdir  -c des-reverse.c
+cc -O -Ilibdir  -c des-sun-key.c
+cc -O -Ilibdir  -c ecb-encrypt.c
+cc -O -Ilibdir  -c ksched-fast.c
+cc -O -Ilibdir  -c ksched.c
+cc -O -Ilibdir  -c new-crypt.c
+cc -O -Ilibdir  -c pcbc-encrypt.c
+cc -O -Ilibdir  -c str-to-key.c
+cc -O -Ilibdir  -c sun-cbc-crypt.c
+cc -O -Ilibdir  -c sun-ecb-crypt.c
+cc -O -Ilibdir  -c sun-setpar.c
+ar ru libdes.a cbc-cksum.o cbc-encrypt.o des-bitrev.o des-data.o des-expand.o des-fun.o des-hash.o des-hex.o des-perms.o des-reverse.o des-sun-key.o ecb-encrypt.o ksched-fast.o ksched.o new-crypt.o pcbc-encrypt.o str-to-key.o sun-cbc-crypt.o sun-ecb-crypt.o sun-setpar.o
+ar: Warning: creating libdes.a
+ranlib libdes.a
+cc -O -Ilibdir  -I../lib -c des-certify.c
+cc -Llibdir  -o des-certify des-certify.o  -ldes -lhut
+cc -O -Ilibdir  -I../lib -c des.c
+cc -Llibdir  -o des des.o  -ldes -lhut
+cc -O -Ilibdir  -I../lib -c des-ktest.c
+ccom: Warning: des-ktest.c, line 85: statement not reached
+        return 0;
+      ----------^
+cc -Llibdir  -o des-ktest des-ktest.o  -ldes -lhut
+cc -O -Ilibdir  -I../lib -c test-crypt.c
+cc -Llibdir  -o test-crypt test-crypt.o  -ldes -lhut
+for j in lib prog; do ( cd $j; make ); done
+cc -O -Ilibdir  -c mp_add.c
+cc -O -Ilibdir  -c mp_add_int.c
+cc -O -Ilibdir  -c mp_atom.c
+cc -O -Ilibdir  -c mp_cmp.c
+cc -O -Ilibdir  -c mp_data.c
+cc -O -Ilibdir  -c mp_div.c
+cc -O -Ilibdir  -c mp_div_x.c
+cc -O -Ilibdir  -c mp_expand.c
+cc -O -Ilibdir  -c mp_gcd.c
+cc -O -Ilibdir  -c mp_inv.c
+cc -O -Ilibdir  -c mp_itom.c
+cc -O -Ilibdir  -c mp_len.c
+cc -O -Ilibdir  -c mp_mul.c
+cc -O -Ilibdir  -c mp_mul_x.c
+cc -O -Ilibdir  -c mp_new.c
+cc -O -Ilibdir  -c mp_norm.c
+cc -O -Ilibdir  -c mp_pow.c
+cc -O -Ilibdir  -c mp_random.c
+cc -O -Ilibdir  -c mp_rdiv.c
+cc -O -Ilibdir  -c mp_reduce.c
+cc -O -Ilibdir  -c mp_rpow.c
+cc -O -Ilibdir  -c mp_sqrt.c
+cc -O -Ilibdir  -c mp_sub.c
+cc -O -Ilibdir  -c str-to-num.c
+cc -O -Ilibdir  -c test-prime.c
+ar ru libamp.a mp_add.o mp_add_int.o mp_atom.o mp_cmp.o mp_data.o mp_div.o mp_div_x.o mp_expand.o mp_gcd.o mp_inv.o mp_itom.o mp_len.o mp_mul.o mp_mul_x.o mp_new.o mp_norm.o mp_pow.o mp_random.o mp_rdiv.o mp_reduce.o mp_rpow.o mp_sqrt.o mp_sub.o str-to-num.o test-prime.o
+ar: Warning: creating libamp.a
+ranlib libamp.a
+cc -O -Ilibdir  -c find-prime.c
+ccom: Warning: find-prime.c, line 108: statement not reached
+        return 0;
+      ----------^
+cc -Llibdir  -o find-prime find-prime.o  -lamp -ldes -lhut
+cc -O -Ilibdir  -c primes.c
+cc -Llibdir  -o primes primes.o  -lamp -ldes -lhut
+cc -O -Ilibdir  -c test-primes.c
+cc -Llibdir  -o test-primes test-primes.o  -lamp -ldes -lhut
+cc -O -Ilibdir  -c test-amp.c
+cc -Llibdir  -o test-amp test-amp.o  -lamp -ldes -lhut
+cc -O -Ilibdir  -c ndc.c
+cc -Llibdir  -o ndc ndc.o  -lamp -ldes -lhut
+cc -O -Ilibdir  -c share-secret.c
+cc -Llibdir  -o share-secret share-secret.o  -lamp -ldes -lhut

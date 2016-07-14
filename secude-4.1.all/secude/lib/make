@@ -1,0 +1,20 @@
+: Run this script through /bin/sh
+
+if [ ${2-"def"} = "yes" ]
+then
+	ar ruv libsecude.a IMPORTS/\*.o
+fi
+
+if [ ${1-"def"} = "static" ]
+then
+	ranlib libsecude.a
+        exit
+fi
+
+
+M=/bin/make
+if [ -f /usr/bin/make ]; then
+    M=/usr/bin/make
+fi
+
+exec $M MODULE=lib -f ../src/config/CONFIG.make -f Makefile ${1+"$@"}

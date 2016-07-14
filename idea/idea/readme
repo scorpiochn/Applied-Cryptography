@@ -1,0 +1,24 @@
+FILE CONTENTS
+=============
+The archive should contain the following files:
+  idea             Executable program (68000, no fast RAM) 
+  crypt.h          Header file containing typedefs and prototypes
+  crypt.c          Core algorithm source
+  idea.c           User program source
+  idea.doc         man page for IDEA in ASCII format
+  lmkfile          makefile for use with SAS (Lattice) lmk utility
+  orig_crypt.h     \
+  orig_crypt.h      > original (SUN, SPARC, UNIX) versions of above
+  orig_idea.c      / 
+  orig_idea.l      man page for IDEA in NROFF format
+  orig_makefile    makefile for use with UNIX make ( change cc to gcc ...)
+  orig_readme      some hints
+  readme           the file you're reading ...
+
+INSTALLATION
+============
+Extract the whole archive.
+Execute the following commands:
+  more idea.doc    important usage and legal infos
+Adjust the lmkfile to your processor
+  lmk              compile and link the thing

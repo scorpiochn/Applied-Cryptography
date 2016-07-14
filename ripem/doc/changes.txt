@@ -1,0 +1,814 @@
+changes.txt   Mark Riordan    
+
+The following lists the changes made between successive releases of
+RIPEM.  The most recent version is 1.2a.
+
+Changes between 1.2a and :
+
++++ Expanded SMALL_PRIMES[] table in RSAREF's prime.c; greatly
+speeds key generation.  (Richard Outerbridge)
+
+Changes between 1.2 and 1.2a:
+
++++ Added conditional compilation to produce RIPEMSIG, an exportable,
+signature-only version of RIPEM.  (Jeff Thompson, MRR)
+
++++ Finally bowed to the forces of least-common-denominator and
+removed ANSI dependencies from bemparse.c, in the name of 
+portability to obsolete compilers.
+
+Changes between 1.2beta3 and 1.2:
+
++++ Added makefile changes for SGI Irix 5.1.1.  (Dave Kristol)
+
++++ Changed output stream to an informative message in certutil.c
+(Jeff Thompson).
+
++++ Updated ripem.el EMACS code.  (Jeff Thompson)
+
++++ Made minor revisions to ripemusr.doc, ripemfmt.doc, and
+ripem.man.  Added change12.txt describing changes since version
+1.1.  Added pemdirec.txt, describing PEM-style direct trust.
+(Jeff Thompson) 
+ 
+Changes between 1.2beta2 and 1.2beta3:
+
++++ Made minor changes to certificate code.  (Jeff Thompson)
+
++++ Revised RIPEM User's Guide to reflect 1.2 changes.  (Jeff Thompson)
+
++++ Revised RIPEM man page to reflect 1.2 changes.  
+
+Changes between 1.1 and 1.2beta2:
+
+*** Note:  All of the changes between 1.1 and 1.2beta2 marked by "*"
+were done by Jeff Thompson of RSA Data Security.
+
+* Added -H option or RIPEM_HOME_DIR environment variable to specify
+the RIPEM home directory where all the user's "local" data is kept
+such as private key and certificates created by the user.  The public
+and private keys files in the RIPEM home dir are searched before
+files given by -p and -s.  (Jeff Thompson)
+
+* Generate (-g) also writes a self-signed certificate to the output
+public key file (-P or pubkeys in the RIPEM home dir).  The
+distinguished name has the Persona format with the RIPEM user name as
+the common name.  This displays the users distinguished name and
+certificate digest (useful for reading over the phone to other users
+who are doing a validation.)  (Jeff Thompson; below changes also by
+him.)
+
+* Change password will append a self-signed certificate to the public
+key output file (-P or pubkeys in the RIPEM home dir) if it doesn't
+already exist in the public key files specified by -p (or pubkeys in
+the RIPEM home dir).  This is useful for upgrading to RIPEM 1.2: a
+user only has to change their password to create a self-signed cert.
+Example: ripem -c -H <my home dir> -s <old private key file> -p <old
+public key file> -u <username>.  Note that the private key output
+file is implicitly in the RIPEM home dir which has the effect of
+"transferring" the private key from the -s file to the home dir -
+very useful for ugrading to 1.2.  After this, -s should never be
+necessary.
+
+* Messages prepared by RIPEM include the self-signed certificate in
+an Originator-Certificate field.  This allows other RIPEM users to
+directly validate the sender's public key.  Also, any MIC-ONLY or
+MIC-CLEAR message is "Persona ready" for sending to
+persona-request@rsa.com to get certified under the Persona CA.
+
+* When receiving a message and the sender is not recognized, RIPEM
+can validate the sender's public key if the message has a self-signed
+certificate and -v is used.  RIPEM creates a validation certificate
+for the sender valid for the number of months given by -v, and
+appends it to the public key file given by -P (or pubkeys in the
+RIPEM home dir).
+
+* When preparing an encrypted message, write the full names and
+validation status of the recipients to the debug file.  This is a
+security measure that forces the user to make sure that the message
+is being encypted for the right people.
+
+* On receiving a message, write sender info to the debug file to give the
+sender username or distinguished name and to give the key status,
+such as "key found but not validated" for RIPEM 1.x keys or "status
+VALID" for validated keys.
+
+* Added -v option to give the number of valid months of self-signed
+certificates (during key generation and change password) and new
+validation certificates created when receiving.  For key generation
+and change password, -v is optional and defaults to 24 months.
+
+* Accept Proc-Type verison 4 as well as 2001, for compatibility with
+future RIPEMs which will have full PEM compliance.
+
+* Added -K option which is the new password when changing the password.
+
+* (Bug fix) When changing the password (-c), do not use -k or
+RIPEM_KEY_TO_PRIVATE_KEY as the new password.
+
+* Allow the output private key file (-S or privkey in the RIPEM home
+dir) to be the same as the input private key file when changing the
+password, so the private key file can change "in place".
+
+* When changing passwords, always display the user's distinguished name
+and certificate digest if possible.  This way, a user can
+find their certificate digest just by changing their password.
+
+* The RIPEM user's public key is now derived from the
+password-protected private key, which is more secure than looking it
+up in the public key file.  (Jeff Thompson)
+
+* Use file randomin in the RIPEM home dir if -F is not given on the
+command line.  The random input file is now checked for in this
+order: -F in RIPEM_ARGS, -F on the command line, randomin in the RIPEM
+home dir, and finally RIPEM_RANDOM_FILE environment variable.
+
+* Modified util/ripem.el as follows:
+Added ripem-change-password and ripem-validate-and-receive.
+Removed generated-public-key-file since this is now in ripem-home-dir.
+Now, ripem-secret-key-file is used only during change password.
+Always prompt for password when preparing or receiving.
+Added ripem-home-dir which defaults to ~/.ripemhome . Create it if it
+  doesn't exist.
+Modified ripem-list-users to include pubkeys in ripem-home-dir.
+Change ripem-process-region to allow displaying output in another
+  window.  This is used during receive so that the original encrypted
+  message is not erased.   (Jeff Thompson)
+
++++ Changed the debug level of some messages so that -D 1 gives
+you only messages regarding the key status of recipients and senders.
+To get the output you used to get from -D 1, you now need to use
+-D 2.
+
++++ Made minor lint-type changes to getsys.c and keyman.c.
+
++++ Changed RIPEM termination to exit with errorcode 1 if RIPEM
+needs to use the message's copy of the public key of the sender 
+to decrypt a message.  (Christopher Wren)
+
++++ Changed a conditional compilation line in bemparse.c to use
+__STDC__ instead of __GNUC__ for HP.  (Mark Henderson)
+
++++ Added -Umips to makefile for SGI entry.  (Mark Henderson)
+
++++ Made minor bugfixes & enhancements to Perl utilities send-ripem
+and display-ripem.  (Greg Onufer)
+
++++ Updated ripem-faq and ripem-attacks documents.  (Marc VanHeyningen)
+
++++ Added EMACS interface to RIPEM and PGP, mailcrypt.el.  (Jin S. Choi)
+
+Changes between 1.0.7 and 1.1:
+
++++ Enhanced RSAREF to include DES-EDE-CBC as an encryption
+algorithm.  This is currently double-key DES: encrypt with key1,
+decrypt with key2, encrypt with key1.  This new encryption mode
+is specified by including the value 1 in bits 15-8 of the
+"algorithm" parameter to RSAREF functions.  (Mark Henderson)
+
++++ Implemented triple-DES in RIPEM.  Added the -A option which
+can take values des-cdc and des-ede-cbc.  (Mark Henderson)
+
++++ Added processor detection and 386 assembly code to double the
+speed of the generic MS-DOS version when running on 386 or higher CPU's.
+(The 386-specific version is faster, but does not run in the DOS
+box of MS Windows, nor with EMM386.)
+
++++ Updated the RIPEM User's Guide to include a discussion of
+the -A option and the previously-implemented ability to have 
+multiple public key files.
+
++++ Included modifications to RSAREF to use the faster GMP
+(GNU Multiple Precision) library.  This is not integrated into
+RSAREF because of possible conflicts with GMP's GNU license.
+See rsaref/test/gmp-hooks-for-rsaref.tar.Z.  (Mark Henderson)
+
++++ Made static the variable "entry" in GetUserRecordFromServer.
+(Rob Spellman)
+
++++ Made minor revisions to again support the Macintosh Command
+Line Interface version.  (Richard Outerbridge)
+
++++ Ported to MIPS RISC/os.  (Rob Spellman)
+
++++ Removed the now unnecessary main/ddes.c and ddes.h.
+(Suggested by Uri Blumenthal)
+
++++ Ported RIPEM to Turbo C++ 2.0.  Changed adduser.c, getsys.c,
+list.c, and ripemmai.c, and added project files.  (Edgar W. Swank)
+
++++ Added "version.h" and modified util/man2code to use it.
+
++++ Modified rsaref makefile to work with AIX/ESA and AIX/386.
+(Uri Blumenthal)
+
++++ Modified RSAREF's rdemo.c to work with additional parameter
+selecting mode on certain RSAREF calls.  (Uri Blumenthal)
+
++++ Added incomplete documentation file ripemfmt.doc, to describe
+RIPEM file formats.
+
++++ Modified server/rkeyserv.c to run under NeXTStep 3.0.
+(Louie Mamakos)
+
++++ Added "repnoh" utility to aid in replying to mail messages
+from mailers that include headers in replies.
+
++++ Changed "generic" entry in rsaref makefile to not include
+USE_BIGNUM, which causes problems on SGI machines.  (chk@alias.com)
+
++++ Changed a #if in bemparse.c to satisfy HP's cc compiler.
+(Richard Johnson)
+
++++ Sped up Perl scripts util/send-ripem and util/display-ripem
+by increasing buffer size in subroutine "clobber".  (Louie Mamakos)
+
++++ Fixed digitas.c and ripemnt.mak to work properly uder Windows NT.
+
++++ Put NN_2ModExp into RSAREF's nn-386.s, fixing an oversight in 1.0.7.
+
++++ Ensure that the minimum keysize when generating keys is 512 bits.
+
++++ Fixed adduser.c so that NRecip, the number of recipients, is
+correctly updated.  (This affects only a debug message.)
+
++++ Allow multiple public key files, either via multiple -p's on
+command line, or multiple filenames in the RIPEM_PUBLIC_KEY_FILE
+environment variable.  (Suggested by Ron Rivest)
+
++++ Added RIPEM Beginner's Guide (ripembeg.*) and RIPEM Internet Key 
+Server Guide (ripemsrv.*).  (Gary Ratterree)
+
++++ Added makefile entry for AUX with gcc 2.3.3.  (Phillip Porch)
+
++++ Removed extra "extern" declaration of usage_msg.  
+(Discovered by Tyler Yip)
+
+Changes between 1.0.6 and 1.0.7:
+
++++ Fixed a bug in ripemmai.c that could cause a key to be written
+to a bad filename when writing a key to PubKeyOutFileName upon
+decrypting.
+
++++ Fixed a debug message "X bytes in encoded & encrypted message key:",
+which could print a null pointer (in ripemmai.c).
+
++++ Added display of version number in debug output.
+
++++ Changed a call to prencode in rdwrmsg.c to zero-fill the input
+buffer.  Not strictly necessary, but not doing so caused RIPEM to
+printably encode buffers differently (for the last nibble in a line)
+for different platforms, causing alarm amoungst RIPEM users.
+
++++ Added code to getsys.c to record keystroke timings for pseudo-random
+data on Unix systems.  (Mark Henderson)
+
++++ Added DOGETRUSAGE #ifdefs to Linux version.  (Mark Henderson)
+
++++ Moved frequently-optimized code in RSAREF's nn.c to digitas.c
+
++++ Ported to Windows NT (Intel 386), including adding some
+386 in-line assember in rsaref/source/digitas.c
+
++++ Added GCC-compatible version of Intel assembler code in
+digitas.c  (Mark Henderson)
+
++++ Split off NN_AddDigitMult and NN_SubDigitMult from RSAREF
+into a separate file, digitas.c , since these are the routines that are most
+frequently optimized.  
+
++++ Modified GetUserRecordFromServer in ripemsoc.c to zero-terminate
+records received from the key server, to guard against key server
+errors.
+
++++ Added "unsigned long long" versions of code in digitas.c to speed
+up RS/6000 version of RSAREF.
+
++++ Changed RSAREF nn.c and prime.c to speed key generation by
+substituting bignum left shifts for bignum multiplies by 2.
+(Mark Henderson)
+
++++ Fixed a bug in the finger client in ripemsoc by always
+clearing all file descriptor sets.
+
++++ Removed the debug print of user's key-to-private key in keyman.c,
+as it is more of a security risk than it's worth.
+
++++ Made changes to makefiles to support Sun's acc compiler.
+(Robert Howard)
+
++++ Added encryption test to makefile.
+
++++ Made minor changes to bemparse and util/tstbem to get tstbem
+working again.
+
++++ Made minor typecast changes to getsys.c to satisfy system
+function prototypes for memcpy.  (Suggested by Robert Howard)
+
++++ Added Makefile support for NeXTStep 486.
+
++++ Changed RIPEM's built-in Finger implementation again, this time
+to use "/W user" to comply with RFC 1288.  (Suggested by Jurgen Bolz)
+
+
++++ Added "util/ripem-encrypt-elm" to facilitate encryption when
+using recent versions of Elm.  See script for details.  (Jon Zeeff)
+
++++ Added new version of "util/ripem-encrypt" script.  (Brent Chivers)
+
+Changes between 1.0.5 and 1.0.6:
+
++++ Added "umask" to util/ripem-encrypt.  (Jon Zeeff)
+
++++ Changed mac68k/RSAREF/rsaref.h to include Ray Lau's enhancements
+to the RSAREF API.  (Richard Outerbridge)
+
++++ Added function "ripem-sign-clear" to ripem.el EMACS function.
+(Uri Blumenthal)
+
++++ Made changes to allow RIPEM to compile on IBM's AIX/ESA (mainframe)
+and AIX/386.  (Uri Blumenthal)
+
++++ Modified keyman.c to allow lines starting with "---" to delimit
+public keys (in addition to blank lines).  (Inspired by Darrell Long)
+
+Changes between 1.0.4 and 1.0.5:
+
++++ Modified RSAREF's r_enhanc.c and rsaref.h to support Initialize,
+Process, and End modes so that it is not necessary to store an entire
+message in memory at once.  (Raymond Lau)
+
++++ Altered ripemmai.c and strutil.c to correspond to Ray Lau's 
+RSAREF API changes above.  However, RIPEM (Unix and DOS) still 
+requires the entire message to be in memory for processing.  
+
++++ Changed RIPEM's Finger implementation to explicitly use the 
+"long form" (-l) to ensure that the .plan file will be obtained
+from all server implementations.  (Greg Onufer)
+
++++ Refixed a bug in which an extra blank lines got inserted at
+the beginning of the body of the message when -h i was not in effect.
+(Greg Onufer)
+
++++ Changed crackhed.c to allow a value to continue from the 
+first line of a multi-line header to subsequent lines.  This 
+affords greater adherance to PEM RFC's.  (Suggested by Ray Lau.)
+
++++ Changed ripemsoc.c to keep trying all key servers even when
+one explicitly reports that it does not have a given key.  This
+allows a situation in which not all key servers have the same database.
+(Suggested by Bill Owens)
+
++++ Changed crekeydb.c (utility in server/) to properly exit if it can't
+open the input file.  (Greg Onufer)
+
+Changes between 1.0.3 and 1.0.4:
+
++++ Modified RIPEM's MIC-CLEAR mode to quote leading "-"'s correctly.
+(Changes to ripemmai.c and rdwrmsg.c.)  (Raymond Lau)
+
++++ Provided a new, faster MC68020 version of nn.c for the Macintosh,
+Think C.  (See mac68K directory.)  (Richard Outerbridge)
+
++++ Provided a new, faster MC68020 version of RSAREF's r_stdlib
+for the Macintosh, Think C (see mac68K directory).  (Richard Outerbridge)
+
++++ Added makefile entry to RSAREF for Linux.  (Mark C. Henderson)
+
++++ Added moderate RSAREF speedup for IBM RS/6000 (files nn.c and
+digit.c).  (Mark C. Henderson)
+
++++ Enhanced the UDP-based key server, rkeyserv, to fork and detach 
+itself automatically.  (David C Lawrence)
+
++++ Enhanced the update-key-database script (used only by key servers).
+(David C Lawrence)
+
++++ Updated ripem-attacks and ripem-faq.  (Marc VanHeyningen)
+
++++ Modified display-ripem (v. 1.0) and send-ripem (v. 1.0) utilities,
+and provided encrypt-ripem (v. 1.0).  These are Perl scripts that
+work with RIPEM.  (Marc VanHeyningen)
+
++++ Added utility encrypt-ripem, superior version of the
+shell script ripem-encrypt, but this one's in Perl.  (Marc VanHeyningen)
+
++++ Fixed the ripem-encrypt utility to not overwrite the input 
+if RIPEM fails (due to mistyped password, etc.)  (Michael Palmer)
+
++++ Fixed a bug in ripem.el (EMACS code) in ripem-list-users.
+(Jeff Thompson)
+
++++ Made several improvements to the utility quote.  (V. Bontchev)
+
+Changes between 1.0.2 and 1.0.3:
+
++++ Enhanced the ripem.el EMACS functions to be more configurable,
+and so on.  (Christopher Owens)
+
++++ Made minor changes to some files in server/ and added the
+server scripts run-server and update-key-database.
+
++++ Documented the "e" option of "-R" in the RIPEM man pages,
+previously overlooked.  (Pointed out by Uri Blumenthal)
+
++++ Modified makefiles to compile under A/UX.  (Phillip Porch)
+
++++ Added support for Apollo DomainOS sr10.3.5. (Drew Solomon)
+
+Changes between 1.0.1 and 1.0.2:
+
++++ Took out some unused debugging code that was causing some
+compilers to issue warning messages.
+
+Changes between 1.0 and 1.0.1:
+
++++ Changed keyman.c to call the RSAREF version of DES.  The duplicate
+copy of DES, ddes.c, remains in the distribution but is not linked.
+Note:  Both ddes and the version of DES that our copy of RSAREF uses
+were written by the same person, rwo.  (Richard Outerbridge)
+
++++ Added support for ESIX, Unix System V R3.2.  (Uri Blumenthal)
+
++++ Fixed a bug in GetPasswordToPrivKey in which the password wasn't
+being zero-terminated when obtained from an environment variable.
+(Louis A. Mamakos)
+
++++ Fixed bug in which an address like fred@computer1.cs.bigu.edu 
+was not properly detected as matching the address fred@cs.bigu.edu.
+
++++ Changed the file permission of ripem.el in the tarred distribution.
+(Jeff Thompson)
+
++++ Fixed a typo in an environment variable in the RIPEM User's Guide.
+(MIke Palmer)
+
+Changes between Beta-9 and 1.0:
+
++++ Eliminated extra blank lines in makefile that confused AIX.
+(Uri Blumenthal)
+
++++ Fixed typo in makefile for SGI.  (Mark Henderson)
+
++++ Performed more Lint-type code cleanup.  (Greg Onufer)
+
+Changes between Beta-8 and Beta-9:
+
++++ When deciphering, ensure that the public key of the sender 
+as supplied in the message header matches the value retrieved 
+from the file/server/finger.  
+
++++ Added support for IBM AIX/370 and AIX/386, including 
+386 assembler code for AIX/386.  (Uri Blumenthal).
+
++++ Do not use Henderson's BIGNUM code in the DOS version.  Doesn't work;
+don't know why.
+
+Changes between Beta-7 and Beta-8:
+
++++ Added makefile support for Solaris 2.x GCC compiler.
+(Greg Onufer)
+
++++ Added support for Linux 0.98 (no sockets, though).
+(Mark C. Henderson)
+
++++ Improved speed of RSAREF nn.c, all-C version, by incorporating
+BIGNUM's integer squaring algorithm.  Speedup of ~15%.  
+(Mark C. Henderson)
+
++++ For the Mac version, get the user name from both the Chooser
+and the environment (separated by a comma), rather than just one or
+the other.  Increases chances that RIPEM will be able to find a
+good email address for user.  (Richard Outerbridge)
+
++++ Do not attempt to find the user's old public key if we are
+generating a public key (-g).
+
++++ Fixed bug in which decrypting a null signed message caused RIPEM to
+claim it couldn't allocate memory.  (Actually, in my opinion the
+bug is in malloc.)   (Reported by Jeff Thompson)
+
++++ Implemented -T recip_opts string to govern certain options related
+to recipients.  recip_opt contains one or more of:
+a -- means always abort if, while encrypting, we can't find the 
+key for a user.
+m -- means add me as a recipient when encrypting (only for
+"-m encrypted").
+n -- clear above conditions.
+(Based on a suggestion by Jeff Thompson)
+
++++ Fixed a bug in which RIPEM thought it had detected an initialization
+vector inconsistency if it couldn't find a public key for the first 
+recipient but was told to proceed anyway.  
+
++++ Cleaned up code in "keyman.c" GetPublicKey; do not decode key
+unless the key has actually been found.
+
++++ Added extra "close" of socket in ripemsoc.c's GetUserRecordFromFinger
+in attempt to solve problem in which finger fails under complex
+circumstances.  (Reported by Marc VanHeyningen)
+
++++ Revamped code to retrieve keys from flat files, to make it more
+similar to process of getting keys from a server or finger.
+
++++ Added check of MD5 digest of retrieved public key vs. the 
+MD5OfPublicKey: field that goes along with the key.  (Requested by
+Jeff Thompson and others)
+
++++ Fixed Beta 7.1 bug by adding code to rewind the public key
+file for every user.
+
+Changes between Beta-6 and Beta-7:
+
++++ Updated Perl routines that interface the MH mailer with RIPEM.
+Changed the name of pshow to display-ripem.  (Marc VanHeyningen)
+
++++ Cleaned up various routines to eliminate compiler warnings.
+(Greg Onufer, Mark R.)
+
++++ Added assembler version of RSAREF nn.c for 680x0-based machines.
+52% faster than C version for key generation.
+
++++ Added assembler version of nn.c for DJGCC 386 DOS-extender version.
+62% faster than C-only DJGCC version.
+
++++ Improved RSAREF makefile to support new assembler code and
+to generally support various architectures more cleanly.
+
+Changes between Beta-5 and Beta-6:
+
++++ Ported RIPEM to DJGCC, Intel 386 DOS-extender version of GNU C 2.2.2.
+Provides about 125% speedup over Microsoft C 7.0.  (I can't believe
+nobody else had ported RIPEM to a 386 compiler yet.)
+
++++ Added SPARC assembler version of nn.c, the most time-critical
+routine in RSAREF.  36% speedup over C version.  
+(Mark Henderson, with help from the French BIGNUM pkg)
+
++++ Added assembler versions of certain time-critical routines
+(desc.c and nn.c) for the Macintosh.  (Richard Outerbridge)
+
++++ Enhanced MH-oriented Perl scripts pshow and send-ripem.
+(Mark VanHeyningen)
+
++++ Made minor formatting and syntactic changes to RIPEM User's Guide.
+
++++ Added newline to end of RSAREF's r_keygen.c to prevent annoying 
+compiler warnings.  (Greg Onufer)
+
++++ Added extra parenthesis to an expression in keyman.c in an attempt
+to keep Sun's ANSI C compiler from complaining.  (Grep Onufer)
+
++++ Removed now-unnecessary #ifdef from getoptpr.h.  (Greg Onufer)
+
+Changes between Beta-4 and Beta-5:
+
++++ Added Perl scripts util/pshow and util/send-ripem to facilitate
+reading and sending RIPEM messages with the MH mailer.
+(Mark VanHeyningen)
+
++++ Modified key server utility routine db2flat to be more cautious
+about listing which aliases should be correctly associated with
+a given key.
+
++++ Modified HP/UX support to use TERMIOS, fixing an intermittant
+problem with interactive prompts on HP's.  (Mark VanHeyningen)
+
++++ Renamed "getopt" to "mygetopt", to work around conflicts
+with function prototypes for the system's version.
+
++++ Fixed an uninitialized variable "found" in DoChangePW.
+
++++ Fixed a bug in which RIPEM was eating the first blank line
+after the header when encrypting messages with -h i.  (Reported
+by Marc VanHeyningen)
+
++++ Fixed a bug in which RIPEM thought it wasn't getting the
+right username from the server if the returned name differed by
+leftmost components of the hostname.   Also added more code to
+prevent server lookup loops.
+
++++ Changed wording of debugging message in keyman.c.
+
++++ Made numerous changes to accomodate Solaris 2.x; also
+did some code cleanup (removed stray variables, etc.)
+(Greg Onufer)
+
+Changes between Beta-3 and Beta-4:
+
++++ Replaced rsaref/source/desc.c with an different version
+(KHODES), speeding DES encryption by a factor of 20.
+(Richard Outerbridge)
+
++++ Added feature in which specifying a key to private key of "-"
+via -k i causes RIPEM to read the real key to private key as the
+first line on standard input.  Useful for programs invoking RIPEM.
+(Suggested by Greg Onufer)
+
++++ Added -c option to allow changing of key to private key.
+
++++ Changed public key lookup algorithm for scanning flat files.
+If a given email address cannot file found as a User: in the file,
+successively remove leftmost components of the hostname in the 
+address until the modified email address is found, or only one
+component remains.
+
++++ Modified key server to perform similar search to above (i.e.,
+remove successive leftmost hostname components as necessary to find
+an email address in the database).
+
++++ Expanded the implementation of "-h p" so it also works for
+decrypting messages.
+
++++ Added external utility "quote" to ease responding to mail
+messages.
+
++++ When computing the salt value for the encrypted private
+component, include the password to the private component as
+a piece of pseudorandom data.  (Suggested by Jeff Thompson)
+
++++ Fixed bug in which an extra blank line would be included at the
+beginning of the message if -h r was selected.  (Greg Onufer)
+
++++ Fixed Finger implementation to work for the local host when 
+the user's email address does not include the hostname.  (Noticed
+by Greg Onufer)
+
++++ Increased maximum password size (key to private key) from
+80 to 256 characters.  (Requested by Uri Bloomenthal)
+
++++ Added a couple of #includes to strutil.c.  (Richard Outerbridge)
+
++++ Increased ALLOC_INC in rdwrmsg.c to speed the reading of large
+messages.
+
+Changes between Beta-2 and Beta-3:
+
++++ Allowed the -u username (as well as RIPEM_USER_NAME environment
+variable) to have multiple values, separated by commas.  This allows
+you to decrypt an email message that's addressed to any of your
+aliases, for people who use multiple email addresses.  (Inspired by
+feedback from Jim Bernatowic.)
+
++++ Changed username processing so that if RIPEM_USER_NAME has
+a value, it is taken literally as the email address of the user
+(rather than having the hostname appended).  (Requested by Jim Bernatowicz.)
+
++++ Added ability to query multiple key servers, in case one key
+server is unreachable.  The servers are specified as multiple 
+values to -y or RIPEM_SERVER_NAME, separated by commas.
+
++++ Reported recent changes to Macintosh and added ability to get
+defaults from string resources.  (Richard Outerbridge)
+
++++ Modified r_encode.c to speed up RFC 1113 printable encoding.
+(Richard Outerbridge)
+
++++ Added option to take pseudo-random data from plaintext message 
+when encrypting.  (-R m)
+
++++ Zeroed out passwords and RandomStruct after use, to increase 
+operational security.
+
++++ Fixed minor bug in getsys.c in which GetPasswordFromUser
+would truncate a password if the user typed a too-short password
+the first time.  (Mark Henderson)
+
++++ Added support for Sun's old bundled non-ANSI CC compiler. (Based
+on feedback from Jeff Thompson.)
+
++++ Added support for SGI Irix 4.x.  (Mark Henderson)
+
++++ Added a few lines to pubinfop.h prototypes file.  (Richard Outerbridge)
+
+Changes between Beta-1 and Beta-2:
+
++++ Added support for SCO ODT 2.0 Unix.  (Mark C. Henderson)
+
++++ Added support for Solaris 2.0 (in Berkeley compatibility mode).
+(William Dorsey)
+
++++ Fixed a last-minute bug introduced in Beta-1 in which MIC-ONLY
+and MIC-CLEAR messages would fail to decrypt, complaining that
+"You are not listed as a recipient".
+
+Changes between Alpha-2 and Beta-1:
+
+Code changes:
+
++++ Added minor changes to get RIPEM to compile under CMU Mach on an 
+IBM RT.  (Marc Ringuette.)
+
++++ Fixed GetUserInput so that echoing is properly restored to its
+previous state upon exit.
+
++++ Fixed test in ripemmai.c parameter CrackCmd which could result in
+bogus message "Must specify at least one source of public keys.".
+ 
++++ Added #include "adduserp.h" to adduser.c
+
++++ Added -h options to choose whether to encipher message headers,
+and to prepend the (plaintext) headers to the enciphered message.
+
++++ In GetUserRecordFromFinger() in ripemsoc.c, made several changes
+so that not defining USE_SOCKETS would work correctly.
+
++++ Changed key registry program so it translates all 
+addresses to lower case, as well as change the server so it
+translates all requests to lower case.
+
++++ Enhanced key registry program to accept Remove and Change
+key requests.
+
++++ Wrote an email server that will return a copy of the public key
+database upon request.
+
++++ In DoRandom in ripemmai.c, initialized nbytes to RANBUFSIZE.
+
++++ Fixed encryption mode so that a recipient is not demanded in MIC-CLEAR
+and MIC-ONLY modes.
+
++++ Fixed code which obtains keys from a finger server; sometimes, it
+garbled the name of the host and hence was unable to contact the host.
+
++++ Made minor changes to the Macintosh version of GetUserInput()
+in getsys.c (Richard Outerbridge).
+
++++ Implemented (in ripem client) a REDIRECT key server option, so that 
+one key server can pass on key requests to another.
+
++++ Added checks in ripem to ensure that responses to key requests
+really contained the key of the correct user.
+
++++ Fixed a problem in which during decryption RIPEM did not recognize 
+that the user was not specified as a recipient of the message.
+A misleading error message resulted.
+
+Documentation changes:
+
++++ Wrote a real user's guide.
+
++++ On man page, changed discussion of -g to refer to -S and -P.
+
++++ Mentioned -Y g in online help blurb.
+
++++ Documented better the use of key in message header as last resort
+when decrypting.  Mentioned that the -P file is appended to in -d -P mode.
+
++++ Discussed the three encryption modes better.
+
++++ Mentioned message size limits due to RSAREF implementation (msg
+must be kept in memory).
+
+
+Changes between Alpha-1 and Alpha-2:
+
+=== Code Changes ===
+
++++ Stopped asking for key to private key when decrypting MIC-xxx types.
+
++++ "ntimebytes" was not being initialized in DoRandom in ripemmai.c.
+Fixed it.
+
++++ Large private keys weren't being parsed correctly.  Fixed.
+
++++ Made necessary #include changes to support Mac Think C command line
+interface.
+
++++ Dropped the MD5DigestOfPrivateKey field from the private key file.
+
++++ "userstream" shouldn't be declared extern in getsys.c.  Fixed.
+
++++ Added #include of missing prototype headers to getopt.c, hexbin.c,
+keyman.c, parsit.c, pubinfo.c, rdwrmsg.c, usage.c.  
+
++++ Email header processing: "To: address (Name)" was parsed as Name
+instead of address.  Fixed.
+
++++ Ported RIPEM to Macintosh Think C 5.x  (Done by Richard Outerbridge).
+
++++ Added support for Motorola Delta 88000-based Unix System V/88 machines.
+(Done by John Tamplin).
+
++++ Changed the password prompt to make it more clear that we are asking
+for a password to the private key.
+
++++ Implemented an additional key server option (a third, "g" option for -Y)
+which makes ripem do a finger to the user's machine an examine the
+results for a public key.  The user would put the public key in
+her .plan file.
+
++++ Fixed server/makefile.
+
++++ Added domainname to email address.
+
++++ Slightly modified RSAREF makefile.
+
++++ Checked more carefully for invalid public keys.  Previously they were not
+caught at the right place; the result was a misleading error message.  
+
++++ Wrote server/db2flat.c, which makes a flat file from the random
+public key database.  Useful for creating an ASCII file that can be
+distributed via anonymous FTP or email.
+
+(Unattributed changes are by Mark R.)

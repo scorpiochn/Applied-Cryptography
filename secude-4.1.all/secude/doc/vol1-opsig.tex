@@ -1,0 +1,587 @@
+\section{Operation of Signature Keys}
+\markboth{Operation Signature}{Operation Signature}
+\thispagestyle{myheadings}
+\label{ops}
+
+\subsection{Verification of a Digital Signature}
+\label{ops-vds}
+
+In SecuDe
+a digital signature is always part of a quadruplet
+({\em text, signatur, creation date, originator certificate}).
+The sender of a signature sends always the {\em complete}
+originator certificate.
+The recipient performs these steps in order to verify a signature
+completely:
+
+\begin{enumerate}
+\item Select optimal chain of certificates from the originator certificate.
+\item Compare signature creation date with
+validity time frames of all certificates
+of the chain found in step 1.
+\item Verify the signature of the text and
+verify the signatures of all certificates
+of the chain found in step 1.
+\end{enumerate}
+
+Step 1 is to read through the {\em certificates} of the
+originator certificate from bottom to top.
+A chain of certificates is a sequence of certificates,
+which fulfills three conditions:
+There is one certificate per hierarchy level,
+the issuer of any certificate is the owner of the certificate at the
+next level above,
+and the highest certificate is to be verified by a public key
+already known to the verificator.
+If, by comparison of the key number of the last certificate
+of the chain, the highest certificate is recognized as an old
+certificate, the user calls the directory attribute ``Old Certificates''
+and appends one cross certificate from the list to the chain.
+A chain is optimal, if it is as short as possible.
+If, for example, two
+users of one certification authority exchange signatures,
+the chain of certificates selected in step 1 will comprise only one
+certificate, i.e. the user certificate.
+
+\begin {center}
+\begin {tabular}{lll}
+struct & {\em Returncode} \{ & \\
+       & unsigned int  & {\em indication}; /* \\
+       &               & 0: OK                \\
+       &               & 1: Text Signature NOTOK         \\
+       &               & 2: Text Signature EXPIRED       \\
+       &               & 3: Certificate Signature NOTOK  \\
+       &               & 4: No trusted public key        \\
+       &               & 5: Certificate Revoked          \\
+       &               & */                    \\
+       & Certificate   & *{\em current\_certificate}; /* \\
+       &               & currently checked certificate,  \\
+       &               & NULL, if indication=0,1 or 4    \\
+       &               & */                    \\
+       & \}            & \\
+\end {tabular}
+\end {center}
+ 
+\label{fig-ops-vds}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: Returncode of the verification algorithm}
+ 
+\subsection{Change of Signature Keys or of Certificates}
+\label{ops-csk}
+
+Within SecuDe
+any certification authority is responsible for all services to the users,
+in particular for the update service of their smartcards.
+This is even so if the changes are initiated by other, e.g. higher,
+certification authorities.
+
+There are many reasons for signature or encryption keys to change,
+for example if new algorithms are inplemented, or
+if keys are lost or suspected to be stolen.
+The update procedure of a pair of keys is different
+for a user-key and a CA-key (see below).
+
+A change of a key makes a change of its certificate necessary.
+Conversely, however, a certificate can be updated with
+respect to the same public key, i.e. certificates can be extended.
+A change of any CA-certificate
+makes all user originator certificates below that CA change:
+that is, their smartcard entries {\em FCPath} (see paragraph \ref{fcpath})
+are to be updated.
+
+Changes of CA-keys have effects on all users below.
+In principle, CAs could change their keys independently of
+one another. However, the increasing load of smartcard updating on
+the users should be taken into account.
+Best is a coordinated change of keys of many CAs within one tree
+or subtree, possibly not more often than every couple of years.
+The change of a user key, however, is not critical for other users
+or for CAs, because that is completely in the hand
+of the user concerned. One CA to which the user is attached
+must become active on the user's request in that it has to sign the
+user certificate.
+
+\subsubsection{Extension of a Certificate (Unchanged Key)}
+\label{ops-ec}
+
+Expiring Certificates are replaced by new certificates.
+The {\em validity-notBefore} (which marks the creation date of the key)
+remains the same.
+The expired certificates are not stored, because the new certificates
+serve the same purpose; the old certificates remain valid for
+old signatures of the past time of validity.
+
+\subsubsection{Change of a User Key}
+\label{ops-cuk}
+
+Users create their own pairs of keys.
+They also create prototype certificates and ask their CAs
+to sign it (cf. paragraph \ref{ca-cuk}).
+
+Changing user keys is simply replacing the old keys by the new keys.
+The old keys are not stored.
+The user-certificate changes, too.
+The old user-certificate is not stored.
+However, the forward certification path remains unaffected.
+It is the responsibility of a recipient of a signature to
+keep the originator certificate of that signature, if he
+wishes to be able to verify the signature even at later times, when the
+sender's signature key has changed.
+
+A user should inform all his important communication partners
+about his new public key.
+The best way to do that is to send a signed message
+together with the new originator-certificate to all of them.
+This allows the partners to update their smartcard lists of trusted
+verification keys with respect to that new key.
+
+\subsubsection{Change of a CA Key}
+\label{ops-cck}
+
+A CA key is a signature key which is used by a certification authority (CA)
+in order to sign certificates for subordinate certification authorities
+or for users.
+A change of a CA key has effect on one level below and one level above
+and on all users who are anywhere below in the certification tree.
+Therefore, these elements are to be changed:
+
+\begin{enumerate}
+\item the certificates ``immediately above'' the CA;
+and its cross-certificates by other CAs;
+\item the certificates ``immediately below'' the CA;
+and its cross-certificates to other CAs;
+\item the originator certificates (i.e. the {\em FCPath} infos) of
+all users anywhere below the CA;
+\item all smartcard entries ``Trusted Public CA Keys'' ({\em PKList infos}) of
+all users anywhere below the CA.
+\end{enumerate}
+
+This changes the forward certification path (``FCPath'')
+and the list of trusted public verification keys (``PKList'')
+of all users below this CA.
+It is the duty of every user-CA to provide {\em its}
+users with the updated FCPath and PKList,
+regardless of which CA has caused the change.
+
+\subsubsection{Change of a Root CA Key}
+\label{ops-crk}
+
+The public verification key of a root certification authority is
+not certified. It is rather stored in all users' smartcard entries
+``Public Root-CA-Keys'' (see paragraph \ref{pkroot}).
+Therefore, these elements are to be changed:
+
+\begin{enumerate}
+\item the directory attribute ``Old Certificates'';
+\item the smartcard entries ``Public Root-CA-Keys''
+of all users of this certification tree;
+\item the certificates ``immediately below'' the CA;
+\item the originator certificates (i.e. the FCPaths) of
+of all users of this certification tree.
+\end{enumerate}
+
+It is of significant importance, that 1 and 2 are changed {\em first}
+and 3 and 4 are changed a {\em certain amount of time thereafter}.
+
+1: The Root CA cross-certifies her newly created public key
+with her expiring signature key.
+The validity time interval of this cross certificate starts
+with the creation date of the newly created key
+and ends with its planned expiry.
+Remember, that validity values refer to the certified keys.
+This cross certificate becomes the new first line of the Root CA's
+directory table ``Old Certificates'',
+and the new first line's serial number is the old first line's
+key number plus one.
+Then, in all the other lines (now lines 2 thru last) the Root CA replaces
+the certificates' signatures and serial numbers,
+whereby other certificate attributes including
+certified keys and validity values remain unchanged.
+Again, this is consistent, because
+validity values refer to the certified keys.
+Of course, the table's serial numbers of those lines remain the same, too.
+
+2: Together with step 1,
+the Root CA informs all CAs about the change of her keys.
+The user-CAs
+send the new PKRoot information to all the users they are
+directly responsible for.
+The users update their smartcard entries {\em PKRoot} (cf \ref{pkroot}).
+
+3 and 4: In complete analogy with the respective steps
+during the change of keys of any CA,
+all user-CAs
+send the new FCPath information to all the users they are
+directly responsible for.
+The users update their smartcard entries {\em FCPath} (cf. \ref{fcpath}).
+If any CA changes her key in line with this procedure,
+the users are given new {\em PKList} information (cf. \ref{pklist})
+and if necessary new user certificates as well.
+
+It is important, that between steps 1/2 and steps 3/4
+there is an suitable interval of time.
+In some environments, several months are suitable;
+in others which are more strictly organized the time interval may be shorter.
+In that time, the root CA may also use her new key for normal communication, 
+if the directory table ``Old Certificates'' is available for users
+(see ``note'' in paragraph \ref{ds-qa} above).
+However, she must use it for the certificates to be created.
+Every user in this certification tree is affected twice:
+the first time, when he updates his smartcard table {\em PKRoot},
+the second time after the time interval between steps 1/2 and 3/4,
+when he updates his smartcard table {\em FCPath}.
+Other changes like the change of {\em PKList} or of his own user key do not
+interfere with this process.
+
+There are three phases of a user smartcard during this process:
+
+\begin{enumerate}
+\item before change of the smartcard table {\em PKRoot},
+\item after change of the smartcard table {\em PKRoot},
+but before change of the smartcard table {\em FCPath},
+\item after change of the smartcard table {\em FCPath}.
+\end{enumerate}
+
+During all three phases a user can use his smartcard without
+any restriction. In order to put light on this dynamic process,
+consider a user S to be an originator of a message,
+sending it to the recipient R.
+Let S and R be located within one certification tree.
+S signs the message, while R verifies the signature.
+Note, that the change of the {\em PKRoot} info on the smartcard
+does not affect the signature process,
+while the change of {\em FCPath} info on the smartcard does not
+affect the verification process.
+As a consequence, any signer would behave the same in phases 1 and 2 above,
+while any verifier would behave the same in phases 2 and 3.
+\\[1ex]
+Let S and R be both in phase 1 or both in phase 3:
+\\[1ex]
+These situations are obviously trivial.
+\\[1ex]
+S in phase 1 and R in phase 2:
+\\[1ex]
+The highest certificate in the originator-certificate sent by S is ``old''.
+For verification,
+R needs the ``old'' public Root-CA key, which he has stored
+in his smartcard table {\em PKRoot} as ``old Root CA key''.
+R does recognize that from the serial number of the highest certificate
+within the originator-certificate sent by S.
+\\[1ex]
+S in phase 2 and R in phase 1:
+\\[1ex]
+Still,
+the highest certificate in the originator-certificate sent by S is ``old''.
+For verification,
+R needs the ``old'' public Root-CA key, which he has still stored
+in his smartcard table {\em PKRoot} as ``new Root CA key''.
+From the point of R there is no difference from the situation of
+yet unchanged Root CA keys.
+\\[1ex]
+Both S and R in phase 2:
+\\[1ex]
+Same as S in phase 1 and R in phase 2,
+because S behaves equally in phases 1 and 2.
+\\[1ex]
+S in phase 2 and R in phase 3:
+\\[1ex]
+Same as both S and E in phase 2,
+because R behaves equally in phases 2 and 3.
+\\[1ex]
+S in phase 3 and R in phase 2:
+\\[1ex]
+The highest certificate in the originator-certificate sent by S is ``new''.
+For verification,
+R needs the ``new'' public Root-CA key, which he has already stored
+in his smartcard table {\em PKRoot} as ``new Root CA key'',
+since R has already advanced to phase 2.
+\\[1ex]
+In a disciplined user community it does not happen,
+that one part of the users are still in phase 1 while the other
+part has already advanced to phase 3.
+But even then {\em no security risk} would occur.
+``Lazy'' users who remain in phase 1, while all the others
+have already advanced to phase 3,
+would be no danger neither to themselves nor to others.
+They would need the help of the directory table ``Old Certificates''
+of the Root CA in order to verify phase 3 signatures.
+And their own signatures would be valid,
+even if produced now, as long as their personal user certificates
+are still valid.
+\\[1ex]
+S in phase 1 and R in phase 3:
+\\[1ex]
+Same as S in phase 1 and R in phase 2,
+because R behaves equally in phases 2 and 3.
+\\[1ex]
+S in phase 3 and R in phase 1:
+\\[1ex]
+The highest certificate in the originator-certificate sent by S is ``new''.
+For verification,
+R needs the ``new'' public Root-CA key, which he has not (yet) stored
+in his smartcard table {\em PKRoot}.
+This situation is recognized by R,
+in that R compares the certificate serial number of the
+the highest certificate in the originator-certificate
+with the serial numbers of the Root CA keys on his smartcard.
+The latter are older, i.e. smaller.
+This should stimulate R to call the directory entry of the Root CA
+and check the attribute ``Old Certificates''.
+That information is sufficient both to verify S's signature
+and to update his own smartcard table {\em PKRoot}.
+The second step would raise R at least into phase 2.
+\\[1ex]
+A smartcard in phase 2 is absolutely up-to-date
+as far as its verification functionality is concerned.
+If the directory table ``Old Certificates'' is available to users,
+a smartcard in phase 1 is also able to verify actual signatures,
+in that it can use the first line of that table.
+However, that ability would be lost after the {\em next}
+change of Root CA keys.
+A smartcard in phase 1 wouldn't become a security risk
+even then, however useless.
+It wouldn't be able to verify then up-to-date signatures,
+because the directory would have been updated as well.
+\\[1ex]
+A smartcard in phase 1 or 2 would be verifiable by other smartcards
+which are up-to-date (at least in phase 2)
+with the help of their PKRoot-old entries.
+However, if a smartcard would remain in phase 1 or 2 even after the {\em next}
+change of Root CA keys,
+its signatures would be verifiable by others
+{\em only} with the help of the directory table ``Old Certificates''
+just as if it were a very old signature.
+A user-CA can prevent from this kind of
+(undangerous, but annoying) situations
+if she makes sure, that validity time intervals of her user certificates
+do not cover two validity time periods of a Root CA key.
+
+A change of Root CA keys does not affect the communication
+across certification tree boundaries,
+because due to cross certificate links, Root CAs are not involved
+in the verification process.
+
+\subsubsection{Change of Root CA}
+\label{ops-cr}
+
+This is much the same as the change of the signature key of the root
+certification authority. However, some things are special:
+
+The smartcard entries ``Public Root-CA-Keys'' will have
+only one value for the ``new'' public key, but no value
+for the ``old'' public key.
+
+If the old root CA ceases to exist, there will be a break of
+verification service (however no security risk)
+during a time, when one part of the users
+have already changed their originator certificates while others have
+not. This time of change should be made as short as possible.
+
+Steps have to be undertaken to maintain the old directory
+table ``Old Certificates''.
+
+More likely an
+old root CA might become a subordinate of another root CA,
+for example as a process of regional extension of a certification tree
+or if two trees are joined.
+If the old root CA becomes a subordinate of another root CA,
+the verification service will not break, because the old
+public root-CA-key is added to the smartcard tables ``Trusted Public CA Keys''.
+It is best, if
+this process follows exactly the pattern of a change of Root CA keys:
+users would receive the new {\em FCPath} information
+only several months after the reception of the new
+{\em PKRoot} and {\em PKList} information.
+
+\subsubsection{Support of Old Signatures}
+\label{ops-sos}
+
+A signature is ``old'', if no public CA key in the
+originator certificate is known to the verificator,
+and if the key number of the highest certificate
+is smaller than the key numbers of the smartcard entry
+``Public Root-CA-Keys''.
+Old signatures remain verifiable with the help of the directory
+attribute ``Old Certificates'' of the root certification authority.
+The smartcard table {\em PKRoot} (see paragraph \ref{pkroot})
+covers two validity time periods of Root CA keys.
+If as a routine CA keys remain for two or three years,
+verification of up to four or five years old signatures
+would succeed without directory support.
+This would make directory support necessary for rare cases only.
+
+\subsection{Marking Certificates ``Invalid'' (Black Lists)}
+\label{ops-mci}
+
+\subsubsection{Black Lists}
+\label{ops-bl}
+
+A certification authority can mark any of the certificates which
+it is the issuer of as ``invalid'' by adding it to the
+list of revoked certificates. It makes those black lists
+public by placing them into its directory entry.
+
+\subsubsection{Repudiation of Signatures}
+\label{ops-ros}
+
+A valid signature remains valid until its certificate is placed
+into a black list.
+Note that the placement of a certificate in a black list
+makes the respective signature {\em retroactively
+invalid from the beginning},
+because a creation date of a signature is proved by the signature only,
+and can therefore be set back into a past valid time interval
+by a signature with a revoked private key.
+
+This design of a data origin authentication service
+does not offer a long ranging non-repudiation service
+without additional operative agreements.
+An example of an operative agreement is
+to put the full responsibility for any kind of use and misuse of a key
+on the key's owner.
+This might be too hard in some application environments
+(such as banking) and would not prevent from strict
+non-repudiation at court.
+
+Black lists still have useful applications,
+the restrictions of which are described in the following cases:
+\\[1ex]
+{\bf Case 1:}
+\\[1ex]
+A user who does not follow the agreed policy of a certification
+authority can be deprived of his right to use his pair of
+keys by placing his certificate
+into a black list.
+All his signatures before the revocation date would remain valid.
+This measure would prevent the user from creating signatures
+after the revocation date.
+It would, however, not prevent the user to masquerade
+newly created signatures as old signatures, dated back before
+the revocation date.
+This could only be done by setting the revocation date
+earlier than the related certificate's value of {\em validity-notBefore}.
+However, that would make even those user's old signatures invalid,
+which used to be valid when they were produced.
+\\[1ex]
+{\bf Case 2:}
+\\[1ex]
+If a user reports,that his private key is stolen,
+there is only one way to protect him against
+back-dated counterfeit signatures:
+his certificate must be revoked with revocation date
+earlier than the certificate's value of {\em validity-notBefore}.
+Unfortunately, the unlucky user will have to re-sign
+all his old signatures,
+which he wanted to remain valid, with a newly created private key.
+\\[1ex]
+{\bf Case 3:}
+\\[1ex]
+A malevolent user might want to repudiate one or more of his old signatures.
+He simply reports, that his private key is stolen,
+and enjoys the revocation of all his old signatures
+while he is supplied with a new key (see case 2 above).
+He will, however, be unable to repudiate
+those among his old signatures, which are notarized
+by a third-party signature.
+\\[1ex]
+{\bf Case 4:}
+\\[1ex]
+Fraudulent cooperation between users and notarization authorities
+can make old signatures invalid in that they ask for revocation
+of their certificates together. Although theoretically possible,
+it would hardly be believable in practice.
+A notarization authority's professional reputation would be destroyed.
+\\[1ex]
+{\bf Case 5:}
+\\[1ex]
+A compromised CA key would be most desastrous, but must be
+considered as possible, for example by an insider attack.
+This CA's black lists were compromised as a whole.
+Black lists of superior CAs could and should, of course,
+revoke this CA's certificate.
+This would, however, affect all user certificates below
+the compromised CA.
+All the old signatures would immediately loose their validity,
+because a CA key can limitless produce certificates of any
+validity time intervals, even of the past.
+There is no counter-measure against this,
+except to handle CA keys very very carefully.
+Users should choose notarization authorities which
+are ``far away'' from their own position in the certification tree.
+
+
+\subsubsection{Long Term Validity of Signatures}
+\label{ops-ltv}
+
+A signature is
+theoretically absolutely valid only at the moment of its verification.
+In that, the time elapsed between creation
+and verification of the signature plays no role.
+However, the valid verification today does not guarantee,
+that tomorrow the signature would also be accepted as valid yesterday,
+because it might have been put into a black list meanwhile.
+Therefore, consequences of signatures for real actions should be taken
+as soon as possible.
+If a verificator of a signature has ``forgotten'' the signature,
+because its realization is completed,
+a later revocation has no effect.
+
+Based on operational cooperation within a community,
+there are several steps which can be taken in order to force
+signatures to have a longer validity.
+
+\begin{enumerate}
+\item Signatures are valid until Revocation.
+In reality this means: Realize a signature at the moment of its verification.
+\item Signatures are valid at least 1 day (1 week, 2 weeks, 1 month, etc.)
+after revocation.
+The users (their insurances, CAs, etc.) are liable for misuse.
+In reality this means: Realize a signature within the guaranteed
+period of time.
+\item Long term validity of signatures can be guaranteed by adding
+notarization signatures to a signed text.
+A multiple signature is as questionable as the probability
+of fraudulent cooperation between users and authorities.
+\\
+In general a valid signature remains valid even if it is revoked later,
+if the creation date is proved by other means than the signature itself,
+e.g. by a notarization signature.
+\item There are high sanctions on placing a certificate into a black list.
+\\
+This takes into account, that in general users want to be long-term
+members of a communicating community.
+\end{enumerate}
+
+\subsubsection{Non-Repudiation with Notarization Signature}
+\label{ops-not}
+
+The best guarantee for a long term validity of a signature is
+to add other third-party signatures to a signed document.
+This can be initiated by the users themselves,
+but there might be also services of certification authorities.
+
+\subsubsection{Examples}
+\label{ops-dfn}
+
+As a simple example, digital signatures could be used for the following services:
+
+\begin{itemize}
+\item access control (Login, Directory, FT, RJC);
+\item proof of integrity of transmitted data (MHS, Directory, FT);
+\item proof of originality of transmitted data (MHS, Directory, FT);
+\item mutual authentication (entities MTA, DSA, etc., end users).
+\end{itemize}
+
+None of these services needs long term validity.
+However, signed documents might be stored for later verification.
+Users are also free to initiate notarization signatures for their
+signed documents, in order to guarantee their long term validity.
+
+The verification of old signatures should be supported in this case.
+A non-repudiation service will could be optional
+(by user actions).
+
+Old certificates should be supported by the directory table ``Old Certificates''
+in which old public keys are cross-certified by the currently valid CA key.
+It is sufficient, if only the root certification authority
+maintains this directory attribute.

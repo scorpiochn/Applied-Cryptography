@@ -1,0 +1,9 @@
+1.2:	`big_string' and `big_set_string' now runs faster.
+
+
+1.1:	`big_set_string' can now take non-capital letters as digits.
+	The external variable `big_end_string' points to the first
+	character in the string that was not accepted as a digit.
+
+	`mkhdr' failed when trying to create `internal.h' on a
+	DEC-2060 when compiling with KCC.  Now works ok.

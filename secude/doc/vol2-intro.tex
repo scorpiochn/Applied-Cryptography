@@ -1,0 +1,2699 @@
+\nm{1}{INTRO}{Introduction to SecuDE}
+\label{intro1}
+\hl{Description}
+{\bf General Introduction}
+\\ [1em]
+The contribution of SecuDE to public domain is part of our effort to 
+facilitate the open, authentic and privacy-protected electronic 
+telecooperation between people through using public key cryptography and openly 
+available security technology. Providing authenticity and protecting the 
+privacy is an increasing concern of everyone as electronic information 
+storage and exchange is rapidly growing. This can be done only with publicly known
+security technology of which the effectiveness is understandable and 
+comprehensible through public control. Security must only rely on the secrecy
+of keys, not on the secrecy of methods. 
+\\ [1em]
+SecuDE (Security Development Environment) is a security toolkit for
+Unix systems. It comprises a library of security functions and a
+number of utilities with the following functionality:
+\bi
+\m basic cryptographic functions like RSA, DSA, DES, various hash functions, 
+   including the RFC 1423 defined algorithm suite, 
+   OIW defined algorithms, and DSS,
+
+\m security functions for {\em data confidentiality}, {\em data integrity}, 
+   {\em origin authentication} and {\em non-repudation of origin} purposes 
+   on the basis of digital signatures and symmetric encryption,
+
+\m X.509 key certification functions, handling of certification pathes, 
+   cross-certification, certificate revocation,
+
+\m utilities and functions for the operation of certification authorities 
+   (CA) and interaction between certifying CAs and certified users,
+
+\m utilities to sign, verify, encrypt, decrypt and hash files,
+
+\m Internet PEM processing according to RFC 1421 - 1424 (see~\ref{pem})
+
+\m processing of RFC 1422-defined certificate revocation lists,
+
+\m secure access to public X.500 security attributes for the storage 
+   and retrieval of certificates, cross-certificates and revocation 
+   lists (integrated secured DUA, based on QUIPU 8.0, using strong 
+   authentication and signed DAP operations, see~\ref{x500}),
+
+\m all necessary ASN.1 encoding/decoding (based on Isode-8.0)
+
+\m integrity-protected and confidentiality-protected storage of all security 
+   relevant information of a user (secret keys, verification keys, certifiactes
+   etc.) in a so called {\em Personal Security Environment} (PSE).
+\ei
+ 
+SecuDE provides two different PSE realizations,
+\bi 
+\m a smartcard environment (SC-PSE), 
+\m a DES-encrypted Unix directory (laxly called software-PSE or SW-PSE),
+\ei 
+both only accessible through the usage of PINs (Personal Identification Numbers).
+Smartcards require the purchase of a particular smartcard environment where 
+RSA and DES cryptography is done in the smartcard reader (information available 
+on request).
+The PSE typically contains the user's secret and public key (the latter
+contained in an X.509 certificate), the public root key which the user
+trusts, the user's distinguished name, the user's login name, and the 
+forward certification path to the user's root CA. In addition, the PSE 
+allows to securely store other public keys after their validation 
+(allowing henceforth to trust them like the root key without verifying 
+them again), and certificate revocation lists (CRLs) from any other CA.
+\\ [1em]
+{\bf SecuDE PEM}
+
+A PEM implementation is part of SecuDE. It provides a PEM filter
+which transforms any input stream into a PEM formatted output stream 
+and vice versa, and which should be capable of being  easily 
+integrated into Mail-UAs or CA tools.SecuDE-PEM realizes all formats 
+and procedures defined in the Internet Specifications RFC 1421-1424 
+except that it only supports asymmetric key management. It is
+possible to securely cache other's certificates and CRLs as this 
+is part of the general SecuDE functionality.
+
+SecuDE-PEM supports the certification and CRL procedures defined in RFC 
+1424 and is integrated into the SecuDE CA functionality. As an additional 
+functionality which goes beyond RFC 1421 - 1424, SecuDE-PEM may be 
+configured with an integrated X.500 DUA which allows, for instance, 
+automatic retrieval of certificates and CRLs during the PEM de-enhancement 
+process.  
+\\ [1em]
+{\bf X.500 Package}
+
+Secured X.500 DUA
+
+Concerning X.500 Directory access, SecuDE can be configured in three 
+alternatives:
+\be
+\m Without X.500 DUA functionality. In this case, the SecuDE package
+   is self-contained and needs no additional software.
+
+\m With integrated X.500 DUA, which operates on the basis of simple
+   authentication (i.e. with passwords) and unprotected DAP operations.
+   SecuDE uses QUIPU-8.0 library functions for this DUA functionality.
+   These library functions are not included in the SecuDE package, and
+   a standard QUIPU-8.0 installation is additionally required (the 
+   Isode/QUIPU libraries libisode.a and libdsap.a are needed to be able 
+   to bind the application programs).
+
+\m With integrated secured X.500 DUA, which operates on the basis of
+   strong authentication (i.e. with digital signatures) and signed DAP
+   operations.
+   SecuDE uses modified (i.e. security-enhanced) QUIPU-8.0 library 
+   functions for this DUA functionality. These library functions are not 
+   included in the SecuDE package, and a security-enhanced QUIPU-8.0 
+   installation is additionally required (the security-enhanced 
+   Isode/QUIPU libraries libisode.a and libdsap.a are needed to be able 
+   to bind the application programs).
+\ee
+
+Alternative 3 requires a security-enhanced version of Quipu which can
+be obtained as a separate distribution from GMD. 
+\\ [1em]
+Secured X.500 DSA
+
+The security-enhanced version of Quipu also contains software for a secured 
+X.500 DSA. ``Secured'' means the ability to perform strong authentication 
+during association setup between DUA and DSA, and subsequent signed 
+operations at the DAP level. The DAP operations into which we have 
+incorporated strong authentication are those assigned by the standard 
+(X.511) for that purpose, i.e. Bind, Read, Compare, Search, List, AddEntry,
+RemoveEntry, ModifyEntry, and ModifyRDN. We have provided both SIGNED 
+arguments and SIGNED results.
+
+This DSA can securely interwork with the secured DUA component of SecuDE 
+(alternative 3 above).
+\\ [1em]
+
+{\large\bf SecuDE Utilities Summary}
+\addtotocsmall{SecuDE Utilities Summary}
+\\[1em]
+{\bf User Utilities}
+
+SecuDE provides a number 
+of utilities to maintain the user's PSE, to hash, sign, verify, 
+encrypt and decrypt files, to perform PEM transformations, to
+operate certification authorities, and to perform key and certificate
+management and distribution functions. All utilities require that
+a user has a PSE which is the user's security database (a user may have
+several PSEs; all utilities allow to specify a particular PSE using
+parameter {\bf -p} {\em psename}). Sectool(1) is the window-oriented
+interactive tool to maintain a PSE, access X.500 Directories, and
+exchange information between the Directory and the PSE.
+Psemaint(1) is the line-oriented equivalent of sectool(1).   
+\\ [1em]
+{\bf Utilities for Certification Authorities (CA)}
+ 
+For the generation of certificates and CRLs certification authorities 
+(CAs) are needed.
+SecuDE basicly provides two methods for the exchange of security
+information between SecuDE users and external CAs.
+\be
+\m A file interface of ASN.1 encoded objects is provided. These
+   files can be exchanged by any means.
+\m Procedures and formats according to PEM RFC 1424 are provided.
+\ee
+Key generation and certification can be done with
+\be
+\m User-generated keys, whereby the pubic component is
+   subsequently transmitted to the CA for certification and
+   retransmitted as certificate to the user (PEM
+   procedures allow this method only),
+\m CA-generated keys, whereby subsequently a whole PSE
+   containing all keys and certificates is transmitted from
+   the CA to the user (this requires that also the CA operates
+   with SecuDE tools).
+\ee
+In addition, tools for setting up a CA hierarchy with SecuDE means 
+only, and for the operation of CAs are provided.
+This tool set is described in KM(1).
+\\ [1em]
+{\large\bf Access to Public Directories}
+\addtotocsmall{Access to Public Directories}
+
+SecuDE provides a set of functions to retrieve and update security 
+attributes in Directories, like UserCertificate, CaCertificate, 
+CrossCertificatePair, CertificateRevocationList etc.
+\\ [1em]
+{\bf Global X.500 Directory and Local afdb Directory}
+\addtotocsmall{Global X.500 Directory and Local afdb Directory}
+ 
+DUA functionality for the access to the X.500 Directory is based on
+QUIPU-8 software and requires a full ISODE-8 installation on the system. 
+X.500 DUA functionality is integrated into many SecuDE utilities
+and functions. For instance, it is part of sectool(1) and psemaint(1)
+which allows the transfer of security information between the user's
+PSE and public Directories and vice versa.
+
+As it stands at the moment the use of the global X.500 Directory is not
+very widespread. Participants of the X.500 Directory are often
+academic and research organizations. Also, in larger organizations 
+the nature of publicly needed security information is not global
+but local. To securely communicate with people from the same organization,
+access to the X.500 Directory is not needed. It would be sufficient
+to retrieve the necessary security information from a local database.
+
+In order to support such a kind of functionality, SecuDE provides a
+local Directory which is called the afdb Directory (afdb: authentication
+framework data base). It resides in the Unix directory \$TOP/.af-db.
+he afdb Directory stores, like the X.500 Directory, certificates, 
+cross certificate pairs and certificate revocation lists on the basis 
+of X.501 distinguished names. Each entry in the afdb Directory is a 
+subdirectory of \$TOP/.af-db with the printable DName as (Unix) directory 
+name (see below on distinguished names).
+
+Note that in order to use the word ``directory'' unambiguously the word
+Directory (with capital D) means an X.500 or afdb Directory and the word
+directory (with small d) means a Unix directory throughout the whole
+SecuDE documentation. 
+\\ [1em]
+{\bf Local Names and Distinguished Names}
+\addtotocsmall{Local Names and Distinguished Names}
+
+This section provides a brief introduction to the concept of the global
+unique name scheme introduced through X.500 Distinguished Names,
+and its realization and application in SecuDE.
+  
+SecuDE uses the X.501 defined name scheme in order to identify subjects who
+process or own keys and certificates, e.g. human users, organizations like 
+CAs and
+particular system components like X.500 DSAs. Each subject is uniquely
+identified by a Distinguished Name. 
+{\em DistinguishedName} is defined in correspondence to CCITT X.501, Annex 
+B, as
+a sequence of relative distinguished names which in turn are sets
+of \{attribute type / attribute value\} pairs:
+{\small
+\bvtab
+DistinguishedName ::= \6 {\bf SEQUENCE OF} RelativeDistinguishedName                  
+\\ [1ex]
+RelativeDistinguishedName ::= \6 {\bf SET OF} AttributeValueAssertion                 
+\\ [1ex]
+AttributeValueAssertion ::= \6 {\bf SEQUENCE} \{                                      
+\\
+                               \7 attributeType \3 OBJECT IDENTIFIER,                 
+\\
+                               \7 attributeValue \3 ANY DEFINED BY 
+attributeType      \\
+                            \6 \} \\
+\evtab                             
+}
+SecuDE handles two representations of distinguished names. One is the {\em 
+DName}
+data type which is a C-structure corresponding to the above ASN.1 notation 
+(see INTRO(3X)). 
+The second which is used at the SecuDE utility interface is the {\em Name} 
+data type.
+This is a printable character string representation
+of a distinguished name in the form
+\bc
+{\small keyword=value \% keyword=value ... ; keyword=value \% keyword = 
+value ...; ...}
+\ec
+keyword is a SecuDE-defined name for an attribute type. 
+The ';' delimiter separates the RDN members of the DN, i. e. each 
+keyword=value \% keyword=value ... expression denotes one relative 
+distinguished name.
+The '\%' delimiter separates the attribute value assertions within one RDN
+(note that within a single RDN a particular attribute type must not
+appear more than once).
+The following keywords, representing X.520 defined attributes,  are 
+possible:
+{\small
+\bvtab
+C   \2 countryName \\
+O   \2 organizationName  \\
+OU  \2 organizationalUnitName \\
+S   \2 surname \\
+CN  \2 commonName \\
+L   \2 localityName \\
+SP  \2 stateOrProvinceName \\
+ST  \2 streetAddress \\
+T   \2 title \\
+SN  \2 serialNumber \\
+BC  \2 businessCategory \\
+D   \2 description
+\evtab
+}
+RDNs must be ordered top down. Letter cases are not significant for names 
+(except in case of the country code which must be a sequence of two capital
+ letters), as well as spaces may be used inside and outside the names.
+
+Example: 
+
+{\small
+C=DE; O=gmd; OU=I2 \% CN=Institut fuer TeleKooperationsTechnik; CN=Wolfgang 
+Schneider}
+
+is a possible printable character string representation of a DName as it might
+be used at the utility interface of SecuDE. 
+\\ [1em]
+{\bf Local Name Aliasing}
+\addtotocsmall{Name Aliasing}
+
+Since Distinguished Names are pretty unhandy to deal with in the
+day-to-day work, SecuDE provides aliasing functionality. Alias names
+can be defined on a per-installation or on a per-user basis. Alias
+files are integrity-protected, i.e. alias files are signed when they are
+generated or changed, and they ar validated when they are read for
+alias name transformations. Per-installation alias files must be signed
+by a system administrator; per-user alias files are signed by the
+user himself. 
+
+In addition it is possible to store the user aliases on a per PSE basis
+in the PSE-object AliasList (where they are integrity-protected through
+PSE means). This is necessary if the user is connected to different
+certification trees with more than one PSE.
+
+The installation alias file is in \$TOP/.af-alias. \$TOP
+is the top level directory of the SecuDE installation. The alias file
+has the system administrator's signature in \$(TOP)/.af-alias.sig and his user
+certificate and forward certification path in \$(TOP)/.af-alias.ctf.
+In order to enable a user to verify the system administrator's signature
+it is necessary that all users and the system administrator share the
+same public root key.
+
+The user alias file is either in \$HOME/.af-alias or in the PSE-object
+AliasList. The alias transforming routines check for the existence of
+the PSE-object AliasList first.
+ 
+SecuDE distinguishes three types of alias names: local names (i.e.
+login names), Internet mail addresses, and X.400 OR-Names. Each 
+X.500 Distinguished Name may have several aliases of the above types.
+
+Each utility which requires a {\em Name} parameter (i.e. the printable
+character string representation of a Distinguished Name) maps the given 
+parameter through the alias mechanism, i.e. each utility allows to
+use alias names instead of X.500 Distinguished Names.
+\\ [1em]
+{\bf Cryptographic Algorithms}
+\addtotocsmall{Cryptographic Algorithms}
+
+SecuDE has a number of cryptographic algorithms implemented for different
+purposes, for instance symmetric and asymmetric encryption algorithms
+for the purpose of confidentiality and privacy, signature algorithms
+for the purpose of authentication and non-repudiation, and hash
+algorithms which are used for integrity purposes.
+In SecuDE, cryptographic algorithms are identified through names or
+through X.509 algorithm identifiers. An implemented algorithm may
+have more than one Name. It is, however, uniquely identified through its
+algorithm identifier. 
+
+If a utilities allows to specify a cryptographic algorithm, an algorithm
+name is required. See a more detailled description in the introduction 
+of section 3 (subroutines) about the use of cryptographic algorithms
+and their properties and parameters.
+\\ [1em]
+{\bf Common Parameters}
+\addtotocsmall{Common Parameters}
+
+There is set of parameters which are common to many SecuDE utilities:
+\\ [1em]
+\parname{{\bf -h}}
+\pardescript{Print a helptext about the command to stderr.}
+
+\parname{{\bf -p} {\em psename}}
+\pardescript{{\em psename} denotes the name of the PSE which is in effect
+for the utility. Each user may have more than one PSE. The use of a
+particular PSE establishes the security context of the requested action.
+For instance, a particular PSE may link the user to a particular
+certification tree (and to a particular root key)}
+
+\parname{{\bf -c} {\em cadir}}
+\pardescript{This parameter does two things. It indicates that the utility
+is called by a CA, and it denotes the name of the PSE which is in effect
+for the utility (Per default a CA has the PSE {\em cadir}/.capse). If
+both parameters {\bf -c} {\em cadir} and {\bf -p} {\em psename} are used,
+it denotes the PSE {\em cadir}/{\em psename}.}
+
+\parname{{\bf -k} {\em keysize}}
+\pardescript{Keysize of asymmetric keys to be generated.}
+
+\parname{{\bf -vVW}}
+\pardescript{Options {\bf -v}, {\bf -V} and {\bf -W} set three
+verbose levels, -v being the least and -W being the most verbose. Not
+more than -v is necessary for normal operations. In general -v
+causes that in case of signature verifications the structure
+VerificationResult is printed, and that in case of errors the error
+stack is printed.}
+
+\parname{{\bf -t}}
+\pardescript{Enable checking of malloc/free behaviour. Each address obtained
+through malloc(3), calloc(3) or realloc(3) is stored in an internal list
+which is examined whenn addresses are freed. Inconsistancies are reported
+to stderr.} 
+
+\parname{{\bf -i} {\em inputfile}}
+\pardescript{Inputfile}
+
+\parname{{\bf -o} {\em outputfile}}
+\pardescript{Outputfile}
+
+In case that Directories are being accessed:
+
+\parname{{\bf -D}}
+\pardescript{Enter the generated information (certificates or CRLs) into
+the Directory}
+
+In case that X.500 Directories are being accessed:
+
+\parname{{\bf -d} {\em dsaname}}
+\pardescript{{\em dsaname} denotes the name of the DSA (Directory System Agent) 
+to be contacted for this purpose. {\em dsaname} is a name which must be contained in the 
+{\em dsaptailor} file of the system as {\em dsa\_address} parameter. If {\bf -d} {\em dsaname} is
+not given, the default DSA, which is the first {\em dsa\_address} parameter in the {\em dsaptailor} 
+file, is accessed.}
+
+\parname{{\bf -A} {\em authlevel}}
+\pardescript{{\em authlevel} determines the level of authentication used when binding to the DSA. 
+{\em authlevel} may have the values STRONG, SIMPLE or NOAUTH.
+If {\bf -A} {\em authlevel} is omitted, the requested 
+level of authentication is taken from the environment variable AUTHLEVEL, and is set to {\em no 
+authentication}, if no such variable exists.
+In case of simple authentication being used, the caller's distinguished name and
+X.500 password are retrieved from the PSE objects Name and QuipuPWD, respectively.
+In case of strong authentication being used, subsequent DAP operations are also signed.
+STRONG requires that SecuDE is installed with the STRONG option.}
+
+\hl{Getting Started}
+\addtotocsmall{Getting Started}
+Though SecuDE is basically a library of security functions for C-programmers, it
+provides some utilities which allow users to encrypt and decrypt files (ENCRYPT(1), DECRYPT(1)),
+sign and verify files (SIGN(1), VERIFY(1)), create and interpret PEM messages (PEM(1)).
+After installation of SecuDE, it is necessary to provide each user with a PSE containing 
+his personal secret keys for encryption and signatures, the corresponding certified public keys,
+the public key of the root certification authority, and the forward certification path, i.e.
+a PSE containing the AF-PSE-objects described in AF\_PSE\_OBJECTS(4).
+
+Type
+
+\begin{center}
+secude -h
+\end{center}
+ 
+to get a list of available SecuDE utilities. Type
+
+\begin{center}
+secude -q
+\end{center}
+
+to get a quick reference guide of the available utilities to stderr. 
+
+It is not necessary that a user gets certificates and the like from external or
+third parties before he is able to do anything. He just has to create a PSE
+with
+\begin{center}
+psecreate {\em distinguished-name}
+\end{center} 
+and can start signing and encrypting files and exchanging keys with others. The user's
+distinguished name and the name of his default PSE can be defined in .cshrc
+in the environment variable MYDNAME and PSE.
+
+On a larger scale, however, it is advisable to connect to an existing certification
+tree or to create an own one. To do the latter, a tree of certification authorities, at least consisting of one root 
+certification authority, must be created, where a user gets his certificates from. 
+This can be done using cacreate(1) and the commands described in KM(1), or using
+the command pem(1) to perform PEM certification procedures instead.
+After the creation of at least
+a root certification authority and the user PSEs, the users are able to
+use the utilities mentioned above.
+ 
+A typical sequence of actions to get an own certification tree is described in KM(1).
+An alternative could be the following (In this example all 
+is done under a single Unix user ID. Normally, the different roles (CAs and users) are
+played under different Unix user IDs or even on different systems):
+\be
+\m Create a root certification authority using {\em cacreate -c RootCA Name}.
+\m If an additional level of CAs is needed below the root CA, create one or more 
+   certification authorities below the root
+   using {\em gen\_ca -c RootCA} at the root CA site and {\em inst\_ca CAFile} at the site
+   of the CA to be created. CAFile is the name of a file which contains the CA-directory
+   (of the CA to be created) as compressed tar-file. {\em gen\_ca} asks for the name of 
+   CAFile and for the name of the CA-directory intercatively.
+\m Repeat step 2. for each CA if additional levels of CAs are needed.
+\m Create one ore more user PSEs under a CA using {\em gen\_pse -c CADir} at the CA site
+   and {\em inst\_pse PSEFile} at the user site. CADir is the CA directory of the issueing
+   CA of the user. PSEFile is the name of the file which contains the PSE (of the user)
+   as compressed tar-file. 
+\ee
+See KM(1) for the detailled parameterization of those KM utilities.
+ 
+Readers are also advised, in order to get an example of how to use KM(1), to examine the shell 
+script {\em create\_TestTree} which is contained in SecuDE's bin directory. 
+{\em create\_TestTree} creates a tree of one root CA, two second level CAs and two
+user PSEs under each second level CA for test purposes. Furthermore, it can enter
+the signature and encryption certificates of each CA and each user into a directory, which 
+may either be a X.500 directory or the local substitute provided by SecuDE. The test 
+tree can be deleted with {\em delete\_TestTree}.
+
+\qr{1}{Quick Reference Guide}
+{\small
+\begin{verbatim}
+SecuDE-4.1                                                         (c)1993 GMD Darmstadt
+
+
+General User Utilities:
+=======================
+
+
+sign:  Sign Files
+
+
+Description:
+
+'sign' signs the given <files>. It uses algorithms and keys according
+to the parameter -k and -a (default: SKnew/SignSK). For each
+file in <files> it produces file.sig (containing the signature) and, if
+-C is given, file.ctf (containing the user certificate and the forward
+certification path).
+
+
+usage:
+
+sign [-CvVWUth] [-p <pse>] [-c <cadir>] [-k <key>] [-a <alg>] [-H <hashinput>] [<files>]
+
+with:
+
+-C               Produce .ctf files containing user certificate and forward certification
+                 path for each file to be signed. Otherwise, produce only .sig files
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only)
+-U               Show time used for cryptographic algorithms
+-t               Control malloc/free behaviour
+-h               Write this help text
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+-k <key>         PSE-object or key reference of signature key. Default: SKnew/SignSK
+-a <signalg>     Signature algorithm. Default: md5WithRsaTimedate (RSA) or dsaWithSHA
+                 (DSS), depending on the signature key
+-H <hashinput>   PSE-object or key reference of hash input (sqmodn only)
+<files>          Filenames
+
+****************************************************************************************
+
+
+verify: Verify Signatures of Files
+
+
+Description:
+
+'verify' verifies the given <files>. It uses algorithms and keys according
+to the parameter -k and -a (default: Cert/SignCert). For each
+file in <files> it expects file.sig (containing the signature) and
+optionally file.ctf (containing the user certificate and the forward
+certification path). If file.ctf does not exist, the verification will
+only succeed if the file was signed by oneself.
+
+
+usage:
+
+verify [-DRvFVWtTUh] [-p <pse>] [-c <cadir>] [-d <dsa>] [-A <authlevel>] [-k <key>] 
+       [-f <fcpath>] [<files>]
+
+with:
+
+-D               Retrieve missing certificates from the Directory (X.500 or .af-db)
+-F               Consider own FCPath as trusted
+-R               Consult certificate revocation lists for all cerificates which
+                 are in the certification path
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only)
+-t               Control malloc/free behaviour
+-T               Perform each public key RSA operation in the smartcard  terminal
+                 instead with the software in the workstation (the latter is default)
+-U               Show time used for cryptographic algorithms
+-h               Write this help text
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+-d <dsa>         name of the DSA to be accessed for retrieving certificates
+                 and certificate revocation lists
+-A <authlevel>   Level of authentication used for binding to the X.500 Directory
+                 It may be SIMPLE or STRONG (default: environment variable AUTHLEVEL, or 
+                 NONE, if this does not exist). STRONG implies the use of signed DAP 
+	         operations.
+-k <key>         PSE-object (containing either a certificate or a key) or key reference 
+                 of verification key. Default: Cert/SignCert
+-f <fcpath>      name of PSE-object which contains the Forward Certification Path
+<files>          Filenames
+
+****************************************************************************************
+
+
+encrypt:  Encrypt Files
+
+
+Description:
+
+'encrypt' encrypts the given <files>. It uses algorithms and keys according
+to the parameter -k or -w or -r or -w. Not more than one of these parameters
+must be given (default: key and alg from PSE-object Cert/EncCert). For each
+file in <files> it encrypts from file to file.enc and removes file.
+'encrypt' also works as a filter from stdin to stdout.
+
+
+usage:
+
+encrypt [-DnxvVWtTU] [-k <key>] [-r <recipient>] [-w <pw>] [-e <deskey>] 
+        [-E <encalg>] [-p <pse>] [-c <cadir>] [-d <dsa>] [-A <auth-level>]
+        [<files>]
+
+with:
+
+(not more than one of the parameters -k, -e, -w and -r must be given. If none of these 
+ four parameters is given, the file is symmetrically (default: desCBC) encrypted with a  
+ newly generated DES key, and the DES key is asymmetrically encrypted with the own 
+ encryption key (Cert/EncCert). This is called the hybrid method.)
+
+-k <object/ref>  PSE-object (containing either a certificate or a key) or key reference 
+                 of encryption key. Default: Cert/EncCert. If this key is an asymmetric
+                 key, the hybrid method is used.
+-e <key>         DES key for desCBC encryption.
+-x               If given, <key> of parameter -e must be a 16 character string
+                 denoting the key in a [0-9, A-F] notation. Otherwise it must be
+                 an 8 character string comprising the key itself.
+-w               8 character password which is transformed into a DES key with a
+                 one-way function, for desCBC encryption.
+-r               Intended recipient (alias allowed). Search encryption key of this 
+                 recipient in EKList/PKList. If not given, encrypt with own encryption 
+                 key. This implies the hybrid method
+-n               Don't use the hybrid method in case of an asymmetric key. Do asymmetric
+                 encryption of the whole file (not recommendable for larger files)
+-D               Search public encryption key in the Directory if it cannot
+                 be found in EKList/PKList of the PSE
+-d <dsa>         Name of the DSA to be accessed for retrieving the public encryption key
+-A <auth_level>  Level of authentication in case of X.500 Directory access. <auth-level>
+                 may be SIMPLE or STRONG (default: environment variable AUTHLEVEL, or NONE,
+                 if this does not exist). STRONG implies the use of signed DAP operations
+-E <encalg>      Use algorithm encalg instead of desCBC for the file encryption. <encalg>
+                 must be a symmetric algorithm
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only)
+-t               Control malloc/free behaviour
+-T               Perform each public key RSA operation in the smartcard  terminal
+                 instead of employing the software in the workstation (the latter is the 
+                 default)
+-U               Show time used for cryptographic algorithms
+-h               Write this help text
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+<files>          Filenames
+
+****************************************************************************************
+
+
+decrypt:  Decrypt Files
+
+
+Description:
+
+'decrypt' decrypts the given <files>. It uses algorithms and keys according
+to the parameter -k or -w or -r or -w. Not more than one of these parameters
+must be given (default: key and alg from PSE-object SKnew/DecSKnew). For each
+file in <files> it decrypts from file.enc to file and removes file.enc.
+'decrypt' also works as a filter from stdin to stdout.
+
+
+usage:
+
+decrypt [-nxvVWtU] [-k <key>] [-w <pw>] [-e <deskey>] 
+        [-E <encalg>] [-p <pse>] [-c <cadir>] [<files>]
+
+with:
+
+(not more than one of the parameters -k, -e and -w must be given. If none of these three
+ parameters is given, the file is symmetrically (default: desCBC) decrypted with the key 
+ from <file>.sig which will be asymmetrically decrypted before with the own decryption 
+ key (SKnew/DecSKnew). This is called the hybrid method.)
+
+-k <object/ref>  PSE-object (containing a KeyInfo) or key reference 
+                 of decryption key. Default: SKnew/DecSKnew. If this key is an asymmetric
+                 key, the hybrid method is used.
+-e <key>         DES key for desCBC decryption.
+-x               If given, <key> of parameter -e must be a 16 character string
+                 denoting the key in a [0-9, A-F] notation. Otherwise it must be
+                 an 8 character string comprising the key itself.
+-w               8 character password which is transformed into a DES key with a
+                 one-way function, for desCBC decryption.
+-n               Don't use the hybrid method in case of an asymmetric key. Do asymmetric
+                 decryption of the whole file
+-E <decalg>      Use algorithm decalg instead of desCBC for the file decryption. <decalg>
+                 must be a symmetric algorithm
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only)
+-t               Control malloc/free behaviour
+-U               Show time used for cryptographic algorithms
+-h               Write this help text
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+<files>          Filenames
+
+****************************************************************************************
+
+
+pem  Privacy Enhancement for Internet Electronic Mail
+
+usage:
+
+pem [ scan | mic-clear | mic-only | encrypted | crl | clr-rr | certify ]
+    [-i <inputfile>] [-o <outputfile>] [-p <psename>] [-c <cadir>] [-m|M 1..200]
+    [-u <update>] [-r <name1 ...> ] [-y <name1 ...> ] [-CnFNOhvVWRDTt] [-d <dsaname>]
+    [-H <mic-alg>] [-S <micenc-alg>] [-E <msgenc-alg>] [-K <dekenc-alg>]
+
+with:
+
+scan             read PEM any Proc-Type, write clear body and/or update
+                 PSE and/or CA-database according to -u (default)
+mic-clear        read text file, write PEM Proc-Type MIC-CLEAR
+mic-only         read text file, write PEM Proc-Type MIC-ONLY
+encrypted        read text file, write PEM Proc Type ENCRYPTED according to -r
+crl              write PEM Proc-Type CRL according to -y
+crl-rr           write PEM Proc-Type CRL-RETRIEVAL-REQUEST according to -y
+certify          read PEM Proc-Type MIC-CLEAR or MIC-ONLY, check whether it is certifi-
+                 cation request, sign Prototype-certificate, write certification reply
+-i <inputfile>   inputfile (default: stdin)
+-o <outputfile>  outputfile (default: stdout)
+-p <psename>     PSE name (default: .pse)
+-c <cadir>       name of CA-directory (default: .ca)
+-m <level>       depth of multi PEM body, which is to be de-enhanced (only if pem scan)
+-M <level>       depth of multi PEM body, up to which is to be de-enhanced (only if 
+                 pem scan)
+-u <update>      mode for updating the PSE or CA-database after scanning a PEM-msg
+                 (ask, yes, no, cadb, pse (default: ask))
+-r <recipients>  DNames or alias-names of recipients (only if pem encrypted)
+-y <issuers>     DNames or alias-names of issuers of CRLs or CRL-RRs (only if pem crl 
+                 or pem clr-rr)
+-C               generate PEM-header with Originator-Certificate and all Issuer-Certifi-
+                 cates (default: generate PEM-header with Originator-ID-Asymmetric)
+-n               don't insert Key-Info header field for originator (only if pem encrypted)
+-N               use of non-PEM conformant algorithms allowed
+-O               RFC 1422 DName subordination not required
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for tests only)
+-F               consider own FCPath as trusted
+-R               consult CRLs during validation process
+-D               retrieve missing certificates or CRLs from the Directory 
+                 (X.500 or .af-db)
+-d <dsaname>     name of the DSA to be initially accessed (default: locally configured 
+                 DSA)
+-A <authlevel>   level of authentication used for binding to the X.500 Directory
+-H <mic-alg>     MIC algorithm (default: RSA-MD5)
+-S <micenc-alg>  MIC encryption algorithm (default: RSA)
+-E <msgenc-alg>  Message encryption algorithm (default: DES-CBC) (only if pem encrypted)
+-K <dekenc-alg>  DEK encryption algorithm (default: RSA) (only if pem encrypted)
+-t               enable memory checking
+-T               verification of signature is to be done by the smartcard terminal
+
+****************************************************************************************
+
+
+hsh:  Hash Filter
+
+
+Description:
+
+'hsh' reads <file> and writes its hash value to <hash>. It uses the algorithm
+given with parameter -a <alg>. <alg> is the name of an algorithm of type HASH.
+
+
+usage:
+
+hsh [-vh] [-a <alg>] [-H <hashinput>] [-p <pse>] [-c <cadir>] [<file> [<hash>] ]
+
+with:
+
+-a <alg>         Name of a hash algorithm (default: md5)
+-H <hashinput>   PSE-object or key reference of hash input (sqmodn only)
+-p <psename>     PSE name, if <hashinput> is PSE-object (sqmodn only)
+-c <cadir>       CA directory, if <hashinput> is PSE-object (sqmodn only)
+-v               verbose
+-h               Write this help text
+<file>           Filename of file to be hashed. Stdin, if omitted
+<hash>           File where hash value shall be written. Stdout, if omitted
+
+****************************************************************************************
+
+
+encode  Encode File to RFC 1421 or [0-9,A-F] ASCII Represenation
+
+usage:
+
+encode [-rxhv] [ -i <n> ] [ file [encodedfile] ]
+
+with:
+
+-r               RFC 1421 encoding style (default)
+-x               [0-9,A-F] encoding style
+-i <n>           insert newlines after n characters (default 64)
+-h               write this help text
+-v               verbose
+
+****************************************************************************************
+
+
+decode  decode RFC 1421 or [0-9,A-F] encoded ASCII file to file
+
+usage:
+
+decode [-rxhv] [ encodedfile [file] ]
+
+with:
+
+-r               RFC 1421 encoding style (default)
+-x               [0-9,A-F] encoding style
+-h               write this help text
+-v               verbose
+
+****************************************************************************************
+
+
+algs  Information about algorithms
+
+usage:
+
+algs [-UGvVth] [-a <name>] [-s <keyword>] [-k <k1> <k2> ... ] [-l <quantity>]
+
+with:
+
+-a <name>        Selects a single algorithm with name <name>
+-s <keyword>     Selects groups of algorithms. Either one of the AlgTypes (SYM_ENC, 
+                 ASYM_ENC, HASH, SIG) which selects all algorithms of the given type, or
+                 a string which is contained in an algorithm name.
+-U               Show performance times of algorithms for sign, verify, encrypt, decrypt
+                 and hash, depending on the algorithm type:
+                 Signature algorithms: Total, asymmetric encryption and hash time for
+                           signing and verifying a given quantity with different
+                           keysizes (parameter -k). Asymmetric keys are generated
+                           and stored in PSE $(TOP)/lib/.testkeys afterwards if not 
+                           available
+                 Asymetric Encryption algorithms: Encryption and decryption of a block
+                           with different keysizes (parameter -k). Asymmetric keys are 
+                           generated and stored in PSE $(TOP)/lib/.testkeys afterwards 
+                           if not available
+                 Symmetric Encryption algorithms: Encryption of a 100 K quantity
+                 Hash algorithms: Hashing of a given quantity
+-G               Show key generation times of asymmetric algorithms with
+                 different keysizes (parameter -k). Needs time!
+-k <k1> <k2> ... Use keysizes k1, k2, ... (default: 512, 640, 756, 1024)
+-l <quantity>    Quantity to be signed or hashed in K bytes (default: 100)
+-v               verbose
+-V               Verbose
+-t               Control malloc/free behaviour
+-h               Write this help text
+
+****************************************************************************************
+
+
+secxlock  Locks the local X display using strong authentication with your PSE
+
+usage:
+
+secxlock [-h] [-p <pse>] [-c <cadir>]
+
+with:
+
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       name of CA-directory (default: Environment variable CADIR or .ca)
+-h               Write this help text
+
+****************************************************************************************
+
+
+Utilities to Create and Maintain your Personal Security Environment (PSE)
+=========================================================================
+
+
+psecreate: Create User PSE
+
+
+Description:
+
+'psecreate'  creates a User PSE with one or two asymmetric keypairs on it,
+whose public keys are held within self-signed prototype certificates.
+
+
+usage:
+
+psecreate [-hqtvVW] [-p <pse>] [-s <signalg>] [-k <keysize>] [-e <encalg>] [-k <keysize>] 
+          [Name]
+
+with:
+
+-p <pse>         PSE name (default: Environment variable PSE or .pse)
+-s <signalg>     Signature algorithm (default: rsa)
+-k <keysize>     Keysize of RSA signature key
+-e <encalg>      Encryption algorithm (default: rsa)
+-k <keysize>     Keysize of RSA encryption key
+-q               create PSE that contains two RSA keypairs (default: one RSA keypair only)
+-h               write this help text
+-t               control malloc/free behaviour
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<Name>           Intended owner of the generated User PSE
+
+****************************************************************************************
+
+
+sectool: Maintain your PSE
+aliastool: Maintain your aliases (Alias sub-tool of sectool)
+directorytool: Access Directory (Directory sub-tool of sectool)
+
+
+Description:
+
+'sectool' is, like psemaint,  a maintenance program which can be used by both
+certification authority administrators and users for the purpose
+of maintaining their PSEs. This includes moving information (e.g. keys,
+certificates, revocation lists etc.) from Unix files or a X.500 Directory
+into the PSE and vice versa, generating keys, changing PINs, displaying
+the content of the PSE, and maintaining the user's aliases. In contrast
+to psemaint, which is line-oriented, sectool is an OpenWindows tool.
+
+
+usage:
+
+sectool [-tDvVWh] [-p <pse>] [-c <cadir>] [-d <dsa name>] [-A <authlevel>]
+aliastool [-tDvVWh] [-p <pse>] [-c <cadir>] [-d <dsa name>]
+directorytool [-tDvVWh] [-p <pse>] [-c <cadir>] [-d <dsa name>] [-A <authlevel>]
+with:
+
+-p <psename>        PSE name (default: environment variable PSE or .pse)
+-c <cadir>          Name of CA-directory (default: environment variable CADIR or .ca)
+-t                  control malloc/free behaviour
+-v                  verbose
+-V                  Verbose
+-W                  Grand Verbose (for testing only)
+-d <dsa name>       Name of the DSA to be initially accessed (default: locally 
+                    configured DSA)
+-A <authlevel>      Level of authentication used for X.500 Directory access
+                    <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                    (default: environment variable AUTHLEVEL or 'No authentication')
+                    STRONG implies the use of signed DAP operations
+
+****************************************************************************************
+
+
+psemaint: Maintain PSE
+
+
+Description:
+
+'psemaint' is a maintenance program which can be used by both
+certification authority administrators and users for the purpose
+of maintaining their PSEs. This includes moving information (e.g. keys,
+certificates, revocation lists etc.) from Unix files or a X.500 Directory
+into the PSE and vice versa, generating keys, changing PINs and displaying
+the content of the PSE.
+
+
+usage:
+
+psemaint [-htvACFRDTVW] [-p <pse>] [-c <cadir>] [-a <issueralg>] [-f <notbefore>] 
+         [-l <notafter>] [-i <inputfile>] [-d <dsa name>] [-A <authlevel>] [cmd]
+with:
+
+-p <psename>        PSE name (default: environment variable PSE or .pse)
+-c <cadir>          Name of CA-directory (default: environment variable CADIR or .ca)
+-i <inputfile>      Scriptfile containing the commands to be executed by 'psemaint'
+-a <issueralg>      CA's signature algorithm (default: md2WithRsaEncryption)
+-f <notbefore>      First date on which the certificate is valid
+                    (evaluated by 'certify' command within 'psemaint')
+-l <notafter>       Last date on which the certificate is valid
+                    (evaluated by 'certify' command within 'psemaint')
+-F                  consider own FCPath as trusted
+-R                  consult PEM revocation lists during verification
+-C                  show list of commands available with 'psemaint'
+-D                  access Directory (X.500 or .af-db)
+-T                  perform each public key RSA operation in the smartcard  terminal
+                    instead of employing the software in the workstation (the latter is 
+                    the default)
+-h                  write this help text
+-t                  control malloc/free behaviour
+-v                  verbose
+-V                  Verbose
+-W                  Grand Verbose (for testing only)
+-d <dsa name>       Name of the DSA to be initially accessed (default: locally 
+                    configured DSA)
+-A <authlevel>      Level of authentication used for X.500 Directory access
+                    <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                    (default: environment variable AUTHLEVEL or 'No authentication')
+                    STRONG implies the use of signed DAP operations
+<cmd>               Single command that shall be executed by 'psemaint'
+                    (otherwise, commands can be provided interactively
+                    or are read from file <inputfile> (see option -i))
+
+****************************************************************************************
+
+
+instpkroot: Install Public Root Information on PSE
+
+
+Description:
+
+'instpkroot' reads file <pkroot> or stdin, if <pkroot> is omitted,
+and installs its content as PSE object PKRoot on the indicated PSE.
+A PKRoot information that already exists on the target PSE will be overwritten.
+
+
+usage:
+
+instpkroot [-htvVW] [-p <pse>] [-c <cadir>] [pkroot]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<pkroot>         File containing public root information (or stdin, if omitted)
+
+****************************************************************************************
+
+
+instfcpath: Install Forward Certification Path on PSE
+
+
+Description:
+
+'instfcpath' reads file <fcpath> or stdin, if <fcpath> is omitted,
+and installs its content as PSE object FCPath on the indicated PSE.
+A FCPath information that already exists on the target PSE will be overwritten.
+
+
+usage:
+
+instfcpath [-htvVW] [-p <pse>] [-c <cadir>] [fcpath]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<fcpath>         File containing FCPath (or stdin, if omitted)
+
+****************************************************************************************
+
+
+instcert: Install Certificate on PSE
+
+
+Description:
+
+'instcert' reads file <cert> or stdin, if <cert> is omitted, and installs its
+content on the PSE.
+
+
+usage:
+
+instcert [-aehrtvVWHD] [-p <pse>] [-c <cadir>] [-d <dsa name>] [-A <authlevel>] [cert]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-e               consider certificate as ENCRYPTION certificate (default: SIGNATURE 
+                 certificate)
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+-D               store certificate in Directory (X.500 or .af-db)
+-r               replace existing certificate in .af-db Directory
+-H               install certificate as hierarchy certificate
+                 (default: add certificate to set of cross certificates)
+-d <dsa name>    Name of the DSA to be initially accessed (default: locally 
+                 configured DSA)
+-a               store certificate as cACertificate attribute value (default: 
+                 userCertificate)
+-A <authlevel>   Level of authentication used for X.500 Directory access
+                 <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                 (default: environment variable AUTHLEVEL or 'No authentication')
+                 STRONG implies the use of signed DAP operations
+<cert>           File containing the certificate (or stdin, if omitted)
+
+****************************************************************************************
+
+
+genkey: Generate Key and Prototype Certificate
+
+
+Description:
+
+'genkey' generates an asymmetric keypair and installs the secret component on the PSE.
+The public component of the keypair is wrapped into a self-signed prototype certificate
+which is stored on the PSE and written to the file <proto> or stdout, if <proto> is 
+omitted.
+
+
+usage:
+
+genkey [-hrtvVW] [-p <pse>] [-c <cadir>] [-a <issueralg>] [-s <signalg>] [-k <keysize>]
+       [-e <encalg>] [-k <keysize>] [proto]
+
+with:
+
+-p <pse>           PSE name (default: environment variable PSE or .pse)
+-c <cadir>         Name of CA-directory (default: environment variable CADIR or .ca)
+-a <issueralg>     Issuer algorithm associated with the signature of the prototype 
+                   certificate (default: md2WithRsaEncryption)
+-s <signalg>       Signature algorithm (default: rsa)
+-k <keysize>       Keysize of RSA signature key
+-e <encalg>        Encryption algorithm (default: rsa)
+-k <keysize>       Keysize of RSA encryption key
+-r                 replace a previously generated secret key
+-h                 write this help text
+-t                 control malloc/free behaviour
+-v                 verbose
+-V                 Verbose
+-W                 Grand Verbose (for testing only)
+<proto>            File containing the resulting prototype certificate (or stdout, if 
+                   omitted)
+
+****************************************************************************************
+
+
+getkey: Build Prototype Certificate
+
+
+Description:
+
+'getkey' creates a prototype certificate from a public key previously
+stored on the PSE, and writes its content to file <proto> or stdout,
+if <proto> is omitted.
+
+
+usage:
+
+getkey [-ehstvVW] [-p <pse>] [-c <cadir>] [proto]
+
+with:
+
+-p <pse>           PSE name (default: Environment variable PSE or .pse)
+-c <cadir>         Name of CA-directory (default: Environment variable CADIR or .ca)
+-s                 build prototype certificate from public signature key (default)
+-e                 build prototype certificate from public encryption key
+-h                 write this help text
+-t                 control malloc/free behaviour
+-v                 verbose
+-V                 Verbose
+-W                 Grand Verbose (for testing only)
+<proto>            File containing the resulting prototype certificate (or stdout, if 
+                   omitted)
+
+****************************************************************************************
+
+
+pkadd: Download Public Key into Cache
+
+
+Description:
+
+'pkadd' retrieves the certificates of owner 'Name' from the Directory
+and downloads the requested public key information into the cache of
+trusted public keys (PKList or EKList) in the indicated PSE.
+
+
+usage:
+
+pkadd [-aehitvVW] [-p <pse>] [-c <cadir>] [-d <dsa name>] [-A <authlevel>] [Name]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-e               consider ENCRYPTION certificates only
+                 (default: consider SIGNATURE certificates only)
+-h               write this help text
+-i               let user specify certificate whose public key is to be downloaded
+-t               control malloc/free behaviour
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+-d <dsa name>    Name of the DSA to be initially accessed (default: locally 
+                 configured DSA)
+-a               read cACertificate attribute (default: userCertificate)
+-A <authlevel>   Level of authentication used for X.500 Directory access
+                 <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                 (default: environment variable AUTHLEVEL or 'No authentication')
+                 STRONG implies the use of signed DAP operations
+<Name>           Owner of the certificate whose public key is downloaded into the cache
+
+****************************************************************************************
+
+
+pkdel  Remove Public Key from Cache
+
+
+Description:
+
+'pkdel' deletes entries from the cache of trusted public keys (PKList or
+EKList). It either deletes all entries of the given <owner>, or the one entry
+that is uniquely identified by its <issuer> and <serial> combination.
+
+
+usage:
+
+pkdel [-ehtvVW] [-p <pse>] [-c <cadir>] [-o <owner>] [-i <issuer>] [-n <serial>]
+
+with:
+
+-p <psename>     PSE name (default: Environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: Environment variable CADIR or .ca)
+-o <owner>       Owner of public key
+-i <issuer>      Issuer of public key
+-n <serial>      Serial number of public key
+-e               remove public key from cache of public ENCRYPTION keys (EKList)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+
+****************************************************************************************
+
+
+pklist: Print Cache of Trusted Public Keys
+
+
+Description:
+
+'pklist' prints out the content of the cache of trusted public keys
+(PKList or EKList) of the indicated PSE.
+
+
+usage:
+
+pklist [-ehtvVW] [-p <pse>] [-c <cadir>]
+
+with:
+
+-p <psename>     PSE name (default: environment variable PSE or .pse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-e               print cache of trusted public ENCRYPTION keys (EKList)
+                 (default: PKList)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+
+****************************************************************************************
+
+
+showdir: Retrieve and Show Security Attributes from Directory
+
+
+Description:
+
+'showdir' reads a security attribute from the directory entry of 'Name'
+and prints its contents in an appropriate format.
+
+
+usage:
+
+showdir [-aehtvVW] [-p <pse>] [-c <cadir>] [-o <attributeType>] [-d <dsa name>] 
+        [-A <authlevel>] [Owner's Name].
+
+with:
+
+-p <psename>        PSE name (default: environment variable PSE or .pse)
+-c <cadir>          Name of CA-directory (default: environment variable CADIR or .ca)
+-e                  consider ENCRYPTION certificates only
+-o <attributeType>  Attribute whose value is requested (default: certificate)
+                    supported attribute types:
+                    'cert' (certificate),
+                    'cross' (cross certificate pair), and
+                    'rev' (PEM revocation list)
+-h                  write this help text
+-t                  control malloc/free behaviour
+-v                  verbose
+-V                  Verbose
+-W                  Grand Verbose (for testing only)
+-d <dsa name>       Name of the DSA to be initially accessed (default: locally
+                    configured DSA)
+-a                  read cACertificate attribute (default: userCertificate)
+-A <authlevel>      Level of authentication used for X.500 Directory access
+                    <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                    (default: environment variable AUTHLEVEL or 'No authentication')
+                    STRONG implies the use of signed DAP operations
+<Name>              Name of directory entry to be accessed
+
+****************************************************************************************
+
+
+show  Show ASN.1-coded SecuDE Object in Suitable Form
+
+usage:
+
+show [-hvVW] [file (containing ASN.1 code)]
+
+with:
+
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+
+****************************************************************************************
+
+
+Utilities for the Operation of Certification Authorities (X.509)
+================================================================
+
+
+cacreate: Create CA PSE (CA command)
+
+
+Description:
+
+'cacreate' creates a CA PSE with one or two asymmetric keypairs on it,
+whose public keys are held within self-signed prototype certificates.
+In addition, an empty PEM revocation list is created.
+
+
+usage:
+
+cacreate [-hqtvDVW] [-p <pse>] [-c <cadir>] [-a <issueralg>] [-s <signalg>] [-k <keysize>]
+         [-e <encalg>] [-k <keysize>] [-n <serial>] [-u <nextupdate>]
+         [-f <notbefore>] [-l <notafter>] [-d <dsa name>] [-A <authlevel>] [CA-Name]
+
+with:
+
+-p <psename>       PSE name (default: environment variable CAPSE or .capse)
+-c <cadir>         Name of CA-directory (default: environment variable CADIR or .ca)
+-a <issueralg>     Issuer algorithm associated with the signature of the prototype 
+                   certificate(s) (default: md2WithRsaEncryption)
+-s <signalg>       Signature algorithm (default: rsa)
+-k <keysize>       Keysize of RSA signature key
+-e <encalg>        Encryption algorithm (default: rsa)
+-k <keysize>       Keysize of RSA encryption key
+-n <serial>        Initial value of the serial number to be used by the CA
+-D                 store self-signed certificate(s) in Directory (X.500 or .af-db)
+-u <nextupdate>    Time and date of next scheduled update of PEM revocation list
+-f <notbefore>     First date on which self-signed certificate is valid
+                   (is only evaluated if option -r was supplied)
+-l <notafter>      Last date on which self-signed certificate is valid
+                   (is only evaluated if option -r was supplied)
+-q                 create PSE that contains two RSA keypairs (default: one RSA keypair 
+                   only)
+-t                 control malloc/free behaviour
+-h                 write this help text
+-v                 verbose
+-V                 Verbose
+-W                 Grand Verbose (for testing only)
+-d <dsa name>      Name of the DSA to be initially accessed (default: locally 
+                   configured DSA)
+-A <authlevel>     Level of authentication used for X.500 Directory access
+                   <authlevel> may have one of the values 'SIMPLE' or 'STRONG'
+                   (default: environment variable AUTHLEVEL or 'No authentication')
+                   STRONG implies the use of signed DAP operations
+<CA-Name>          Intended owner of the generated CA PSE
+
+****************************************************************************************
+
+
+certify: Certify Public Key (CA command)
+
+
+Description:
+
+'certify' reads a prototype certificate from file <proto> or stdin, if
+<proto> is omitted, and transforms it into a 'valid' certificate.
+It replaces the 'issuer' and 'serialnumber' fields of the prototype
+certificate by its CA values (taken from its CA PSE), and replaces
+the signature appended to the prototype certificate by its own signature.
+The resulting certificate is written to file <cert> or stdout, if <cert>
+is omitted.
+
+
+usage:
+
+certify [-htvVW] [-p <pse>] [-c <cadir>] [-a <issueralg>] [-f <notbefore>] 
+        [-l <notafter>] [proto [cert]]
+
+with:
+
+-p <psename>       PSE name (default: environment variable CAPSE or .capse)
+-c <cadir>         Name of CA-directory (default: environment variable CADIR or .ca)
+-a <issueralg>     CA's signature algorithm (default: md2WithRsaEncryption)
+-f <notbefore>     First date on which the certificate is valid
+-l <notafter>      Last date on which the certificate is valid
+-t                 control malloc/free behaviour
+-h                 write this help text
+-v                 verbose
+-V                 Verbose
+-W                 Grand Verbose (for testing only)
+<proto>            File containing the prototype certificate (or stdin, if omitted)
+<cert>             File containing the resulting certificate (or stdout, if omitted)
+
+****************************************************************************************
+
+
+revoke: Revoke Certificate (CA command)
+
+
+usage:
+
+revoke [-htvVWD] [-p <pse>] [-c <cadir>] [-d <dsa name>] [-A <authlevel>]
+
+with:
+
+-p <psename>     PSE name (default: .capse)
+-c <cadir>       name of CA-directory (default: .ca)
+-t               enable memory checking
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+-D               store updated revocation list in Directory (X.500 or .af-db)
+-d <dsa name>    name of the DSA to be initially accessed (default: locally configured 
+                 DSA)
+-A <authlevel>   level of authentication used for binding to the X.500 Directory
+
+****************************************************************************************
+
+
+getpkroot  Extract Public Root Information from CA PSE (CA command)
+
+
+Description:
+
+'getpkroot' extracts the the PSE object PKRoot from the CA's PSE
+and writes its content to the file <pkroot> or stdout, if <pkroot>
+is omitted.
+
+
+usage:
+
+getpkroot [-htvVW] [-p <pse>] [-c <cadir>] [pkroot]
+
+with:
+
+-p <psename>     PSE name (default: environment variable CAPSE or .capse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<pkroot>         File containing public root information (or stdout, if omitted)
+
+****************************************************************************************
+
+
+getfcpath: Extract Forward Certification Path from CA PSE (CA command)
+
+
+Description:
+
+'getfcpath' adds the CA's hierarchy and cross certificates to the CA's
+own forward certification path (FCPath), and writes the extended FCPath
+to the file <fcpath> or stdout, if <fcpath> is omitted.
+
+
+usage:
+
+getfcpath [-htvVW] [-p <pse>] [-c <cadir>] [fcpath]
+
+with:
+
+-p <psename>     PSE name (default: environment variable CAPSE or .capse)
+-c <cadir>       Name of CA-directory (default: environment variable CADIR or .ca)
+-t               control malloc/free behaviour
+-h               write this help text
+-v               verbose
+-V               Verbose
+-W               Grand Verbose (for testing only)
+<fcpath>         File containing the extended FCPath (or stdout, if omitted)
+
+****************************************************************************************
+
+
+gen_pse  Create and Update entire PSE's at CA Sites (Key Generation at CA Site)
+
+usage:
+
+gen_pse            [-i script][-c cadir][-p capse][-H home][-u userunixname]
+                   [-a issueralg][-s signalg][-e encalg][-k keysize]
+                   [-f notbefore][-l notafter][-x nameprefix]
+                   [-P subjectpse][-C caname][-g serialnumber]
+                   [-d dsaname] [-n][-vrDqth][namesuffix]
+                   
+-i <script>        Name of a script file which allows to specify a list of subjects and 
+                   their specific parameters
+-c <cadir>         Name of CA-directory (default: environment variable CADIR or .ca)
+-p <capse>         CA's PSE name (default: environment variable CAPSE or .capse)
+-H <home>          Path of all home-directories
+-u <userunixname>  Unixname of the owner of a PSE to create/update
+-a <issueralg>     Algorithm to sign certificates with
+-s <signalg>       Algorithm of signature key to create/update
+-e <encalg>        Algorithm of encryption key to create/update
+-k <keysize>       Keysize of key to generate
+-f <notbefore>     First date on which the certificate is valid
+-l <notafter>      Last date on which the certificate is valid
+-x <nameprefix>    First part of the name associated to the PSE
+-P <subjectpse>    Name of PSE to create/update (default: environment variable PSE 
+                   or .pse)
+-C <caname>        Create a CA with CA-directory name <caname>
+-g <serialnumber>  If a CA is created a serialnumber to start with can be specified
+-d <dsaname>       The name of the dsa
+-n                 Read the name of the dsa from PSE
+-v                 Verbose
+-r                 Replace an existing PSE in case of creation
+-D                 Store generated certificates in X500 directory
+-q                 Create two different key pairs for signature and encryption
+-t                 Check malloc/free behaviour
+-h                 Write this help text
+                   
+<namesuffix>      Second part of the name associated to the PSE
+
+****************************************************************************************
+
+
+Test
+====
+
+create_TestTree          Create a Test Certification Tree and Test Users 
+ 
+usage: 
+ 
+create_TestTree [-v] [-p] [-D] [-t] [-q] 
+ 
+with: 
+ 
+-v       verbose 
+-p       use PEM RFC 1424 certification procedures, 
+         otherwise use KM utilities for certification 
+-D       enter certificates into Directory (X.500 or .af-db), 
+-t       Enable checking of malloc/free behaviour 
+-q       create PSEs with separate key pairs for SIGNATURE/ENCRYPTION purposes, 
+         otherwise create 'one key pair' PSEs
+ 
+This shell-script creates, for test purposes, the following tree of 
+certification authorities and users: 
+ 
+                         Root-CA 
+                 /                       \ 
+         ORG-1-CA                        ORG-2-CA 
+         /       \                       /       \ 
+ ORG-1-User-1 ORG-1-User-2       ORG-2-User-1 ORG-2-User-2 
+ 
+ 
+It creates the directory TestTree under the home directory and the following directories 
+under TestTree: 
+ 
+Root-CA          CA directory of the root ca, CA-PSE is .capse
+ORG-1-CA         CA directory of the ca ORG-1-CA under Root-CA, CA-PSE is .capse
+ORG-2-CA         CA directory of the ca ORG-2-CA under Root-CA, CA-PSE is .capse
+ORG-1-User-1     PSE of user ORG-1-User-1 under ca ORG-1-CA
+ORG-1-User-2     PSE of user ORG-1-User-2 under ca ORG-1-CA
+ORG-2-User-1     PSE of user ORG-2-User-1 under ca ORG-2-CA
+ORG-2-User-2     PSE of user ORG-2-User-2 under ca ORG-2-CA
+
+Each PSE (CA and User) has the PIN "test".
+ 
+create_TestTree needs about 100 sec on a Sun SPARC10-41
+
+****************************************************************************************
+\end{verbatim}
+}
+
+\nm{3X}{INTRO}{Introduction to security functions}
+\label{intro3}
+\hl{Description}
+\addtotocsmall{SecuDE Library Functions Summary}
+The SecuDE library functions are grouped into five major collections which 
+can be identified by the prefex of the function name (sec\_, af\_,
+aux\_, pem\_ and e\_/d\_).
+
+%\begin{figure}
+\input{genstruct11}
+{\footnotesize Fig.\arabic{Abb}:
+General SecuDE structure}
+%\end{figure}
+\\ [1em]
+The following modules are currently realized (Fig. 1):
+\bi
+\m {\bf Personal Security Environment and Cryptography (Secure)}. 
+   The cryptographic functionality and the PSE functionality
+   is strongly coupled in SecuDE. Keys which are being
+   used by the cryptographic functions are normally addressed
+   through references to PSE-objects. In the smartcard realization
+   the PSE is a separated device where cryptographic functions
+   are performed. The Secure module provides
+   the basic cryptographic functions for the generation and 
+   verification of digital signatures, and encryption and decryption 
+   of data, and the basic PSE access functions. No higher level
+   functionality like certificate processing is available in this module.
+   Two PSE realizations are availabe in this module, one of them
+   is a particular smartcard realization. Secure-IF, the interface of 
+   this module, however, hides different technologies from
+   the applications, i.e. Secure-IF claims to be an abstract security
+   interface from the application's point of view which allows various
+   PSE realizations including smartcard environments without affecting 
+   the application's structure.
+   The description of the {\em Smartcard Application Interface} (SCA-IF) 
+   used in SecuDE is available on request.
+   Particularly, the Personal Security Environment and Cryptography 
+   module comprises
+   \bi
+   \m RSA, DSA and DES as basic cryptosystems,
+   \m key generation,
+   \m different message digest algorithms (SqmodN, MD2, MD4, MD5,
+      SHA), 
+   \m different signature and encryption algorithms (e.g. PKCS \#1),
+   \m routines to access the PSE, handling (create, delete, read, write)
+      of PSE objects.
+   \ei
+   The functions realizing this module are prefixed with sec\_.
+\m {\bf Authentication Framework and Certification (AF)}. This module
+   adds X.509 certification functionality to SecuDE.
+   Both local (i.e. PSE-located) certificates and directory-located
+   certificates can be addressed. Together with the Secure module, the
+   following functionality is provided:
+   \bi
+   \m sign, verify, encrypt, and decrypt information using PSE-based or 
+      directory-based keys, certificates, certification pathes and 
+      certificate revocation lists,
+   \m maintain a PSE with the objects defined in the AF 
+      module, i.e. maintain certificates, crosscertificate pairs,
+      the forward certification path, the public root key,
+      certificate revocation lists, and lists of trusted public keys.
+   \m check PSE for validity and consistency,
+   \ei
+   Functions for the support of the X.509 authentication framework are
+   prefixed with af\_.
+\m {\bf Key Management Support (KM)}. 
+   This module provides functions for the ge\-ne\-ra\-tion and distribution
+   of keys, certificates,
+   cross-certificates, and certification pathes, provides additional
+   functionality for the 
+   implementation of a Certification Authority (CA), and supports the
+   interaction between user and CA
+   as well as between CA's.
+
+   Key management support functions are also prefixed with af\_. 
+\m {\bf Privacy Enhanced Mail Support (PEM)}. This module covers functions 
+   which realize the Internet Specifications RFC 1421 - 1423. 
+   The basic idea of PEM is to define document oriented message 
+   encipherment and authentication procedures for the protection of 
+   messages through the use of 
+   end-to-end cryptography between originator and recipient with no special
+   processing
+   requirements imposed on the message transfer system (in contrast to
+   transfer 
+   protocol oriented security functionality as with X.400). This makes them
+   transparent to the mail 
+   transfer systems and applicable for local security services, too. 
+   Particularly, this module provides the following functions:
+   \bi
+   \m enhance messages, i.e. create MIC-CLEAR, MIC-ONLY and
+      ENCRYPTED message formats,
+   \m de-enhance messages, i.e. scan MIC-CLEAR, MIC-ONLY and
+      ENCRYPTED message formats, and perform the necessary
+      validation steps (including CRL checks)
+   \m create Certification Request, Certification Reply, CRL Storage
+      Request and CRL Storage Reply message formats,
+   \m scan Certification Request, Certification Reply, CRL Storage
+      Request and CRL Storage Reply message formats, and perform
+      appropriate actions.
+   \ei
+   Functions for PEM support are prefixed with pem\_.
+\m {\bf ASN.1 Encoding/Decoding Functions}
+   ASN.1 encoding and decoding functions are available 
+   for all SecuDE information objects which are intended for external
+   use (i.e. which are either stored externally, for instance in the
+   PSE, or exchanged via communication protocols). 
+   The encoding/decoding functions
+   transform from the internal C-structures of the objects to
+   corresponding (and in many cases standardized) ASN.1 codes
+   and vice-versa. The encoding functions generally apply distinguished encoding 
+   (DER) according to X.509 clause 8.7 in order to be able to process 
+   digitally signed objects.
+
+   ASN.1 encoding functions are prefixed with e\_, ASN.1 decoding functions 
+   are prefixed with d\_.
+\m {\bf Auxiliary Functions}
+   A number of auxiliary functions are available for general functions,
+   for instance
+   \bi
+   \m handling of distinguished names, algorithm identifiers, object
+      identifiers and similar basic elements,
+   \m UTCTime handling functions,
+   \m error handling,
+   \m print routines
+   \m alias naming functions
+   \ei
+   Auxiliary functions are prefixed with aux\_.
+\ei 
+
+{\bf Keys, Algorithm Identifiers and Object Identifiers}
+\addtotocsmall{Keys, Algorithm Identifiers and Object Identifiers}
+\\ [1em]
+All keys are processed in a type {\em KeyInfo} (see SEC(5)) which holds a 
+bit representation of the 
+key plus its algorithm identifier. An algorithm identifier
+is a pair of object identifier (which identifies the algorithm) and 
+algorithm dependant parameter set of that
+algorithm. An object identifier is a structured set of nonnegative integers 
+which represent a node or leaf
+in a tree of objects (i.e. of algorithms in our case).
+{\small
+\bvtab
+\4 typdef struct \{ \\
+\6	AlgId     \2 *subjectAI; \\
+\6      BitString \2 subjectkey; \\
+\4 \} KeyInfo; \\
+\evtab
+}
+with
+{\small
+\bvtab
+\4 typedef struct \{ \\
+\6      ObjId  \2  *objid; \3 /* object identifier */ \\
+\6      char   \2  *parm;  \3 /* alg-specific parameters */ \\
+\4 \} AlgId; \\
+\evtab
+}
+{\small
+\bvtab
+\4 typedef struct \{ \\
+\6      int           \3  oid\_nelem;     \3 /* number of integers */ \\
+\6      unsigned int  \3  *oid\_elements; \3 /* array of integers  */ \\
+\4 \} ObjId; \\
+\evtab
+}
+{\small
+\bvtab
+\4 typedef struct \{ \\
+\6      unsigned int \3   nbits;  \3 /* number of bits */ \\
+\6      char         \3  *bits;   \3 /* bitstring */ \\
+\4 \} BitString; \\
+\evtab
+}
+Thus each key is linked to the algorithm to be used. The algorithm 
+identifier is assigned
+during key generation. 
+\\ [1em]
+In case of RSA keys, the BitString {\em subjectkey} consists of the DER 
+code (see {\em Encoding of PSE Objects}) of the type {\em KeyBits}.
+{\small
+\btab
+\2      typedef struct \{ \\
+\3	        OctetString \2 part1; \\
+\3      	OctetString \2 part2; \\
+\3      	OctetString \2 part3; \\
+\3      	OctetString \2 part4; \\
+\2      \} KeyBits; \\
+\etab
+}
+Part3 and part4 are unused in case of RSA keys.
+Part1 and part2 contain the prime numbers $p$ and $q$ in case of secret keys, and the 
+modulus $m$ and the public exponent $e$ in case of public keys. OctetString is a similar
+type like BitString dealing with octets instead of bits. 
+\\ [1em]
+In case of DSAkeys, the BitString {\em subjectkey} consists of the DER 
+code  of the type {\em KeyBits}, too.
+Part1 to part4 contain $y$, $p$, $q$ and $g$ in case of secret DSA keys, and  
+$x$, $p$, $q$ and $g$ in case of public DSA keys. 
+\\ [1em]
+Keys (i.e. {\em KeyInfo's}) are supposed to reside either in PSEs or in security boxes
+which are separate devices attached to the Unix system. Both functionality can be modelled by
+the sec\_* functions. If keys have to be passed or identified via
+parameters of the sec\_* functions, this is normally done with the type 
+{\em Key}:
+{\small
+\btab
+\2 typedef struct \{ \\
+\3      KeyInfo  \1 *key; \\
+\3      KeyRef   \1  keyref; \\
+\3      PSESel    \1 *pse\_sel; \\
+\2 \} Key;
+\etab
+}
+This parameter type allows either to pass the key in {\em key}, or to refer 
+to a key reference
+{\em keyref} in a security box (modelled in SecuDE through a per user key 
+pool), 
+or to refer to a PSE object via {\em pse\_sel} (see {\em PSE Objects} 
+below). 
+Only one of the three parts of this type must be non zero. 
+\\ [1em]
+{\bf Cryptographic Algorithms}
+\addtotocsmall{Cryptographic Algorithms} 
+\\ [1em]
+In most cases algorithms are identified by algorithm identifiers, in some 
+cases by names (i.e.
+NULL terminated character strings being used in the pem environment). 
+In addition, addresses of predefined AlgId structures
+are also available as externals (through including {\em secure.h}). The 
+following algorithms are available :
+\bc
+{\small
+\begin{tabular}{|l|l|l|c|l|} \hline
+{\bf Name}      & {\bf AlgId *}      &  {\bf Parameter}  & {\bf Object Identifier}    & {\bf Type}   \\ \hline
+desECB          & desECB             &  --               & \{ 1 3 14 3 2 6 \}         & SYM\_ENC \\
+desCBC          & desCBC             &  IV zeroes        & \{ 1 3 14 3 2 7 \}         & SYM\_ENC \\
+desECB3         & desEDE             &  --               & \{ 1 3 14 3 2 17 \}        & SYM\_ENC \\
+desCBC3         & desCBC3            &  IV zeroes        & \{ 1 3 36 3 1 11 \}        & SYM\_ENC \\
+desCBC\_pad     & desCBC\_pad        &  IV zeroes        & \{ 1 3 36 3 1 5 \}         & SYM\_ENC \\
+desCBC3\_pad    & desCBC3\_pad       &  IV zeroes        & \{ 1 3 36 3 1 13 \}        & SYM\_ENC \\
+DES-ECB         & desECB             &  --               & \{ 1 3 14 3 2 6 \}         & SYM\_ENC \\
+DES-CBC         & desCBC             &  IV zeroes        & \{ 1 3 14 3 2 7 \}         & SYM\_ENC \\
+DES-EDE         & desEDE             &  --               & \{ 1 3 14 3 2 17 \}        & SYM\_ENC \\ rsa             & rsa                &  Keysize 512      & \{ 2 5 8 1 1 \}            & ASYM\_ENC \\
+RSA             & rsaEncryption      &  --               & \{ 1 2 840 113549 1 1 1 \} & ASYM\_ENC \\
+dsa             & dsa                &  --               & \{ 1 3 14 3 2 12 \}        & ASYM\_ENC \\
+dsaSK           & dsaSK              &  Keysize 512      & \{ 1 3 36 3 1 20 \}        & ASYM\_ENC \\
+NIST-DSA        & dsa                &  --               & \{ 1 3 14 3 2 12 \}        & ASYM\_ENC \\
+sqmodn          & sqmodn             &  Blocksize 512    & \{ 2 5 8 2 1 \}            & HASH \\
+md2             & md2                &  --               & \{ 1 2 840 113549 2 2 \}   & HASH \\
+md4             & md4                &  --               & \{ 1 2 840 113549 2 4 \}   & HASH \\
+md5             & md5                &  --               & \{ 1 2 840 113549 2 5 \}   & HASH \\
+sha             & sha                &  --               & \{ 1 3 14 3 2 18 \}        & HASH \\
+RSA-MD2         & md2                &  --               & \{ 1 2 840 113549 2 2 \}   & HASH \\
+RSA-MD5         & md5                &  --               & \{ 1 2 840 113549 2 5 \}   & HASH \\
+NIST-SHA        & sha                &  --               & \{ 1 3 14 3 2 18 \}        & HASH \\
+sqmodnWithRsa   & sqmodnWithRsa      &  Keysize 512      & \{ 2 5 8 3 1 \}            & SIG \\
+md2WithRsa      & md2WithRsa         &  --               & \{ 1 3 14 7 2 3 1 \}       & SIG \\
+md4WithRsa      & md4WithRsa         &  --               & \{ 1 3 14 3 2 2 \}         & SIG \\
+md5WithRsa      & md5WithRsa         &  --               & \{ 1 3 14 3 2 3 \}         & SIG \\
+md2WithRsaEncryption & md2WithRsaEncryption &  --        & \{ 1 2 840 113549 1 1 2 \} & SIG \\
+md4WithRsaEncryption & md4WithRsaEncryption &  --        & \{ 1 3 14 3 2 4 \}         & SIG \\
+md5WithRsaEncryption & md5WithRsaEncryption &  --        & \{ 1 2 840 113549 1 1 4 \} & SIG \\
+md2WithRsaTimeDate   & md2WithRsaTimeDate   &  --        & \{ 1, 3, 36, 3, 1, 22 \}   & SIG \\
+md4WithRsaTimeDate   & md4WithRsaTimedate   &  --        & \{ 1, 3, 36, 3, 1, 24 \}   & SIG \\
+md5WithRsaTimeDate   & md5WithRsaTimedate   &  --        & \{ 1, 3, 36, 3, 1, 25 \}   & SIG \\
+dsaWithSHA      & dsaWithSHA         &  --               & \{ 1 3 14 3 2 13 \}        & SIG \\
+\hline
+\end{tabular}
+}
+\ec
+
+\underline{Note:} Some algorithms appear more than once because they can be used under 
+different names.
+The algorithm identifier uniquely identifies the algorithm. A -- in the parameter field 
+indicates an ASN.1 NULL value as parameter. Parameter values shown for algorithms
+with parameters are default values. 
+
+{\large\bf DES Algorithms:} 
+ 
+The length of the encryption result is always a multiple of 64 bits. 
+ 
+In case of {\bf desCBC\_pad} and {\bf desCBC3\_pad} 
+algorithm, additional encoding which allows 
+the decrypting routine ({\em sec\_de\-crypt}/{\em af\_decrypt}) to restore 
+the plaintext length is added 
+by the encryption routine ({\em sec\_encrypt}/{\em af\_encrypt}) prior to 
+encryption. 
+If $n$ is the plaintext length,
+8 - $n$ $mod$ 8 octets are padded by the encryption routine with
+the last octet of the last block containing the number of 
+valid octets of that block (between 0 and 7), i.e. if the plaintext 
+consists 
+of a multiple of eight octets, one extra block is added with the last octet 
+set to zero. 
+The decryption routine expects this padding. 
+ 
+In case of {\bf desCBC} algorithm, 
+padding as defined in RFC 1423 is applied prior to encrypting
+which again enables the decryption routine to restore the plaintext length:
+\begin{quote}
+   The input to the DES CBC encryption process shall be padded to a
+   multiple of 8 octets, in the following manner.  Let n be the length
+   in octets of the input.  Pad the input by appending 8-(n mod 8)
+   octets to the end of the message, each having the value 8-(n mod 8),
+   the number of octets being added.  In hexadecimal, the possible
+   paddings are:  01, 0202, 030303, 04040404, 0505050505, 060606060606,
+   07070707070707, and 0808080808080808.  All input is padded with 1 to
+   8 octets to produce a multiple of 8 octets in length.  The padding
+   can be removed unambiguously after decryption.
+\end{quote} 
+In all other cases,
+zeroes are padded prior to encrypting until an eight-octet boundary is 
+reached, i.e.
+no octets are padded if the plaintext length is a multiple of eight octets.
+Measures which allow to restore the original plaintext length must
+be taken by the application in this case.
+\\ [1em]
+The algorithms desEDE, desCBC3 and desCBC3\_pad imply each block
+to be encrypted with a double key {\em \{k1, k2\}} in the encryption-
+decryption-encryption mode,
+i. e. each block is encrypted with k1, afterwards decrypted with k2, and 
+then encrypted with k1.
+Decryption of a block is done vice versa, i. e. decryption with k1, then 
+encryption with k2
+and then decryption with k1.
+\\ [1em]
+{\large\bf RSA Algorithms:}
+
+{\em rsa} is the RSA algorithm as defined in X.509. {\em rsaEncryption}, 
+{\em md2WithRsaEncryption}
+and {\em md5With\-RsaEncryption} are the algorithms defined in PKCS \#1. 
+They use a specific
+padding method for the RSA input value. {\em md2WithRsa}, {\em md4WithRsa} 
+and {\em md5WithRsa}
+are defined by OIW Stable Agreements. Here, the RSA input value is left-
+padded with zeroes
+prior to RSA encryption. {\em md4WithRsaEncryption} is defined by OIW, but 
+uses the
+PKCS padding method.
+
+The algorithms {\em md2WithRsaTimeDate}, {\em md4WithRsaTimeDate} and {\em 
+md5WithRsaTimeDate}
+are SecuDE-defined. They are basicly the same as the corresponding PKCS \#1 
+signature algorithms
+with the following differences:
+\be
+\m The rsa input block is coded with BlockType 05 instead of 01.
+\m The 13 octets after the BlockType contain the date and time of 
+signature, encoded
+   as GMT UTCTime, instead of 13 0xFF padding octets as defined in PKCS 
+\#1.
+\ee
+
+Interpretation of Integer Values
+
+The ASN.1 basic encoding rules [ISO8825] together with the X.509 defined 
+DER rules
+define the encoding of integer values
+which is used throughout this specification. To recall from this
+definition the value of an integer will be represented with the minimum
+possible number of octets.  The highest significant octet comes first
+followed by the next significant octet until the least significant
+octet as last one. Each octet consists of 8 bits of which the high
+significant bit is the first bit and the least significant bit is the
+last one.
+
+The definition of {\em subjectPublicKey} (from X.509 Authentication 
+Framework) is
+a BitString comprising the ASN.1 encoded type of
+
+\bc
+	SEQUENCE \{ INTEGER, INTEGER \}
+\ec
+\noindent
+where the first part represents the modulus and the second the public 
+exponent.
+For example the following encoding represents the ASN.1 encoding of such a
+sequence.
+
+\btab
+	\1 SEQUENCE (30) L 47 $=$ \{            \\
+	\2      INTEGER (02) L 40 $=$           \\
+	\3              {\tt 72430266 95995A0F BB148995 393AC2F8 }\\
+	\3              {\tt 6092F33A BAEC832B 42FF0926 78C0271F }\\
+	\3              {\tt D94479AD 957E5682 6EB3E228 3C1FC338 }\\
+	\3              {\tt 06F1E775 32F9812D 21ABEB13 F412A851 }\\
+	\2      INTEGER (02) L 03 $=$           \\
+	\3              {\tt 010001    }              \\
+	\1 \}
+\etab
+\noindent
+Note: SecuDE considers the components of incoming public keys to be 
+unsigned integers;
+the sign of the integer will be ignored. One leading zero octet will be 
+accepted, too.
+Public keys produced by SecuDE will be encoded as SEQUENCE of signed 
+integers, i.e.
+SecuDE will produce a leading zero octet if the most significant bit of a 
+component
+is one.
+\\ [1em]
+Encryption
+
+In order to encrypt arbitrary text the input data to encryption must be
+segmented in data blocks of equal length.  The length of every data
+block is determined by the $keysize$, i.e. the amount of bits to
+represent the modulus $N$.  The largest number $L$ of octets containing
+fewer bits than the modulus is then defined as
+
+\begin{eqnarray*}
+	L	& = & (keysize-1)/8 \\
+	keysize & = & int ( log_2 (N) + 1 )
+\end{eqnarray*}
+
+Each data block is interpreted as an unsigned integer of length $L$ octets
+according to the rules of ASN.1 encoding of integers, except that leading
+zero octets may occur and that the value is unsigned.
+The last data block, if incomplete, is padded with zero octets.
+Additional data blocks of padding are not used.
+
+The data blocks which represent the integer values 0 or 1 will be handled 
+in
+a special way since the regular RSA computation would not change these 
+values.
+In order to avoid these data in the encrypted data block the value
+$2^{keysize-1}$ will be added before encryption.
+
+The result $Y$ of encrypting one data block $X$, (after the possible 
+modification for
+the values 0 or 1), is computed with the public key $e$
+\begin{eqnarray*}
+	Y = X^e ~(mod ~N)
+\end{eqnarray*}
+\noindent
+and gives at most $keysize$ bits. The encrypted data block is extended
+with leading zero bits to build a BIT~STRING of size $keybits$. The 
+contents
+of the BIT~STRING represents the (unsigned) integer value of $Y$.
+The result of encryption is the concatenated bitstring of all encrypted 
+data
+blocks.
+\\ [1em]
+Decryption
+
+The decryption of arbitrary text uses data blocks of size $keysize$ bits.
+These data blocks are interpreted as integer values $Y$ with the highest
+significant bit first.
+The result of decrypting one data block is computed with the private key 
+$d$
+\begin{eqnarray*}
+	X = (Y^d ~(mod ~N)) ~(mod ~2^{8L})
+\end{eqnarray*}
+\noindent
+The resulting (unsigned) integer value $X$ is transformed into an 
+OCTET~STRING
+of size $L$ octets with the assumption that the originating
+block had this size.  This includes stripping off any increment for
+possible integer values 0 or 1.  The padding which had been added by
+the encryption will not be discarded.
+
+The result of decryption is the concatenated octetstring of all decrypted
+data blocks.
+\\ [1em]
+{\bf Signatures} 
+
+The signatures are produced with 2 steps of processing on the input data.
+The first step is to produce a hash value of the input data. The signature
+itself is then produced with encrypting this hash value with the private
+key. It will be assumed, that the resulting hash value corresponds to the
+$keysize$ of the signature key, i.e. the hash value will be treated $mod 
+~N$
+the public modulus.
+
+The length of the resulting signature will be extended to a multiple of
+8 bits by prepending leading zero bits, but arbitrary lengthes of
+signatures will be accepted for verification.
+\\ [1em]
+{\bf Verification}
+
+In order to verify a given signature $S$ of a text, the first step is to
+produce the hash value $H$ of the input data as it was described in the 
+last section.
+Then the signature value will be computed with the signers public key $e$ 
+\begin{eqnarray*}
+	V = S^e ~(mod ~N)
+\end{eqnarray*}
+\noindent
+and compared with the hash value $H$. The verification succeeds, if
+\begin{eqnarray*}
+	V \equiv H ~(mod ~N).
+\end{eqnarray*}
+\\ [1em]
+{\large\bf DSA Algorithms}
+
+    A DSA public key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       key INTEGER, - - y (public key)   \\
+    \4  \2       params DSAParameters OPTIONAL  \\
+    \4  \} \\
+    \evtab
+    with
+    \bvtab
+    DSAParameters ::= SEQUENCE \{ \\
+    \4  \2       prime1 [0] INTEGER, - - p \\
+    \4  \2       prime2 [1] INTEGER, - - q \\
+    \4  \2       base [2] INTEGER, - - g \\
+    \4  \} \\
+    \evtab
+    
+    A DSA secret key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       key INTEGER, - - x (secret key)   \\
+    \4  \2       params DSAParameters OPTIONAL  \\
+    \4  \} \\
+    \evtab
+    with
+    \bvtab
+    DSAParameters ::= SEQUENCE \{ \\
+    \4  \2       prime1 [0] INTEGER, - - p \\
+    \4  \2       prime2 [1] INTEGER, - - q \\
+    \4  \2       base [2] INTEGER, - - g \\
+    \4  \} \\
+    \evtab
+
+
+{\bf Square-mod-N}
+
+\noindent
+The input data is segmented into data blocks of equal length~~$L$
+\begin{eqnarray*}
+	 L	& = & (keysize-1)/16 \\
+	keysize & = & int(log_2(N)+1)
+\end{eqnarray*}
+\noindent
+Each octet of a data block is split into 2 sedecimal digits comprising
+the original octet. Each sedecimal digit is prepended with the sedecimal 
+digit
+$0xF$ and gives one octet for the hash block $B$. The length of the hash 
+block
+is then $2L$.
+The possible free bits remaining in the hash block - up to keysize - are 
+left zero.
+The last block, if incomplete, will be padded with binary ones.
+The so produced integer value is added to the last hash result $H_i$
+and then squared ($mod ~N$) giving a new hash result, the starting value
+for the first block is assumed to be zero.
+\begin{eqnarray*}
+	H_0 & = & 0	\\
+	H_i & = & (( H_{i-1} \oplus B_i )^2) ~(mod ~N), i = 1, \ldots
+\end{eqnarray*}
+The add operation $\oplus$ represents the boolean function exclusive or.
+\\ [1em]
+{\bf PSE Objects}
+\addtotocsmall{PSE Objects} 
+\\ [1em]
+Some of the structures handled as parameters of the security functions (e. 
+g. keys and certificates)
+are supposed to reside in the Personal Security Environment (PSE), e.g. in 
+smartcards.
+
+PSE objects are handled at the parameter interface of the sec\_* functions 
+by means of the type
+{\em PSESel} (PSE selector):
+{\small
+\btab
+\2 typedef struct \{ \\
+\3      char  \1  *app\_name; \\
+\3      char  \1  *pin;      \\
+\3      struct \{            \\
+\4         char *name;       \\
+\4         char *pin;        \\
+\3      \}    \1 object;     \\
+\3      int    \1  dev;      \\
+\3      int    \1  app\_id;   \\
+\2 \} PSESel;
+\etab
+}
+This structure allows to identify a PSE object by an application name (e.g. 
+in the
+case of multifunctional smartcards) and an object name. In case of the SW-
+PSE, the
+application name is the name of the directory which comprises the PSE (see 
+below).
+
+In addition, this structure allows to provide a PIN (Personal Identification 
+Number)
+both as global PIN for the whole application (or PSE) or as object-specific 
+PIN.
+In case of the SW-PSE, this PIN is a password which is hashed into a DES 
+key. If no
+PIN is given when requesting the access to a PSE object, and the requested 
+object
+is PIN-protected, the PIN will be asked from /dev/tty (in case of the SW-
+PSE) or
+at the auxiliary device (depending on the smartcard environment). If 
+specific
+smartcard environments are implemented, the passing of PIN's via sec\_* 
+parameters
+may be impossible.
+
+PSE objects known by the sec\_* functions are {\em 
+KeyInfo} which holds a key
+plus algorithm identifier, and {\em PSEToc} which holds the table of 
+contents of the
+PSE. For more information see SEC-PSE-OBJECTS(4).
+
+PSE objects known by the af\_* functions are, for instance, {\em Certificate} 
+which holds an X.509 certificate,
+{\em FCPath} which holds a forward certification path (in the sense of 
+X.509), {\em PKRoot} which
+holds the root verification key (i. e. the public key of the highest 
+certification authority),
+and {\em PKList} which holds a chained list of public keys. For more 
+information see
+AF-PSE-OBJECTS(4). \\ [1em] 
+{\bf Software Realization of the PSE (SW-PSE)} \\ [1em]
+The model of the software realization of the PSE was developed under the 
+assumption that
+it is necessary to store all security relevant and personal information in 
+a multi-user
+environment in standard 
+background storage media which belong to the file system of the 
+corresponding
+operating system and which are principally accessible by everyone who
+has access to the system. Only the standard access control mechanisms 
+provided by the operating system are assumed to be available. But even if 
+the
+operating system is ``secure'', security problems remain, eg. the problem
+of privileged people (system administrators, maintenance) who in general 
+have
+access to all data. Therefore the only possibility is to use encryption 
+techniques
+with keys which exist in the mind of the user only, but which do not exist 
+in
+the system for longer time.
+
+A software PSE is a Unix directory (not to be confused with an X.500 
+directory).
+It is not necessary to take the multifunctionality of a smartcard into 
+consideration.
+Each application has its own directory. The name of the directory is the 
+name of the
+application (e.g. {\em .pse}). If the name of the application does not 
+begin with a slash,
+the PSE is located in the HOME directory of the user, otherwise the name is 
+considered 
+as the fully qualified pathname of the PSE.
+
+A file name within the PSE with the suffix {\em .sf} indicates that the
+content of the file is encrypted in the following way:
+\be
+\m A PIN or password which is entered by the user via the keyboard is 
+mapped onto a 
+   DES key by means of a one-way function (the terms PIN and password are 
+used 
+   synonymously in this context).
+\m The content of {\em object} is stored in the file {\em object}.sf in 
+DES-encrypted 
+   form using this key (.sf stands for {\em secret file}). This is also 
+called ``PIN-encrypted''
+   or ``PIN-protected'' in the following.
+\m The PIN itself is DES-encrypted with this key, too, and stored either in 
+the file {\em object}.pw, 
+   if the PIN is object specific, or in the file pse.pw, if the PIN is the 
+one for the whole PSE
+   (.pw stands for {\em password}).
+\m Before reading {\em object} one can recognize PIN-protection by the 
+suffix {\em .sf}, verify
+   the correctness of the PIN entered by the user through hashing and 
+encrypting this PIN and 
+   comparing the result with the content of the file {\em object}.pw or 
+pse.pw resp., and decrypt the file
+   {\em object}.sf afterwards.
+\ee
+The software realization of the PSE consists of: 
+\bi
+\m The PSE PIN (optional). \\
+   This is the PIN which is valid for the whole PSE. It is stored
+   in encrypted form in the file {\em pse.pw}, if it exists, otherwise
+   the file {\em pse.pw} does not exist.
+\m The table of contents (Toc). \\
+   If {\em pse.pw} exists,
+   the Toc is contained in encrypted form in the file {\em Toc.sf}, 
+   otherwise it is contained in clear in the file {\em Toc}.
+\m The PSE owner's name. \\
+   If {\em pse.pw} exists,
+   the owner's name is contained in encrypted form in the file {\em 
+Name.sf}, 
+   otherwise it is contained in clear in the file {\em Name}.
+\m An arbitrary number of files containing the data objects and optionally 
+their 
+   object-specific PINs (in encrypted form). 
+   Each data object is stored in one file. If the name of the file is {\em 
+object} 
+   with no {\em .sf} suffix, the object is not PIN protected and stored in 
+clear 
+   in this file. If the name of the file is {\em object.sf}, the object is 
+   PIN-protected and stored in encrypted form in this file.
+   If, in this case, a file {\em object.pw} exists, it contains the 
+corresponding PIN.
+   Otherwise, i.e. if the name of the object
+   file has the suffix {\em .sf}, but no corresponding {\em .pw} file 
+exists, the data object
+   is encrypted with the PSE-PIN. 
+\ei
+The internal structure and bit representation of the data objects is 
+application dependent. 
+However, in order to achieve a system independant bit representation, 
+predefined PSE objects 
+which are necessary when using SEC- and AF-functions are encoded by 
+applying
+the {\em Basic Enoding Rules for ASN.1} (BER) with X.509 DER restrictions 
+to the ASN.1 definitions 
+of those objects. This is called DER-code in the following. In addition,
+corresponding C-structures are defined for these objects. For each PSE 
+object both encoding 
+and decoding functions exist which perform
+the mapping between the program-internal C-structure and the corresponding 
+DER-code and vice versa.
+See in E\_SEC(3X) and E\_AF(3X) for the available encoding and decoding 
+functions and AF-PSE-Objects(4)
+and SEC-PSE-Objects(4) for the corresponding ASN.1-structures and C-
+structures. The mechanism
+of DER-encoding is used for other purposes, too, e.g. to produce exchange 
+formates for communication
+protocols (see E\_X400(3X)).
+
+The internal structure and bit representation of the Toc is described in 
+SEC-PSE-OBJECTS(4). 
+The internal structure and bit representation of the owner's name (Name) 
+and other
+PSE objects for the use of the AF-functions are described in AF-PSE-
+OBJECTS(4).
+\\ [1em]
+This is a pretty simple model which largely prevents the user from being 
+eavesdropped by
+others. It does not prevent modifications of the user's PSE by unauthorized
+persons, but it provides means to the user to recognize such modifications, 
+and to check
+the consistancy of his PSE. There is no way, however, to restore a 
+forgotten PIN from
+the stored PSE data.
+\\ [1em]
+Example of a software PSE ({\em object1} without PIN-protection, 
+{\em object2} object-PIN protected, {\em object3} PSE-PIN protected): 
+\\[1em]
+{\small
+\parbox[t]{4cm}{
+{\bf Filename}
+}
+\parbox[t]{10.8cm}{
+{\bf Content}
+} \\
+\parbox[t]{4cm}{
+pse.pw
+}
+\parbox[t]{10.8cm}{
+Encrypted PSE-PIN (of the entire PSE).
+} \\
+\parbox[t]{4cm}{
+Toc.sf
+}
+\parbox[t]{10.8cm}{
+Table of Contents of the PSE, PIN-protected (PSE-PIN).
+} \\
+\parbox[t]{4cm}{
+Name.sf
+}
+\parbox[t]{10.8cm}{
+PSE owner's name, PIN-protected (PSE-PIN).
+} \\
+\parbox[t]{4cm}{
+{\em object1}
+}
+\parbox[t]{10.8cm}{
+Object 1, application-specific, without PIN-protection.
+} \\
+\parbox[t]{4cm}{
+{\em object2}.sf
+}
+\parbox[t]{10.8cm}{
+Object 2, application-specific, PIN-protected (object-PIN).
+} \\
+\parbox[t]{4cm}{
+{\em object2}.pw
+}
+\parbox[t]{10.8cm}{
+Encrypted PIN for {\em object2}.
+} \\
+\parbox[t]{4cm}{
+{\em object3}
+}
+\parbox[t]{10.8cm}{
+Object 3, application-specific, PIN-protected (PSE-PIN).
+}
+} \\ [1em]
+In addition to the PSE, a key pool is provided where keys (which means the 
+ASN.1 DER code
+of KeyInfo) can be stored and restored by means of key references. 
+Technically, the key pool is also a
+PSE with the only difference that it has the fixed name .key\_pool in the 
+home directory of the user and that a user-specific encryption key is used 
+which is compiled into the
+software. 
+\\ [1em]
+{\bf Distinguished Names} 
+\\ [1em]
+See INTRO(1) for a detailled explanation of distinguished names and
+the two representations of them handled by SecuDE.
+The functions aux\_Name2DName() and aux\_DName2Name do the mapping
+between these two distinguished name representations.
+\\ [1em]
+{\bf Functions for the support of Internet Privacy Enhanced Mail (PEM)} 
+\\ [1em]
+The basic idea of {\em PEM} is to define security services
+for the protection of texts
+which are document oriented (in contrast to transfer protocol oriented)
+in that they are transparent to the mail transfer systems.
+In summary, an outbound message is subjected to the following
+composition of transformations:
+
+\begin{displaymath}
+Transmit\_Form=Encode(Encrypt(Canonicalize(Local\_Form)))
+\end{displaymath}
+
+``Encrypt'' means cryptographic encryption.
+``Encode'' means the printable representation of an arbitrary octet string
+(also referred to as ``zoning'').
+An encapsulated header portion of so called ``encapsulated header fields''
+is added to the transformed text.
+It contains encryption and signature control fields inserted in plaintext.
+The supported encapsulated header fields are
+Proc-Type, DEK-Info, Originator-ID-Asymmetric,
+Originator-Certificate, Issuer-Certificate, MIC-Info,
+Recipient-ID-Asymmetric, Key-Info (see {\em RFC 1423: 4.6 Summary of
+Encapsulated Header Fields}).
+
+A C-language structure called {\em PemInfo}
+contains the encryption and signature control informations
+and is utilized by the {\em pem\_*} interface functions
+in order to process a message text.
+
+{\small
+\bvtab
+typedef struct \{ \\
+\1   Boolean     \4  confidential;\3 /* TRUE iff PEM shall be encrypted */ 
+\\
+\1   Boolean     \4  clear;       \3 /* TRUE iff PEM shall be not encoded 
+*/ \\
+\1   Key         \4 *encryptKEY;  \3 /* plain DES-key */ \\
+\1   Certificates\4 *origcert;    \3 /* originator certificates */ \\
+\1   AlgId       \4 *signAI;      \3 /* signature algorithm id */ \\
+\1   RecpList    \4 *recplist;    \3  /* list of recipients' informations 
+*/ \\
+  \} PemInfo; \\ \\
+
+typedef struct \{ \\
+\1   KeyInfo     \4 *key;         \3 /* in PemInfo:encryptKEY: plain DES-
+key */ \\
+\1   KeyRef      \4  keyref;      \3 /* in PemInfo:encryptKEY: unused */ \\
+\1   PSESel      \4 *pse\_sel;    \3 /* in PemInfo:encryptKEY: unused */ \\
+  \} Key; \\ \\
+
+typedef struct \{  \\
+\1   AlgId       \4 *subjectAI;   \3 /* in PemInfo:encryptKEY: plain DES-IV 
+*/ \\
+\1   BitString   \4 subjectkey;  \3 /* in PemInfo:encryptKEY: plain DES-key 
+*/ \\
+   \} KeyInfo; \\ \\
+
+typedef struct reclist \{ \\
+\1   Certificate \4 *recpcert;    \3 /* recipient's user certificate */ \\
+\1   OctetString \4 *key;         \3 /* RSA-encrypted DES-key */ \\
+\1   struct reclist \4 *next;     \3 /* RSA-encrypted DES-key */ \\
+   \} RecpList;
+\etab
+}
+The {\em pem\_create} functions map
+a plain user text and a related {\em PemInfo} onto
+a privacy enhanced mail text.
+Inversely, the {\em pem\_scan} functions map
+a privacy enhanced mail text onto
+a plain user text and a related {\em PemInfo}
+and verifies the message integrity.
+\\ [1em]
+{\bf Include Files}
+\\ [1em]
+All include files which are indicated in the following subroutine 
+descriptions can be found
+in the directory \$TOP/secude/src/include, where \$TOP is installation-
+dependant, e.g. \$TOP=/usr/local.
+Application programs which use SecuDE subroutines should be compiled 
+therefore with
+option -I\$TOP/secude/src/include.
+\\ [1em]
+{\bf Binding Application Programs}
+\addtotocsmall{Binding Application Programs}
+\\ [1em]
+The SecuDE library is \$TOP/secude/lib/libsecude.a. 
+In addition, SecuDE provides the library \$TOP/secude/lib/libisode.a which 
+contains a collection
+of necessary ISODE subroutine objects. 
+When binding application programs with SecuDE subroutines one should use 
+therefore options
+-L\$TOP/secude/lib -lsecude -lisode.  
+ 
+At sites which have a full ISODE installation, the original libisode.a can 
+be used 
+instead of \$TOP/secude/lib/libisode.a when binding application programs.
+
+\hl{Errors}
+\addtotoc{Errors}
+In case of an error ({\em Return Value} -1, if return parameter type  RC, 
+or NULL pointer else),
+the error cause is indicated in the global variable {\em err\_stack} (data 
+type ErrStack).
+\bvtab
+\4 extern struct ErrStack \{                 \\
+\5        int             \3 e\_number;      \\
+\5        char            \3 *e\_text;       \\
+\5        char            \3 *e\_addr;       \\
+\5        Struct\_No      \3  e\_addrtype;   \\
+\5        char	          \3 *e\_proc;       \\
+\5        struct ErrStack \3 *next;	     \\
+\4 \} *err\_stack;
+\evtab
+err\_stack is a pointer to a chained list of errors which represents a 
+trace of all errors
+which occured inside the called routine. The first element in the list is 
+th most recent error.
+err\_stack can be printed using {\em aux\_fprint\_error()} and freed using 
+{\em aux\_free\_error()}
+(see aux\_error(3)). 
+ 
+{\em err\_stack}\pf e\_proc is the name of the routine where the error 
+occured. 
+ 
+If {\em err\_stack}\pf e\_addr is not NULL, it contains the address of a 
+structure which caused
+the error, for instance the address of a Certificate which could not be 
+verified. 
+{\em err\_stack}\pf e\_addrtype is of type Struc\_No and indicates the type 
+of the address. 
+ 
+{\em err\_stack}\pf e\_text contains an additional explanatory text 
+description of the error situation.
+\\ [1em]
+{\em err\_stack}\pf e\_number can have the following values: \\ [1em]
+\firstbox  {1 EALGID}
+\secondbox  {Invalid Algorithm Identifier} \\
+\firstbox  {2 EAPP}
+\secondbox  {Cannot select application} \\
+\firstbox  {3 EAPPNAME}
+\secondbox  {Application name does not exist} \\
+\firstbox  {4 ECREATEAPP}
+\secondbox  {Cannot create application (e.g. application name already 
+exists)} \\
+\firstbox  {5 EOBJ}
+\secondbox  {Cannot select object} \\
+\firstbox  {6 EOBJNAME}
+\secondbox  {Object does not exist} \\
+\firstbox  {7 ECREATEOBJ}
+\secondbox  {Cannot create object (e.g. object already exists)} \\
+\firstbox  {8 EPIN}
+\secondbox  {Invalid PIN} \\
+\firstbox  {9 EVERIFICATION}
+\secondbox  {Verification unsuccessful} \\
+\firstbox  {10 ESYSTEM}
+\secondbox  {System call failed inside routine} \\
+\firstbox  {11 EINVALID}
+\secondbox  {Invalid argument} \\
+\firstbox  {12 EDAMAGE}
+\secondbox  {Toc of PSE not readable or PSE inconsistent} \\
+\firstbox  {13 EMALLOC}
+\secondbox  {Unable to allocate new memory} \\
+\firstbox  {14 EDECRYPT}
+\secondbox  {Wrong state of sec\_decrypt} \\
+\firstbox  {15 EENCRYPT}
+\secondbox  {Wrong state of sec\_encrypt} \\
+\firstbox  {16 EHASH}
+\secondbox  {Wrong state of sec\_hash} \\
+\firstbox  {17 EENCODE}
+\secondbox  {ASN.1-encoding error} \\
+\firstbox  {18 EDECODE}
+\secondbox  {ASN.1-decoding error} \\
+\firstbox  {19 ESIGN}
+\secondbox  {Wrong state of sec\_sign} \\
+\firstbox  {20 EVERIFY}
+\secondbox  {Wrong state of sec\_verify} \\ 
+\firstbox  {100 EOPEN}
+\secondbox  {PSE is already open} \\
+\firstbox  {101 EVALIDITY}
+\secondbox  {Invalid validity date of certificate} \\
+\firstbox  {102 EPK}
+\secondbox  {PK already exists in PKList} \\
+\firstbox  {103 ENAME}
+\secondbox  {Name already exists in PKList} \\
+\firstbox  {104 ENOPK}
+\secondbox  {PK not found in PKList} \\
+\firstbox  {105 ENONAME}
+\secondbox  {Name not found in PKList} \\
+\firstbox  {106 EROOTKEY}
+\secondbox  {Highest verification key not available} \\
+\firstbox  {107 ENODIR}
+\secondbox  {Directory service does not respond} \\
+\firstbox  {108 ENAMEDIR}
+\secondbox  {No object assigned to this name found in directory} \\
+\firstbox  {109 EASCDIR}
+\secondbox  {Directory access rights not sufficient for requested 
+operation} \\
+\firstbox  {110 EATTRDIR}
+\secondbox  {No directory entry of requested attribute type found in 
+directory} \\
+\firstbox {201 ESPACE}
+\secondbox {Malloc cannot allocate space} \\
+\firstbox {202 EPOINTER}
+\secondbox {A pointer wasn't allocated by calling function} \\
+\firstbox {203 EINTEGER}
+\secondbox {Unexpected integer value} \\
+\firstbox {204 ERETURN}
+\secondbox {Unexpected return value of a called function} \\
+\firstbox {205 EMSGBUF}
+\secondbox {Syntax Error of msgbuf} \\
+\firstbox {206 EMIC}
+\secondbox {Verification of MIC unsuccessful} \\
+\firstbox {207 ECTFOWNER}
+\secondbox {Certificate owner is not signer of PEM text} \\
+\firstbox {208 EMYNAME}
+\secondbox {``my name'' missing in list of Recipient-IDs} \\
+\firstbox {209 EENCRMIC}
+\secondbox {MIC couldn't be encrypted} \\
+\firstbox {210 EENCRBODY}
+\secondbox {PEM body couldn't be encrypted} \\
+\firstbox {211 EDECRMIC}
+\secondbox {MIC couldn't be decrypted} \\
+\firstbox {212 EDECRBODY}
+\secondbox {PEM body couldn't be decrypted} \\
+\firstbox {213 EPEMBOUND}
+\secondbox {PEM encapsulation boundary lines inconsistent} \\
+\firstbox  {401 ELABEL}
+\secondbox  {Security label inconsistent or invalid} \\
+\firstbox  {402 EPOLICY}
+\secondbox  {Unknown security policy} \\
+\firstbox  {403 ENOTOKEN}
+\secondbox  {According to message security label
+	       no message token required;
+	       or message sequence number missing on input} \\
+\firstbox  {404 ERECIPNAME}
+\secondbox  {Recipient name missing or invalid} \\
+\firstbox  {405 ERECIPKEY}
+\secondbox  {Recipient public key not available} \\
+\firstbox  {406 ESECCONTEXT}
+\secondbox  {Unacceptable security context} \\
+\firstbox  {407 EMAC}
+\secondbox  {Message authentication check (verification) failed} \\
+\firstbox  {408 ETOKENCRYPT}
+\secondbox  {Cannot decrypt (message or bind) token} \\
+\firstbox  {409 ETOKSIGN}
+\secondbox  {(Message or bind) token verification failed} \\
+\firstbox  {410 ETOKRANDOM}
+\secondbox  {Unacceptable random number in bind token} \\
+\firstbox  {411 ETOKTIME}
+\secondbox  {Unacceptable (message or bind) token time} \\
+\firstbox  {412 ECREDCERT}
+\secondbox  {Credential certificates failure} \\
+\firstbox  {413 ECREDKEY}
+\secondbox  {Unverifiable partner public key in
+	       bind token of credentials} \\
+
+\hl{Flaws and anticipated changes}
+A certain amount of control over the security operations of the SecuDE
+functions is done via global variables. This is not very well structured
+and bears a risk of unexpected behaviour. The next version of SecuDE
+will introduce the concept of a  ``security context'' which will have 
+to be established prior to security operations and which will have to be passed
+to the security functions as parameter. This will be a considerable change
+to most of the API.
+
+The error handling of SecuDE is sometimes not satifying. Error messages and codes
+are sometimes nothing saying or misleading. Expect to find a major reshuffle
+of error codes and error messages for the next version.
+
+\nm{4}{INTRO}{Introduction to File and Object Formats}
+\label{intro4}
+\hl{Description}
+In order to achieve a system independant bit representation, all security 
+objects 
+which are stored on files or exchanged via communication protocols are 
+defined as ASN.1 structures and encoded by applying
+the {\em Basic Enoding Rules for ASN.1} (BER) with X.509 DER restrictions 
+to these 
+ASN.1 structures. This is simply called DER code in the following. 
+
+Within a C-program those objects have corresponding C-structure 
+representations.
+
+The following section describes all objects of the PSE, presenting their 
+ASN.1 definitions
+and the corresponding C-structures, and all objects which are exchanged via 
+the X.400-88
+protocols.
+
+The available encoding and decoding functions which provide the mapping 
+between the 
+program-internal C-structures and the corresponding ASN.1 DER-code and vice 
+versa are described
+in E\_SEC(3X), E\_AF(3X), and E\_X400(3X).
+
+\nm{5}{INTRO}{Introduction to miscellaneous facilities}
+\label{intro5}
+\hl{Description}
+This section mainly contains all C type and data definitions which are 
+contained
+in the include files $<$af.h$>$, $<$pem.h$>$ and$<$secure.h$>$.
+

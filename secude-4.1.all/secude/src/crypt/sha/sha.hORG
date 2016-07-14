@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+/* --------------------------------- SHS.H -------------------------------*/
+
+/* NIST proposed Secure Hash Standard.
+
+   Written 2 September 1992, Peter C. Gutmann.
+   This implementation placed in the public domain.
+
+   Comments to pgut1@cs.aukuni.ac.nz */
+
+/* Useful defines/typedefs */
+
+typedef unsigned char   BYTE;
+typedef unsigned long   LONG;
+
+/* The SHS block size and message digest sizes, in bytes */
+
+#define SHS_BLOCKSIZE   64
+#define SHS_DIGESTSIZE  20
+
+/* The structure for storing SHS info */
+
+typedef struct {
+	       LONG digest[ 5 ];            /* Message digest */
+	       LONG countLo, countHi;       /* 64-bit bit count */
+	       LONG data[ 16 ];             /* SHS data buffer */
+	       } SHS_INFO;
+

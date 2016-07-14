@@ -1,0 +1,38 @@
+CC	= cl
+CFLAGS	= -O
+
+default:	bignum.obj
+
+all:		bigtest.exe pi.exe bignum.obj
+
+bigtest.exe:	bigtest.obj bignum.obj
+		$(CC) -o bigtest.exe bigtest.obj bignum.obj
+
+bigtest.obj:	bigtest.c bignum.h internal.h
+		$(CC) $(CFLAGS) -c bigtest.c
+
+pi.exe:		pi.obj bignum.obj
+		$(CC) -o pi.exe pi.obj bignum.obj
+
+pi.obj:		pi.c bignum.h internal.h
+		$(CC) $(CFLAGS) -c pi.c
+
+bignum.obj: 	bignum.c bignum.h internal.h
+		$(CC) $(CFLAGS) -c bignum.c
+
+internal.h:	mkhdr.exe
+		mkhdr.exe
+
+
+# If your compiler can't handle long identifiers (> 6 chars), move the `#' to
+# the other line.
+
+mkhdr.exe:	mkhdr.c makefile.dos
+		$(CC) $(CFLAGS) -o mkhdr.exe mkhdr.c
+#		$(CC) $(CFLAGS) -DBIG_SHORT_NAMES -o mkhdr.exe mkhdr.c
+
+clean:
+		erase mkhdr.exe
+		erase bigtest.exe
+		erase pi.exe
+		erase *.obj

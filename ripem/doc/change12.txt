@@ -1,0 +1,128 @@
+From jefft@RSA.COM Fri Feb  4 13:13:04 1994
+Received: from RSA.COM by scss3.cl.msu.edu (4.1/4.7)  id AA03255; Fri, 4 Feb 94 13:13:02 EST
+Received: by RSA.COM 
+	id AA00462; Fri, 4 Feb 94 10:09:36 PST
+Date: Fri, 4 Feb 94 10:09:36 PST
+From: jefft@RSA.COM (Jeff Thompson)
+Message-Id: <9402041809.AA00462@RSA.COM>
+To: raylau@mit.edu
+Cc: mrr@scss3.cl.msu.edu
+Subject: RIPEM 1.2 changes
+Status: ORS
+
+
+-----BEGIN PRIVACY-ENHANCED MESSAGE-----
+Proc-Type: 2001,MIC-CLEAR
+Content-Domain: RFC822
+Originator-Name: jefft@chirality.rsa.com
+Originator-Certificate:
+ MIIB0zCCAX0CEHvlDG8l4VHdqec4RvFBuGIwDQYJKoZIhvcNAQECBQAwbzELMAkG
+ A1UEBhMCVVMxIDAeBgNVBAoTF1JTQSBEYXRhIFNlY3VyaXR5LCBJbmMuMRwwGgYD
+ VQQLExNQZXJzb25hIENlcnRpZmljYXRlMSAwHgYDVQQDFBdqZWZmdEBjaGlyYWxp
+ dHkucnNhLmNvbTAeFw05MzExMzAxOTE1NTFaFw05NTExMzAxOTE1NTFaMG8xCzAJ
+ BgNVBAYTAlVTMSAwHgYDVQQKExdSU0EgRGF0YSBTZWN1cml0eSwgSW5jLjEcMBoG
+ A1UECxMTUGVyc29uYSBDZXJ0aWZpY2F0ZTEgMB4GA1UEAxQXamVmZnRAY2hpcmFs
+ aXR5LnJzYS5jb20wWDAKBgRVCAEBAgIB/gNKADBHAkAtAto1Bdion6FnjY2qkliO
+ 7n6RxmL68IJ8r5XMMPX5IERpo4pSEiE/Fbrw2jVlFUTbdQ36Y65tezhS1E4oNsUX
+ AgMBAAEwDQYJKoZIhvcNAQECBQADQQAK/hg100zdjSCapJusmVSzwDaj6YKAa0p3
+ GJBYYMMIMZbGlE2gx1bnMiI+twftqA2nRj7v7zlaWv3WiP+pihyx
+MIC-Info: RSA-MD5,RSA,
+ CT9gKhKXRWC6YviNQ5wEvitTiKpt9SWKHtTqS/hscHyMwNxOAEaU2EkqONHp15em
+ cXowyetdnmJDW52rax9n3Q==
+
+Ray,
+
+Mark asked me to tell you about the new RIPEM 1.2 message format.
+
+The use of the self-signed certificate and Recipient-Key-Asymmetric is
+as we discussed it on certem.
+
+As you can see in the header of this message, the old field of
+Originator-Name is only supported for backward compatibility.  RIPEM
+1.2 really uses the self-signed cert in the Originator-Certificate
+field.  If you receive this message for the first time, RIPEM will
+tell you that you don't have a validated cert for me and will display
+my self-signed certificate digest.  You can call me and verify that
+it's correct.  Then, you receive the message in -v validation mode
+which will create and store a certificate from you to me.  From now
+on, RIPEM uses it.
+
+When you encrypt a message for me, the message includes something like
+
+Recipient-Name: jefft@chirality.rsa.com
+Recipient-Key-Asymmetric:
+ MFkwCgYEVQgBAQICAgUDSwAwSAJBFc8Mu+7j0iRqZ7eY39hyLUVSKPIRB+oVaGOJ
+ 9ttcJrBDPaucqCcp50leLhh48n9eUbvkQW9L7Yu8RiaLjeaNlU0CAwEAAQ==
+Key-Info: RSA,
+ Ep8yateOeP3bCBZzh4JYs9ZhlsZJ9B1WSM64nFnV2Y5gCExnKwIT/lhZssZTN0as
+ V/i1ysZIp5QUPsRz/mlF0Ck=
+
+Recipient-Name is only included for backwards compatibility.
+RIPEM 1.2 really uses Recipient-Key-Asymmetric, which is the DER
+encoding of my public key.  When I see this while receiving the
+message, I know the associated Key-Info is for me.  Using the public
+key is nice because you don't have to know who I think my issuer and
+serial number are. It supports this direct trust model nicely.
+
+RIPEM 1.2 uses a home directory which currently holds two files:
+privkey and pubkeys.  privkey is the same as the old RIPEM -s private
+key file.  The pubkeys file holds the user's self-signed certificate
+and the direct-trust certificates they make for other users:
+
+User: jefft@chirality.rsa.com
+UserDistinguishedName: CN = jefft@chirality.rsa.com, OU = Persona Certificate, O = RSA Data Security, Inc., C = US
+CertificateInfo:
+ MIIB0zCCAX0CEHvlDG8l4VHdqec4RvFBuGIwDQYJKoZIhvcNAQECBQAwbzELMAkG
+ A1UEBhMCVVMxIDAeBgNVBAoTF1JTQSBEYXRhIFNlY3VyaXR5LCBJbmMuMRwwGgYD
+ VQQLExNQZXJzb25hIENlcnRpZmljYXRlMSAwHgYDVQQDFBdqZWZmdEBjaGlyYWxp
+ dHkucnNhLmNvbTAeFw05MzExMzAxOTE1NTFaFw05NTExMzAxOTE1NTFaMG8xCzAJ
+ BgNVBAYTAlVTMSAwHgYDVQQKExdSU0EgRGF0YSBTZWN1cml0eSwgSW5jLjEcMBoG
+ A1UECxMTUGVyc29uYSBDZXJ0aWZpY2F0ZTEgMB4GA1UEAxQXamVmZnRAY2hpcmFs
+ aXR5LnJzYS5jb20wWDAKBgRVCAEBAgIB/gNKADBHAkAtAto1Bdion6FnjY2qkliO
+ 7n6RxmL68IJ8r5XMMPX5IERpo4pSEiE/Fbrw2jVlFUTbdQ36Y65tezhS1E4oNsUX
+ AgMBAAEwDQYJKoZIhvcNAQECBQADQQAK/hg100zdjSCapJusmVSzwDaj6YKAa0p3
+ GJBYYMMIMZbGlE2gx1bnMiI+twftqA2nRj7v7zlaWv3WiP+pihyx
+
+Notice that there is no public key by itself, since it is now
+validated inside the certificate.  For RIPEM 1.2, a user's
+distinguished name is formed with the old RIPEM username as the common
+name in a Persona distinguished name.
+
+Important: During ripem -e -m encrypted -u username, RIPEM looks up
+the recipient's certificate by scanning pubkeys for a "User:" field as
+specified by -u and uses the first one it finds.  It is possible that
+there are multiple users with the same common name, so RIPEM always
+displays the full distinguished names of the recipients it finds when
+encrypting.  If one of these is the wrong DN, the user can abort
+sending the message.
+
+Notice that the Originator-Certificate field is a self-signed cert, a
+RIPEM signed message conforms closely to RFC 1424.  In fact, since the
+names are already Persona names, you can send it to
+persona-request@rsa.com and it will return a real Persona certificate.
+(The RIPEM 1.2 documentation doesn't mention this because there's
+really nothing a 1.2 user can do with a hierarchical cert right now,
+but you can see what my plans are. ;-)  )
+
+Lastly, RIPEM 1.2 doesn't make use of key servers except for backwards
+compatibility.  Let me include a paragraph from the user manual:
+
+  Note:  RIPEM 1.2 does not use key servers or finger to manage 
+  certificates.  RIPEM 1.2 only transmits a self-signed 
+  certificate, and the only other certificates that are made are 
+  direct peer-to-peer.  As a RIPEM 1.2 user, you make a 
+  certificate from yourself to, say, fred@snark.edu.  No one other 
+  than you and fred  would be interested in this certificate.  
+  Hence, RIPEM 1.2 makes no provision for these certificates to be 
+  on key servers.  A future version of RIPEM is planned which will 
+  allow certificate chaining.  This will allow you to indirectly 
+  trust users directly certified by users of your choice.  You 
+  will be able to say "I trust all users certified by fred".  When 
+  this future version of RIPEM is available, it will become 
+  meaningful to place certificates on key servers.
+
+Let me know if you need more info.
+
+- - Jeff
+-----END PRIVACY-ENHANCED MESSAGE-----
+

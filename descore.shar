@@ -1,0 +1,1818 @@
+BABYL OPTIONS:
+Version: 5
+Labels:
+Note:   This is the header of an rmail file.
+Note:   If you are seeing it in rmail,
+Note:    it means the file has no messages in it.
+
+0, unseen,,
+*** EOOH ***
+From: how@isl.stanford.edu (Dana How)
+Newsgroups: comp.sources.misc
+Subject: v29i080: descore - high performance DES core routines, Part01/01
+Date: 22 Apr 92 10:19:23 GMT
+Sender: aem@aber.ac.uk (Alec David Muffett)
+Followup-To: comp.sources.d
+Organization: University College of Wales, Aberystwyth
+Approved: aem@aber.ac.uk
+X-Md4-Signature: 4273f951be4f2b47669208672e313721
+
+Submitted-by: how@isl.stanford.edu (Dana How)
+Posting-number: Volume 29, Issue 80
+Archive-name: descore/part01
+Environment: UNIX, 32BIT
+
+desCore is a package which contains just the core DES functionality:
+specifying keys, encryption and decryption.  the latter two functions
+are faster (by 40%+) than any software i have seen posted before:
+	encryption/decryption on a sparcstation 1:
+	variant			blocks/sec	bytes/sec	bits/sec
+	with  2k tables		20,000		160,000		1,280,000
+	with 64k tables		30,000		480,000		3,840,000
+omitting the initial and final permutation improves the performance even
+more;  all four combinations of table size and IP/FP support are provided.
+
+desCore is for those who want to implement such things as DES filters,
+rather than UNIX password crackers. for this reason i have not spent much
+effort yet to improve the performance of the key-setting routine.
+
+i have attempted to keep the package small, portable and easily plugged-in
+to kerberos-compatible code. i have NOT reimplemented all the other routines
+in kerberos because i have nothing new to add -- that has already been done
+at least three times by other people.
+
+the majority of the performance optimizations which appear in this package
+also appear in the recent post from australia,  which is a good package.
+here extra performance is derived by careful attention to minimizing machine-
+level operations (such as hidden index scaling) and allowing the code to be
+highly tuned to the number of registers available on the target machine.
+it should be noted that this performance was NOT obtained at the expense
+of portability, or requiring the input or output data to be aligned in
+unnecessary ways,  nor are the tables rearranged for different machine types
+as in some DES packages --  indeed, this package is _oblivious_ to the endedness
+of your machine.
+
+enjoy!						posted by how@isl.stanford.edu
+
+-----------------------------  CUT HERE -------------------------------
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+# it by saving it into a file and typing "sh file".  To overwrite existing
+# files, type "sh file -c".  You can also feed this as standard input via
+# unshar, or by typing "sh <file", e.g..  If this archive is complete, you
+# will see the following message at the end:
+#		"End of archive 1 (of 1)."
+# Contents:  Makefile README desCode.h desCore.h desKerb.c desQuick.c
+#   desTest.c desUtil.c desdata.c desinfo.h
+# Wrapped by how@tau on Thu Apr 16 18:10:34 1992
+PATH=/bin:/usr/bin:/usr/ucb ; export PATH
+if test -f 'Makefile' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'Makefile'\"
+else
+echo shar: Extracting \"'Makefile'\" \(3872 characters\)
+sed "s/^X//" >'Makefile' <<'END_OF_FILE'
+X#
+X#	des - fast & portable DES encryption & decryption.
+X#	Copyright (C) 1992  Dana L. How
+X#	Please see the file `README' for the complete copyright notice.
+X#
+X
+X# $Id: Makefile,v 1.14 1992/04/17 00:04:39 how E $
+X
+XCFLAGS=		-g		# debug
+XCFLAGS=		-O4		# max opt
+XCFLAGS=		-O4
+XCPPFLAGS=	-Dsparc		# use 6+8 general regs
+XCPPFLAGS=	-Dmc68000	# use 3+4 addr (1+4 live), and 3+3 data regs
+XCPPFLAGS=	-Dvax		# use 6+0 general regs
+XCPPFLAGS=	-Di386		# use 3+0 regs, and 3+0 normal variables
+XCPPFLAGS=	-Dsparc
+XLDFLAGS=
+XCC=		cc
+XCPP=		$(CC) -E $(CPPFLAGS)
+XCODEGEN.c=	$(CC) $(CFLAGS) $(CPPFLAGS) -S
+XCOMPILE.c=	$(CC) $(CFLAGS) $(CPPFLAGS) -c
+XLINK.c=		$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
+X
+X# hand-entered files that go into the library
+XSC=		desKerb.c desUtil.c desQuick.c
+XSO=		desKerb.o desUtil.o desQuick.o
+X
+X# special generated files
+XGH=		parity.h rotors.h keymap.h
+XGC=		desSmallFips.c desSmallCore.c desQuickFips.c desQuickCore.c
+XGI=		desSmallFips.i desSmallCore.i desQuickFips.i desQuickCore.i
+XGO=		desSmallFips.o desSmallCore.o desQuickFips.o desQuickCore.o
+X
+X# what to distribute
+XRCS=		Makefile README						\
+X		desCore.h desinfo.h desCode.h				\
+X		desTest.c $(SC) desdata.c
+XFILES=		$(RCS)
+X
+XO=		$(SO) $(GO)
+X
+X# prefer compilation from .i if .i exists
+X.SUFFIXES:
+X.SUFFIXES:	.i .o .c $(SUFFIXES)
+X
+X.PRECIOUS:	$(RCS) test
+X
+Xtest:		desCore.a desTest.o
+X		$(LINK.c) -o $@ desTest.o desCore.a
+X		test
+X
+X# get stuff from RCS
+X$(RCS):
+X		co $@
+X
+X# test all performance enhancement flags
+Xsure:
+X		rm *.i; make 'CPPFLAGS=-Di386    -Umc68000 -Usparc'
+X		rm *.i; make 'CPPFLAGS=-Dvax     -Umc68000 -Usparc'
+X		rm *.i; make 'CPPFLAGS=-Dmc68000 -Usparc'
+X		rm *.i; make 'CPPFLAGS=-Dsparc   -Umc68000'
+X
+XdesCore.a:	$O
+X		ar cru $@ $O
+X		ranlib $@
+X
+Xdesdata.o:	desinfo.h desCore.h
+XdesUtil.o:	$(GH)
+X$(SO):		desCore.h
+X$(GI):		desCode.h desCore.h Makefile
+XdesTest.o:	desCore.h
+X
+X$(GH):		desdata
+X		desdata $@ > $@
+X
+Xdesdata:	desdata.o
+X		$(LINK.c) -o $@ desdata.o
+X
+Xtar:		$(FILES)
+X		tar cf des.tar $(FILES)
+X
+Xshar:		$(FILES)
+X		makekit -ndes.shar -s53k '-tnow run make' $(FILES)
+X
+Xlint:		desTest.c $(SC) $(GC)
+X		lint	$(CPPFLAGS) \
+X			desTest.c $(SC) $(GC) | \
+X		sed	'/possible pointer alignment problem/d'
+X
+Xwarn:		desTest.c $(SC) $(GC)
+X		gcc2	-Wall -ansi -pedantic $(CPPFLAGS) -O2 \
+X			desTest.c $(SC) $(GC)
+X
+X# new rules  (note: tr|sed|tr is NOT necessary,  just there so .i is readable)
+X.c.i:
+X	$(CPP) $< > $*.x
+X	@tr ';'\\012 \\012';' < $*.x |			\
+X	 sed	-e 's/[ 	][ 	]*/ /g'		\
+X		-e 's/^ //'				\
+X		-e 's/ $$//'				\
+X		-e '/^$$/d'				\
+X		-e '/^[^;]/s/^/;/'			\
+X		-e 's/#[^;]*;//g'			\
+X		-e 's/\([){]\) *\(register\)/\1;\2/g'	\
+X		-e 's/\([[(]\) /\1/g'			\
+X		-e 's/ \([])]\)/\1/g'			\
+X		-e 's/\([^]+0123 ]\) =/\1  =/g'		\
+X		-e 's/}/};;/g'				\
+X		-e 's/ *; */;/g'			\
+X		-e 's/;;;*/;;/g'			\
+X		-e '1s/^;*//' |				\
+X	 tr ';'\\012 \\012';' > $@
+X	@echo ""  >> $@
+X	@echo "}" >> $@			# last definition must be a procedure
+X
+X#		-e 's/\(;[kmxyz][0-9]*\)\([^;]*=\)/\1  \2/g'
+X
+X.i.o:
+X		$(CODEGEN.c) $<
+X		$(COMPILE.c) $*.s
+X
+X# slowest to quickest
+XdesSmallFips.c:
+X		@echo '#include "desCode.h"' > $@
+X		@echo \
+X'ENCRYPT(DesSmallFipsEncrypt,TEMPSMALL,LOADFIPS,KEYMAPSMALL,SAVEFIPS)' >> $@
+X		@echo \
+X'DECRYPT(DesSmallFipsDecrypt,TEMPSMALL,LOADFIPS,KEYMAPSMALL,SAVEFIPS)' >> $@
+XdesSmallCore.c:
+X		@echo '#include "desCode.h"' > $@
+X		@echo \
+X'ENCRYPT(DesSmallCoreEncrypt,TEMPSMALL,LOADCORE,KEYMAPSMALL,SAVECORE)' >> $@
+X		@echo \
+X'DECRYPT(DesSmallCoreDecrypt,TEMPSMALL,LOADCORE,KEYMAPSMALL,SAVECORE)' >> $@
+XdesQuickFips.c:
+X		@echo '#include "desCode.h"' > $@
+X		@echo \
+X'ENCRYPT(DesQuickFipsEncrypt,TEMPQUICK,LOADFIPS,KEYMAPQUICK,SAVEFIPS)' >> $@
+X		@echo \
+X'DECRYPT(DesQuickFipsDecrypt,TEMPQUICK,LOADFIPS,KEYMAPQUICK,SAVEFIPS)' >> $@
+XdesQuickCore.c:
+X		@echo '#include "desCode.h"' > $@
+X		@echo \
+X'ENCRYPT(DesQuickCoreEncrypt,TEMPQUICK,LOADCORE,KEYMAPQUICK,SAVECORE)' >> $@
+X		@echo \
+X'DECRYPT(DesQuickCoreDecrypt,TEMPQUICK,LOADCORE,KEYMAPQUICK,SAVECORE)' >> $@
+END_OF_FILE
+if test 3872 -ne `wc -c <'Makefile'`; then
+    echo shar: \"'Makefile'\" unpacked with wrong size!
+fi
+# end of 'Makefile'
+fi
+if test -f 'README' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'README'\"
+else
+echo shar: Extracting \"'README'\" \(14994 characters\)
+sed "s/^X//" >'README' <<'END_OF_FILE'
+Xdes - fast & portable DES encryption & decryption.
+XCopyright (C) 1992  Dana L. How
+X
+XThis program is free software; you can redistribute it and/or modify
+Xit under the terms of the GNU Library General Public License as published by
+Xthe Free Software Foundation; either version 2 of the License, or
+X(at your option) any later version.
+X
+XThis program is distributed in the hope that it will be useful,
+Xbut WITHOUT ANY WARRANTY; without even the implied warranty of
+XMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+XGNU Library General Public License for more details.
+X
+XYou should have received a copy of the GNU Library General Public License
+Xalong with this program; if not, write to the Free Software
+XFoundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+X
+XAuthor's address: how@isl.stanford.edu
+X
+X$Id: README,v 1.12 1992/04/17 00:47:11 how E $
+X
+X
+X==>> To compile after untarring/unsharring, just `make' <<==
+X
+X
+XThis package was designed with the following goals:
+X1.	Highest possible encryption/decryption PERFORMANCE.
+X2.	PORTABILITY to any byte-addressable machine with a 32bit unsigned C type
+X3.	Plug-compatible replacement for KERBEROS's low-level routines.
+X
+X
+Xperformance comparison to other available des code which i could
+Xcompile on a SPARCStation 1 (cc -O4):
+X
+Xthis code (byte-order independent):
+X   30us per encryption (options: 64k tables, no IP/FP)
+X   33us per encryption (options: 64k tables, FIPS standard bit ordering)
+X   45us per encryption (options:  2k tables, no IP/FP)
+X   49us per encryption (options:  2k tables, FIPS standard bit ordering)
+X  275us to set a new key (uses 1k of key tables)
+X	this has the quickest encryption/decryption routines i've seen.
+X	since i was interested in fast des filters rather than crypt(3)
+X	and password cracking, i haven't really bothered yet to speed up
+X	the key setting routine. also, i have no interest in re-implementing
+X	all the other junk in the mit kerberos des library, so i've just
+X	provided my routines with little stub interfaces so they can be
+X	used as drop-in replacements with mit's code or any of the mit-
+X	compatible packages below. (note that the first two timings above
+X	are highly variable because of cache effects).
+X
+Xkerberos des replacement from australia:
+X   68us per encryption (uses 2k of tables)
+X   96us to set a new key (uses 2.25k of key tables)
+X	this is a very nice package which implements the most important
+X	of the optimizations which i did in my encryption routines.
+X	it's a bit weak on common low-level optimizations which is why
+X	it's 39%-106% slower.  because he was interested in fast crypt(3) and
+X	password-cracking applications,  he also used the same ideas to
+X	speed up the key-setting routines with impressive results.
+X	(at some point i may do the same in my package).  he also implements
+X	the rest of the mit des library.
+X	(code from eay@psych.psy.uq.oz.au via comp.sources.misc)
+X
+Xfast crypt(3) package from denmark:
+X	the des routine here is buried inside a loop to do the
+X	crypt function and i didn't feel like ripping it out and measuring
+X	performance. his code takes 26 sparc instructions to compute one
+X	des iteration; above, Quick (64k) takes 21 and Small (2k) takes 37.
+X	he claims to use 280k of tables but the iteration calculation seems
+X	to use only 128k.  his tables and code are machine independent.
+X	(code from glad@daimi.aau.dk via alt.sources or comp.sources.misc)
+X
+Xswedish reimplementation of Kerberos des library
+X  108us per encryption (uses 34k worth of tables)
+X  134us to set a new key (uses 32k of key tables to get this speed!)
+X	the tables used seem to be machine-independent;
+X	he seems to have included a lot of special case code
+X	so that, e.g., `long' loads can be used instead of 4 `char' loads
+X	when the machine's architecture allows it.
+X	(code obtained from chalmers.se:pub/des)
+X
+Xcrack 3.3c package from england:
+X	as in crypt above, the des routine is buried in a loop. it's
+X	also very modified for crypt.  his iteration code uses 16k
+X	of tables and appears to be slow.
+X	(code obtained from aem@aber.ac.uk via alt.sources or comp.sources.misc)
+X
+X``highly optimized'' and tweaked Kerberos/Athena code (byte-order dependent):
+X  165us per encryption (uses 6k worth of tables)
+X  478us to set a new key (uses <1k of key tables)
+X	so despite the comments in this code, it was possible to get
+X	faster code AND smaller tables, as well as making the tables
+X	machine-independent.
+X	(code obtained from prep.ai.mit.edu)
+X
+XUC Berkeley code (depends on machine-endedness):
+X  226us per encryption
+X10848us to set a new key
+X	table sizes are unclear, but they don't look very small
+X	(code obtained from wuarchive.wustl.edu)
+X
+X
+Xmotivation and history
+X
+Xa while ago i wanted some des routines and the routines documented on sun's
+Xman pages either didn't exist or dumped core.  i had heard of kerberos,
+Xand knew that it used des,  so i figured i'd use its routines.  but once
+Xi got it and looked at the code,  it really set off a lot of pet peeves -
+Xit was too convoluted, the code had been written without taking
+Xadvantage of the regular structure of operations such as IP, E, and FP
+X(i.e. the author didn't sit down and think before coding),
+Xit was excessively slow,  the author had attempted to clarify the code
+Xby adding MORE statements to make the data movement more `consistent'
+Xinstead of simplifying his implementation and cutting down on all data
+Xmovement (in particular, his use of L1, R1, L2, R2), and it was full of
+Xidiotic `tweaks' for particular machines which failed to deliver significant
+Xspeedups but which did obfuscate everything.  so i took the test data
+Xfrom his verification program and rewrote everything else.
+X
+Xa while later i ran across the great crypt(3) package mentioned above.
+Xthe fact that this guy was computing 2 sboxes per table lookup rather
+Xthan one (and using a MUCH larger table in the process) emboldened me to
+Xdo the same - it was a trivial change from which i had been scared away
+Xby the larger table size.  in his case he didn't realize you don't need to keep
+Xthe working data in TWO forms, one for easy use of half the sboxes in
+Xindexing, the other for easy use of the other half; instead you can keep
+Xit in the form for the first half and use a simple rotate to get the other
+Xhalf.  this means i have (almost) half the data manipulation and half
+Xthe table size.  in fairness though he might be encoding something particular
+Xto crypt(3) in his tables - i didn't check.
+X
+Xi'm glad that i implemented it the way i did, because this C version is
+Xportable (the ifdef's are performance enhancements) and it is faster
+Xthan versions hand-written in assembly for the sparc!
+X
+X
+Xporting notes
+X
+Xone thing i did not want to do was write an enormous mess
+Xwhich depended on endedness and other machine quirks,
+Xand which necessarily produced different code and different lookup tables
+Xfor different machines.  see the kerberos code for an example
+Xof what i didn't want to do; all their endedness-specific `optimizations'
+Xobfuscate the code and in the end were slower than a simpler machine
+Xindependent approach.  however, there are always some portability
+Xconsiderations of some kind, and i have included some options
+Xfor varying numbers of register variables.
+Xperhaps some will still regard the result as a mess!
+X
+X1) i assume everything is byte addressable, although i don't actually
+X   depend on the byte order, and that bytes are 8 bits.
+X   i assume word pointers can be freely cast to and from char pointers.
+X   note that 99% of C programs make these assumptions.
+X   i always use unsigned char's if the high bit could be set.
+X2) the typedef `word' means a 32 bit unsigned integral type.
+X   if `unsigned long' is not 32 bits, change the typedef in desCore.h.
+X   i assume sizeof(word) == 4 EVERYWHERE.
+X
+Xthe (worst-case) cost of my NOT doing endedness-specific optimizations
+Xin the data loading and storing code surrounding the key iterations
+Xis less than 12%.  also, there is the added benefit that
+Xthe input and output work areas do not need to be word-aligned.
+X
+X
+XOPTIONAL performance optimizations
+X
+X1) you should define one of `i386,' `vax,' `mc68000,' or `sparc,'
+X   whichever one is closest to the capabilities of your machine.
+X   see the start of desCode.h to see exactly what this selection implies.
+X   note that if you select the wrong one, the des code will still work;
+X   these are just performance tweaks.
+X2) for those with functional `asm' keywords: you should change the
+X   ROR and ROL macros to use machine rotate instructions if you have them.
+X   this will save 2 instructions and a temporary per use,
+X   or about 32 to 40 instructions per en/decryption.
+X
+Xthese optimizations are all rather persnickety, yet with them you should
+Xbe able to get performance equal to assembly-coding, except that:
+X1) with the lack of a bit rotate operator in C, rotates have to be synthesized
+X   from shifts.  so access to `asm' will speed things up if your machine
+X   has rotates, as explained above in (3).
+X2) if your machine has less than 12 32-bit registers i doubt your compiler will
+X   generate good code.
+X   `i386' tries to configure the code for a 386 by only declaring 3 registers
+X   (it appears that gcc can use ebx, esi and edi to hold register variables).
+X   however, if you like assembly coding, the 386 does have 7 32-bit registers,
+X   and if you use ALL of them, use `scaled by 8' address modes with displacement
+X   and other tricks, you can get reasonable routines for DesQuickCore... with
+X   about 250 instructions apiece.  For DesSmall... it will help to rearrange
+X   des_keymap, i.e., now the sbox # is the high part of the index and
+X   the 6 bits of data is the low part; it helps to exchange these.
+X   since i have no way to conveniently test it i have not provided my
+X   shoehorned 386 version.
+X
+Xcoding notes
+X
+Xthe en/decryption routines each use 6 necessary register variables,
+Xwith 4 being actively used at once during the inner iterations.
+Xif you don't have 4 register variables get a new machine.
+Xup to 8 more registers are used to hold constants in some configurations.
+X
+Xi assume that the use of a constant is more expensive than using a register:
+Xa) additionally, i have tried to put the larger constants in registers.
+X   registering priority was by the following:
+X	anything more than 12 bits (bad for RISC and CISC)
+X	greater than 127 in value (can't use movq or byte immediate on CISC)
+X	9-127 (may not be able to use CISC shift immediate or add/sub quick),
+X	1-8 were never registered, being the cheapest constants.
+Xb) the compiler may be too stupid to realize table and table+256 should
+X   be assigned to different constant registers and instead repetitively
+X   do the arithmetic, so i assign these to explicit `m' register variables
+X   when possible and helpful.
+X
+Xi assume that indexing is cheaper or equivalent to auto increment/decrement,
+Xwhere the index is 7 bits unsigned or smaller.
+Xthis assumption is reversed for 68k and vax.
+X
+Xi assume that addresses can be cheaply formed from two registers,
+Xor from a register and a small constant.  i never use the `two registers
+Xand offset' form you see in some CISC machines.
+Xall index scaling is done explicitly - no hidden shifts by log2(sizeof).
+X
+Xthe code is written so that even a dumb compiler
+Xshould never need more than one hidden temporary,
+Xincreasing the chance that everything will fit in the registers.
+XKEEP THIS MORE SUBTLE POINT IN MIND IF YOU REWRITE ANYTHING.
+X
+X
+Xspecial efficient data format
+X
+Xbits are manipulated in this arrangement most of the time (S7 S5 S3 S1):
+X	003130292827xxxx242322212019xxxx161514131211xxxx080706050403xxxx
+X(the x bits are still there, i'm just emphasizing where the S boxes are).
+Xbits are rotated left 4 when computing S6 S4 S2 S0:
+X	282726252423xxxx201918171615xxxx121110090807xxxx040302010031xxxx
+Xthe rightmost two bits are usually cleared so the lower byte can be used
+Xas an index into an sbox mapping table. the next two x'd bits are set
+Xto various values to access different parts of the tables.
+X
+X
+Xhow to use the routines
+X
+Xdatatypes:
+X	pointer to 8 byte area of type DesData
+X	used to hold keys and input/output blocks to des.
+X
+X	pointer to 128 byte area of type DesKeys
+X	used to hold full 768-bit key.
+X	must be long-aligned.
+X
+XDesQuickInit()
+X	call this before using any other routine with `Quick' in its name.
+X	it generates the special 64k table these routines need.
+XDesQuickDone()
+X	frees this table
+X
+XDesMethod(m, k)
+X	m points to a 128byte block, k points to an 8 byte des key
+X	which must have odd parity (or -1 is returned) and which must
+X	not be a (semi-)weak key (or -2 is returned).
+X	normally DesMethod() returns 0.
+X	m is filled in from k so that when one of the routines below
+X	is called with m, the routine will act like standard des
+X	en/decryption with the key k. if you use DesMethod,
+X	you supply a standard 56bit key; however, if you fill in
+X	m yourself, you will get a 768bit key - but then it won't
+X	be standard.  it's 768bits not 1024 because the least significant
+X	two bits of each byte are not used.  and yes, each byte controls
+X	a specific sbox during a specific iteration.
+X	NOTE: actually, every other word has been rotated right 4 bits
+X	to reduce the number of temporaries needed when the key is used.
+X	you really shouldn't use the 768bit format directly;  i should
+X	provide a routine that converts 128 6-bit bytes (specified in
+X	S-box mapping order or something) into the right format for you.
+X	this would entail some byte concatenation and rotation.
+X
+XDes{Small|Quick}{Fips|Core}{Encrypt|Decrypt}(d, m, s)
+X	performs des on the 8 bytes at s into the 8 bytes at d. (d,s: char *).
+X	uses m as a 768bit key as explained above.
+X	the Encrypt|Decrypt choice is obvious.
+X	Fips|Core determines whether a completely standard FIPS initial
+X	and final permutation is done; if not, then the data is loaded
+X	and stored in a nonstandard bit order (FIPS w/o IP/FP).
+X	Fips slows down Quick by 10%, Small by 9%.
+X	Small|Quick determines whether you use the normal routine
+X	or the crazy quick one which gobbles up 64k more of memory.
+X	Small is 50% slower then Quick, but Quick needs 32 times as much
+X	memory.  Quick is included for programs that do nothing but DES,
+X	e.g., encryption filters, etc.
+X
+X
+XGetting it to compile on your machine
+X
+Xthere are no machine-dependencies in the code (see porting),
+Xexcept perhaps the `now()' macro in desTest.c.
+XALL generated tables are machine independent.
+Xyou should edit the Makefile with the appropriate optimization flags
+Xfor your compiler (MAX optimization).
+X
+X
+XSpeeding up kerberos (and/or its des library)
+X
+Xnote that i have included a kerberos-compatible interface in desUtil.c
+Xthrough the functions des_key_sched() and des_ecb_encrypt().
+Xto use these with kerberos or kerberos-compatible code put desCore.a
+Xahead of the kerberos-compatible library on your linker's command line.
+Xyou should not need to #include desCore.h;  just include the header
+Xfile provided with the kerberos library.
+X
+XOther uses
+X
+Xthe macros in desCode.h would be very useful for putting inline des
+Xfunctions in more complicated encryption routines.
+END_OF_FILE
+if test 14994 -ne `wc -c <'README'`; then
+    echo shar: \"'README'\" unpacked with wrong size!
+fi
+# end of 'README'
+fi
+if test -f 'desCode.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'desCode.h'\"
+else
+echo shar: Extracting \"'desCode.h'\" \(10874 characters\)
+sed "s/^X//" >'desCode.h' <<'END_OF_FILE'
+X/*
+X *	des - fast & portable DES encryption & decryption.
+X *	Copyright (C) 1992  Dana L. How
+X *	Please see the file `README' for the complete copyright notice.
+X */
+X
+X#ifndef	lint
+Xstatic char desCode_hRcs[] = "$Id: desCode.h,v 1.16 1992/04/17 00:44:43 how E $";
+X#endif
+X
+X#include	"desCore.h"
+Xextern word des_keymap[], des_bigmap[];
+X
+X
+X/* optional customization:
+X * the idea here is to alter the code so it will still run correctly
+X * on any machine,  but the quickest on the specific machine in mind.
+X * note that these silly tweaks can give you a 15%-20% speed improvement
+X * on the sparc -- it's probably even more significant on the 68000. */
+X
+X/* take care of machines with incredibly few registers */
+X#if	defined(i386)
+X#define	REGISTER		/* only x, y, z will be declared register */
+X#else
+X#define	REGISTER	register
+X#endif	/* i386 */
+X
+X/* is auto inc/dec faster than 7bit unsigned indexing? */
+X#if	defined(vax) || defined(mc68000)
+X#define	FIXR		r += 32;
+X#define	FIXS		s +=  8;
+X#define	PREV(v,o)	*--v
+X#define	NEXT(v,o)	*v++
+X#else
+X#define	FIXR
+X#define	FIXS
+X#define	PREV(v,o)	v[o]
+X#define	NEXT(v,o)	v[o]
+X#endif
+X
+X/* if no machine type, default is indexing, 6 registers and cheap literals */
+X#if	!defined(i386) && !defined(vax) && !defined(mc68000) && !defined(sparc)
+X#define	vax
+X#endif
+X
+X/* handle a compiler which can't reallocate registers */
+X#if	defined(strange)			/* didn't feel like deleting */
+X#define	SREGFREE	; s = (byte *) D
+X#define	DEST		s
+X#define	D		m0
+X#define	BYTE		word
+X#else
+X#define	SREGFREE
+X#define	DEST		d
+X#define	D		d
+X#define	BYTE		byte
+X#endif
+X
+X/* handle constants in the optimal way for 386 & vax */
+X/* 386: we declare 3 register variables (see above) and use 3 more variables;
+X * vax: we use 6 variables, all declared register;
+X * we assume address literals are cheap & unrestricted;
+X * we assume immediate constants are cheap & unrestricted. */
+X#if	defined(i386) || defined(vax)
+X#define	MQ0	 des_bigmap
+X#define	MQ1	(des_bigmap +  64)
+X#define	MQ2	(des_bigmap + 128)
+X#define	MQ3	(des_bigmap + 192)
+X#define	HQ0(z)				/*	z |= 0X01000000L; */
+X#define	HQ2(z)				/*	z |= 0X03000200L; */
+X#define	LQ0(z)	0XFCFC & z
+X#define	LQ1(z)	0XFCFC & z
+X#define	LQ2(z)	0XFCFC & z
+X#define	LQ3(z)	0XFCFC & z
+X#define	SQ	16
+X#define	MS0	 des_keymap 
+X#define	MS1	(des_keymap +  64)
+X#define	MS2	(des_keymap + 128)
+X#define	MS3	(des_keymap + 192)
+X#define	MS4	(des_keymap + 256)
+X#define	MS5	(des_keymap + 320)
+X#define	MS6	(des_keymap + 384)
+X#define	MS7	(des_keymap + 448)
+X#define	HS(z)
+X#define	LS0(z)	0XFC & z
+X#define	LS1(z)	0XFC & z
+X#define	LS2(z)	0XFC & z
+X#define	LS3(z)	0XFC & z
+X#define	REGQUICK
+X#define	SETQUICK
+X#define	REGSMALL
+X#define	SETSMALL
+X#endif	/* defined(i386) || defined(vax) */
+X
+X/* handle constants in the optimal way for mc68000 */
+X/* in addition to the core 6 variables, we declare 3 registers holding constants
+X * and 4 registers holding address literals.
+X * at most 6 data values and 5 address values are actively used at once.
+X * we assume address literals are so expensive we never use them;
+X * we assume constant index offsets > 127 are expensive, so they are not used.
+X * we assume all constants are expensive and put them in registers,
+X * including shift counts greater than 8. */
+X#if	defined(mc68000)
+X#define	MQ0	m0
+X#define	MQ1	m1
+X#define	MQ2	m2
+X#define	MQ3	m3
+X#define	HQ0(z)
+X#define	HQ2(z)
+X#define	LQ0(z)	k0 & z
+X#define	LQ1(z)	k0 & z
+X#define	LQ2(z)	k0 & z
+X#define	LQ3(z)	k0 & z
+X#define	SQ	k1
+X#define	MS0	m0
+X#define	MS1	m0
+X#define	MS2	m1
+X#define	MS3	m1
+X#define	MS4	m2
+X#define	MS5	m2
+X#define	MS6	m3
+X#define	MS7	m3
+X#define	HS(z)	z |= k0;
+X#define	LS0(z)	k1 & z
+X#define	LS1(z)	k2 & z
+X#define	LS2(z)	k1 & z
+X#define	LS3(z)	k2 & z
+X#define	REGQUICK				\
+X	register word k0, k1;			\
+X	register word *m0, *m1, *m2, *m3;
+X#define	SETQUICK				\
+X	; k0 = 0XFCFC				\
+X	; k1 = 16				\
+X	/*k2 = 28 to speed up ROL */		\
+X	; m0 = des_bigmap			\
+X	; m1 = m0 + 64				\
+X	; m2 = m1 + 64				\
+X	; m3 = m2 + 64
+X#define	REGSMALL				\
+X	register word k0, k1, k2;		\
+X	register word *m0, *m1, *m2, *m3;
+X#define	SETSMALL				\
+X	; k0 = 0X01000100L			\
+X	; k1 = 0X0FC				\
+X	; k2 = 0X1FC				\
+X	; m0 = des_keymap			\
+X	; m1 = m0 + 128				\
+X	; m2 = m1 + 128				\
+X	; m3 = m2 + 128
+X#endif	/* defined(mc68000) */
+X
+X/* handle constants in the optimal way for sparc */
+X/* in addition to the core 6 variables, we either declare:
+X * 4 registers holding address literals and 1 register holding a constant, or
+X * 8 registers holding address literals.
+X * up to 14 register variables are declared (sparc has %i0-%i5, %l0-%l7).
+X * we assume address literals are so expensive we never use them;
+X * we assume any constant with >10 bits is expensive and put it in a register,
+X * and any other is cheap and is coded in-line. */
+X#if	defined(sparc)
+X#define	MQ0	m0
+X#define	MQ1	m1
+X#define	MQ2	m2
+X#define	MQ3	m3
+X#define	HQ0(z)
+X#define	HQ2(z)
+X#define	LQ0(z)	k0 & z
+X#define	LQ1(z)	k0 & z
+X#define	LQ2(z)	k0 & z
+X#define	LQ3(z)	k0 & z
+X#define	SQ	16
+X#define	MS0	m0
+X#define	MS1	m1
+X#define	MS2	m2
+X#define	MS3	m3
+X#define	MS4	m4
+X#define	MS5	m5
+X#define	MS6	m6
+X#define	MS7	m7
+X#define	HS(z)
+X#define	LS0(z)	0XFC & z
+X#define	LS1(z)	0XFC & z
+X#define	LS2(z)	0XFC & z
+X#define	LS3(z)	0XFC & z
+X#define	REGQUICK				\
+X	register word k0;			\
+X	register word *m0, *m1, *m2, *m3;
+X#define	SETQUICK				\
+X	; k0 = 0XFCFC				\
+X	; m0 = des_bigmap			\
+X	; m1 = m0 + 64				\
+X	; m2 = m1 + 64				\
+X	; m3 = m2 + 64
+X#define	REGSMALL				\
+X	register word *m0, *m1, *m2, *m3, *m4, *m5, *m6, *m7;
+X#define	SETSMALL				\
+X	; m0 = des_keymap			\
+X	; m1 = m0 + 64				\
+X	; m2 = m1 + 64				\
+X	; m3 = m2 + 64				\
+X	; m4 = m3 + 64				\
+X	; m5 = m4 + 64				\
+X	; m6 = m5 + 64				\
+X	; m7 = m6 + 64
+X#endif	/* defined(sparc) */
+X
+X
+X/* some basic stuff */
+X
+X/* generate addresses from a base and an index */
+X#define	ADD(b,x)	(word *) ((byte *)b + (x))
+X
+X/* low level rotate operations */
+X#define	NOP(d,c,o)
+X#define	ROL(d,c,o)	d = d << c | d >> o
+X#define	ROR(d,c,o)	d = d >> c | d << o
+X#define	ROL1(d)		ROL(d, 1, 31)
+X#define	ROR1(d)		ROR(d, 1, 31)
+X
+X/* elementary swap for doing IP/FP */
+X#define	SWAP(x,y,m,b)				\
+X	z  = ((x >> b) ^ y) & m;		\
+X	x ^= z << b;				\
+X	y ^= z
+X
+X
+X/* the following macros contain all the important code fragments */
+X
+X/* load input data, then setup special registers holding constants */
+X#define	TEMPQUICK(LOAD)				\
+X	REGQUICK				\
+X	LOAD()					\
+X	SETQUICK
+X#define	TEMPSMALL(LOAD)				\
+X	REGSMALL				\
+X	LOAD()					\
+X	SETSMALL
+X
+X/* load data */
+X#define	LOADDATA(x,y)				\
+X	FIXS					\
+X	y  = PREV(s, 7); y<<= 8;		\
+X	y |= PREV(s, 6); y<<= 8;		\
+X	y |= PREV(s, 5); y<<= 8;		\
+X	y |= PREV(s, 4);			\
+X	x  = PREV(s, 3); x<<= 8;		\
+X	x |= PREV(s, 2); x<<= 8;		\
+X	x |= PREV(s, 1); x<<= 8;		\
+X	x |= PREV(s, 0)				\
+X	SREGFREE
+X/* load data without initial permutation and put into efficient position */
+X#define	LOADCORE()				\
+X	LOADDATA(x, y);				\
+X	ROR1(x);				\
+X	ROR1(y)
+X/* load data, do the initial permutation and put into efficient position */
+X#define	LOADFIPS()				\
+X	LOADDATA(y, x);				\
+X	SWAP(x, y, 0X0F0F0F0FL, 004);		\
+X	SWAP(y, x, 0X0000FFFFL, 020);		\
+X	SWAP(x, y, 0X33333333L, 002);		\
+X	SWAP(y, x, 0X00FF00FFL, 010);		\
+X	ROR1(x);				\
+X	z  = (x ^ y) & 0X55555555L;		\
+X	y ^= z;					\
+X	x ^= z;					\
+X	ROR1(y)
+X
+X
+X/* core encryption/decryption operations */
+X/* S box mapping and P perm */
+X#define	KEYMAPSMALL(x,z,mq0,mq1,hq,lq0,lq1,sq,ms0,ms1,ms2,ms3,hs,ls0,ls1,ls2,ls3)\
+X	hs(z)					\
+X	x ^= *ADD(ms3, ls3(z));			\
+X	z>>= 8;					\
+X	x ^= *ADD(ms2, ls2(z));			\
+X	z>>= 8;					\
+X	x ^= *ADD(ms1, ls1(z));			\
+X	z>>= 8;					\
+X	x ^= *ADD(ms0, ls0(z))
+X/* alternate version: use 64k of tables */
+X#define	KEYMAPQUICK(x,z,mq0,mq1,hq,lq0,lq1,sq,ms0,ms1,ms2,ms3,hs,ls0,ls1,ls2,ls3)\
+X	hq(z)					\
+X	x ^= *ADD(mq0, lq0(z));			\
+X	z>>= sq;				\
+X	x ^= *ADD(mq1, lq1(z))
+X/* apply 24 key bits and do the odd  s boxes */
+X#define	S7S1(x,y,z,r,m,KEYMAP,LOAD)		\
+X	z  = LOAD(r, m);			\
+X	z ^= y;					\
+X	KEYMAP(x,z,MQ0,MQ1,HQ0,LQ0,LQ1,SQ,MS0,MS1,MS2,MS3,HS,LS0,LS1,LS2,LS3)
+X/* apply 24 key bits and do the even s boxes */
+X#define	S6S0(x,y,z,r,m,KEYMAP,LOAD)		\
+X	z  = LOAD(r, m);			\
+X	z ^= y;					\
+X	ROL(z, 4, 28);				\
+X	KEYMAP(x,z,MQ2,MQ3,HQ2,LQ2,LQ3,SQ,MS4,MS5,MS6,MS7,HS,LS0,LS1,LS2,LS3)
+X/* actual iterations.  equivalent except for UPDATE & swapping m and n */
+X#define	ENCR(x,y,z,r,m,n,KEYMAP)		\
+X	S7S1(x,y,z,r,m,KEYMAP,NEXT);		\
+X	S6S0(x,y,z,r,n,KEYMAP,NEXT)
+X#define	DECR(x,y,z,r,m,n,KEYMAP)		\
+X	S6S0(x,y,z,r,m,KEYMAP,PREV);		\
+X	S7S1(x,y,z,r,n,KEYMAP,PREV)
+X
+X/* write out result in correct byte order */
+X#define	SAVEDATA(x,y)				\
+X	NEXT(DEST, 0) = x; x>>= 8;		\
+X	NEXT(DEST, 1) = x; x>>= 8;		\
+X	NEXT(DEST, 2) = x; x>>= 8;		\
+X	NEXT(DEST, 3) = x;			\
+X	NEXT(DEST, 4) = y; y>>= 8;		\
+X	NEXT(DEST, 5) = y; y>>= 8;		\
+X	NEXT(DEST, 6) = y; y>>= 8;		\
+X	NEXT(DEST, 7) = y
+X/* write out result */
+X#define	SAVECORE()				\
+X	ROL1(x);				\
+X	ROL1(y);				\
+X	SAVEDATA(y, x)
+X/* do final permutation and write out result */
+X#define	SAVEFIPS()				\
+X	ROL1(x);				\
+X	z  = (x ^ y) & 0X55555555L;		\
+X	y ^= z;					\
+X	x ^= z;					\
+X	ROL1(y);				\
+X	SWAP(x, y, 0X00FF00FFL, 010);		\
+X	SWAP(y, x, 0X33333333L, 002);		\
+X	SWAP(x, y, 0X0000FFFFL, 020);		\
+X	SWAP(y, x, 0X0F0F0F0FL, 004);		\
+X	SAVEDATA(x, y)
+X
+X
+X/* the following macros contain the encryption/decryption skeletons */
+X
+X#define	ENCRYPT(NAME, TEMP, LOAD, KEYMAP, SAVE)	\
+X						\
+Xvoid						\
+XNAME(D, r, s)					\
+XREGISTER BYTE * D;				\
+XREGISTER word * r;				\
+XREGISTER byte * s;				\
+X{						\
+X	register word x, y, z;			\
+X						\
+X	/* declare temps & load data */		\
+X	TEMP(LOAD);				\
+X						\
+X	/* do the 16 iterations */		\
+X	ENCR(x,y,z,r, 0, 1,KEYMAP);		\
+X	ENCR(y,x,z,r, 2, 3,KEYMAP);		\
+X	ENCR(x,y,z,r, 4, 5,KEYMAP);		\
+X	ENCR(y,x,z,r, 6, 7,KEYMAP);		\
+X	ENCR(x,y,z,r, 8, 9,KEYMAP);		\
+X	ENCR(y,x,z,r,10,11,KEYMAP);		\
+X	ENCR(x,y,z,r,12,13,KEYMAP);		\
+X	ENCR(y,x,z,r,14,15,KEYMAP);		\
+X	ENCR(x,y,z,r,16,17,KEYMAP);		\
+X	ENCR(y,x,z,r,18,19,KEYMAP);		\
+X	ENCR(x,y,z,r,20,21,KEYMAP);		\
+X	ENCR(y,x,z,r,22,23,KEYMAP);		\
+X	ENCR(x,y,z,r,24,25,KEYMAP);		\
+X	ENCR(y,x,z,r,26,27,KEYMAP);		\
+X	ENCR(x,y,z,r,28,29,KEYMAP);		\
+X	ENCR(y,x,z,r,30,31,KEYMAP);		\
+X						\
+X	/* save result */			\
+X	SAVE();					\
+X						\
+X	return;					\
+X}
+X
+X#define	DECRYPT(NAME, TEMP, LOAD, KEYMAP, SAVE)	\
+X						\
+Xvoid						\
+XNAME(D, r, s)					\
+XREGISTER BYTE * D;				\
+XREGISTER word * r;				\
+XREGISTER byte * s;				\
+X{						\
+X	register word x, y, z;			\
+X						\
+X	/* declare temps & load data */		\
+X	TEMP(LOAD);				\
+X						\
+X	/* do the 16 iterations */		\
+X	FIXR					\
+X	DECR(x,y,z,r,31,30,KEYMAP);		\
+X	DECR(y,x,z,r,29,28,KEYMAP);		\
+X	DECR(x,y,z,r,27,26,KEYMAP);		\
+X	DECR(y,x,z,r,25,24,KEYMAP);		\
+X	DECR(x,y,z,r,23,22,KEYMAP);		\
+X	DECR(y,x,z,r,21,20,KEYMAP);		\
+X	DECR(x,y,z,r,19,18,KEYMAP);		\
+X	DECR(y,x,z,r,17,16,KEYMAP);		\
+X	DECR(x,y,z,r,15,14,KEYMAP);		\
+X	DECR(y,x,z,r,13,12,KEYMAP);		\
+X	DECR(x,y,z,r,11,10,KEYMAP);		\
+X	DECR(y,x,z,r, 9, 8,KEYMAP);		\
+X	DECR(x,y,z,r, 7, 6,KEYMAP);		\
+X	DECR(y,x,z,r, 5, 4,KEYMAP);		\
+X	DECR(x,y,z,r, 3, 2,KEYMAP);		\
+X	DECR(y,x,z,r, 1, 0,KEYMAP);		\
+X						\
+X	/* save result */			\
+X	SAVE();					\
+X						\
+X	return;					\
+X}
+END_OF_FILE
+if test 10874 -ne `wc -c <'desCode.h'`; then
+    echo shar: \"'desCode.h'\" unpacked with wrong size!
+fi
+# end of 'desCode.h'
+fi
+if test -f 'desCore.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'desCore.h'\"
+else
+echo shar: Extracting \"'desCore.h'\" \(731 characters\)
+sed "s/^X//" >'desCore.h' <<'END_OF_FILE'
+X/*
+X *	des - fast & portable DES encryption & decryption.
+X *	Copyright (C) 1992  Dana L. How
+X *	Please see the file `README' for the complete copyright notice.
+X */
+X
+X#ifndef	lint
+Xstatic char desCore_hRcs[] = "$Id: desCore.h,v 1.10 1992/04/16 23:08:44 how E $";
+X#endif
+X
+Xtypedef unsigned char byte, DesData[ 8];
+Xtypedef unsigned long word, DesKeys[32];
+X
+Xextern int DesMethod();
+Xextern void DesQuickInit(), DesQuickDone();
+Xextern void DesQuickCoreEncrypt(), DesQuickFipsEncrypt();
+Xextern void DesQuickCoreDecrypt(), DesQuickFipsDecrypt();
+Xextern void DesSmallCoreEncrypt(), DesSmallFipsEncrypt();
+Xextern void DesSmallCoreDecrypt(), DesSmallFipsDecrypt();
+Xextern void (*DesCryptFuncs[])();
+Xextern int des_key_sched(), des_ecb_encrypt();
+END_OF_FILE
+if test 731 -ne `wc -c <'desCore.h'`; then
+    echo shar: \"'desCore.h'\" unpacked with wrong size!
+fi
+# end of 'desCore.h'
+fi
+if test -f 'desKerb.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'desKerb.c'\"
+else
+echo shar: Extracting \"'desKerb.c'\" \(708 characters\)
+sed "s/^X//" >'desKerb.c' <<'END_OF_FILE'
+X/*
+X *	des - fast & portable DES encryption & decryption.
+X *	Copyright (C) 1992  Dana L. How
+X *	Please see the file `README' for the complete copyright notice.
+X */
+X
+X#ifndef	lint
+Xstatic char desKerb_cRcs[] = "$Id: desKerb.c,v 1.2 1992/04/16 23:08:44 how E $";
+X#endif
+X
+X#include	"desCore.h"
+X
+X
+X/* permit the default style of des functions to be changed */
+X
+Xvoid (*DesCryptFuncs[2])() = { DesSmallFipsDecrypt, DesSmallFipsEncrypt };
+X
+X/* kerberos-compatible key schedule function */
+X
+Xint
+Xdes_key_sched(k, s)
+Xbyte * k;
+Xword * s;
+X{
+X	return DesMethod(s, k);
+X}
+X
+X/* kerberos-compatible des coding function */
+X
+Xint
+Xdes_ecb_encrypt(s, d, r, e)
+Xbyte * s, * d;
+Xword * r;
+Xint e;
+X{
+X	(*DesCryptFuncs[e])(d, r, s);
+X	return 0;
+X}
+END_OF_FILE
+if test 708 -ne `wc -c <'desKerb.c'`; then
+    echo shar: \"'desKerb.c'\" unpacked with wrong size!
+fi
+# end of 'desKerb.c'
+fi
+if test -f 'desQuick.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'desQuick.c'\"
+else
+echo shar: Extracting \"'desQuick.c'\" \(1039 characters\)
+sed "s/^X//" >'desQuick.c' <<'END_OF_FILE'
+X/*
+X *	des - fast & portable DES encryption & decryption.
+X *	Copyright (C) 1992  Dana L. How
+X *	Please see the file `README' for the complete copyright notice.
+X */
+X
+X#ifndef	lint
+Xstatic char desQuick_cRcs[] = "$Id: desQuick.c,v 1.4 1992/04/16 23:08:44 how E $";
+X#endif
+X
+X#include	"desCore.h"
+Xextern word des_keymap[];
+X
+X
+X/* static information */
+X
+Xstatic depth = 0;		/* keep track of the request depth */
+Xword des_bigmap[0x4000];	/* big lookup table */
+X
+X/* fill in the 64k table used by the `quick' option */
+X
+Xvoid
+XDesQuickInit()
+X{
+X	int s1, s3, x;
+X	word * t0, * t1, * t2, * t3;
+X
+X	if ( depth++ )
+X		return;
+X
+X	t0 = des_bigmap;
+X	t1 = t0 + 64;
+X	t2 = t1 + 64;
+X	t3 = t2 + 64;
+X
+X	for ( s3 = 63; s3 >= 0; s3-- ) {
+X		for ( s1 = 63; s1 >= 0; s1-- ) {
+X			x = (s3 << 8) | s1;
+X			t0[x] = des_keymap[s3+128] ^ des_keymap[s1+192];
+X			t1[x] = des_keymap[s3    ] ^ des_keymap[s1+ 64];
+X			t2[x] = des_keymap[s3+384] ^ des_keymap[s1+448];
+X			t3[x] = des_keymap[s3+256] ^ des_keymap[s1+320];
+X		}
+X	}
+X}
+X
+X/* free the 64k table, if necessary */
+X
+Xvoid
+XDesQuickDone()
+X{
+X}
+END_OF_FILE
+if test 1039 -ne `wc -c <'desQuick.c'`; then
+    echo shar: \"'desQuick.c'\" unpacked with wrong size!
+fi
+# end of 'desQuick.c'
+fi
+if test -f 'desTest.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'desTest.c'\"
+else
+echo shar: Extracting \"'desTest.c'\" \(4027 characters\)
+sed "s/^X//" >'desTest.c' <<'END_OF_FILE'
+X/*
+X *	des - fast & portable DES encryption & decryption.
+X *	Copyright (C) 1992  Dana L. How
+X *	Please see the file `README' for the complete copyright notice.
+X *
+X *	Exercise the DES routines and collect performance statistics.
+X */
+X
+X#ifndef	lint
+Xstatic char desTest_cRcs[] = "$Id: desTest.c,v 1.10 1992/04/17 00:44:15 how E $";
+X#endif
+X
+Xextern printf();
+X
+X#include	"desCore.h"
+X
+X/* define now(w) to be the elapsed time in hundredths of a second */
+X
+X#include	<sys/time.h>
+X#include	<sys/resource.h>
+Xextern getrusage();
+Xstatic struct rusage usage;
+X#define	now(w)	(						\
+X		(void)getrusage(RUSAGE_SELF, &usage),		\
+X		usage.ru_utime.tv_sec  * 100 +			\
+X		usage.ru_utime.tv_usec / 10000			\
+X	)
+X
+X/* test data
+X * the tests (key0-3, text0-3) are cribbed from code which is (c) 1988 MIT
+X */
+X
+Xbyte keyt[8] =		{0x5d, 0x85, 0x91, 0x73, 0xcb, 0x49, 0xdf, 0x2f};
+Xbyte key0[8] =		{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x80};
+Xbyte key1[8] =		{0x80, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+Xbyte key2[8] =		{0x08, 0x19, 0x2a, 0x3b, 0x4c, 0x5d, 0x6e, 0x7f};
+Xbyte key3[8] =		{0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
+Xbyte textt[8] =		{0x67, 0x1f, 0xc8, 0x93, 0x46, 0x5e, 0xab, 0x1e};
+Xbyte text0[8] =		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+Xbyte text1[8] =		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40};
+Xbyte text2[8] =		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+Xbyte text3[8] =		{'N',  'o',  'w',  ' ',  'i',  's',  ' ',  't' };
+X
+X/* work areas */
+X
+XDesKeys keys;
+Xbyte cipher[8], output[8];
+X
+X/* noisy interfaces to the routines under test */
+X
+Xstatic void
+Xmethod(key)
+Xbyte *key;
+X{
+X	int j;
+X
+X	(void)printf("\nkey:\t");
+X	for ( j = 0; j < 8; j++ )
+X		(void)printf("%02X ", key[j]);
+X	if ( des_key_sched(key, keys) )
+X		(void)printf("W");
+X	(void)printf("\t");
+X}
+X
+Xstatic void
+Xencode(src, dst)
+Xbyte *src, *dst;
+X{
+X	int j;
+X
+X	(void)printf("clear:\t");
+X	for (j = 0; j < 8; j++)
+X		(void)printf("%02X ", src[j]);
+X
+X	(void)des_ecb_encrypt(src, dst, keys, 1);
+X
+X	(void)printf("\tcipher:\t");
+X	for (j = 0; j < 8; j++)
+X		(void)printf("%02X ", dst[j]);
+X	(void)printf("\n");
+X}
+X
+Xstatic void
+Xdecode(src, dst)
+Xbyte *src, *dst;
+X{
+X	int j;
+X
+X	(void)printf("cipher:\t");
+X	for (j = 0; j < 8; j++)
+X		(void)printf("%02X ", src[j]);
+X
+X	(void)des_ecb_encrypt(src, dst, keys, 0);
+X
+X	(void)printf("\tclear:\t");
+X	for (j = 0; j < 8; j++)
+X		(void)printf("%02X ", dst[j]);
+X	(void)printf("\n");
+X}
+X
+X/* run the tests */
+X
+Xint
+Xmain()
+X{
+X	int j, m, e, n;
+X	void (*f)();
+X	static char * expect[] = {
+X		"57 99 F7 2A D2 3F AE 4C", "9C C6 2D F4 3B 6E ED 74",
+X		"90 E6 96 A2 AD 56 50 0D", "A3 80 E0 2A 6B E5 46 96",
+X		"43 5C FF C5 68 B3 70 1D", "25 DD AC 3E 96 17 64 67",
+X		"80 B5 07 E1 E6 A7 47 3D", "3F A4 0E 8A 98 4D 48 15",
+X	};
+X	static void (*funcs[])() = {
+X		DesQuickCoreEncrypt, DesQuickFipsEncrypt,
+X		DesSmallCoreEncrypt, DesSmallFipsEncrypt,
+X		DesQuickCoreDecrypt, DesQuickFipsDecrypt,
+X		DesSmallCoreDecrypt, DesSmallFipsDecrypt };
+X	static char * names[] = {
+X		"QuickCore", "QuickFips",
+X		"SmallCore", "SmallFips" };
+X
+X	n = 0;
+X	DesQuickInit();
+X
+X	/* do timing info first */
+X
+X	f = (void (*)())DesMethod;
+X	j = 10000;
+X	m = now(0);
+X	do
+X		(*f)(keys, keyt);
+X	while ( --j );
+X	m = now(1) - m;
+X
+X	do {
+X		    DesCryptFuncs[0] = funcs[n+4];
+X		f = DesCryptFuncs[1] = funcs[n  ];
+X		j = 100000;
+X		e = now(0);
+X		do
+X			(*f)(cipher, keys, textt);
+X		while ( --j );
+X		e = now(1) - e;
+X
+X		(void)printf(	"%s:  setkey,%5duS;  encode,%3d.%1duS.\n",
+X				names[n], m, e/10, e%10);
+X
+X		/* now check functionality */
+X
+X		method(key0);
+X		(void)printf("cipher?\t%s\n", expect[(n % 2) + 0]);
+X		encode(text0, cipher);
+X		decode(cipher, output);
+X
+X		method(key1);
+X		(void)printf("cipher?\t%s\n", expect[(n % 2) + 2]);
+X		encode(text1, cipher);
+X		decode(cipher, output);
+X
+X		method(key2);
+X		(void)printf("cipher?\t%s\n", expect[(n % 2) + 4]);
+X		encode(text2, cipher);
+X		decode(cipher, output);
+X
+X		method(key3);
+X		(void)printf("cipher?\t%s\n", expect[(n % 2) + 6]);
+X		encode(text3, cipher);
+X		decode(cipher, output);
+X
+X		(void)printf("%c", "\n\f\n\0"[n]);
+X
+X	} while ( ++n < 4 );
+X
+X	DesQuickDone();
+X	return 0;
+X}
+END_OF_FILE
+if test 4027 -ne `wc -c <'desTest.c'`; then
+    echo shar: \"'desTest.c'\" unpacked with wrong size!
+fi
+# end of 'desTest.c'
+fi
+if test -f 'desUtil.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'desUtil.c'\"
+else
+echo shar: Extracting \"'desUtil.c'\" \(4178 characters\)
+sed "s/^X//" >'desUtil.c' <<'END_OF_FILE'
+X/*
+X *	des - fast & portable DES encryption & decryption.
+X *	Copyright (C) 1992  Dana L. How
+X *	Please see the file `README' for the complete copyright notice.
+X */
+X
+X#ifndef	lint
+Xstatic char desUtil_cRcs[] = "$Id: desUtil.c,v 1.11 1992/04/16 23:08:44 how E $";
+X#endif
+X
+X#include	"desCode.h"
+X
+X
+X/* various tables */
+X
+Xword des_keymap[] = {
+X#include	"keymap.h"
+X};
+X
+Xstatic byte rotors[] = {
+X#include	"rotors.h"
+X};
+Xstatic char parity[] = {
+X#include	"parity.h"
+X};
+X
+X#ifndef	lint
+Xstatic char ego[] = "\n\nFast DES Library Copyright (c) 1991 Dana L. How\n\n";
+X#endif
+X
+X
+X/* set up the method list from the key */
+X
+Xint
+XDesMethod(method, k)
+Xregister word * method;
+Xregister byte * k;
+X{
+X	register word n, w;
+X	register char * b0, * b1;
+X	char bits0[56], bits1[56];
+X
+X	/* check for bad parity and weak keys */
+X	b0 = parity;
+X	n  = b0[k[0]]; n <<= 4;
+X	n |= b0[k[1]]; n <<= 4;
+X	n |= b0[k[2]]; n <<= 4;
+X	n |= b0[k[3]]; n <<= 4;
+X	n |= b0[k[4]]; n <<= 4;
+X	n |= b0[k[5]]; n <<= 4;
+X	n |= b0[k[6]]; n <<= 4;
+X	n |= b0[k[7]];
+X	w  = 0X88888888L;
+X	/* report bad parity in key */
+X	if ( n & w )
+X		return -1;
+X	/* report a weak or semi-weak key */
+X	if ( !((n - (w >> 3)) & w) ) {	/* 1 in 10^10 keys passes this test */
+X		if ( n < 0X41415151 ) {
+X			if ( n < 0X31312121 ) {
+X				if ( n < 0X14141515 ) {
+X					/* 01 01 01 01 01 01 01 01 */
+X					if ( n == 0X11111111 ) return -2;
+X					/* 01 1F 01 1F 01 0E 01 0E */
+X					if ( n == 0X13131212 ) return -2;
+X				} else {
+X					/* 01 E0 01 E0 01 F1 01 F1 */
+X					if ( n == 0X14141515 ) return -2;
+X					/* 01 FE 01 FE 01 FE 01 FE */
+X					if ( n == 0X16161616 ) return -2;
+X				}
+X			} else {
+X				if ( n < 0X34342525 ) {
+X					/* 1F 01 1F 01 0E 01 0E 01 */
+X					if ( n == 0X31312121 ) return -2;
+X					/* 1F 1F 1F 1F 0E 0E 0E 0E */	/* ? */
+X					if ( n == 0X33332222 ) return -2;
+X				} else {
+X					/* 1F E0 1F E0 0E F1 0E F1 */
+X					if ( n == 0X34342525 ) return -2;
+X					/* 1F FE 1F FE 0E FE 0E FE */
+X					if ( n == 0X36362626 ) return -2;
+X				}
+X			}
+X		} else {
+X			if ( n < 0X61616161 ) {
+X				if ( n < 0X44445555 ) {
+X					/* E0 01 E0 01 F1 01 F1 01 */
+X					if ( n == 0X41415151 ) return -2;
+X					/* E0 1F E0 1F F1 0E F1 0E */
+X					if ( n == 0X43435252 ) return -2;
+X				} else {
+X					/* E0 E0 E0 E0 F1 F1 F1 F1 */	/* ? */
+X					if ( n == 0X44445555 ) return -2;
+X					/* E0 FE E0 FE F1 FE F1 FE */
+X					if ( n == 0X46465656 ) return -2;
+X				}
+X			} else {
+X				if ( n < 0X64646565 ) {
+X					/* FE 01 FE 01 FE 01 FE 01 */
+X					if ( n == 0X61616161 ) return -2;
+X					/* FE 1F FE 1F FE 0E FE 0E */
+X					if ( n == 0X63636262 ) return -2;
+X				} else {
+X					/* FE E0 FE E0 FE F1 FE F1 */
+X					if ( n == 0X64646565 ) return -2;
+X					/* FE FE FE FE FE FE FE FE */
+X					if ( n == 0X66666666 ) return -2;
+X				}
+X			}
+X		}
+X	}
+X
+X	/* explode the bits */
+X	n = 56;
+X	b0 = bits0;
+X	b1 = bits1;
+X	do {
+X		w = (256 | *k++) << 2;
+X		do {
+X			--n;
+X			b1[n] = 8 & w;
+X			w >>= 1;
+X			b0[n] = 4 & w;
+X		} while ( w >= 16 );
+X	} while ( n );
+X
+X	/* put the bits in the correct places */
+X	n = 16;
+X	k = rotors;
+X	do {
+X		w   = (b1[k[ 0   ]] | b0[k[ 1   ]]) << 4;
+X		w  |= (b1[k[ 2   ]] | b0[k[ 3   ]]) << 2;
+X		w  |=  b1[k[ 4   ]] | b0[k[ 5   ]];
+X		w <<= 8;
+X		w  |= (b1[k[ 6   ]] | b0[k[ 7   ]]) << 4;
+X		w  |= (b1[k[ 8   ]] | b0[k[ 9   ]]) << 2;
+X		w  |=  b1[k[10   ]] | b0[k[11   ]];
+X		w <<= 8;
+X		w  |= (b1[k[12   ]] | b0[k[13   ]]) << 4;
+X		w  |= (b1[k[14   ]] | b0[k[15   ]]) << 2;
+X		w  |=  b1[k[16   ]] | b0[k[17   ]];
+X		w <<= 8;
+X		w  |= (b1[k[18   ]] | b0[k[19   ]]) << 4;
+X		w  |= (b1[k[20   ]] | b0[k[21   ]]) << 2;
+X		w  |=  b1[k[22   ]] | b0[k[23   ]];
+X
+X		method[0] = w;
+X
+X		w   = (b1[k[ 0+24]] | b0[k[ 1+24]]) << 4;
+X		w  |= (b1[k[ 2+24]] | b0[k[ 3+24]]) << 2;
+X		w  |=  b1[k[ 4+24]] | b0[k[ 5+24]];
+X		w <<= 8;
+X		w  |= (b1[k[ 6+24]] | b0[k[ 7+24]]) << 4;
+X		w  |= (b1[k[ 8+24]] | b0[k[ 9+24]]) << 2;
+X		w  |=  b1[k[10+24]] | b0[k[11+24]];
+X		w <<= 8;
+X		w  |= (b1[k[12+24]] | b0[k[13+24]]) << 4;
+X		w  |= (b1[k[14+24]] | b0[k[15+24]]) << 2;
+X		w  |=  b1[k[16+24]] | b0[k[17+24]];
+X		w <<= 8;
+X		w  |= (b1[k[18+24]] | b0[k[19+24]]) << 4;
+X		w  |= (b1[k[20+24]] | b0[k[21+24]]) << 2;
+X		w  |=  b1[k[22+24]] | b0[k[23+24]];
+X
+X		ROR(w, 4, 28);		/* could be eliminated */
+X		method[1] = w;
+X
+X		k	+= 48;
+X		method	+= 2;
+X	} while ( --n );
+X
+X	return 0;
+X}
+END_OF_FILE
+if test 4178 -ne `wc -c <'desUtil.c'`; then
+    echo shar: \"'desUtil.c'\" unpacked with wrong size!
+fi
+# end of 'desUtil.c'
+fi
+if test -f 'desdata.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'desdata.c'\"
+else
+echo shar: Extracting \"'desdata.c'\" \(4518 characters\)
+sed "s/^X//" >'desdata.c' <<'END_OF_FILE'
+X/*
+X *	des - fast & portable DES encryption & decryption.
+X *	Copyright (C) 1992  Dana L. How
+X *	Please see the file `README' for the complete copyright notice.
+X *
+X *	Generate tables used by desUtil.c and desCode.h.
+X */
+X
+X#ifndef	lint
+Xstatic char desdata_cRcs[] = "$Id: desdata.c,v 1.10 1992/04/17 00:04:39 how E $";
+X#endif
+X
+X#include	"desinfo.h"
+X
+X#include	"desCode.h"
+X
+X/* list of weak and semi-weak keys
+X
+X	 +0   +1   +2   +3   +4   +5   +6   +7
+X	0x01 0x01 0x01 0x01 0x01 0x01 0x01 0x01
+X	0x01 0x1f 0x01 0x1f 0x01 0x0e 0x01 0x0e
+X	0x01 0xe0 0x01 0xe0 0x01 0xf1 0x01 0xf1
+X	0x01 0xfe 0x01 0xfe 0x01 0xfe 0x01 0xfe
+X	0x1f 0x01 0x1f 0x01 0x0e 0x01 0x0e 0x01
+X	0x1f 0x1f 0x1f 0x1f 0x0e 0x0e 0x0e 0x0e
+X	0x1f 0xe0 0x1f 0xe0 0x0e 0xf1 0x0e 0xf1
+X	0x1f 0xfe 0x1f 0xfe 0x0e 0xfe 0x0e 0xfe
+X	0xe0 0x01 0xe0 0x01 0xf1 0x01 0xf1 0x01
+X	0xe0 0x1f 0xe0 0x1f 0xf1 0x0e 0xf1 0x0e
+X	0xe0 0xe0 0xe0 0xe0 0xf1 0xf1 0xf1 0xf1
+X	0xe0 0xfe 0xe0 0xfe 0xf1 0xfe 0xf1 0xfe
+X	0xfe 0x01 0xfe 0x01 0xfe 0x01 0xfe 0x01
+X	0xfe 0x1f 0xfe 0x1f 0xfe 0x0e 0xfe 0x0e
+X	0xfe 0xe0 0xfe 0xe0 0xfe 0xf1 0xfe 0xf1
+X	0xfe 0xfe 0xfe 0xfe 0xfe 0xfe 0xfe 0xfe
+X */
+X
+X/* key bit order in each method pair: bits 31->00 of 1st, bits 31->00 of 2nd */
+X/* this does not reflect the rotate of the 2nd word */
+X
+X#define	S(box,bit)	(box*6+bit)
+Xint korder[] = {
+X	S(7, 5), S(7, 4), S(7, 3), S(7, 2), S(7, 1), S(7, 0),
+X	S(5, 5), S(5, 4), S(5, 3), S(5, 2), S(5, 1), S(5, 0),
+X	S(3, 5), S(3, 4), S(3, 3), S(3, 2), S(3, 1), S(3, 0),
+X	S(1, 5), S(1, 4), S(1, 3), S(1, 2), S(1, 1), S(1, 0),
+X	S(6, 5), S(6, 4), S(6, 3), S(6, 2), S(6, 1), S(6, 0),
+X	S(4, 5), S(4, 4), S(4, 3), S(4, 2), S(4, 1), S(4, 0),
+X	S(2, 5), S(2, 4), S(2, 3), S(2, 2), S(2, 1), S(2, 0),
+X	S(0, 5), S(0, 4), S(0, 3), S(0, 2), S(0, 1), S(0, 0),
+X};
+X
+X/* the order in which the algorithm accesses the s boxes */
+X
+Xint sorder[] = {
+X	7, 5, 3, 1, 6, 4, 2, 0,
+X};
+X
+Xint
+Xmain(argc, argv)
+Xint argc;
+Xchar *argv[];
+X{
+X	word d, i, j, k, l, m, n, s;
+X	char b[256], ksr[56];
+X	extern printf();
+X
+X	switch ( argv[1][0] ) {
+X
+X	/*
+X	 * <<< make the key parity table >>>
+X	 */
+X
+Xcase 'p':
+X	(void)printf(
+X"/* automagically produced - do not fuss with this information */\n\n");
+X
+X	/* store parity information */
+X	for ( i = 0; i < 256; i++ ) {
+X		j  = i;
+X		j ^= j >> 4;	/* bits 3-0 have pairs */
+X		j ^= j << 2;	/* bits 3-2 have quads */
+X		j ^= j << 1;	/* bit  3 has the entire eight (no cox) */
+X		b[i] = 8 & ~j;	/* 0 is okay and 8 is bad parity */
+X	}
+X
+X	/* only these characters can appear in a weak key */
+X	b[0x01] = 1;
+X	b[0x0e] = 2;
+X	b[0x1f] = 3;
+X	b[0xe0] = 4;
+X	b[0xf1] = 5;
+X	b[0xfe] = 6;
+X
+X	/* print it out */
+X	for ( i = 0; i < 256; i++ ) {
+X		(void)printf("%d,", b[i]);
+X		if ( (i & 31) == 31 )
+X			(void)printf("\n");
+X	}
+X
+X	break;
+X
+X
+X	/*
+X	 * <<< make the key usage table >>>
+X	 */
+X
+Xcase 'r':
+X	(void)printf("/* automagically made - do not fuss with this */\n\n");
+X
+X	/* KL specifies the initial key bit positions */
+X	for (i = 0; i < 56; i++)
+X		ksr[i] = (KL[i] - 1) ^ 7;
+X
+X	for (i = 0; i < 16; i++) {
+X
+X		/* apply the appropriate number of left shifts */
+X		for (j = 0; j < KS[i]; j++) {
+X			m = ksr[ 0];
+X			n = ksr[28];
+X			for (k = 0; k < 27; k++)
+X				ksr[k     ] = ksr[k +  1],
+X				ksr[k + 28] = ksr[k + 29];
+X			ksr[27] = m;
+X			ksr[55] = n;
+X		}
+X
+X		/* output the key bit numbers */
+X		for (j = 0; j < 48; j++) {
+X			m = ksr[KC[korder[j]] - 1];
+X			m = (m / 8) * 7 + (m % 8) - 1;
+X			m = 55 - m;
+X			(void)printf(" %2d,", m);
+X			if ((j % 12) == 11)
+X				(void)printf("\n");
+X		}
+X		(void)printf("\n");
+X	}
+X
+X	break;
+X
+X
+X	/*
+X	 * <<< make the keymap table >>>
+X	 */
+X
+Xcase 'k':
+X	(void)printf("/* automagically made - do not fuss with this */\n\n");
+X
+X	for ( i = 0; i <= 7 ; i++ ) {
+X		s = sorder[i];
+X		for ( d = 0; d <= 63; d++ ) {
+X			/* flip bits */
+X			k =	((d << 5) & 32) |
+X				((d << 3) & 16) |
+X				((d << 1) &  8) |
+X				((d >> 1) &  4) |
+X				((d >> 3) &  2) |
+X				((d >> 5) &  1) ;
+X			/* more bit twiddling */
+X			l =	((k << 0) & 32) |	/* overlap bit */
+X				((k << 4) & 16) |	/* overlap bit */
+X				((k >> 1) & 15) ;	/* unique bits */
+X			/* look up s box value */
+X			m = SB[s][l];
+X			/* flip bits */
+X			n =	((m << 3) &  8) |
+X				((m << 1) &  4) |
+X				((m >> 1) &  2) |
+X				((m >> 3) &  1) ;
+X			/* put in correct nybble */
+X			n <<= (s << 2);
+X			/* perform p permutation */
+X			for ( m = j = 0; j < 32; j++ )
+X				if ( n & (1 << (SP[j] - 1)) )
+X					m |= (1 << j);
+X			/* rotate right (alg keeps everything rotated by 1) */
+X			ROR(m, 1, 31);
+X			/* print it out */
+X			(void)printf(" 0x%08lx,", m);
+X			if ( ( d & 3 ) == 3 )
+X				(void)printf("\n");
+X		}
+X		(void)printf("\n");
+X	}
+X
+X	break;
+X
+X	}
+X
+X	return 0;
+X}
+END_OF_FILE
+if test 4518 -ne `wc -c <'desdata.c'`; then
+    echo shar: \"'desdata.c'\" unpacked with wrong size!
+fi
+# end of 'desdata.c'
+fi
+if test -f 'desinfo.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'desinfo.h'\"
+else
+echo shar: Extracting \"'desinfo.h'\" \(3506 characters\)
+sed "s/^X//" >'desinfo.h' <<'END_OF_FILE'
+X/*
+X *	des - fast & portable DES encryption & decryption.
+X *	Copyright (C) 1992  Dana L. How
+X *	Please see the file `README' for the complete copyright notice.
+X *
+X *	Tables describing DES rather than just this implementation.
+X *	These are used in desdata but NOT in runtime code.
+X */
+X
+X#ifndef	lint
+Xstatic char desinfo_hRcs[] = "$Id: desinfo.h,v 1.3 1992/04/16 23:08:44 how E $";
+X#endif
+X
+X/* the initial permutation, E selection, and final permutation are hardwired */
+X
+X/* Key Load: how to load the shift register from the user key */
+X
+Xchar KL[] = {
+X
+X	57, 49, 41, 33, 25, 17,  9,  1, 58, 50, 42, 34, 26, 18,
+X	10,  2, 59, 51, 43, 35, 27, 19, 11,  3, 60, 52, 44, 36,
+X
+X	63, 55, 47, 39, 31, 23, 15,  7, 62, 54, 46, 38, 30, 22,
+X	14,  6, 61, 53, 45, 37, 29, 21, 13,  5, 28, 20, 12,  4,
+X};
+X
+X/* Key Shift: how many times to shift the key shift register */
+X
+Xchar KS[] = {
+X
+X	1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1,
+X};
+X
+X/* Key Choose: which key bits from shift reg are used in the key schedule */
+X
+Xchar KC[] = {
+X
+X	14, 17, 11, 24,  1,  5,  3, 28, 15,  6, 21, 10,
+X	23, 19, 12,  4, 26,  8, 16,  7, 27, 20, 13,  2,
+X
+X	41, 52, 31, 37, 47, 55, 30, 40, 51, 45, 33, 48,
+X	44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32,
+X};
+X
+X/* S Boxes */
+X
+Xchar SB[8][64] = {
+X
+X	14,  4, 13,  1,  2, 15, 11,  8,  3, 10,  6, 12,  5,  9,  0,  7,
+X	 0, 15,  7,  4, 14,  2, 13,  1, 10,  6, 12, 11,  9,  5,  3,  8,
+X	 4,  1, 14,  8, 13,  6,  2, 11, 15, 12,  9,  7,  3, 10,  5,  0,
+X	15, 12,  8,  2,  4,  9,  1,  7,  5, 11,  3, 14, 10,  0,  6, 13,
+X
+X	15,  1,  8, 14,  6, 11,  3,  4,  9,  7,  2, 13, 12,  0,  5, 10,
+X	 3, 13,  4,  7, 15,  2,  8, 14, 12,  0,  1, 10,  6,  9, 11,  5,
+X	 0, 14,  7, 11, 10,  4, 13,  1,  5,  8, 12,  6,  9,  3,  2, 15,
+X	13,  8, 10,  1,  3, 15,  4,  2, 11,  6,  7, 12,  0,  5, 14,  9,
+X
+X	10,  0,  9, 14,  6,  3, 15,  5,  1, 13, 12,  7, 11,  4,  2,  8,
+X	13,  7,  0,  9,  3,  4,  6, 10,  2,  8,  5, 14, 12, 11, 15,  1,
+X	13,  6,  4,  9,  8, 15,  3,  0, 11,  1,  2, 12,  5, 10, 14,  7,
+X	 1, 10, 13,  0,  6,  9,  8,  7,  4, 15, 14,  3, 11,  5,  2, 12,
+X
+X	 7, 13, 14,  3,  0,  6,  9, 10,  1,  2,  8,  5, 11, 12,  4, 15,
+X	13,  8, 11,  5,  6, 15,  0,  3,  4,  7,  2, 12,  1, 10, 14,  9,
+X	10,  6,  9,  0, 12, 11,  7, 13, 15,  1,  3, 14,  5,  2,  8,  4,
+X	 3, 15,  0,  6, 10,  1, 13,  8,  9,  4,  5, 11, 12,  7,  2, 14,
+X
+X	 2, 12,  4,  1,  7, 10, 11,  6,  8,  5,  3, 15, 13,  0, 14,  9,
+X	14, 11,  2, 12,  4,  7, 13,  1,  5,  0, 15, 10,  3,  9,  8,  6,
+X	 4,  2,  1, 11, 10, 13,  7,  8, 15,  9, 12,  5,  6,  3,  0, 14,
+X	11,  8, 12,  7,  1, 14,  2, 13,  6, 15,  0,  9, 10,  4,  5,  3,
+X
+X	12,  1, 10, 15,  9,  2,  6,  8,  0, 13,  3,  4, 14,  7,  5, 11,
+X	10, 15,  4,  2,  7, 12,  9,  5,  6,  1, 13, 14,  0, 11,  3,  8,
+X	 9, 14, 15,  5,  2,  8, 12,  3,  7,  0,  4, 10,  1, 13, 11,  6,
+X	 4,  3,  2, 12,  9,  5, 15, 10, 11, 14,  1,  7,  6,  0,  8, 13,
+X
+X	 4, 11,  2, 14, 15,  0,  8, 13,  3, 12,  9,  7,  5, 10,  6,  1,
+X	13,  0, 11,  7,  4,  9,  1, 10, 14,  3,  5, 12,  2, 15,  8,  6,
+X	 1,  4, 11, 13, 12,  3,  7, 14, 10, 15,  6,  8,  0,  5,  9,  2,
+X	 6, 11, 13,  8,  1,  4, 10,  7,  9,  5,  0, 15, 14,  2,  3, 12,
+X
+X	13,  2,  8,  4,  6, 15, 11,  1, 10,  9,  3, 14,  5,  0, 12,  7,
+X	 1, 15, 13,  8, 10,  3,  7,  4, 12,  5,  6, 11,  0, 14,  9,  2,
+X	 7, 11,  4,  1,  9, 12, 14,  2,  0,  6, 10, 13, 15,  3,  5,  8,
+X	 2,  1, 14,  7,  4, 10,  8, 13, 15, 12,  9,  0,  3,  5,  6, 11
+X};
+X
+X/* Sbox Permutation */
+X
+Xchar SP[] = {	
+X
+X	16,  7, 20, 21, 29, 12, 28, 17,  1, 15, 23, 26,  5, 18, 31, 10,
+X	 2,  8, 24, 14, 32, 27,  3,  9, 19, 13, 30,  6, 22, 11,  4, 25,
+X};
+END_OF_FILE
+if test 3506 -ne `wc -c <'desinfo.h'`; then
+    echo shar: \"'desinfo.h'\" unpacked with wrong size!
+fi
+# end of 'desinfo.h'
+fi
+echo shar: End of archive 1 \(of 1\).
+cp /dev/null ark1isdone
+MISSING=""
+for I in 1 ; do
+    if test ! -f ark${I}isdone ; then
+	MISSING="${MISSING} ${I}"
+    fi
+done
+if test "${MISSING}" = "" ; then
+    echo You have the archive.
+    echo "now run make"
+    rm -f ark[1-9]isdone
+else
+    echo You still need to unpack the following archives:
+    echo "        " ${MISSING}
+fi
+##  End of shell archive.
+exit 0
+exit 0 # Just in case...
+

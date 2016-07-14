@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e
+if [ $1 ] 
+then
+        cat $1.tex | ./mansort
+else
+        cat vol2-cmd.tex vol2-intro.tex vol2-af.tex vol2-sec.tex vol2-pem.tex vol2-aux.tex | ./mansort
+fi
+if [ -f 1.INTRO ]
+        then mv 1.INTRO 1.@INTRO 
+fi
+if [ -f "1.QUICK REFERENCE GUIDE" ]
+        then mv "1.QUICK REFERENCE GUIDE" "1.@QUICK REFERENCE GUIDE" 
+fi
+if [ -f 3X.INTRO ]
+        then mv 3X.INTRO 3X.@INTRO 
+fi
+if [ -f 4.INTRO  ]
+        then mv 4.INTRO 4.@INTRO 
+fi
+if [ -f 5.INTRO  ]
+        then mv 5.INTRO 5.@INTRO 
+fi
+cat [0-9]* > manual.tex
+rm [0-9]*

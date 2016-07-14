@@ -1,0 +1,1106 @@
+\section{Privacy Enhanced Mail (PEM)}
+\markboth{Privacy Enhanced Mail}{Privacy Enhanced Mail}
+\thispagestyle{myheadings}
+\label{isw-pem}
+
+\subsection{Secure X.400 MHS}
+\label{isw-mhs}
+
+There are three places, at which security services for X.400 message handling
+can be applied.
+One place is to secure authentic associations between message handling
+system agents such as message transfer agents, user agents, and message
+stores.
+This is defined in X.411-1988 \cite{cci2}
+and will be described in paragraph \ref{isw-x400as} below.
+The second place is to apply encryption and signature functions
+on the message content and place information about the resulting bit strings
+into the message envelope.
+This is also defined in X.411-1988
+and will be described in paragraph \ref{isw-x400env} below.
+
+%\begin{figure}
+\begin{center}
+\makebox[4.305in][l]{
+  \vbox to 5.291in{
+    \vfill
+    \special{psfile=vol1-fig18.ps}
+  }
+  \vspace{-\baselineskip}
+}
+\end{center}
+\label{fig-isw-mhs-1}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+Authentication of associations between MHS agents}
+%\end{figure}
+\\ [1em]
+A third logical place would be to define security oriented
+body parts. There is, however, no such definition in X.420-1988.
+On the other hand, by the definition of {\em externally defined
+body parts} in X.420-1988,
+other communication applications such as {\em EDIFACT}
+or {\em ODA/ODIF} are free to define document oriented security features
+and include them into an X.400 message.
+This is not considered within SecuDe.
+Instead, there is a definition of an MHS-protocol transparent
+security function. There are
+encryption and signature functions
+to be applied on IA5 texts, and a printable encoding
+of the resulting signature and encryption bitstrings in order to include
+them into an IA5 text.
+This has been done by several projects in different ways.
+SecuDe follows the
+``Privacy Enhanced Mail'' project of the US-Internet,
+which published its definitions
+in a series of Internet RFCs 1421 - 1423 \cite{rfc1}.
+This is described in the next paragraph \ref{isw-pem} below.
+%\begin{figure}
+\begin{center}
+\makebox[4.125in][l]{
+  \vbox to 7.383in{
+    \vfill
+    \special{psfile=vol1-fig19.ps}
+  }
+  \vspace{-\baselineskip}
+}
+\end{center}
+\label{fig-isw-mhs-2}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 P1 oriented security}
+%\end{figure}
+
+\newpage
+%\begin{figure}
+\begin{center}
+\makebox[3.694in][l]{
+  \vbox to 3.513in{
+    \vfill
+    \special{psfile=vol1-fig20.ps}
+  }
+  \vspace{-\baselineskip}
+}
+\end{center}
+\label{fig-isw-mhs-3}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+MHS protocol transparent security}
+%\end{figure}
+
+\subsubsection{Secure X.400 Messages (envelope oriented)}
+\label{isw-x400env}
+
+Currently, SecuDe considers two security services:
+{\em message confidentiality} and {\em message integrity}.
+These are described in more details below.
+
+Security is a new feature of X.400-1988 \cite{cci2},
+security issues are not considered in the older MHS recommendations
+X.400-1984 \cite{cci1}.
+In X.400-1988,
+all security {\em services} for message handling
+are designed to encounter certain security {\em threats}
+(X.402 \cite{cci2}, 10., 10.2 and table D-1).
+They are realized by security {\em elements}, which are
+combinations of protocol data units
+(X.402, 10.3 and table E-1).
+Message oriented security elements reside
+inside of the message envelope.
+(Note that association oriented security elements
+reside as parameters of the bind operation in the association protocol,
+as is outlined in paragraph \ref{isw-x400as} below.)
+In order to be compatible with the X.400-1984 recommendations
+the security elements are embedded into an extension
+mechanism which is used for other new services as well,
+like the support of distribution lists.
+See also figure 18 on page \pageref{fig-isw-mhs-2} above.
+
+{\bf Message Envelope Extensions}
+\label{isw-mee}
+
+X.411 \cite{cci2}
+defines the following envelope extension elements,
+which are designed for security purposes:
+
+\begin{itemize}
+\item originator certificate (per message),
+\item message token (per recipient),
+\item content confidentiality algorithm identifier (per message),
+\item content integrity check (per recipient),
+\item message origin authentication check (per message),
+\item message security label (per message),
+\item proof of submission request (per message),
+\item proof of delivery request (per message).
+\end{itemize}
+
+An X.400-1988 message envelope distinguishes between
+per-message and per-recipi\-ent envelope elements.
+From the extension elements above, message token and
+con\-tent integrity check are per-recipient,
+the others are per-message envelope elements.
+The terms above are explained in X.411,  8.2.1.1.1.25 -- 32
+(8.2 Submission Port, but the same parameters are used
+at the Delivery Port (8.3) and the Transfer Port (12.2)).
+Additionally,
+certificate, message token, security label, and algorithm identifier
+are explained in more details in X.411, 8.5.7 -- 8.5.10
+(8.5: Common Parameter Types).
+The protocol data units of the envelope extension elements are defined in a
+section of X.411, 9: MTS Abstract Syntax Definition, figure 2,
+Extension Fields.
+Every extension element is a sequence of three elements: an integer which
+indicates the type of the extension element, a bitstring which indicates
+the criticality (for submission, for transfer, for delivery)
+of the extension element,
+and the value which is the specific extension element itself:
+{\small
+\begin {center}
+\begin {tabular}{llll}
+\multicolumn{4}{l} {ExtensionField ::= SEQUENCE \{ } \\
+& & & \\
+type           & [0] & INTEGER,        & -- -- ExtensionType \\
+criticality    & [1] & BitString  \{   & for-submission (0) , \\
+	       &     &                 & for-transfer   (1) , \\
+	       &     &                 & for-delivery   (2) \} , \\
+value          & [2] &  ANY defined by & type \\
+ \} & & &
+\end {tabular}
+\end {center}
+}
+\label{fig-isw-mee-1}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 Message envelope extension element format
+\\[1ex]
+The type-integers of the security relevant extension
+elements are given in brackets below:
+originator certificate (15),
+message token (16),
+content confidentiality algorithm identifier (17),
+content integrity check (18),
+message origin authentication check (19),
+message security label (20),
+proof of submission request (21),
+proof of delivery request (22).
+}
+\\[1em]
+The envelope extension element {\em originator certificate}
+is used to convey the originator's public key in a trustworthy way.
+The originator certificate consists of the
+originator's certificate and the certification path between
+the originator's certifiation authority and its Root CA,
+i.e. its value is of type ``Certificates''.
+The originator certificate as an envelope extension element is used
+for validation of signatures inside of security oriented envelope
+extension elements (see below).
+Its protocol data unit is defined in X.411,
+section 9 (MTS Abstract Syntax Definition),
+Extension Fields:
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+\multicolumn{3}{l} {originator-certificate :== SEQUENCE \{ } \\
+	    &     & \\
+type        & [0] INTEGER "15", & \\
+criticality & [1] BitString "2", & -- -- for delivery \\
+value       & [2] Certificates & \\
+ \}         &     &
+\end {tabular}
+\end {center}
+}
+\label{fig-isw-mee-2}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 originator certificate}
+\\[1em]
+The protocol data unit of ``Certificates'' (note the plural) is a sequence
+(in the context above, an implicit sequence), which comprises at least the
+one "Certificate" (note the singular) of the originator, and optionally
+more ``Certificate''s as a representation of the certification path of
+the certification authorities concerned. Certificates of the
+certification path can include sets of cross-referencing certificates.
+This concept of certificates
+is described in X.509, section 7 (Obtaining a User's Public Key) \cite{cci4}.
+The protocol data units of both, Certificates and Certificate is defined in
+X.509, Annex G.
+\\[1em]
+The envelope extension element {\em message security label}
+is used for both, message integrity and confidentiality services.
+Message security labels are explained at several places of X.411,
+the most detailed of which is at 8.5.9 (8: MTS Abstract Service
+Definition, 8.5: Common Parameter Types). Other places are
+8.2.1.1.1.30, 8.4.1.1.7. Its data unit format is defined in
+X.411, section 9 (MTS Abstract Syntax Definition), figure 2:
+
+\begin {center}
+\begin {tabular}{lll}
+\multicolumn{3}{l} {message-security-label :== SEQUENCE \{ } \\
+	    &     & \\
+type        & [0] INTEGER "20", & \\
+criticality & [1] BitString "2", & -- -- for delivery \\
+value       & [2] SecurityLabel & \\
+ \}         &     & \\
+	    &     & \\
+\multicolumn{3}{l} {SecurityLabel ::= SET \{ }  \\
+	    &     & \\
+security-policy-identifier & SecurityPolicyIdentifier & OPTIONAL, \\
+security-classification    & SecurityClassification   & OPTIONAL, \\
+privacy-mark               & PrivacyMark              & OPTIONAL, \\
+security-categories        & SecurityCategories       & OPTIONAL  \\
+ \}         &     &
+\end {tabular}
+\end {center}
+
+\label{fig-isw-mee-3}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 Message security label}
+\\[1em]
+Security labels are assigned to an object, e.g. to a message (other examples:
+to an MTA, to a UA, to an MTA-MTA association, etc.), in line with a
+security policy in force. The security {\em policy} identifier
+is an object identifier.
+The security {\em classification} is an enumerate type which expresses
+one out of 6 hierarchically ordered levels
+(unmarked, unclassified, restricted, confidential, secret, top secret).
+The {\em privacy mark} is a printable string, which says
+something like ``confidential'' or ``authentic''
+or anything which is defined by a security policy in force.
+One possible list of privacy marks shall be assigned to any
+security classification.
+Finally, the security {\em categories} give further
+restrictions within the context of security classification
+and/or privacy mark.
+
+To give an example for a very simple security policy,
+let the following type of labels be assigned to messages.
+Two classifications {\em unmarked} and {\em restricted} are defined.
+{\em Unmarked} induces the absence of any other label subfield,
+while {\em restricted} leaves a choice for the privacy mark
+as either "confidential" or "authentic".
+Security categories are not specified.
+A security label could have one of three values:
+\begin {center}
+\begin {tabular}{lccc}
+\multicolumn{4}{l} {{\em Example SecurityLabel} ::= SET \{ }  \\
+ & & & \\
+security-policy-identifier:
+ & \multicolumn{3}{l} {object id  \pf ``simple example policy''}  \\
+security-classification:    & unmarked   & restricted & restricted \\
+privacy-mark                & missing    & ``confidential'' & ``authentic'' \\
+security-categories         & missing    & missing    & missing  \\
+ \} & & &
+\end {tabular}
+\end {center}
+
+\label{fig-isw-mee-4}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 Example for a message security label}
+\\[1em]
+Another envelope extension element, which is used both
+for message integrity and confidentiality services is
+the {\em message token}.
+It has a rather complicated format.
+Its basic idea, however, is very simple.
+It is designed to carry two portions of information,
+the first portion signed for its integrity,
+the second portion encrypted for its confidentiality.
+It also contains a recipient name, because it is intended
+to be on a per-recipient base.
+This can be exploited by the confidentiality service,
+in that it contains a content confidentiality key subfield:
+the same symmetric (i.e. DES) key used to
+encrypt the message content
+is transferred to every recipient in a different message token
+within the same message.
+
+\begin {center}
+\begin {tabular}{lll}
+\multicolumn{3}{l} {message-token :== SEQUENCE \{ } \\
+	    &     & \\
+type        & [0] INTEGER "16", & \\
+criticality & -- -- missing,    & \\
+value       & [2] MessageToken  & \\
+ \}         &     & \\
+	    &     & \\
+\multicolumn{3}{l} {MessageToken ::= Token ::= SEQUENCE \{ }  \\
+	    &     & \\
+token-type-identifier & [0] OBJECT IDENTIFIER, & -- -- ``asymmetric'' \\
+token                 & [1] AsymmetricToken & \\
+ \}         &     & \\
+	    &     & \\
+\multicolumn{3}{l} {AsymmetricToken ::= SIGNED SEQUENCE \{ }  \\
+	    &     & \\
+signature-algorithm-id. & AlgorithmIdentifier, & \\
+recipient-name & \multicolumn{2}{l} {ORAddressAndOrDirectoryName,} \\
+time        & UTCTime,      & \\
+signed-data & [0] TokenData & OPTIONAL, \\
+encryption-algorithm-id. & [1] AlgorithmIdentifier & OPTIONAL, \\
+encrypted-data & \multicolumn{2}{l} {[2] ENCRYPTED TokenData OPTIONAL} \\
+ \}         &     &
+\end {tabular}
+\end {center}
+
+\begin {center}
+\begin {tabular}{lll}
+\multicolumn{3}{l} {TokenData ::= SEQUENCE \{ }  \\
+	    &     & \\
+type  & [0] INTEGER, & -- -- 2 for ``signed'' \\
+      &              & -- -- 3 for ``encrypted'' \\
+value & \multicolumn{2}{l} {[1] MessageTokenSigned(or Encrypted)Data} \\
+ \}         &     & \\
+	    &     & \\
+\multicolumn{3}{l} {MessageTokenSignedData ::= SEQUENCE \{ }  \\
+	    &     & \\
+\multicolumn{3}{l} {content-confidentiality-algorithm-identifier} \\
+	    & \multicolumn{2}{l} {[0] Algorithm Identifier OPTIONAL,} \\
+content-integrity-check     &  \multicolumn{2}{l} {[1] ContentIntegrityCheck OPTIONAL} \\
+message-security-label      &  \multicolumn{2}{l} {[2] SecurityLabel OPTIONAL} \\
+proof-of-delivery-request   & \multicolumn{2}{l} {[3] ProofOfDeliveryRequest OPTIONAL} \\
+message-sequence-number     &  \multicolumn{2}{l} {[4] INTEGER OPTIONAL} \\
+\multicolumn{3}{l} { \} -- -- signed by the originator of the message } \\
+	    &     & \\
+\multicolumn{3}{l} {MessageTokenEncryptedData ::= SEQUENCE \{ }  \\
+	    &     & \\
+content-confidentiality-key & \multicolumn{2}{l} {[0] BIT STRING OPTIONAL} \\
+content-integrity-check     & \multicolumn{2}{l} {[1] ContentIntegrityCheck OPTIONAL} \\
+message-security-label      & \multicolumn{2}{l} {[2] SecurityLabel OPTIONAL} \\
+content-integrity-key       & \multicolumn{2}{l} {[3] BIT STRING OPTIONAL} \\
+message-sequence-number     & \multicolumn{2}{l} {[4] INTEGER OPTIONAL} \\
+\multicolumn{3}{l} { \} -- -- encrypted for the recipient of the message } \\
+\end {tabular}
+\end {center}
+
+\label{fig-isw-mee-5}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 Message token
+\\[1ex]
+Mainly consisting of the two portions ``signed data'' and ``encrypted data''.
+The ``recipient name'' and the encrypted ``content confidentiality key''
+(or ``content integrity key'', resp.)
+allow for encryption (or integrity, resp.) on a per-recipient base.
+}
+\\[1em]
+The envelope extension element
+{\em content confidentiality algorithm identifier}
+is related to an encryption algorithm
+by which the content of a confidential message is encrypted.
+
+\begin {center}
+\begin {tabular}{lll}
+\multicolumn{3}{l} {content-confidentiality-algorithm-identifier::= SEQUENCE \{ } \\
+	    &     & \\
+type        & [0] INTEGER "17",       & \\
+criticality & -- -- missing,          & \\
+value       & [2] AlgorithmIdentifier & \\
+ \}         &     &
+\end {tabular}
+\end {center}
+\label{fig-isw-mee-6}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 Content confidentiality algorithm identifier}
+\\[1em]
+The envelope extension element
+{\em message origin authentication check}
+is used for message integrity services.
+It contains a signature of the algorithm identifier,
+by which the signature is performed,
+of the message content and,
+optionally, of a content identifier and a security label.
+
+\begin {center}
+\begin {tabular}{lll}
+\multicolumn{3}{l} {message-origin-authentication-check ::= SEQUENCE \{ } \\
+	    &     & \\
+type        & [0] INTEGER "19", & \\
+criticality & [1] BitString "2", & -- -- for delivery \\
+value       & \multicolumn{2}{l} {[2] MessageOriginAuthenticationCheck} \\
+ \}         &     & \\
+	    &     & \\
+\multicolumn{3}{l} {MessageOriginAuthenticationCheck ::= SIGNATURE SEQUENCE \{ } \\
+	    &     & \\
+algorithm-identifier   & AlgorithmIdentifier, & \\
+content                & Content, & \\
+content-identifier     & PrintableString      & OPTIONAL, \\
+message-security-label & SecurityLabel        & OPTIONAL \\
+ \multicolumn{3}{l} { \} -- -- signed by the originator of the message}
+\end {tabular}
+\end {center}
+\label{fig-isw-mee-7}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 Message origin authentication check
+\\[1ex]
+In the ContentIntegrityCheck, the optional fields above are missing.
+The use of the security label subfield is strongly recommended
+in order to link it securely with the message content.
+}
+
+{\bf Message Confidentiality Service}
+\label{isw-mcs}
+
+X.402, 10.2 \cite{cci2}
+defines one service which ensures the confidentiality of a message:
+{\em Content Confidentiality}.
+X.402, table 14, assigns
+the envelope extension elements
+{\em content confidentiality algorithm identifier} and
+{\em message token} to this service.
+A message token contains also a content confidentiality algorithm identifier
+as one of its signed subfields.
+For the message confidentiality service,
+it is recommended to use the following envelope extension elements:
+
+\begin{itemize}
+\item originator certificate,
+\item per-recipient message token
+\begin{itemize}
+\item mandatory subfields including:
+\item recipient name;
+\item signed data including:
+\item content confidentiality algorithm identifier,
+\item message security label;
+\item encryped data including:
+\item content confidentiality key.
+\end{itemize}
+\end{itemize}
+
+When originating a message,
+a confidentiality service of this shape would
+generate one DES-key and
+perform one encryption and one signature action.
+When accepting a message,
+one decryption and one verification action would be performed;
+however, more verifications could be required by the originator certificate.
+
+One message token per recipient should be included into the
+extended message envelope.
+Each message token should contain its individual recipient name.
+The encrypted data of all message tokens of one message
+should contain the same
+symmetric (DES) content confidentiality key,
+however encrypted individually with the recipient's
+asymmetric public encryption key.
+The other subfields of the encrypted data may be missing.
+
+The signed data of all message tokens of one message should be equal,
+signed by the originator's secret signature key.
+They should contain the content confidentiality algorithm identifier
+(for example ``DES in ECB mode'' without initialization vector),
+and also a security label.
+The other subfields of the signed data may be missing.
+
+The originator certificate with respect to the message originator's
+public verification key is also put as an
+extension element into the message envelope.
+This is, because the message token contains signed data.
+
+In addition to the originator certificate and the message token,
+it is not necessary to have any other security oriented
+extension envelope elements. In particular
+it is sufficient to have the content confidentiality algorithm identifier
+and the security label contained {\em inside} the message token.
+
+An application programming interface for X.400 confidentiality services
+should specify C-structures
+for an originator certificate,
+for a message token,
+for a security label,
+for an algorithm identifier,
+and for a confidentiality key.
+It should also provide functions, which fill these C-structures.
+The C-structures contain data elements for signed and encrypted data and keys,
+and the functions are able to handle these data elements,
+i.e. to sign, verify, encrypt and decrypt the subfields concerned.
+
+{\bf Message Integrity Service}
+\label{isw-mis}
+
+X.402, 10.2 \cite{cci2}
+defines three services which prove the integrity of a message:
+{\em Message Origin Authentication},
+{\em Content Integrity}, and
+{\em Message Sequence Integrity}.
+X.402, table 14, assigns
+the envelope extension elements
+{\em message origin authentication check} and
+{\em message token} to the service
+{\em Message Origin Authentication} and
+the envelope extension elements
+{\em content integrity check},
+{\em message origin authentication check}, and
+{\em message token} to the service
+{\em Content Integrity}.
+The service {\em Message Sequence Integrity} is realized by
+a message sequence number, which is signed inside
+the envelope extension element
+{\em message token}.
+The per-recipient base
+of the content integrity check will not be exploited in
+SecuDe, because asymmetric encryption
+is used for the signature mechanism.
+In this case, the message origin authentication is the more
+general service, because its envelope extension element
+``message origin authentication check'' contains
+a signature applied to all subfields
+of the ``content integrity check'',
+and additionally to a content identifier and to a security label.
+For the message integrity service,
+it is recommended to use the following envelope extension elements:
+
+\begin{itemize}
+\item originator certificate,
+\item message security label,
+\item message origin authentication check
+\begin{itemize}
+\item signature including:
+\item content,
+\item message security label;
+\end{itemize}
+\item optionally, per-recipient message token
+\begin{itemize}
+\item signed data including:
+\item message sequence number.
+\end{itemize}
+\end{itemize}
+
+When originating a message,
+an integrity service of this shape would perform
+no encryption, but two signature actions.
+When accepting a message,
+no decryption but two verification actions would be performed;
+however, more verifications could be required by the originator certificate.
+
+The ``security label'' is an independent envelope extension element,
+and a signed subfield of the message token, too.
+However, if it is contained in the signature
+of the message origin authentication check
+(what is recommended), then
+it is not necessary to convey it in the message token signed data,
+it should better be one extra envelope extension element
+per message (not per recipient like the message token).
+
+The ``message token'', which is another envelope extension element
+contains in its signed data
+the subfield ``message sequence number''.
+If the integrity of a {\em sequence of messages} is to be proved,
+then the message token
+shall be conveyed as an extra envelope extension element, as well.
+In this case, its subfields ``encryption algorithm identifier''
+and ``encrypted data'' shall be missing, while
+its subfield ``signed data'' contains the ``message sequence number'' only.
+Note however, that the message token is always on a per-recipient base,
+such that there must be as many message tokens as there are
+message recipients, although they all contain the same signature.
+
+The originator certificate with respect to the message originator's
+public verification key is also put as an
+extension element into the message envelope.
+This is, because the
+message origin authentication check
+(and also the message token, if it is included)
+contains signed data.
+
+In addition to the originator certificate,
+the message security label,
+and the message origin authentication check
+(and perhaps the message token for message sequence integrity),
+it is not necessary to have any other security oriented
+extension envelope elements.
+
+An application programming interface for X.400 integrity services
+should specify C-structures for an originator certificate,
+a security label,
+a message origin authentication check and a message token.
+It should also provide functions, which fill these C-structures.
+The C-structures contain data elements for signed and encrypted data and keys,
+and the functions are able to handle these data elements,
+i.e. to sign, verify, encrypt and decrypt the subfields concerned.
+
+{\bf Combined Message Confidentiality and Integrity Service}
+\label{isw-mcis}
+
+For the combined message confidentiality and integrity service,
+the following envelope extension elements
+are recommended:
+
+\begin{itemize}
+\item originator certificate,
+\item message security label (identical with message token labels),
+\item per-recipient message token
+\begin{itemize}
+\item mandatory subfields including:
+\item recipient name;
+\item signed data including:
+\item content confidentiality algorithm identifier,
+\item message security label,
+\item optionally, message sequence number;
+\item encryped data including:
+\item content confidentiality key;
+\end{itemize}
+\item message origin authentication check
+\begin{itemize}
+\item signature including:
+\item content,
+\item message security label.
+\end{itemize}
+\end{itemize}
+
+When originating a message,
+a combined confidentiality and integrity service of this shape would
+generate one DES-key and
+perform one encryption and two signature actions.
+When accepting a message,
+one decryption and two verification actions would be performed;
+however, more verifications could be required by the originator certificate.
+
+The message content is encrypted, but the signature of the
+message origin authentication check is applied to the
+clear text of the content,
+i.e. the integrity service is performed first, the
+confidentiality service thereafter.
+When accepting a message, the services are performed
+in reverse order: first the message is decrypted,
+then its integrity is verified.
+This is, because the signature of an encrypted text does
+not prove a message origin, because the originator might
+claim that he has no knowledge of the message content:
+everybody could have been able to encrypt the content.
+This way, however,
+the integrity of a message cannot be verified
+without the recipient's private decryption key.
+Therefore, no intermediate message transfer agent,
+nor the message store are able to produce a proof of delivery.
+They can produce unproved delivery reports only.
+This seems to be a serious deficiency of the X.400-1988 security model.
+
+\subsubsection{Secure X.400 Associations}
+\label{isw-x400as}
+
+{\bf Security Oriented Bind Paramteres}
+\label{isw-sbp}
+
+Security is a new feature of X.400-1988 \cite{cci2},
+security issues are not considered in the older MHS recommendations
+X.400-1984 \cite{cci1}.
+In X.400-1988,
+all security {\em services} for message handling
+are designed to encounter certain security {\em threats}
+(X.402 \cite{cci2}, 10., 10.2 and table 13).
+They are realized by security {\em elements}, which are
+combinations of protocol data units
+(X.402, 10.3 and table 14).
+As was outlined in the previous paragraph \ref{isw-x400env},
+message oriented security elements reside
+inside of the message envelope.
+
+Message handling systems comprise interacting agents such as
+message transfer agents (MTA), user agents (UA) and message stores (MS).
+Interactive operations between these objects can only be invoked
+in the context of an established association.
+The MTS-bind, and MTA-bind, respectively,
+establish an association with the message transfer system (MTS),
+and among MTAs, respectively.
+Associations can perform security services
+like the proof of identity (authenticity) of association partners,
+or a confidential or authentic message exchange between association partners.
+This is outlined in detail in X.411, paragraphs 8.1.1.1 (MTS-bind)
+and 12.1.1.1 (MTA-bind).
+See also figure 17, page \pageref{fig-isw-mhs-1} above.
+
+Association oriented {\em security elements} reside as
+{\em arguments}, {\em results} and {\em errors}
+of the MTS- and MTA-bind operation in the association protocol (ACSE).
+ACSE was only developed by ISO in the period since 1984.
+Generally, ACSE is part of an X.400-1988 implementations.
+However,
+in order to be compatible with the X.400-1984 recommendations
+X.400-1988 can use the Reliable Transfer Service (RTS)
+in a so called ``X.410-1984 mode'', in which the ACSE
+is ``bypassed''. In this case, the new security elements
+for the associations between message handling agents
+such as transfer agents, user agents, and message stores,
+can not be activated.
+
+As to associations between message handling agents
+such as transfer agents, user agents, and message stores,
+the X.400-1988 recommendations offer parameters for
+the Association Control (ACSE) bind operation,
+that allow for secure exchange of security labels,
+tokens of signed and encrypted data,
+and certificates.
+The initiator of an association
+can offer a set of security labels,
+which is called the {\em security context}.
+The responder of an association
+can either accept the security context and send a result set,
+or indicate an {\em unacceptable security context error}
+and refuse the association.
+This way, partner agents agree on the security
+elements to be exchanged thereafter.
+For example,
+they might agree to exchange confidential and/or authentic messages only,
+to encrypt all operation arguments between them,
+or to perform traffic padding between messages,
+or anything else which
+is defined by a security policy in force.
+This way, associations can automatically perform
+security services on behalf of the users of a message handling system.
+\\[1em]
+\begin {center}
+\begin {tabular}{llll}
+\multicolumn{4}{l} {SecurityContext ::= SET OF SecurityLabel} \\
+ & & &
+\end {tabular}
+\end {center}
+\label{fig-isw-sbp-1}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 Security context of MTS- and MTA-bind
+\\[1ex]
+The security label is of exactly the same format as the message
+security label discussed in paragraph \ref{isw-mee} above.
+}
+\\[1em]
+The initiator of an association
+can include an {\em initiator credentials} in his bind argument set.
+The responder of an association
+would include a {\em responder credentials} in his bind result set,
+or indicate an {\em authentication error} and refuse the association.
+Simple credentials are passwords as they are normally used
+by X.400-1984 associations. They are defined for X.400-1988
+associations as well.
+Within SecuDe, however, only {\em strong authentication}
+is considered,
+because passwords are not protected against unauthorized disclosure,
+while they are transferred in plain text.
+Both, initiator and responder strong credentials are of the same format:
+
+\begin {center}
+\begin {tabular}{llll}
+\multicolumn{4}{l} {StrongCredentials ::= SET \{ } \\
+& & & \\
+bind-token     & [0] & Token           & OPTIONAL, \\
+certificate    & [1] & Certificates    & OPTIONAL  \\
+ \} & & &
+\end {tabular}
+\end {center}
+\label{fig-isw-sbp-2}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 Strong credentials of MTS- and MTA-bind
+\\[1ex]
+``Token'' conveys mainly a signed random number.
+``Certificates'' has the same format as the message originator certificate.
+}
+\\[1em]
+The {\em bind token} has a similar base format
+as the message token for the message oriented security services,
+in that it contains
+a time stamp, a recipient name,
+and some additional signed and encrypted subfields
+(see paragraph \ref{isw-mee} above).
+However, the bind token signed data are different from
+the message token signed data:
+
+\begin {center}
+\begin {tabular}{llll}
+\multicolumn{4}{l} {bind-token-signed-data ::=  } \\
+\multicolumn{4}{l} {TokenData ::= SEQUENCE \{   } \\
+& & & \\
+type   & [0] & INTEGER,   & -- -- 1 for ``bind-token''  \\
+value  & [1] & BitString  & -- -- Random Number    \\
+ \} & & &
+\end {tabular}
+\end {center}
+\label{fig-isw-sbp-3}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+X.400 Bind token signed data
+\\[1ex]
+The bind token signed data are included in the signed sequence
+of the asymmetric token. The signed random number proves
+the authenticity of the association partner.
+}
+\\[1em]
+The bind token encrypted data are similar to
+the message token signed data,
+of which the confidentiality key subfield is of only interest.
+
+The certificates, which is the second subfield
+of a strong credentials can be used by the initiator
+to convey a verified copy of the public-asymmetric-encryption key
+in order to enable the responder to compute the responder bind token.
+It can also be used to convey the public-asymmetric-verification key
+in order to enable the partner to verify the bind token.
+However, in a secure message handling environment,
+it is expected, that directly interacting agents have or have access to
+their partner's public keys. Therefore, it is recommended
+to omit the certificates subfield from the strong credentials element.
+
+{\bf Strong Authentication}
+\label{isw-sa}
+
+For strong authentication between MTA and MTA,
+and between MTS (MTA) and MTS-user (UA or MS),
+it is recommended to exchange the following security elements:
+
+\begin{itemize}
+\item {\bf MTS-/MTA-bind argument:}
+\item initiator name,
+\item strong credentials:
+\begin{itemize}
+\item asymmetric token (signed sequence):
+\item signature algorithm identifier,
+\item recipient name,
+\item signed data: {\em random number};
+\item {\em no} encryption data;
+\end{itemize}
+\item {\em no} initiator certificates;
+\item security context:
+\begin{itemize}
+\item one security label, demanding this form of strong authentication.
+\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+\item {\bf MTS-/MTA-bind result:}
+\item responder name,
+\item strong credentials:
+\begin{itemize}
+\item asymmetric token (signed sequence):
+\item signature algorithm identifier,
+\item recipient name,
+\item signed data: {\em initiator's random number};
+\item {\em no} encryption data;
+\end{itemize}
+\item {\em no} responder certificates;
+\end{itemize}
+
+The responder bind token signed data should contain
+exactly the same random number as sent by the initiator,
+this way making a replay of the responder's result impossible.
+The time stamp is supposed to encounter replay of the
+initiator's argument. Additionally, the random number
+could be computed to be increasing with the number
+of associations between two partners; this, too, can be checked
+by a responder against replay of an initiator's argument.
+The initiator name and the reponder name in combination with
+the respective signature of the bind token
+proves the identity of the partners to one another,
+provided they have or have access to the public keys of one another.
+
+{\bf Confidential Association}
+\label{isw-ca}
+
+If an acceptable security context (i.e. a security label)
+requires a confidential association,
+the bind token encrypted data of the initiator of the association
+convey one symmetric DES-key.
+After the association has been established,
+both partners possess this DES-key,
+which is used by both partners in order to
+encrypt and decrypt all parameters of the subsequent operations
+of this association, such that only DES-encrypted
+parameters are visible above the ACSE sublayer.
+There is no advantage in security, but a disadvantage of
+effectivity from an operational point of view,
+if instead of one shared DES-key each partner generates
+his own DES-key for encryption, and uses the partner's DES-key for decryption.
+However, one DES-key should be {\em valid for only one association
+between two partners} and should {\em never be reused}.
+
+
+\subsection{Internet PEM (RFC 1421 - 1424)}
+The acronym {\em PEM} is an abbreviation for
+``Privacy Enhanced Mail''.
+It is defined by a
+related set of RFCs
+(RFC 1421, 1422, 1423, 1424)
+titled ``Privacy Enhancement for Internet Electronic Mail''.
+
+The basic idea of {\em PEM} is to define security services
+for the protection of texts
+which are document oriented (in contrast to transfer protocol oriented)
+in that they are transparent to the mail transfer systems.
+See also figure 19 on page \pageref{fig-isw-mhs-3} above. \\
+{\em RFC 1421}, paragraph 1 ({\em Executive Summary}), says:
+
+\begin{quote}
+This RFC defines message encipherment and authentication
+procedures, in order to provide privacy enhanced mail (PEM)
+services for electronic mail transfer in the Internet.
+$\ldots$
+Privacy enhancement services (confidentiality, authentication,
+message integrity assurance, and non-repudiation of origin)
+are offered through the use of
+end-to-end cryptography between originator and recipient
+processes at or above the User Agent level.
+No special processing requirements are imposed on the
+Message Transfer System at endpoints or at intermediate relay sites.
+This approach allows privacy enhancement facilities to be incorporated
+selectively on a site-by-site or user-by-user basis without impact
+on other Internet entities.
+Interoperability among heterogeneous components and mail transport
+facilities is supported.
+\end{quote}
+
+In {\em RFC 1421}, paragraph 4 ({\em Processing of Messages}),
+the approach (4.3.2) is described as quoted below:
+
+\begin{quote}
+Our approach to supporting PEM across an
+environment in which intermediate conversion may occur
+defines an encoding for mail
+which is uniformly representable across the set of PEM UAs
+regardless of their systems' native character sets.
+This encoded form is used
+(for specified PEM message types)
+to represent mail text in transit from originator to recipient,
+but the encoding is not applied to enclosing MTS headers
+or to encapsulated headers
+inserted to carry control information between PEM UAs.
+The encoding's characteristics are such that the transformations
+anticipated between originator and recipient UAs will not prevent
+an encoded message from being decoded properly at its destination.
+\end{quote}
+
+As a consequence of
+this property the {\em PEM}-Services are independent of a transport
+protocol and are called
+{\em document oriented} in SecuDe.
+In summary, the outbound message is subjected to the following
+composition of transformations:
+
+\begin{displaymath}
+Transmit\_Form=Encode(Encrypt(Canonicalize(Local\_Form)))
+\end{displaymath}
+
+`Encrypt' means cryptographic encryption.
+`Encode' means the printable representation of an arbitrary octet string
+(also referred to as `zoning').
+An encapsulated header portion of so called
+``encapsulated header fields''
+is added to the transformed text.
+It contains encryption and signature control fields inserted in plaintext.
+The encapsulated header fields are
+Proc-Type, DEK-Info, Originator-ID,
+Certificate, Issuer-Certificate, MIC-Info,
+Recipient-ID, Key-Info
+(see paragraphs 4.3.2.5, {\em Summary of Transformations},
+and 4.4, {\em Encapsulation Mechanism},
+of {\em RFC 1421}).
+
+An example of
+a privacy enhanced mail including encapsulated header fields and an 
+encrypted and encoded
+message body, is given in Figure 3, {\em Example Encapsulated Message
+(Asymmetric Case)} of {\em RFC 1421}.
+{\small
+\begin{verbatim}
+-----BEGIN PRIVACY-ENHANCED MESSAGE-----
+Proc-Type: 4,ENCRYPTED
+Content-Domain: RFC822
+DEK-Info: DES-CBC,54FDF243C0F93E9F
+Originator-Certificate: 
+ MIIBwDCCAWoCAQEwDQYJKoZIhvcNAQECBQAwXjELMAkGA1UEBhMCREUxOzA5BgNV
+ BAoTMkdlc2VsbHNjaGFmdCBmdWVyIE1hdGhlbWF0aWsgdW5kIERhdGVudmVyYXJi
+ ZWl0dW5nMRIwEAYDVQQHEwlEYXJtc3RhZHQwHhcNOTMwMzEyMTcyNTE2WhcNOTQw
+ MzEyMTcyNTE2WjB7MQswCQYDVQQGEwJERTE7MDkGA1UEChMyR2VzZWxsc2NoYWZ0
+ IGZ1ZXIgTWF0aGVtYXRpayB1bmQgRGF0ZW52ZXJhcmJlaXR1bmcxEjAQBgNVBAcT
+ CURhcm1zdGFkdDEbMBkGA1UEAxMSV29sZmdhbmcgU2NobmVpZGVyMFkwCgYEVQgB
+ AQICAgADSwAwSAJBAIGZfQqqb9R2HJ+1P3vsFRGJBy75faHOdOUSwn8VqIyR3zQR
+ /J2LjUhGRgfk20DYfXy5NymLyb7hdPM5F0IF+ecCAwEAATANBgkqhkiG9w0BAQIF
+ AANBABkhNPDPgenCPR9NTOO5LIMz3Pot0p7E0+ES6+DYnwTxqKWtystk4c7ql1qA
+ t0EkylUzV0Q/TOrz2LuZBZ3ZIC0=
+Key-Info: RSA,
+ SrBlHtVHEhuGMOmEJbV598jZX6P1DDziAr5DX9B5ATINFMfj/Ql0vs0JcvFDysk2
+ wGBvCMZPj4hjNDO5N3UI7g==
+Issuer-Certificate: 
+ MIIBjzCCATkCAQIwDQYJKoZIhvcNAQECBQAwSjELMAkGA1UEBhMCREUxOzA5BgNV
+ BAoTMkdlc2VsbHNjaGFmdCBmdWVyIE1hdGhlbWF0aWsgdW5kIERhdGVudmVyYXJi
+ ZWl0dW5nMB4XDTkzMDMxMjE3MDUwNVoXDTk0MDMxMjE3MDUwNVowXjELMAkGA1UE
+ BhMCREUxOzA5BgNVBAoTMkdlc2VsbHNjaGFmdCBmdWVyIE1hdGhlbWF0aWsgdW5k
+ IERhdGVudmVyYXJiZWl0dW5nMRIwEAYDVQQHEwlEYXJtc3RhZHQwWTAKBgRVCAEB
+ AgICAANLADBIAkEAhh4fPTepNuoG39J/gkg3gjiHYxzs5qEjiYVxR5UB9uRp2sBt
+ VrhwMdTKXYkR0lkJgPWmLZWQcUwHq8yWkPnKmQIDAQABMA0GCSqGSIb3DQEBAgUA
+ A0EAQMqLY9AwuynacHMa0G+jOT9WKwLBD9CO/f83oGparUOMz09smziq4ojqP31F
+ BIOpLyCYqLsN/0/LFeRQeyoKlw==
+MIC-Info: RSA-MD5,RSA,
+ 9v02VRNRUHD9OKK90b63DtoLAK+tIQRdAJ10m7MBLHAgatRJpqRWFraH4NAU3/64
+ igVsfUf72dcaTAm+COjDwauAs8fx1gyh
+Recipient-ID-Asymmetric: 
+ MEYxCzAJBgNVBAYTAlVTMSQwIgYDVQQKExtUcnVzdGVkIEluZm9ybWF0aW9uIFN5
+ c3RlbXMxETAPBgNVBAsTCEdsZW53b29k
+ ,02
+Key-Info: RSA,
+ omNyyAx6SwzP8bbAQhCU8h7SSW5kqgmdt5ttViid67Dm1Dme0jlKH/glD1jKJzgX
+ mWlDAx9uDCwd2ViWDuOP6w==
+
+aQwmGMjuJ96iM9t9EDsJSTYY3p7wLkZLLt07/VaqM37DpChGB9quI25tvVYM9Pvl
+aw385ZAr6ghQ2Ip0JYO+hsiTAy/BUezhwxrdZKXy+2N/XxAS6p2sNnC825xAoYOS
+Gc94JvfT3VhHYbWcsesmPCmlTUDCnE3SW11sCUjG612dmPWiPdzM1xE3IAw2bQSu
+R1bHgD6M7AfGT8KxIlD3pV8BFSPe2VynDwfbRIdZ2OlxoJqlwNIgvN74wXpS0DOc
+FYpJOWvABYOjriMS+yYV6UX4CjXxpMrkosC2pyjIki9YMQ6/oNgGWRKBxiwvUnSj
+iukMS93uBZA=
+-----END PRIVACY-ENHANCED MESSAGE-----
+\end{verbatim}
+}
+
+\label{fig-isw-pem}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}:
+Example of an RFC 1421-type Encapsulated Message}
+\\[1em]
+A C-language structure called {\em PemInfo}
+contains the encryption and signature control information
+and is utilized by the {\em pem\_*} interface functions
+in order to process a message text.
+
+{\small
+\begin{verbatim}
+typedef struct {
+   Boolean       confidential; /* TRUE if PEM shall be encrypted  */
+   Boolean       clear;        /* TRUE if PEM shall be unencoded  */
+   Key          *encryptKEY;   /* plain DES-key                   */
+   Certificates *origcert;     /* originator certificates         */
+   AlgId        *signAI;       /* signature algorithm id          */
+   RecpList     *recplist;     /* list of recipients' information */
+} PemInfo;
+
+typedef struct {
+   KeyInfo   *key;          /*in PemInfo:encryptKEY: plain DES-key*/
+   KeyRef     keyref;       /*in PemInfo:encryptKEY: unused       */
+   PSESel    *pse_sel;      /*in PemInfo:encryptKEY: unused       */
+   } Key;
+
+typedef struct {
+   AlgId      *subjectAI;   /*in PemInfo:encryptKEY: plain DES-IV */
+   BitString  *subjectkey;  /*in PemInfo:encryptKEY: plain DES-key*/
+   } KeyInfo;
+
+typedef struct reclist {
+   Certificate  *recpcert;       /*recipient's user certificate   */
+   OctetString  *key;            /*RSA-encrypted DES-key          */
+   struct reclist *next;
+   } RecpList;
+\end{verbatim}
+}
+
+\label{fig-isw-pem2}
+\stepcounter{Abb}
+{\footnotesize Fig.\arabic{Abb}: C-Structure PemInfo}
+\\[1em]
+The {\em pem-create} functions map
+a plain user text and a related {\em PemInfo} onto
+a privacy enhanced mail text.
+Inversely, the {\em pem-scan} functions map
+a privacy enhanced mail text onto
+a plain user text and a related {\em PemInfo}
+and verify the message integrity.
+

@@ -1,0 +1,59 @@
+.TH SHA_FILE 3 "30 Apr 1993"
+.SH NAME
+sha_file, sha_stream, sha_memory \- Secure Hash Algorithm
+.SH SYNOPSIS
+.B "sha_file(char *filename, unsigned long *hash)"
+.br
+.B "void sha_stream(FILE *stream, unsigned long *hash)"
+.br
+.B "void sha_memory(char *mem, long length, unsigned long *hash)"
+.SH DESCRIPTION
+These functions calculate
+the NIST Secure Hash Algorithm defined in FIPS 180.
+In each function the
+.I hash
+pointer identifies a user-allocated array of
+five longs for the hash output, for a total of 160 bits.  The first argument
+in
+.I sha_file()
+is the name of the file to process.
+It returns 0 if successful,
+non-zero if the file could not be opened.
+The first argument of
+.I sha_stream()
+is a previously-opened stream (e.g. stdin).
+.I sha_memory()
+expects a pointer to the block of memory to be hashed, and the length in
+bytes of the block to be hashed.
+.PP
+NIST suggests using the Secure Hash Algorithm as a message digesting function,
+producing a message-dependent fixed-size block that may be securely signed
+with a digital signature system such as NIST's DSS.  Quoting from the
+draft standard, "The SHA is designed to have the following properties:
+it is computationally infeasible to recover a message corresponding to
+a given message digest, or to find two different messages which produce
+the same message digest."
+.PP
+It may also be used as an ordinary file checksum.
+
+.SH LIMITATIONS
+The
+.I sha_memory()
+call processes blocks only up to 4 gigabytes.  For longer samples, the stream
+version of
+.I sha (1)
+will probably be most convenient, e.g.:
+.br
+.sp
+.ti +8
+perl moby_data.pl | sha
+
+.SH BUGS
+NIST defines SHA for arbitrary bit strings.  This implementation operates
+only at the byte level.
+
+.SH "SEE ALSO"
+sum(1), sha(1), FIPS 180
+
+.SH AUTHOR
+Jim Gillogly

@@ -1,0 +1,49 @@
+From msuinfo!uwm.edu!wupost!usc!rand.org!jim Wed Jun  2 19:31:18 1993
+Path: msuinfo!uwm.edu!wupost!usc!rand.org!jim
+From: jim@rand.org (Jim Gillogly)
+Newsgroups: sci.crypt
+Subject: Re: Secure Hash Standard Approved - FIPS 180
+Message-ID: <16826@rand.org>
+Date: 2 Jun 93 16:44:43 GMT
+References: <5438.204.uupcb@ssr.com> <1ugu0q$s08@msuinfo.cl.msu.edu> <HANCHE.93Jun2111344@ptolemy.ams.sunysb.edu>
+Sender: news@rand.org
+Organization: Banzai Institute
+Lines: 621
+Nntp-Posting-Host: mycroft.rand.org
+
+hanche@ams.sunysb.edu (Harald Hanche-Olsen) writes:
+> (Mark Riordan) writes:
+>> Peter Gutmann's C implementation is available on ripem.msu.edu.
+>
+>Is it exportable?  The site maintainers on ripem seem to think not, as
+>they have not made it accessible to all:
+
+Peter Gutmann's is certainly exportable, since he's from New Zealand.  It's
+exportable in any case, since SHA is non-cryptographic and doesn't hide
+information by itself.  Note, though, that Phil Karn and others have shown
+how hash algorithms may be used as the core of cryptosystems.
+
+I'm <so> confident that it's exportable from the US that I'll include my
+own implementation here.  :)  After un-sharing and compiling it with
+
+	cc -O -o sha sha.c
+
+or however you'd like, you can test it against the three NIST appendix
+values by uudecoding the files app.a.uue, app.b.uue and app.c.Z.uue.  Test
+them in turn with
+
+	sha -v app.a app.b
+	zcat app.c.Z | sha
+
+For reference, here's what NIST says the three examples should yield:
+
+     A Message digest =  0164b8a9 14cd2a5e 74c4f7ff 082c4d97 f1edf880
+     B Message digest =  d2516ee1 acfa5baf 33dfc1c4 71e43844 9ef134c8
+     C Message digest =  3232affa 48628a26 653b5aaa 44541fd9 0d690603
+
+This package may be used either as a stand-alone program or as a library
+routine to hash memory blocks.
+
+	Jim Gillogly
+	12 Forelithe S.R. 1993, 16:29
+

@@ -1,0 +1,3095 @@
+\nm{1}{algs}{show available cryptographic algorithms}
+\label{algs}
+\hl{Synopsis}
+{\bf algs} [ {\bf -UGvVth} ] [ {\bf -a} {\em name} ] [ {\bf -s} {\em keyword} ] [ {\bf -k} {\em k1 k2 k3 ...} ] [ {\em quantity} ]
+\hl{Description}
+{\em algs} prints information about all available cryptographic algorithms, or about all algorithms 
+which correspond to the given {\em keyword}, or about the algorithm with the given {\em name}.
+{\em keyword} can be a pattern which is contained in the algorithm name (e.g. rsa or md2), or one of the 
+following algorithm types:
+\bvtab
+ASYM\_ENC \4 asymmetric encryption algorithms \\
+SYM\_ENC  \4 symmetric encryption algorithms  \\
+HASH      \4 hash (message digest) algorithms \\
+SIG       \4 signature algorithms  
+\evtab
+{\em keyword} is not case-sensitive.
+
+If option {\bf -a} is omitted, only the algorithm names are printed. 
+Otherwise, the object identifiers and default parameter values are additionally printed. 
+
+With option {\bf -U} online time measurements are performed with precomputed or newly generated keys. 
+In case of asymmetric algorithms, keys with the keysizes {\em k1, k2, k3, ..} are used to 
+encrypt/decrypt a corresponding block. If {\bf -k} {\em k1 k2 k3 ...} is omitted, keysizes
+512, 640, 768 and 1024 are used.
+
+In case of symmetric algorithms and message digest algorithms, an octetstring of {\em quantity} K
+octets is encrypted/decrypted or hashed. If {\em quantity} is omitted, 100 K octets are
+encrypted/decrypted or hashed.
+
+In case of signature algorithms, an octetstring of {\em quantity} K octets is signed
+and verified with keys of keysizes {\em k1, k2, k3, ...}. If {\em quantity} is omitted, 100 K octets are 
+signed/verified. If {\bf -k} {\em k1 k2 k3 ...} is omitted, keysizes 512, 640, 768 and 1024 are used.
+
+algs uses the PSE \$TOP/lib/.testkeys. If this PSE does not exist, it is created. If through
+parameter {\bf -k} {\em k1 k2 k3 ...} keysizes are requested for which no keys exist,
+they are generated and stored afterwards in \$TOP/lib/.testkeys.
+
+With option {\bf -G} additional time measurements will be made for the key generation (asymmetric 
+algorithms only) even if the requested keys exist already.
+
+The figures presented here provide a rough impression about the performance of the algorithms on the 
+installation platform. Note that the asymmetric algorithms can be installed on the
+basis of C-programs or assembler programs. Time measurements are only possible for the software 
+implementations of the algorithms. The performance of the smartcard terminal algorithm
+implementation cannot be measured.
+
+An example output of algs produced on a Sun Sparc10-41 workstation is shown below:
+{\small
+\begin{verbatim}
+
+SYM_ENC Algorithms
+==================
+-------------------------------------------------------------------------------------
+DES-ECB              OID { 1 3 14 3 2 6 } NULL parameter
+                     Encr (100 Kbytes):   0.891  
+                     Decr (100 Kbytes):   0.875  
+-------------------------------------------------------------------------------------
+DES-CBC              OID { 1 3 14 3 2 7 } Parameter DES-IV (default zeros)
+                     Encr (100 Kbytes):   0.928  
+                     Decr (100 Kbytes):   0.925  
+-------------------------------------------------------------------------------------
+DES-EDE              OID { 1 3 14 3 2 17 } NULL parameter
+                     Encr (100 Kbytes):   2.634  
+                     Decr (100 Kbytes):   2.630  
+-------------------------------------------------------------------------------------
+desECB               Same algorithm as DES-ECB
+-------------------------------------------------------------------------------------
+desCBC               Same algorithm as DES-CBC
+-------------------------------------------------------------------------------------
+desEDE               Same algorithm as DES-EDE
+-------------------------------------------------------------------------------------
+desCBC_pad           OID { 1 3 36 3 1 5 } Parameter DES-IV (default zeros)
+                     Encr (100 Kbytes):   0.911  
+                     Decr (100 Kbytes):   0.942  
+-------------------------------------------------------------------------------------
+desECB3              Same algorithm as DES-EDE
+-------------------------------------------------------------------------------------
+desCBC3              OID { 1 3 36 3 1 11 } Parameter DES-IV (default zeros)
+                     Encr (100 Kbytes):   2.652  
+                     Decr (100 Kbytes):   2.673  
+-------------------------------------------------------------------------------------
+desCBC3_pad          OID { 1 3 36 3 1 13 } Parameter DES-IV (default zeros)
+                     Encr (100 Kbytes):   2.771  
+                     Decr (100 Kbytes):   2.666  
+
+ASYM_ENC Algorithms
+===================
+-------------------------------------------------------------------------------------
+RSA                  OID { 1 2 840 113549 1 1 1 } NULL parameter
+                     Encr ( 512 bits):   0.014  
+                     Decr ( 512 bits):   0.172  
+                     KGen ( 512 bits):  13.839  
+                     Encr ( 640 bits):   0.020  
+                     Decr ( 640 bits):   0.333  
+                     KGen ( 640 bits):  27.564  
+                     Encr ( 768 bits):   0.028  
+                     Decr ( 768 bits):   0.495  
+                     KGen ( 768 bits):  25.495  
+                     Encr (1024 bits):   0.048  
+                     Decr (1024 bits):   1.103  
+                     KGen (1024 bits):  86.174  
+-------------------------------------------------------------------------------------
+NIST-DSA             OID { 1 3 14 3 2 12 } NULL parameter
+                     Irreversible (can't encrypt/decrypt, see SIG for time)
+-------------------------------------------------------------------------------------
+rsa                  OID { 2 5 8 1 1 } Parameter Keysize (default 512)
+                     Encr ( 512 bits):   0.013  
+                     Decr ( 512 bits):   0.177  
+                     KGen ( 512 bits):   9.889  
+                     Encr ( 640 bits):   0.027  
+                     Decr ( 640 bits):   0.328  
+                     KGen ( 640 bits):  22.967  
+                     Encr ( 768 bits):   0.028  
+                     Decr ( 768 bits):   0.497  
+                     KGen ( 768 bits):  39.718  
+                     Encr (1024 bits):   0.048  
+                     Decr (1024 bits):   1.093  
+                     KGen (1024 bits): 146.979  
+-------------------------------------------------------------------------------------
+dsa                  Same algorithm as NIST-DSA
+-------------------------------------------------------------------------------------
+dsaSK                OID { 1 3 36 3 1 20 } Parameter Keysize (default 512)
+                     Irreversible (can't encrypt/decrypt, see SIG for time)
+
+HASH Algorithms
+===============
+-------------------------------------------------------------------------------------
+RSA-MD2              OID { 1 2 840 113549 2 2 } NULL parameter
+                     Hash (100 Kbytes):   1.076  
+-------------------------------------------------------------------------------------
+RSA-MD5              OID { 1 2 840 113549 2 5 } NULL parameter
+                     Hash (100 Kbytes):   0.035  
+-------------------------------------------------------------------------------------
+NIST-SHA             OID { 1 3 14 3 2 18 } NULL parameter
+                     Hash (100 Kbytes):   0.045  
+-------------------------------------------------------------------------------------
+sqmodn               OID { 2 5 8 2 1 } Parameter Keysize (default 512)
+                     Hash (100 Kbytes):   2.663  
+-------------------------------------------------------------------------------------
+md2                  Same algorithm as RSA-MD2
+-------------------------------------------------------------------------------------
+md4                  OID { 1 2 840 113549 2 4 } NULL parameter
+                     Hash (100 Kbytes):   0.068  
+-------------------------------------------------------------------------------------
+md5                  Same algorithm as RSA-MD5
+-------------------------------------------------------------------------------------
+sha                  Same algorithm as NIST-SHA
+
+SIG Algorithms (100 K message signed)
+=====================================
+-------------------------------------------------------------------------------------
+sqmodnWithRsa        OID { 2 5 8 3 1 } Parameter Keysize (default 512)
+                     Sign ( 512 bits):   2.993 (total),  0.184 (RSA),  2.735 (SQMODN)  
+                     Veri ( 512 bits):   2.752 (total),  0.013 (RSA),  2.737 (SQMODN)  
+                     Sign ( 640 bits):   3.592 (total),  0.334 (RSA),  3.256 (SQMODN)  
+                     Veri ( 640 bits):   3.273 (total),  0.021 (RSA),  3.250 (SQMODN)  
+                     Sign ( 768 bits):   4.232 (total),  0.495 (RSA),  3.736 (SQMODN)  
+                     Veri ( 768 bits):   3.745 (total),  0.028 (RSA),  3.716 (SQMODN)  
+                     Sign (1024 bits):   6.079 (total),  1.123 (RSA),  4.955 (SQMODN)  
+                     Veri (1024 bits):   4.901 (total),  0.048 (RSA),  4.850 (SQMODN)  
+-------------------------------------------------------------------------------------
+md2WithRsa           OID { 1 3 14 7 2 3 1 } NULL parameter
+                     Sign ( 512 bits):   1.310 (total),  0.166 (RSA),  1.142 (MD2)  
+                     Veri ( 512 bits):   1.115 (total),  0.013 (RSA),  1.101 (MD2)  
+                     Sign ( 640 bits):   1.444 (total),  0.323 (RSA),  1.119 (MD2)  
+                     Veri ( 640 bits):   1.149 (total),  0.020 (RSA),  1.127 (MD2)  
+                     Sign ( 768 bits):   1.572 (total),  0.474 (RSA),  1.097 (MD2)  
+                     Veri ( 768 bits):   1.135 (total),  0.028 (RSA),  1.106 (MD2)  
+                     Sign (1024 bits):   2.186 (total),  1.093 (RSA),  1.092 (MD2)  
+                     Veri (1024 bits):   1.147 (total),  0.052 (RSA),  1.094 (MD2)  
+-------------------------------------------------------------------------------------
+md4WithRsa           OID { 1 3 14 3 2 2 } NULL parameter
+                     Sign ( 512 bits):   0.212 (total),  0.168 (RSA),  0.043 (MD4)  
+                     Veri ( 512 bits):   0.042 (total),  0.013 (RSA),  0.027 (MD4)  
+                     Sign ( 640 bits):   0.353 (total),  0.317 (RSA),  0.034 (MD4)  
+                     Veri ( 640 bits):   0.048 (total),  0.020 (RSA),  0.027 (MD4)  
+                     Sign ( 768 bits):   0.526 (total),  0.497 (RSA),  0.028 (MD4)  
+                     Veri ( 768 bits):   0.056 (total),  0.028 (RSA),  0.027 (MD4)  
+                     Sign (1024 bits):   1.186 (total),  1.158 (RSA),  0.027 (MD4)  
+                     Veri (1024 bits):   0.078 (total),  0.049 (RSA),  0.027 (MD4)  
+-------------------------------------------------------------------------------------
+md5WithRsa           OID { 1 3 14 3 2 3 } NULL parameter
+                     Sign ( 512 bits):   0.218 (total),  0.182 (RSA),  0.035 (MD5)  
+                     Veri ( 512 bits):   0.050 (total),  0.013 (RSA),  0.035 (MD5)  
+                     Sign ( 640 bits):   0.354 (total),  0.318 (RSA),  0.035 (MD5)  
+                     Veri ( 640 bits):   0.056 (total),  0.020 (RSA),  0.035 (MD5)  
+                     Sign ( 768 bits):   0.527 (total),  0.492 (RSA),  0.035 (MD5)  
+                     Veri ( 768 bits):   0.064 (total),  0.028 (RSA),  0.035 (MD5)  
+                     Sign (1024 bits):   1.109 (total),  1.071 (RSA),  0.037 (MD5)  
+                     Veri (1024 bits):   0.085 (total),  0.048 (RSA),  0.035 (MD5)  
+-------------------------------------------------------------------------------------
+dsaWithSHA           OID { 1 3 14 3 2 13 } NULL parameter
+                     Sign ( 512 bits):   0.235 (total),  0.197 (DSA),  0.037 (SHA)  
+                     Veri ( 512 bits):   0.393 (total),  0.347 (DSA),  0.044 (SHA)  
+                     Sign ( 640 bits):   0.293 (total),  0.255 (DSA),  0.037 (SHA)  
+                     Veri ( 640 bits):   0.536 (total),  0.498 (DSA),  0.037 (SHA)  
+                     Sign ( 768 bits):   0.367 (total),  0.329 (DSA),  0.037 (SHA)  
+                     Veri ( 768 bits):   0.747 (total),  0.708 (DSA),  0.037 (SHA)  
+                     Sign (1024 bits):   0.622 (total),  0.584 (DSA),  0.037 (SHA)  
+                     Veri (1024 bits):   1.235 (total),  1.197 (DSA),  0.037 (SHA)  
+-------------------------------------------------------------------------------------
+md2WithRsaEncryption OID { 1 2 840 113549 1 1 2 } NULL parameter
+                     Sign ( 512 bits):   1.368 (total),  0.186 (RSA),  1.181 (MD2)  
+                     Veri ( 512 bits):   1.116 (total),  0.015 (RSA),  1.100 (MD2)  
+                     Sign ( 640 bits):   1.431 (total),  0.341 (RSA),  1.089 (MD2)  
+                     Veri ( 640 bits):   1.108 (total),  0.021 (RSA),  1.086 (MD2)  
+                     Sign ( 768 bits):   1.580 (total),  0.488 (RSA),  1.090 (MD2)  
+                     Veri ( 768 bits):   1.128 (total),  0.028 (RSA),  1.099 (MD2)  
+                     Sign (1024 bits):   2.195 (total),  1.110 (RSA),  1.084 (MD2)  
+                     Veri (1024 bits):   1.136 (total),  0.049 (RSA),  1.086 (MD2)  
+-------------------------------------------------------------------------------------
+md4WithRsaEncryption OID { 1 3 14 3 2 4 } NULL parameter
+                     Sign ( 512 bits):   0.201 (total),  0.172 (RSA),  0.028 (MD4)  
+                     Veri ( 512 bits):   0.044 (total),  0.014 (RSA),  0.029 (MD4)  
+                     Sign ( 640 bits):   0.376 (total),  0.342 (RSA),  0.033 (MD4)  
+                     Veri ( 640 bits):   0.049 (total),  0.020 (RSA),  0.027 (MD4)  
+                     Sign ( 768 bits):   0.524 (total),  0.496 (RSA),  0.027 (MD4)  
+                     Veri ( 768 bits):   0.057 (total),  0.028 (RSA),  0.028 (MD4)  
+                     Sign (1024 bits):   1.149 (total),  1.121 (RSA),  0.027 (MD4)  
+                     Veri (1024 bits):   0.077 (total),  0.049 (RSA),  0.027 (MD4)  
+-------------------------------------------------------------------------------------
+md5WithRsaEncryption OID { 1 2 840 113549 1 1 4 } NULL parameter
+                     Sign ( 512 bits):   0.216 (total),  0.181 (RSA),  0.035 (MD5)  
+                     Veri ( 512 bits):   0.050 (total),  0.014 (RSA),  0.035 (MD5)  
+                     Sign ( 640 bits):   0.363 (total),  0.327 (RSA),  0.035 (MD5)  
+                     Veri ( 640 bits):   0.056 (total),  0.020 (RSA),  0.035 (MD5)  
+                     Sign ( 768 bits):   0.537 (total),  0.501 (RSA),  0.035 (MD5)  
+                     Veri ( 768 bits):   0.064 (total),  0.028 (RSA),  0.035 (MD5)  
+                     Sign (1024 bits):   1.152 (total),  1.116 (RSA),  0.035 (MD5)  
+                     Veri (1024 bits):   0.086 (total),  0.049 (RSA),  0.035 (MD5)  
+-------------------------------------------------------------------------------------
+md2WithRsaTimeDate   OID { 1 3 36 3 1 22 } NULL parameter
+                     Sign ( 512 bits):   1.277 (total),  0.189 (RSA),  1.087 (MD2)  
+                     Veri ( 512 bits):   1.119 (total),  0.029 (RSA),  1.087 (MD2)  
+                     Sign ( 640 bits):   1.423 (total),  0.327 (RSA),  1.095 (MD2)  
+                     Veri ( 640 bits):   1.136 (total),  0.041 (RSA),  1.094 (MD2)  
+                     Sign ( 768 bits):   1.594 (total),  0.503 (RSA),  1.089 (MD2)  
+                     Veri ( 768 bits):   1.150 (total),  0.056 (RSA),  1.092 (MD2)  
+                     Sign (1024 bits):   2.196 (total),  1.109 (RSA),  1.086 (MD2)  
+                     Veri (1024 bits):   1.206 (total),  0.116 (RSA),  1.089 (MD2)  
+-------------------------------------------------------------------------------------
+md4WithRsaTimeDate   OID { 1 3 36 3 1 24 } NULL parameter
+                     Sign ( 512 bits):   0.208 (total),  0.180 (RSA),  0.027 (MD4)  
+                     Veri ( 512 bits):   0.057 (total),  0.028 (RSA),  0.027 (MD4)  
+                     Sign ( 640 bits):   0.356 (total),  0.328 (RSA),  0.027 (MD4)  
+                     Veri ( 640 bits):   0.069 (total),  0.041 (RSA),  0.027 (MD4)  
+                     Sign ( 768 bits):   0.534 (total),  0.505 (RSA),  0.027 (MD4)  
+                     Veri ( 768 bits):   0.085 (total),  0.056 (RSA),  0.027 (MD4)  
+                     Sign (1024 bits):   1.248 (total),  1.219 (RSA),  0.027 (MD4)  
+                     Veri (1024 bits):   0.129 (total),  0.100 (RSA),  0.027 (MD4)  
+-------------------------------------------------------------------------------------
+md5WithRsaTimeDate   OID { 1 3 36 3 1 25 } NULL parameter
+                     Sign ( 512 bits):   0.209 (total),  0.173 (RSA),  0.035 (MD5)  
+                     Veri ( 512 bits):   0.063 (total),  0.027 (RSA),  0.035 (MD5)  
+                     Sign ( 640 bits):   0.372 (total),  0.336 (RSA),  0.035 (MD5)  
+                     Veri ( 640 bits):   0.077 (total),  0.041 (RSA),  0.035 (MD5)  
+                     Sign ( 768 bits):   0.545 (total),  0.509 (RSA),  0.035 (MD5)  
+                     Veri ( 768 bits):   0.093 (total),  0.056 (RSA),  0.035 (MD5)  
+                     Sign (1024 bits):   1.145 (total),  1.109 (RSA),  0.035 (MD5)  
+                     Veri (1024 bits):   0.134 (total),  0.098 (RSA),  0.035 (MD5)  
+\end{verbatim}
+}
+
+\nm{1}{psemaint}{maintain PSE}
+\label{psemaint}
+\hl{Synopsis}
+{\bf psemaint} [ {\bf -htvACFRDTVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -a} {\em 
+issueralg} ] [ {\bf -f} {\em notbefore} ] 
+\\ \hspace*{1.59cm} [ {\bf -l} {\em notafter} ] [ {\bf -i} {\em inputfile} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] [ {\em command} ]
+\hl{Description}
+{\bf psemaint} is a maintenance program which can be used by both
+certification authority administrators and users for the purpose of maintaining their
+PSEs. This includes moving information (e.g. keys, certificates, revocation lists etc.) from Unix files
+or public X.500 directories into the PSE and vice versa, generating keys, changing PINs and displaying the 
+content
+of the PSE. If a CA PSE is addressed, the CA database contained in the CA directory is used, too.
+In the basic version of SECUDE the PSE is realized by software.
+
+If {\bf -p} {\em psename} is given, the PSE {\em psename} is selected. The default for
+{\em psename} is either provided by the environment variable PSE, or is {\em .pse} under the
+HOME directory, if no such variable exists.
+
+If {\bf -c} {\em cadir} is given, the PSE {\em psename} of a CA residing in the CA directory {\em cadir}
+is selected; in this case, the default for PSE is either provided by the environment
+variable CAPSE or is {\em .capse}, if no such variable exists.
+
+{\em notbefore} (option {\bf -f}) and {\em notafter} (option {\bf -l}) are dates of validity in the 
+form 'YYMMDD'. They are evaluated by the {\bf certify} command available with {\bf psemaint}. 
+If they are omitted, the first date on which a certificate generated with the {\bf certify} command
+is valid, is set to the current time, 
+and the last date on which the certificate is valid is set to one year hereafter.
+
+If option {\bf -D} is provided, Directory-based information may be stored on the PSE, or
+information stored on the PSE may be entered into the Directory.
+The Directory may either be a 
+X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}) (see also DirectoryType(5)).
+
+If a X.500 directory is accessed, option {\bf -d} may be used to specify the DSA (Directory System 
+Agent) 
+(identified by {\em dsaname}) which shall be contacted for the required directory operation; otherwise, the DSA whose name and network address are defined by the {\em dsa\_address} parameter in the system's 
+{\em dsaptailor} file will be accessed. 
+Parameter {\em authlevel} (option {\bf -A}) may be provided to determine the level of authentication used when binding. If {\bf -A} {\em authlevel} is omitted, the requested 
+level of authentication is taken from the environment variable AUTHLEVEL, and is set to {\em no 
+authentication}, if no such variable exists.
+In case of simple authentication being used, the caller's distinguished name and
+X.500 password are retrieved from the PSE objects Name and QuipuPWD, respectively.
+
+If a command available with {\bf psemaint} requires a signature to be performed (e.g. command {\em 
+certify}) and the own
+signature key is of type {\em ASYM\_ENC}, the algorithm name associated with the signature can be 
+specified by {\em issueralg} (option {\bf -a}). {\em issueralg} must be a
+signature algorithm (AlgType SIG, see INTRO(3) on available algorithms) which fits to the associated 
+algorithm of the signature key (e.g., the algorithm md5WithRsa cannot be used with an ElGamal key).
+The default for {\em issueralg} is md2WithRsaEncryption.
+
+If option {\bf -F} is provided, the own FCPath is considered as being trusted.
+This is useful for optimizing the verification process (see psemaint command {\em verify}),
+if the originator of a digital signature and the PSE owner have a common point of trust
+within their forward certification paths, or if the PSE owner wishes to verify signatures
+generated by himself.
+
+If option {\bf -R} is provided, PEM revocation lists will be considered by the verification process
+(see psemaint command {\em verify}).
+
+Option {\bf -v} renders the psemaint command verbose, and options {\bf -V} and {\bf -W} provide some further
+logging information. 
+
+Option {\bf -t} may be provided for testing purposes; it requests to control 
+the malloc/free behaviour.
+
+In case that a smartcard terminal is used, option {\bf -T} requests to perform any public key 
+RSA operation in the smartcard terminal, and not with the software in the workstation 
+(the latter is the default).
+
+If {\bf -i} {\em inputfile} is given, commands are read from {\em inputfile}, otherwise
+commands are read from stdin.
+
+If {\em command} is given, psemaint executes this single command only and then terminates. 
+Otherwise, commands can be executed interactively or from {\em inputfile}.make  
+
+If the required PSE does not exist,
+and {\em command} is other than {\em create}, psemaint terminates with an appropriate message.
+\\ [1em]
+{\bf Creation of a PSE}
+\\ [1em]
+A new PSE can be created by giving the command 
+\bc
+{\bf psemaint} [ {\bf -p} {\em psename} ] create
+\ec
+{\bf psemaint} then requires the distinguished name of the owner of the PSE from /dev/tty.
+This name is of the type {\em Name} which is the character string representation
+of distinguished names described in INTRO(1).
+\\ [1em]
+After the owner's name was entered, {\bf psemaint} asks for a PIN (which is a password in case
+of the PSE) of the entire PSE, the so called PSE-PIN. If a PIN is given here, 
+the table of contents (TOC) of the PSE,
+and each object for which no object-specific PIN is given on creation time, are encrypted with an 
+encryption
+key derived from the given PSE-PIN. If no PIN shall be used, CR must be entered. 
+\\ [1em]
+{\bf Commands} 
+\\ [1em]
+The following commands are available. They may be abbreviated as indicated by bold letters.
+Commands which are marked as CA commands are for CAs only.
+\\ [1em]
+\begin{tabular}{ll}
+{\bf add}alias     & Add Alias entry to Alias Database           		       \\
+{\bf add}ek        & Add ToBeSigned part of certificate to EKList    		       \\
+{\bf add}pk        & Add ToBeSigned part of certificate to PKList    		       \\
+{\bf alg}s         & Show OIDs, names and parameters of algorithm or algorithm type    \\
+{\bf ali}as2dname  & Search aliasnames containing given pattern and show corresp. DName\\
+{\bf authno}ne     & Access the X.500 directory without using any authentication       \\
+{\bf authsi}mple   & Access the X.500 directory using SIMPLE authentication            \\
+{\bf authst}rong   & Access the X.500 directory using STRONG authentication            \\
+{\bf cac}ertificate & Show certificate with given serial number (CA command)           \\
+{\bf cap}emcrl     & List PEM-revocation lists of all CAs known to the CA (CA command) \\
+{\bf cas}erialnumbers & Show serialnumbers and dates of issue for given user (CA command) \\
+{\bf cau}sers      & List all users of CA (CA command)                                 \\
+{\bf certi}fy      & Certify public key contained in Certificate (CA command)          \\
+{\bf cert2k}eyinfo & Write object of type KeyInfo with PK from Certificate             \\
+{\bf cert2p}kroot  & Write object of type PKRoot with PK from Certificate              \\
+{\bf che}ck        & Check PSE consitency                                              \\
+{\bf chp}in        & Change PSE-PIN or object-PIN                                      \\
+{\bf cl}ose        & Close PSE or PSE object                                           \\
+{\bf cr}eate       & Create PSE or object                                              \\
+{\bf dela}lias     & Remove Alias name from Alias Database               	       \\
+{\bf delek}        & Remove ToBeSigned part of certificate from EKList    	       \\
+{\bf delet}e       & Delete PSE object                                                 \\
+{\bf delk}ey       & Delete key with given keyref                                      \\
+{\bf delpe}mcrl    & Remove locally stored revocation list of a given issuer           \\
+{\bf delpk}        & Remove ToBeSigned part of certificate from PKList    	       \\
+{\bf dn}ame2alias  & Search DNames containing given pattern and show corresp. aliases  \\
+{\bf end}          & Exit program                                                      \\
+{\bf ent}er	   & Enter object into Directory				       \\
+{\bf ex}it         & Exit program                                                      \\
+{\bf g}enkey       & Generate key and store in object or under keyref                  \\
+{\bf h}elpcmd or {\bf ?} & Show helptext for cmd                                       \\
+{\bf i}nitpemcrl   & Create an empty PemCrl (CA command)                               \\
+{\bf k}eytoc       & Show table of contents (TOC) of key-pool                          \\
+{\bf o}pen         & Open PSE or PSE object                                            \\
+{\bf p}rototype    & Create self-signed prototype certificate of own public signature key \\
+{\bf q}uit         & Exit program                                                      \\
+{\bf rea}d         & Read PSE object into file                                         \\
+{\bf rem}ove       & Remove object from Directory				       \\
+{\bf ren}ame       & Rename PSE object                                                 \\
+{\bf ret}rieve     & Retrieve object from Directory				       \\
+{\bf rev}oke       & Revoke one or more certificates (CA command)                      \\
+{\bf set}parm      & Set parameters of given algorithm                                 \\
+{\bf sh}ow         & Show PSE object or keyref in suitable form                        \\
+{\bf sp}lit        & Split Cross Certificate Pair into its components                  \\
+{\bf stri}ng2key   & Generate DES key from string and store in object or under keyref  \\
+{\bf t}oc          & Show table of contents (TOC)                                      \\
+{\bf v}erify       & Verify digital signatures                                         \\
+{\bf w}rite        & Write file into PSE object                                        \\
+{\bf x}dump        & xdump object or keyref                                            \\
+\end{tabular} \\ [1em]
+Most commands require parameters which are interactively asked for when they are missing. 
+Parameters are partly keyword-parameters of the form {\em keyword$=$value}, partly positional 
+parameters. Keywords
+may be abbreviated, either. In case of the PSE, object-names are the names of 
+the files on the PSE containing the objects.
+\\ [1em]
+{\bf Description of the Commands} 
+\\ [1em]
+{\bf algs} {\em algname} or {\em algtype}
+\begin{quote}
+Shows names, OIDs and parameters of the given algorithm {\em algname} or of all algorithms
+of type {\em algtype}. The algorithm type can be one of
+\bvtab
+\1 ASYM\_ENC \3 - asymmetric encryption algorithms \\
+\1 SYM\_ENC  \3 - symmetric encryption algorithms \\
+\1 HASH      \3 - hash algorithms \\
+\1 SIG       \3 - signature algorithms \\
+\1 ALL       \3 - all algorithms \\
+\evtab
+See INTRO(3X) for valid algorithm names.
+\end{quote}
+
+{\bf addalias} {\em username}
+\begin{quote}
+Adds an alias entry with distinguished name {\em username} to the USER or SYSTEM alias file.
+\end{quote}
+
+{\bf addek} {\em certificate}
+\begin{quote}
+Extracts the ToBeSigned from PSE object {\em certificate} (which must be of type Certificate)
+and adds it to PSE object EKList.
+\end{quote}
+
+{\bf addpk} {\em certificate}
+\begin{quote}
+Extracts the ToBeSigned from PSE object {\em certificate} (which must be of type Certificate)
+and adds it to PSE object PKList.
+\end{quote}
+
+{\bf alias2dname} {\em pattern}
+\begin{quote}
+Searches the alias files \$HOME/.af-alias and \$TOP/secude/.af-alias for alias names
+containing pattern and prints one line per hit
+\bc
+{\em aliasname} - - -$>$ $<${\em distinguished name}$>$
+\ec
+\end{quote}
+
+{\bf authnone}
+\begin{quote}
+This command is available only if a X.500 Directory is being used.
+It determines that the X.500 Directory shall henceforth be accessed without using any authentication.
+(Simple authentication is the default level of authentication.) 
+\end{quote}
+
+{\bf authsimple}
+\begin{quote}
+This command is available only if a X.500 Directory is being used.
+It determines that the X.500 Directory shall henceforth be accessed using simple authentication.
+(Simple authentication is the default level of authentication.) 
+\end{quote}
+
+{\bf authstrong}
+\begin{quote}
+This command is available only if a X.500 Directory is being used.
+It determines that the X.500 Directory shall henceforth be accessed using strong authentication. 
+\end{quote}
+
+
+{\bf cacertificate} {\em serial}
+\begin{quote}
+This command is for CA PSEs only.
+It shows the certificate with serial number {\em serial} issued by the PSE-owning CA (see also
+{\em caserialnumbers} to obtain a list of all issued serial numbers). The
+information is retrieved from the CA database contained in the CA directory (see also {\em cacreate(1)}).
+\end{quote}
+
+{\bf capemcrl}
+\begin{quote}
+This command is for CA PSEs only.
+It lists the PEM revocation lists of all CAs known to the CA. Each of the revocation lists is optionally
+accompanied by its issuer's certification path. 
+The information is retrieved from the CA database contained in the CA directory (see also {\em 
+cacreate(1)}).
+\end{quote}
+
+{\bf caserialnumbers} {\em name}
+\begin{quote}
+This command is for CA PSEs only.
+It lists serial number and date-of-issue of all certificates which the PSE-owning CA has 
+issued for the user identified by {\em name} where {\em name} is a distinguished name in 
+printable representation (Name form) or an alias name. If {\em name} is of Name form
+(containing '=' characters) it must be quoted. The information is retrieved from the 
+CA database contained in the CA
+directory (see also {\em cacreate(1)}).
+\end{quote}
+
+{\bf causers}
+\begin{quote}
+This command is for CA PSEs only.
+It lists all users for whom the PSE-owning CA has issued a certificate. Each user is represented 
+by its distinguished name in printable representation. The information is retrieved from the CA database
+contained in the CA directory (see also {\em cacreate(1)}).
+\end{quote}
+
+{\bf certify} {\em certificate}
+\begin{quote}
+This command is for CA PSEs only.
+It certifies the public key contained in {\em certificate} (which must be of type Certificate).
+This command is useful for a CA which requests to cross-certify another CA's public key.
+\end{quote}
+
+{\bf cert2keyinfo} {\em certificate}~ {\em keyinfo}
+\begin{quote}
+Extracts the KeyInfo containing the public key from PSE object {\em certificate} 
+(which must be of type Certificate), and writes it to {\em keyinfo}.
+\end{quote}
+
+{\bf cert2pkroot} {\em certificate}~ {\em pkroot}
+\begin{quote}
+Extracts the KeyInfo containing the public key from PSE object {\em certificate} 
+(which must be of type Certificate), builds a new object of type PKRoot (containing
+only the {\em newkey} member) and writes it to {\em pkroot}.
+\end{quote}
+
+{\bf check}
+\begin{quote}
+Check the consistency of the PSE. The certification pathes SignCert --> FCPath --> PKRoot
+and EncCert --> FCPath --> PKRoot are verified. In addition it is checked whether
+the public RSA key in SignCert fits to the secret RSA key in SignSK, and whether the
+public RSA key in EncCert fits to the secret RSA key in DecSKnew.
+\end{quote}
+
+{\bf chpin} {\em object}
+\begin{quote}
+Changes the PSE-PIN, if no PSE object is given, or the object-PIN for the PSE object {\em object}. 
+If an PSE-PIN is indicated, the PIN's of all objects which have
+no object-specific PIN are changed. If only CR is entered as PIN, the PIN-protection is removed.
+\end{quote}
+
+{\bf close} {\em psename}
+\begin{quote}
+Close the previously opened PSE.
+\end{quote}
+
+{\bf create} {\em object}
+\begin{quote}
+Create the PSE object {\em object}
+of the PSE which is currently open. Asks for PIN's.
+\end{quote}
+
+{\bf delalias} {\em alias}
+\begin{quote}
+Removes the given {\em alias} from either the USER alias file or the SYSTEM alias file. If the
+last alias name of an alias entry is removed, the whole alias entry is deleted from the alias file.
+\end{quote}
+
+{\bf delek} {\em subject}~ {\em issuer}~ {\em serialnumber}
+\begin{quote}
+Removes ToBeSigned entries from PSE object EKList.
+{\em delek} deletes either all entries of the given {\em subject} (owner) or exactly the one entry identified by 
+the
+given {\em issuer} and {\em serialnumber} combination. {\em Owner} and {\em Issuer} are distinguished
+names in printable form or alias names.
+\end{quote}
+
+{\bf delete} {\em object}
+\begin{quote}
+Delete the the PSE object {\em object}. 
+\end{quote}
+
+{\bf delkey} {\em keyref} 
+\begin{quote}
+Removes the key {\em keyref} from the key-pool.
+\end{quote}
+
+{\bf delpemcrl} {\em issuer}
+\begin{quote}
+Removes revocation list from PSE object CrlSet.
+{\em delpemcrl} deletes the revocation list (PEM syntax) issued by {\em issuer} from the set of 
+locally stored revocation lists. {\em Issuer} is a distinguished name in printable form or an alias name.
+\end{quote}
+
+{\bf delpk} {\em subject}~ {\em issuer}~ {\em serialnumber}
+\begin{quote}
+Removes ToBeSigned entries from PSE object PKList.
+{\em delpk} deletes either all entries of the given {\em subject} (owner) or exactly the one entry identified by 
+the
+given {\em issuer} and {\em serialnumber} combination. {\em Owner} and {\em Issuer} are distinguished
+names in printable form or alias names.
+\end{quote}
+
+{\bf dname2alias} {\em pattern}
+\begin{quote}
+Searches the alias files \$HOME/.af-alias and \$TOP/secude/.af-alias for distinguished names
+containing pattern and prints all corresponding alias names (one line per alias)
+\bc
+$<${\em distinguished name}$>$ - - -$>$  {\em aliasname}
+\ec
+\end{quote}
+
+{\bf enter} {\em attrtype}~ {\em keytype} 
+\begin{quote}
+Enter information of type {\em attrtype} into Directory. \\
+The Directory may either be a X.500 Directory or the local substitute provided by 
+SecuDE ({\em .af-db}). (see also DirectoryType(5)).
+{\em attrtype} is {\em {\bf U}serCertificate} or {\em {\bf Ce}rtificate} by default, depending on whether
+or not a X.500 Directory shall be accessed. Further possible values for {\em attrtype} are
+{\em {\bf CA}Certificate}, {\em {\bf Cr}ossCertificatePair}, and {\em {\bf P}emCertificateRevocationList}.
+{\em keytype} may have one of the values {\bf E} or {\bf S}.
+ 
+If the X.500 Directory is accessed and {\em attrtype} is {\em UserCertificate} ({\em CACertificate}), a certificate stored in the PSE 
+is added to the {\em userCertificate} ({\em cACertificate}) attribute in
+the caller's X.500 directory entry.
+If the .af-db Directory is accessed, however, the certificate is stored in the file {\em SignCert} or 
+{\em EncCert}, depending on {\em keytype}, in the .af-db subdirectory identified by the distinguished name 
+of the certificate owner. (If the caller's PSE is restricted to carry one RSA keypair only, the
+certificate is stored as file {\em Cert}, instead.)
+The PSE object containing the certificate is asked for interactively. \\
+The following objects (CrossCertificatePairs and Revocation Lists) may be entered into 
+the Directory by CAs only: \\
+If the X.500 Directory is accessed and {\em attrtype} is {\em CrossCertificatePair}, 
+a cross certificate pair 
+is added to the {\em crossCertificatePair} attribute in the calling CA's X.500 directory entry. 
+If the local .af-db Directory is accessed, however, the cross certificate pair is added to the 
+file {\em CrossCSet}
+in the .af-db subdirectory identified by the CA's distinguished name.
+The PSE objects (which must be of type 
+Certificate) containing the components of the cross certificate pair ({\em forward} and {\em reverse}
+certificate) are asked for interactively; at least one of the two components (forward 
+or reverse certificate) of the cross certificate pair must be indicated. \\
+If the X.500 Directory is accessed and {\em attrtype} is {\em PemCertificateRevocationList}, 
+the CA's PEM revocation list
+is retrieved from the CA's {\em pemcrlwithcerts} database and stored in the calling CA's X.500 
+directory entry.
+If the local .af-db Directory is accessed, however, the CA's revocation list is stored in
+the file {\em PemCrl} in the .af-db subdirectory identified by the CA's distinguished name. 
+\end{quote}
+
+{\bf genkey} {\em algname}~ {\em object1/keyref1} {\em object2/keyref2} 
+\begin{quote}
+Generates a symmetric key or asymmetric key pair and stores it in {\em object1/object2} or 
+under {\em keyref1/keyref2}. 
+If a PSE object is indicated, the object must not exist, otherwise psemaint will ask for overwriting. 
+Parameters associated to the indicated algorithm (i.e. keysize for RSA) may
+be changed before using {\bf setparm}. 
+ 
+If {\em algname} indicates a DES algorithm, a 64-bit long BitString is generated as DES key. The
+known bad DES keys are avoided. If {\em algname} indicates a DES algorithm in 
+Encryption(k1)-Decryption(k2)-Encryption(k1) mode, a 128-bit long BitString is generated with
+the first 64 bit comprising k1 and the second 64 bit comprising k2.
+ 
+If {\em algname} indicates an RSA algorithm, two BitStrings are generated, one being
+the ASN.1 code of the public key, the other being the ASN.1 code of the secret key.
+The public key ist stored in {\em object1} or {\em keyref1}, the secret key is stored in
+{\em object2} or {\em keyref2}.
+See INTRO(3X) for valid algorithm names.
+\end{quote}
+
+{\bf help} or {\bf ?} {\em cmd}
+\begin{quote}
+Shows helptext for the command {\em cmd}.
+\end{quote}
+
+{\bf initpemcrl} 
+\begin{quote}
+This command is for CA PSEs only.
+It creates an empty PEM revocation list which is stored in the CA database and entered into the Directory. \\
+The Directory may either be a X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}). (The decision whether a X.500 directory or the local substitute 
+is used is done at compile time through the variable DX500 in the file CONFIG.make
+at \$TOP/secude/config.) \\
+The {\em lastUpdate} component of the empty revocation list is set to the current time, whereas the value 
+of the {\em nextUpdate} component may individually be specified by the calling CA. The empty
+revocation list is written to the {\em pemcrlwithcerts} database in the CA's directory, where an already
+existing revocation list of the calling CA will be replaced; in addition, 
+it is entered into the directory (X.500 or local substitute, respectively), where it replaces
+a revocation list that has already been stored there by the calling CA. 
+Furthermore, the empty revocation list is added to the PSE object CrlSet in the CA's PSE, where an
+already existing revocation list of this CA will be replaced.
+\end{quote}
+
+{\bf keytoc}
+\begin{quote}
+Show table of contents (toc) of the key-pool. The (user-specific) key-pool keeps all
+keys which are addressable via keyref's (see INTRO(3X) for further explanation of the key-pool).
+\end{quote}
+
+{\bf open} {\em psename}
+\begin{quote}
+Open a new PSE. The PSE which is currently open is closed. After the invocation 
+of psemaint either the PSE .pse or the PSE
+given with option {\bf -p} {\em psename} is open. All succeeding commands refer to this
+PSE.
+\end{quote}
+
+{\bf prototype}
+\begin{quote}
+Create a self-signed prototype-certificate containing the own public signature key.
+\end{quote}
+
+{\bf quit} or {\bf exit} or {\bf end} 
+\begin{quote}
+Exit program.
+\end{quote}
+
+{\bf read} {\em object}~ {\em destination} 
+\begin{quote}
+Read the content of the given PSE object {\em object}
+and write the objectValue into file {\em destination}. Includes all PIN-handling. 
+{\em sec\_read\_PSE()} is used to get the objectValue part.
+\end{quote}
+
+{\bf remove} {\em attrtype}~ {\em keytype} cert$=${\em serial},{\em issuer}~ for$=${\em serial},{\em 
+issuer}~ rev$=${\em serial},{\em issuer}
+\begin{quote}
+Remove information of type {\em attrtype} from Directory. \\
+The Directory may either be a X.500 Directory or the local substitute provided by 
+SecuDE ({\em .af-db}). (see also DirectoryType(5)).
+{\em attrtype} is {\em {\bf U}serCertificate} or {\em {\bf Ce}rtificate} by default, depending on whether
+or not a X.500 Directory is accessed. Further possible values for {\em attrtype} are
+{\em {\bf CA}Certificate} and {\em {\bf Cr}ossCertificatePair}.
+{\em keytype} may have one of the values {\bf E} or {\bf S}.
+ 
+If the X.500 Directory is accessed and {\em attrtype} is {\em UserCertificate} ({\em CACertificate}), the certificate identified by 
+{\em serial} and {\em issuer} is removed from the {\em userCertificate} ({\em cACertificate}) attribute in the caller's X.500 directory entry. \\
+If the local substitute is used, however, the file {\em SignCert} or {\em EncCert} 
+(depending on {\em keytype}) 
+in the .af-db subdirectory identified by the caller's distinguished name is deleted.
+(If the caller's PSE is restricted to hold one RSA keypair only, the file {\em Cert} is
+removed, instead.)
+If {\em attrtype} is {\em CrossCertificatePair}, a cross certificate pair whose components ({\em forward}
+and {\em reverse} certificate) are identified by their serial number {\em serial} and issuer
+{\em issuer}, is removed from the {\em crossCertificatePair} attribute in the calling CA's 
+X.500 directory entry. (A cross certificate pair may be removed from the Directory by CAs only.)
+If the local substitute is used, however, the cross certificate pair is removed from the file {\em CrossCSet}
+in the .af-db subdirectory defined by the CA's distinguished name.
+At least one of the two components ({\em forward} or {\em reverse} certificate) is required for identifying 
+the cross certificate pair that is to be removed from the Directory.
+\end{quote}
+
+{\bf rename} {\em object}~ {\em newname}
+\begin{quote}
+Rename the given PSE object {\em object} with {\em newname}. 
+\end{quote}
+
+{\bf retrieve} {\em dirname}~ {\em attrtype}~ {\em keytype} {\em update}
+\begin{quote}
+Retrieve information of type {\em attrtype} from Directory. \\
+The Directory may either be a X.500 Directory or the local substitute provided by 
+SecuDE ({\em .af-db}). (see also DirectoryType(5)).
+{\em attrtype} is {\em {\bf U}serCertificate} or {\em {\bf Ce}rtificate} by default, depending on whether
+or not a X.500 Directory shall be accessed. Further possible values for {\em attrtype} are
+{\em {\bf CA}Certificate}, {\em {\bf Cr}ossCertificatePair}, and {\em {\bf P}emCertificateRevocationList}.
+{\em keytype} may have one of the values {\bf E} or {\bf S}.
+ 
+If the X.500 Directory is accessed and {\em attrtype} is {\em UserCertificate} ({\em CACertificate}), 
+the set of certificates 
+stored in the X.500 directory entry identified by {\em dirname} is returned; the set of 
+certificates comprises the value(s) of the {\em userCertificate} ({\em cACertificate}) attribute. 
+If the local .af-db Directory is accessed, however, the returned set of certificates either comprises
+the certificate stored in file {\em Cert} (if present), or the certificate stored in file 
+{\em SignCert} or {\em EncCert} (depending on {\em keytype}), which is located in 
+the .af-db subdirectory identified by {\em dirname}.
+If {\em update} is set to TRUE, one certificate among the returned set of certificates may
+be selected by the user and stored in its PSE.\\
+If the X.500 Directory is accessed and {\em attrtype} is {\em CrossCertificatePair}, 
+the set of cross certificate 
+pairs stored in the directory entry identified by {\em dirname} is returned; the set of 
+cross certificate pairs comprises the value(s) of the {\em crossCertificatePair} attribute. 
+If the local .af-db Directory is accessed, however, the set of cross certificate pairs is retrieved
+from the file {\em CrossCSet} in the .af-db subdirectory identified by {\em dirname}.
+If {\em update} is set to TRUE, the cross certificate pairs are added as entries 
+to the PSE object CrossCSet; if that PSE object does not exist, however, it is created. \\
+If the X.500 Directory is accessed and {\em attrtype} is {\em PemCertificateRevocationList}, 
+the revocation list stored 
+in the directory entry identified by {\em dirname} is returned. 
+If the local .af-db Directory is accessed, however, the revocation list is retrieved from the
+file {\em PemCrl} in the .af-db subdirectory identified by {\em dirname}.
+The format of the revocation list is that defined by PEM (see RFC 1422, Appendix A). 
+If {\em update} is set to TRUE, the revocation list is added as entry to the 
+PSE object CrlSet; if that PSE object does not exist, however, it is created.
+\end{quote}
+
+{\bf revoke} 
+\begin{quote}
+This command is for CA PSEs only.
+It revokes one or more certificates and enters the resulting revocation list into the 
+Directory. \\
+The directory may either be a X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}). (The decision whether a X.500 directory or the local substitute 
+is used is done at compile time through the variable DX500 in the file CONFIG.make
+at \$TOP/secude/config.) \\
+The certificates which are to be revoked are identified by their serial numbers which are to be
+entered interactively (see also {\em caserialnumbers} and {\em cacertificate}). 
+Each serial number is submitted to the following check: \\
+1. It is checked whether the given serial number is contained in the CA database in the
+CA directory of the PSE-owning CA; this check is performed in order to find out whether the 
+PSE-owning CA has issued a certificate with the given serial number. \\
+2. It is checked whether the given serial number is already contained in the most current version
+of the CA's revocation list. The CA's revocation list is retrieved from the {\em pemcrl} file
+in the directory of the PSE-owning CA; its format is that specified by PEM. If there is no 
+such file in the CA's directory, an empty revocation list will be created. \\
+This check is performed in order to find out whether the certificate with the given serial number 
+has already been revoked by the PSE-owning CA. \\
+Only in case of at least one certificate having been revoked and added to the revocation list, the 
+{\em lastUpdate} component of the revocation list is set to the current time, whereas the value 
+of the {\em nextUpdate} component may individually be specified by the revoking CA. The extended
+revocation list is written back to the {\em pemcrlwithcerts} database in the CA's directory; in addition, 
+it is entered into the directory (X.500 or local substitute, respectively). 
+Furthermore, the extended revocation list is added to the PSE object CrlSet in the CA's PSE.
+\end{quote}
+
+{\bf setparm} {\em algname}
+\begin{quote}
+Changes parameters of the given algorithm {\em algname}. See INTRO(3X) for valid algorithm names.
+\end{quote}
+
+{\bf show} {\em object/keyref}~ [DER] [KEYBITS] [ALL]
+\begin{quote}
+Prints {\em object} or {\em keyref} in suitable form to stdout. If the given object contains
+keys, only the algorithm identifier are showed. The keyword DER can be used to additionally
+show the DER-Code of the BitString of the key, while the keyword KEYBITS causes
+additionally showing the two INTEGERS if RSA-keys are involved. Keyword ALL means both of them.
+\end{quote}
+
+
+{\bf split} for$=${\em serial},{\em issuer}~ rev$=${\em serial},{\em issuer}
+\begin{quote}
+Split cross certificate pair into its components ({\em forward} and {\em reverse} certificate)
+and store them on PSE. The names of the PSE objects where the {\em forward} and {\em reverse} 
+certificate are to be stored are asked for interactively. \\
+The cross certificate pair to be split must be contained in the PSE object CrossCSet;
+its components ({\em forward} and {\em reverse} certificate) are identified by their serial 
+number {\em serial} and issuer {\em issuer}. At least one of the two components 
+({\em forward} or {\em reverse} certificate) must be present. \\
+No update is done on the PSE object CrossCSet.
+\end{quote}
+
+{\bf string2key} {\em string}~ {\em object/keyref} 
+\begin{quote}
+Generates a DES key from the given string and stores it in {\em object} or under {\em keyref}. The
+key is generated using a one-way hash function.
+\end{quote}
+
+
+{\bf toc}
+\begin{quote}
+Show table of contents (toc). 
+\end{quote}
+
+
+{\bf verify} certificate$=${\em certobj}~ fcpath$=${\em fcpathobj}~ pkroot$=${\em pkrootobj}~ 
+\begin{quote}
+Verifies the chain Certificate -- FCPath -- PKRoot. {\em certobj}, {\em fcpathobj}, and {\em pkrootobj}
+are PSE objects containing a Certificate, a FCPath, and a PKRoot, respectively. The default PSE objects
+are SignCert, FCPath and PKRoot, if parameters are omitted. If only 'fcpath$=$' is given,
+no FCPath is used for verification. \\
+The global variable {\em af\_chk\_crl} determines whether a directory (either X.500 or .af-db, see also 
+DirectoryType(5)) is to be accessed
+in order to find out if any of the certificates encountered in the verification process is 
+contained in the revocation list of its issuer.
+The global variable {af\_search\_directory} determines whether a directory (either X.500 or .af-db, see also 
+DirectoryType(5)) is to be accessed
+in order to establish or complete the certification path required for the verification of {\em certobj}. 
+\end{quote}
+
+{\bf write} {\em object}~ {\em source}~ {\em type}
+\begin{quote}
+Read file {\em source} and write it as objectValue the given PSE object {\em object} (using
+{\em sec\_write\_PSE()}). The objectType is taken from {\em type}.
+Includes all PIN-handling. If the PSE object does not exist, it is created.
+If {\em type} is omitted, the content of {\em source} is written to PSE object
+{\em object} using {\em sec\_write()}.
+\end{quote}
+
+{\bf xdump} {\em object/keyref} 
+\begin{quote}
+Prints {\em object} or {\em keyref} in a suitable form to stdout.
+\end{quote}
+
+\nm{1}{pem}{Privacy Enhanced Mail (PEM) according to RFC 1421 - 1424}
+\label{pem}
+\hl{Synopsis}
+{\bf pem} [ {\bf scan $|$ mic-clear $|$ mic-only $|$ encrypted $|$ crl $|$ crl-rr $|$ certify } ]
+\\ \hspace*{0.95cm} 
+[ {\bf -i} {\em inputfile} ] [ {\bf -o} {\em outputfile} ] [ {\bf -p} {\em psename} ] [ {\bf -c} {\em cadir} ] [ {\bf 
+-m/M}  {\em depth} ] 
+\\ \hspace*{0.95cm}
+[ {\bf -u} {\em update} ] [ {\bf -r} {\em name1} {\em name2} ... ] [ {\bf -y} {\em name1} {\em name2} ... ] [ {\bf 
+-DFRCnhvVNO} ]
+\\ \hspace*{0.95cm}
+[ {\bf -H} {\em md-alg} ] [ {\bf -S} {\em micenc-alg} ] [ {\bf -E} {\em msgenc-alg} ] [ 
+{\bf -K} {\em dekenc-alg} ] [ {\bf -d} {\em dsaname} ]
+\\ \hspace*{0.95cm} [ {\bf -A} {\em authlevel} ]
+
+\hl{Description}
+This PEM filter transforms any input text file into a PEM formatted output file 
+and vice versa. It can be used both by ordinary users or by certification
+authorities. It realizes all formats 
+and procedures defined in the Internet Specifications RFC 1421-1424 
+except that it only supports asymmetric key management. It is
+possible to securely cache other's certificates and CRLs as this 
+is part of the general SecuDE functionality. In particuar, it is possible
+with {\em pem} to
+\bi
+   \m enhance messages, i.e. create MIC-CLEAR, MIC-ONLY and
+      ENCRYPTED message formats,
+   \m de-enhance messages, i.e. scan MIC-CLEAR, MIC-ONLY and
+      ENCRYPTED message formats, and perform the necessary
+      validation steps (including CRL checks),
+   \m create Certification Request, Certification Reply, CRL Storage
+      Request and CRL Storage Reply message formats,
+   \m scan Certification Request, Certification Reply, CRL Storage
+      Request and CRL Storage Reply message formats, and perform
+      appropriate actions, for instance updating the PSE or
+      the CA-database,
+   \m support a CRL storage service.
+\ei
+
+Pem requires to use a PSE which holds one keypair for signature and encryption purposes since
+MIC encryption and DEK encryption is to be performed with the same keypair. 
+
+For the purpose of
+MIC encryption, the own secret key contained in PSE-object SKnew is used. If a scanned
+privacy enhancement contains an Originator-Certificate header field, MIC decryption
+is done with the public key contained there. If a scanned privacy enhancement contains an 
+Originator-ID-Asymmetric header field, the given issuer/serialnumber must be found in
+the PSE-object PKList which is the list of the user's trusted keys. MIC decryption
+is then done with the public key found in the corresponding entry of PKList.
+
+The per-recipient DEK encryption is done with the public key of the recipient which is retrieved
+from the PSE-object PKList. If it is not found there, the local afdb Directory is consulted.
+If it is not found there either, and if the option -D is given, it is retrieved from
+the X.500 Directory. DEK decryption is done with the own secret key contained in PSE-object
+SKnew. 
+
+A keyword which must be the first parameter of {\em pem} controls the PEM transformation mode.
+Only the {\bf scan} mode transforms from the PEM format to a cleartext format. All other
+modes create PEM formats.  
+
+{\large\bf Scan}
+
+Scan is the default mode. The keyword scan can be omitted. In this mode the textfile {\em inputfile}
+(or stdin if {\em inputfile} is omitted) is scanned for privacy enhancements. The term input is
+subsequently used to denote the data coming either from {\em inputfile} or from stdin. The input
+may contain a single privacy enhancement, enclosed in PEM boundary lines, or nested privacy
+enhancements, the latter, however, only with Proc-Types MIC-CLEAR, MIC-ONLY or ENCRYPTED.
+Multiple consecutive privacy enhancements are not possible. Depending on the type of the scanned
+privacy enhancements and the given {\bf -u} {\em update} parameter, {\em pem scan} does one or
+more of the following actions:
+
+\bi
+\m write a notification about the MIC verification and other status information to stderr,
+\m write the PEM transformation result to {\em outputfile} or stdout, if {\em outputfile} is omitted,
+   The term output is subsequently used to denote the data which are written either to
+   {\em outputfile} or to stdout.
+\m update the user's PSE,
+\m update the CA-database.
+\ei
+
+A notification about the {\bf MIC verification} is given in any case. The MIC validation will be done
+according to the procedure described in af\_verify(3). 
+
+If option {\bf -D} is given, missing certificates will automatically be retrieved from the Directory.
+The Directory may either be a X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}) (see also DirectoryType(5)).
+
+If the X.500 Directory is accessed, parameter {\bf -d} {\em dsaname} allows to specify the 
+name of the DSA (Directory System Agent) to be contacted for this purpose. 
+{\em dsaname} is a name which must be contained in the 
+{\em dsaptailor} file of the system as {\em dsa\_address} parameter. If {\bf -d} {\em dsaname} is
+not given, the default DSA, which is the first {\em dsa\_address} parameter in the {\em dsaptailor} 
+file, is accessed.
+Parameter {\em authlevel} (option {\bf -A}) may be provided to determine the level of authentication used when binding. If {\bf -A} {\em authlevel} is omitted, the requested 
+level of authentication is taken from the environment variable AUTHLEVEL, and is set to {\em no 
+authentication}, if no such variable exists.
+In case of simple authentication being used, the caller's distinguished name and
+X.500 password are retrieved from the PSE objects Name and QuipuPWD, respectively.
+
+If option {\bf -F} is provided, the own FCPath is considered as being trusted.
+This is useful for optimizing the verification process,
+if the originator of a PEM message and its recipient have a common point of trust
+within their forward certification paths, or if the caller wishes to evaluate PEM messages
+generated by himself.
+
+If option {\bf -R} is given, a check of certificate revocation lists is required for all certificates
+which are in the certification path. In case that option {\bf -D} is additionally provided, missing CRLs will
+automatically be retrieved from the Directory. In addition, whenever a CRL is consulted, the 
+nextUpdate field of the CRL is compared with the current time and date, and in case of nextUpdate
+being expired, the actual CRL will be retrieved from the Directory. 
+
+If option {\bf -N}
+is given, also non standard algorithms (i.e. algorithms which are not defined by RFC 1423,
+but which are suitable for PEM purposes and contained in the SecuDE algorithm suite, for instance
+NIST-SHA and NIST-DSA) are accepted. Otherwise, only RFC 1423 defined algorithms are accepted.
+
+If option {\em -O} (capital letter O) is given, RFC 1422 defined DName subordination rules
+are not applied during MIC verification. Otherwise only RFC 1422 conformant certification
+structures are accepted. 
+
+{\bf Status information} may consists of the following notifications:
+\bi
+\m a Proc-Type ENCRYPTED has been scanned, but that no appropriate 
+   issuer/serialnumber was found in the Recipient-ID-Asymmetric header fields,
+\m a Proc-Type ENCRYPTED has been scanned and an appropriate 
+   issuer/serialnumber was found, but that the decryption of the key from the corresponding 
+   Key-Info field failed,
+\m a Proc-Type MIC-CLEAR or MIC-ONLY has been scanned and the message appears to be a
+   certification request (which is the case if it contains an Originator-Certificate
+   header field with the issuer DName and subject DName being identical). 
+   issuer/serialnumber was found, but that the decryption of the key from the corresponding 
+   Key-Info field failed,
+\m a Proc-Type CRL has been scanned, containing the indicated issuers,
+\m a Proc-Type CRL-RETRIEVAL-REQUEST has been scanned, containing the indicated issuers,
+\m Detected syntax errors.
+\ei
+
+The {\bf PEM transformation result} which is written to the output consists of the
+following:
+\bi
+\m If no PEM boundary lines are found, the input is copied to the output.
+\m If the scanned Proc-Type is MIC-CLEAR, MIC-ONLY or ENCRYPTED, all input lines which are 
+   outside the PEM boundary lines, and the de-enhanced PEM body are written to the output. 
+   This is done even in case that the MIC verification and validation failed. If
+   syntax errors have been encountered, or an ENCRYPTED message could not be decrypted,
+   nothing is written to the output.
+\m If the scanned Proc-Type is CRL-RETRIEVAL-REQUEST, a PEM message of Proc-Type CRL is written
+   to the output if the request can at least partly be satisfied with the locally stored 
+   information. In case that {\em pem scan} was called by a normal user (indicated through the
+   absence of parameter {\bf -c} {\em cadir}), the PSE-object CrlSet is consulted to
+   satisfy the request. In case that {\em pem} scan was called by a CA (indicated through the
+   presence of parameter {\bf -c} {\em cadir}), the CA-database is consulted to
+   satisfy the request. If none of the requested CRLs is available, nothing is written
+   to the output.
+\ei
+
+The user's (or CA's) {\bf PSE} can be potentially {\bf update}d in the following situations:
+
+\bi
+\m An Originator-Certificate has been scanned and successfully validated which is not
+   contained in the user's list of trusted keys, PKList. The ToBeSigned part of such
+   a certificate can be added to PKList in order to consider it being trusted in the future.
+   Whenever {\em pem} adds a new entry to PKList, it checks whether the distinguished
+   name of the subject has already an alias name. If not, it requests the user to
+   supply at least one alias name.  
+\m An Originator-Certificate has been scanned and successfully validated which has the
+   own distinguished name as subject name. This is supposed to be a certification reply
+   if it is different from what is currently stored in the PSE-object Cert, and if it
+   is part of a MIC-CLEAR or MIC-ONLY message. This certificate can be stored in the
+   PSE-object Cert as own public key certificate.
+\m A Proc-Type CRL has been scanned which can either be a CRL-storage request or be a
+   CRL-retrieval reply. The CRLs contained in that PEM message can be stored in the CA-database,
+   if {\em pem scan} was called by a CA, or can be added to the PSE-object CrlSet which is the
+   user's CRL-cache, or it can be stored in both.
+\ei
+
+The {\em CA-database} can be potentially {\bf update}d when a Proc-Type CRL has been scanned
+which is supposed to be a CRL-storage request.
+
+Parameter {\bf -u} {\em update} controls whether or not {\em pem} scan does these updates automatically. 
+{\em update} may have five values:
+\bvtab
+{\bf ask:}  \2 pem asks interactively via /dev/tty whether it shall do the update or not. \\
+{\bf no:}   \2 pem doesn't do any update of the PSE or CA-database. \\
+{\bf yes:}  \2 pem automatically updates both PSE and/or CA-database. \\
+{\bf cadb:} \2 pem automatically updates the CA-database. \\
+{\bf pse:}  \2 pem automatically updates the PSE. \\
+\evtab
+
+{\large\bf Mic-clear}
+
+This mode transforms the input to a MIC-CLEAR PEM message. If option {\bf -C} is given, the created
+PEM message contains an Originator-Certificate header field and all Issuer-Certificate header fields
+up to the root CA. If option {\bf -C} is omitted, it contains an Originator-ID-Asymmetric header
+field.
+
+Parameter {\bf -H} {\em md-alg} and {\bf -S} {\em micenc-alg}
+allow to use any of the algorithms available in SecuDE and suitable
+for the intended purpose. {\em md-alg} and {\em micenc-alg}
+are names of algorithms as they are listed in INTRO(3).
+
+{\bf -H} {\em md-alg}: Algorithm which is used to compute the MIC. RSA-MD5 is the default.
+To be conformant to RFC 1423, only RSA-MD2 can be choosen as an alternative. If RFC 1423
+conformance is not a requirement, any algorithm can be choosen which has AlgType HASH.
+
+{\bf -S} {\em micenc-alg}: Algorithm which is used to encrypt the MIC. RSA is the default.
+To be conformant to RFC 1423, no other algorithm can be choosen. If RFC 1423
+conformance is not a requirement, any algorithm can be choosen which has AlgType ASYM\_ENC.
+
+{\large\bf Mic-only}
+
+This mode transforms the input to a MIC-ONLY PEM message. All options described under mic-clear
+above apply to mic-only, too.
+
+{\large\bf Encrypted}
+
+This mode transforms the input to an ENCRYPTED PEM message. Parameter {\bf -r} {\em name1 name2 
+...}
+allows to specify the intended recipients. {\em name1 name2 ...} may be alias names or distinguished
+names in their printable representation. In the latter case, the names must be quoted since they
+contain shell metacharacters.
+
+In addition to the parameters {\bf -C}, {\bf -H} {\em md-alg} and {\bf -S} {\em micenc-alg} 
+described under mic-clear, which also apply in the encrypted case, {\bf -E} {\em msgenc-alg} and
+{\bf -K} {\em dekenc-alg} allow to use any of the algorithms available in SecuDE and suitable 
+for purpose of hybrid message encryption. {\em msgenc-alg} and {\em dekenc-alg}
+are names of algorithms as they are listed in INTRO(3).
+
+{\bf -E} {\em msgenc-alg}: Algorithm which is used to encrypt the message body.
+DES-CBC is the default.
+To be conformant to RFC 1423, no other algorithm can be choosen. If RFC 1423
+conformance is not a requirement, any algorithm can be choosen which has AlgType SYM\_ENC.
+
+{\bf -K} {\em dekenc-alg}: Algorithm which is used to encrypt the DEK (data encryption key).
+RSA is the default.
+To be conformant to RFC 1423, no other algorithm can be choosen. If RFC 1423
+conformance is not a requirement, any algorithm can be choosen which has AlgType ASYM\_ENC.
+
+{\large\bf Crl}
+
+This mode creates a CRL PEM message. Parameter {\bf -y} {\em issuer1 issuer2 ...}
+allows to specify a list of issuers. {\em issuer1 issuer2 ...} may be alias names or distinguished
+names in their printable representation. In the latter case, the names must be quoted since they
+contain shell metacharacters. The given issuer's CRLs are searched in the PSE-object CrlSet, or they
+are retrieved from the CA-database, depending on whether {\em pem crl} was called from a normal
+user (indicated through the absence of parameter {\bf -c} {\em cadir}) or from a CA (indicated through 
+the presence of parameter {\bf -c} {\em cadir}).
+
+{\large\bf Crl-rr}
+
+This mode creates a CRL-RETRIEVAL-REQUEST PEM message. Parameter {\bf -y} {\em issuer1 issuer2 
+...}
+allows to specify a list of issuers. {\em issuer1 issuer2 ...} may be alias names or distinguished
+names in their printable representation. In the latter case, the names must be quoted since they
+contain shell metacharacters.
+
+{\large\bf Certify}
+
+This mode is used by a CA in order to satisfy an incoming certification request. It scans the input
+which is supposed to be a certification request and writes the certification reply to the output.
+The output is identical to the input except that the Originator-Certificate from the input which
+is a requestor generated prototype certificate is replaced by a certificate signed by the CA.
+{\em pem certify} performs all necessary validation and checking. No output is written if the
+Originator-Certificate can't be verified or if it is not a prototype certificate. The use
+of {\em pem certify} requires additional out-of-band verification of the prototype certificate
+and the presented subject name.
+
+\hl{Options}
+\parname {{\bf scan}}
+\pardescript {Scan PEM message, write clear body of the message ({\bf default}).} \\
+\parname {{\bf mic-clear}}
+\pardescript {Read clear body, create Proc-Type MIC-CLEAR.} \\
+\parname {{\bf mic-only}}
+\pardescript {Read clear body, create Proc-Type MIC-ONLY.} \\
+\parname {{\bf encrypted}}
+\pardescript {Read clear body, create Proc-Type ENCRYPTED} \\
+\parname {{\bf crl}}
+\pardescript {Create Proc-Type CRL.} \\
+\parname {{\bf crl-rr}}
+\pardescript {Create Proc-Type CRL-RETRIEVAL-REQUEST.} \\
+\parname {{\bf certify}}
+\pardescript {Scan PEM message and create certification reply (for CAs only).} \\
+\parname {{\bf -i} {\em inputfile}}
+\pardescript {Inputfile (default stdin).} \\
+\parname {{\bf -o} {\em outputfile}}
+\pardescript {Outputfile (default stdout).} \\
+\parname {{\bf -p} {\em psename}}
+\pardescript {PSE name (default: {\em .pse}).} \\
+\parname {{\bf -c} {\em cadir}}
+\pardescript {CA-directory name.} \\
+\parname {{\bf -m} {\em depth}}
+\pardescript {Depth of multi PEM body, which is to be de-enhanced (if {\bf scan} a nested PEM message). A 
+{\em depth} of 
+zero identifies the outmost body.} \\
+\parname {{\bf -M} {\em depth}}
+\pardescript {depth of multi PEM body, up to which is to be de-enhanced (if {\bf scan} a nested PEM 
+message).} \\
+\parname {{\bf -u} {\em update}}
+\pardescript {Controls under which circumstances the PSE or the CA-database will be updated.} \\
+\parname {{\bf -r} {\em name1 name2 ... }}
+\pardescript {List of intended recipients in case of creating a PEM Proc-Type ENCRYPTED.} \\
+\parname {{\bf -y} {\em name1 name2 ... }}
+\pardescript {Issuers of CRLs, if crl or crl-rr.} \\
+\parname {{\bf -C} }
+\pardescript {generate PEM-header with Originator-Certificate and all Issuer-Certificates (default: 
+generate PEM-header with Originator-ID-Asymmetric).} \\
+\parname {{\bf -n} }
+\pardescript {don't insert Key-Info header field for originator (only if pem encrypted).} \\
+\parname {{\bf -h} }
+\pardescript {write help-text to stderr.} \\
+\parname {{\bf -v} }
+\pardescript {verbose.} \\
+\parname {{\bf -V} }
+\pardescript {Verbose.} \\
+\parname {{\bf -R} }
+\pardescript {Consult CRLs during the validation process.} \\
+\parname {{\bf -F} }
+\pardescript {Consider own FCPath as trusted.} \\
+\parname {{\bf -D} }
+\pardescript {Retrieve certificates and CRLs needed for the MIC verification from Directory.} \\
+\parname {{\bf -d} {\em dsaname}}
+\pardescript {Name of the DSA to be initially accessed (default: locally configured DSA).} \\
+\parname {{\bf -A} {\em authlevel}}
+\pardescript {Authentication level to be used when accessing the X.500 Directory 
+(default: environment variable AUTHLEVEL or no authentication).} \\
+\parname {{\bf -H} {\em md-alg}}
+\pardescript {Message digest algorithm (default: RSA-MD5).} \\
+\parname {{\bf -S} {\em micenc-alg}}
+\pardescript {MIC encryption algorithm (default: RSA).} \\
+\parname {{\bf -E} {\em msgenc-alg}}
+\pardescript {Message encryption algorithm (default: DES-CBC) (only if pem encrypted).} \\
+\parname {{\bf -K} {\em dekenc-alg}}
+\pardescript {DEK encryption algorithm (default: RSA) (only if pem encrypted).} \\
+\parname {{\bf -t} }
+\pardescript {Enable control of malloc/free behaviour (needs SecuDE compiled with option MFCHECK)} \\
+\parname {{\bf -T} }
+\pardescript {Perform public key RSA operations in the SCT (per default this is done in the workstation
+even if a smartcard terminal is connected)} \\
+\hl{Files}
+\btab
+\$HOME/.af-alias \4 Per user alias names \\
+\$TOP/secude/.af-db/.af-alias \4 Per installation alias names 
+\etab
+\hl{See Also}
+pem\_read(3), pem\_write(3)
+
+\nm{1}{encrypt}{encrypt/decrypt files}
+\addtotoc{decrypt}
+\label{encrypt}
+\hl{Synopsis}
+{\bf encrypt} [ {\bf -DnxvVWtU} ] [ {\bf -k} {\em key} ] [ {\bf -r} {\em recipient} ] [ {\bf -w} {\em pw} ] [ {\bf -e} {\em deskey} ] [ {\bf 
+-E} {\em encalg} ] 
+\\ \hspace*{1.59cm} [ {\bf -p} {\em psename} ] [ {\bf -c} {\em cadir} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] [ {\em files} ]
+
+{\bf decrypt} [ {\bf -nxvVWtU} ] [ {\bf -k} {\em key} ] [ {\bf -w} {\em pw} ] [ {\bf -e} {\em deskey} ] [ {\bf -E} {\em decalg} ] \\
+\hspace*{1.59cm} [ {\bf -p} {\em psename} ] [ {\bf -c} {\em cadir} ] [ {\em files} ]
+\hl{Description}
+
+{\large\bf Encrypt} encrypts all files listed in {\em files}. It transforms each
+file from {\em files} into a corresponding file {\em file}.enc, using 
+an algorithm and key which are indicated by one of the options 
+{\bf -k}, {\bf -r}, {\bf -w}, or {\bf -e}. Not more than one of those options 
+must be given.
+The plainfiles are removed after the encryption.
+
+If the use of an asymmetric algorithm is indicated through
+these parameters, the so called hybrid method will be applied; i.e. encrypt
+generates a DES key, encrypts the file with DES-CBC using this DES-KEY,
+and asymmetrically encrypts the DES key. The encrypted DES key is stored as
+ASN.1 encoded data type EncryptedKey
+in file {\em plainfile}.key which is created if it does not exists. Decrypt
+does the reverse process using the given keys if it finds the file {\em plainfile}.key
+It is not possible in the hybrid case to use encrypt and decrypt as a filter
+which transforms stdin to stdout. Option {\bf -n} causes that in the asymmetric case
+the hybrid method is not used, and that straight asymmetric encryption is
+used instead (which is time consuming).
+ 
+If none of the parameters {\bf -k}, {\bf -r}, {\bf -w}, or {\bf -e} is given, the own public
+encryption key and algorithm which is contained in PSE object {\em Cert} or {\em EncCert} is used
+for encryption. 
+ 
+Parameter {\bf -k} {\em key} either denotes a PSE object of type KeyInfo or Certificate, 
+or a key reference of type KeyInfo, which contains the encryption key.
+
+The location of the PSE is determined by {\bf -p} {\em psename} and/or {\bf -c} {\em cadir}. 
+The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, 
+if no such variable exists.
+ 
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists. 
+ 
+If option {\bf -r} is given, encryption is done with the public encryption key
+of the intended recipient {\em recipient}. {\em recipient} is either a Name (see INTRO(1) on Names)
+for which an entry exists in PSE object PKList or EKList, or an alias name. If option {\bf -D}
+is provided, the public encryption key is searched for in the X.500 Directory, after it could
+neither be found in the PSE nor in the local .af-db Directory.
+ 
+If the X.500 Directory is accessed, parameter {\em dsaname} (option {\bf -d}) allows to specify the name of the DSA (Directory System Agent) which
+will initially be contacted. {\em dsaname} is a name which must be provided in the 
+{\em dsaptailor} file of the system as {\em dsa\_address} parameter. If {\bf -d} {\em dsaname} is
+not given, the default DSA, which is the first {\em dsa\_address} parameter in the {\em dsaptailor} 
+file, is contacted.
+Parameter {\em authlevel} (option {\bf -A}) may be provided to determine the level of authentication used when binding. If {\bf -A} {\em authlevel} is omitted, the requested 
+level of authentication is taken from the environment variable AUTHLEVEL, and is set to {\em no 
+authentication}, if no such variable exists.
+In case of simple authentication being used, the caller's distinguished name and
+X.500 password are retrieved from the PSE objects Name and QuipuPWD, respectively.
+ 
+Parameter {\bf -w} {\em pw} denotes DES-CBC encryption with {\em pw} being a password from which the 
+DES key 
+is derived through a one-way function.
+ 
+Parameter {\bf -e} {\em deskey} denotes DES-CBC encryption with {\em deskey} comprising the key itself.
+If option {bf -x} is given in that case, the DES key is a 16 character string comprising
+the key in the [ 0 - 9, A - F ] notation. Otherwise, the key is the bitstring given through
+an 8 character long string.
+
+Parameter {\bf -E} {\em encalg} allows to specify an alternative symmetric encryption algorithm.
+DES-CBC is the default.
+
+Option {\bf -v} renders the encrypt command verbose, and options {\bf -V} and {\bf -W} provide
+some further logging information.
+
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+Option {\bf -U} requests to measure the time used for the cryptographic computations. 
+In case that a smartcard terminal is used, option {\bf -T} requests to perform each public key 
+RSA operation in the smartcard terminal, and not with the software in the workstation 
+(the latter is the default). 
+\\ [1em]
+
+{\large\bf Decrypt} decrypts all files which are listed in {\em files} to the corresponding
+plainfiles. The filenames in {\em files} should have the .enc suffix (this can be omitted;
+however when shell metacharacters are used, the suffixes must not be omitted since
+otherwise the shell wouldn't be able to expand the filenames). The .enc files are
+removed after the decryption. If decrypt
+finds a corresponding {\em file}.key file, it assumes that this contains an asymmetrically
+encrypted DES key and applies the hybrid method.
+ 
+Algorithm and key are indicated by one of the options 
+{\bf -k}, {\bf -w}, or {\bf -e}. Not more than one of those options 
+must be given. If none of the options {\bf -k}, {\bf -w}, or {\bf -d} is given, the own
+secret decryption key which is contained in PSE object {\em SKnew} or
+{\em DecSKnew} is used for decryption. 
+
+If none of the parameters {\bf -k}, {\bf -w}, or {\bf -e} is given, the own secret
+decryption key and algorithm which is contained in PSE object {\em SKnew/SKold} or {\em 
+DecSKnew/DecSKold}
+is used for the decryption.
+ 
+Parameter {\bf -k} {\em key} denotes a PSE object or a key reference of type KeyInfo
+which contains the decryption key.
+ 
+The PSE is indicated through parameter {\bf -p} {\em psename} or {\bf -c} {\em cadir}. If none of them
+is given, the default PSE .pse is used.
+
+Parameter {\bf -w} {\em pw} denotes DES-CBC encryption with {\em pw} being a password from which the 
+DES key 
+is derived through a one-way function.
+ 
+Parameter {\bf -e} {\em deskey} denotes DES CBC decryption with {\em deskey} comprising the key itself.
+If option {bf -x} is given in that case, the DES key is a 16 character string comprising
+the key in the [ 0 - 9, A - F ] notation. Otherwise, the key is the bitstring given through
+an 8 character long string.
+
+Parameter {\bf -E} {\em decalg} allows to specify an alternative symmetric encryption algorithm.
+DES-CBC is the default.
+
+Option {\bf -v} renders decrypt verbose, and options {\bf -V} and {\bf -W} provide some further logging
+information. For test purposes, option {\bf -t} requests
+to control the malloc/free behaviour, and option {\bf -U} requests to measure the time used for the 
+cryptographic
+algorithms.
+\\ [1em]
+
+{\bf Original file length encoding}
+
+Since the encrypted file has always a multiple of {\em blocksize} or {\em keysize} octets,
+additional encoding of the original file length must be added to the plain file prior
+to encryption in order to be able to restore the original file during decryption.
+ 
+Several algorithm identifier already imply a method of additional padding (see INTRO(3X)
+about algorithms). If an algorithm is used which does not imply padding, the
+following padding methods are applied:
+ 
+In case of DES ({\em blocksize} eight octets), the last octet of the last block of the
+decrypted file contains the number of valid octets of that block (between 0 and 7), i.e.
+if the original file consists of a multiple of eight octets, one extra block is added
+with the last octet set to zero.
+
+In case of RSA, the plain file is blocked into portions of {\em blocksize} octets which
+are encrypted into portions of {\em keysize} bits each. The parameter {\em keysize}
+belongs to the algorithm while {\em blocksize} is derived from {\em keysize} as
+$blocksize = (keysize - 1)/8$. The last octet of the last block of the
+decrypted file contains the number of valid octets of that block (between 0 and 255), i.e.
+if the original file consists of a multiple of {\em blocksize} octets, one extra block is added
+with the last octet set to zero. For this reason the maximum RSA keysize for {\em encrypt}
+is 2048.
+
+\hl{Options}
+
+\parname {{\bf -k} {\em key}}
+\pardescript {If {\em key} is numeric, it denotes a key reference under which key and 
+corresponding algorithm identifier was previously installed. If {\em key} contains 
+also non-numeric characters, it denotes the name of a PSE object which contains 
+the key and corresponding algorithm identifier. This PSE object must be of type KeyInfo.}  
+ 
+\parname {{\bf -r} {\em recipient}}
+\pardescript {{\em user} is the Name of an intended recipient whose public encryption key is used
+for encryption. This option applies only for {\em encrypt}. {\em recipient} may be a distinguished
+name (in the Name form, must be quoted) or an alias. The corresponding public key is searched
+in the PSE-object PKList or EKList and after this in the local afdb Directory. In case that
+option {\bf -D} is given, the PK is addiotionally searched in the X.500 Directory.}
+i  
+\parname {{\bf -w} {\em pw}}
+\pardescript {Encryption/decryption with desCBC using a password. The arbitrary long {\em pw} is 
+transformed into the DES key using a one-way hash function.
+If {\em pw} is omitted, the program prompts for a password from /dev/tty.}
+ 
+\parname {{\bf -e} {\em deskey}}
+\pardescript {Encryption/decryption with desCBC. {\em deskey} is an eight character 
+ASCII string which comprises the key.}
+
+\parname {{\bf -n}}
+\pardescript {Don't use the hybrid method in case that the encryption algorithm is asymmetric.}
+ 
+\parname {{\bf -x}} 
+\pardescript {This option applies only in conjunction with option {\bf -e}. In this case,
+{\em deskey} is the 16-character hexadecimal representation of the key (i.e. ASCII
+characters from [0 - 9] and [a - f] or [A - F]).}
+
+\parname {{\bf -E}} 
+\pardescript {This option applies only in conjunction with options {\bf -w} or {\bf -d}. 
+In this case, desECB is used instead of desCBC.}
+
+\parname {{\bf -p} {\em psename}}
+\pardescript {With this parameter 
+the PSE {\em psename} is selected instead of the default PSE {\em .pse}.}
+
+\parname {{\bf -c} {\em cadir}}
+\pardescript {{\em cadir} is the CA directory whose PSE is used for encrypt/decrypt.}
+
+\parname {{\bf -v}}
+\pardescript {Makes sign and verify verbose.}
+
+\parname {{\bf -V}}
+\pardescript {Makes sign and verify Verbose.}
+
+\parname {{\bf -t}}
+\pardescript {Enables the control of the malloc/free behaviour. For tests only.}
+
+\parname {{\bf -T}}
+\pardescript {Enforces that public key RSA operations are performed in the smartcard terminal
+instead with software in the workstation, which is the default. Applies only if smartcards
+are used.}
+
+\parname {{\bf -U}}
+\pardescript {Enables the measurement of time used for the cryptographic algorithms. For tests only.}
+
+\hl{See Also}
+af\_encrypt(3), af\_decrypt(3)
+
+\nm{1}{sign}{sign files / verify signatures of files}
+\addtotoc{verify}
+\label{sign}
+\hl{Synopsis}
+{\bf sign} [ {\bf -CvVWUth} ] [ {\bf -p} {\em psename} ] [ {\bf -c} {\em cadir} ] [ {\bf -k} {\em key} ] [ {\bf 
+-a} {\em issueralg} ] [ {\bf -h} {\em hashinput} ]
+\\ \hspace *{1cm} 
+ [ {\em files} ]
+\\
+{\bf verify} [ {\bf -DFRvVWtUh} ] [ {\bf -p} {\em psename} ] [ {\bf -c} {\em cadir} ] [ {\bf 
+-k} {\em key} ]
+\\ \hspace *{1cm} 
+[ {\bf -f} {\em fcpath} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] [ {\em files} ]
+\hl{Description}
+{\bf Sign} generates digital signatures of {\em files}. {\em files} is a list of filenames. For each
+{\em file} from the list of files, the signature is stored in file {\em file}.sig.
+as ASN.1-encoded data type Signature (as produced by e\_Signature()). If no {\em files} are specified, 
+stdin is signed and 
+the signature is written to stdout. 
+
+Each signature will be produced using the PSE-object SKnew or SignSK
+of the PSE indicated through {\bf -p} {\em psename} or {\bf -c} {\em cadir}.
+If {\bf -c} {\em cadir} is given, the PSE .capse of a CA residing in the CA directory {\em cadir}
+is selected. \\
+If {\bf -p} {\em psename} is given, the PSE {\em psename} is selected. Per default the PSE {\em .pse} is 
+selected.
+
+The signature algorithm can be given with {\bf -a} {\em issueralg}. 
+{\em issueralg} must be a
+signature algorithm (AlgType SIG, see INTRO(3) on available algorithms) which fits to the associated 
+algorithm
+of the signature key (e.g. the algorithm md5WithRsa cannot be used with an ElGamal key). The *TimeDate 
+algorithms
+are SecuDE-defined. With these algorithms the time and date when the signature was produced is 
+contained
+in the signature value and can be restored during the verification.
+The default for {\em issueralg} is md5WithRsaTimedate or dsaWithSHA, depending on the signature key. 
+
+If option {\bf -C} is given, for each file the user certificate and the forward certification path related to
+the corresponding verification key is written to {\em file}.ctf as ASN.1-encoded data type Certicates 
+(note the plural; Certificates is the X.509 Certificates which is a SEQUENCE of the user certificate and
+the forward certification path). This allows any user who shares the same public root key to verify
+this digital signature. If option {\bf -C} is not given, the digital signature of the file can only be
+verified by the signing user itself, using his PSE-object Cert or SignCert. This can be useful to
+protect own files against manipulation with no need that others are able to validate this.
+
+The .sig and .ctf files are created if they do not exist.
+ 
+Option {\bf -k} {\em key} allows to specify the signature key to be used. {\em key} may
+be the name of a PSE-object or a key reference. In case of option {\bf -k} {\em key} is given,
+option {\bf -C} must not be used.
+
+If the selected signature algorithm is sqmodnWithRsa, the hashinput for Sqmodn (modulus) is taken 
+from the own verification key which is the public key contained in the PSE-object Cert or SignCert.
+If {\bf -h} {\em hashinput} is given, the hashinput for Sqmodn is taken from {\em hashinput}
+which may be the name of a PSE-object or a key reference.
+
+Option {\bf -v} renders the sign command verbose, and options {\bf -V} and {\bf -W} provide some further
+logging information. For test purposes, option {\bf -t} requests
+to control the malloc/free behaviour, and option {\bf -U} requests to measure the time used for the 
+cryptographic
+algorithms.
+\\ [1em]
+
+{\bf Verify} verifies the digital signatures of {\em files}. For each file from the list of files, 
+the signature is expected in {\em file}.sig
+as ASN.1-encoded data type Signature (as produced by e\_Signature()). The signature will be verfied using 
+the PSE-object Cert or SignCert
+of the PSE indicated through {\bf -p} {\em psename} or {\bf -c} {\em cadir}.
+If {\bf -c} {\em cadir} is given, the PSE .capse of a CA residing in the CA directory {\em cadir}
+is selected. \\
+If {\bf -p} {\em psename} is given, the PSE {\em psename} is selected. Per default, the PSE {\em .pse} 
+is selected.
+
+{\em verify} uses the verification procedure specified in af\_verify(3).
+
+If option {\bf -D} is given, missing certificates will be automatically retrieved from the Directory.
+The Directory may either be a X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}) (see also DirectoryType(5)).
+
+If the X.500 Directory is accessed, parameter {\em dsaname} (option {\bf -d}) allows to specify the name of the DSA (Directory System Agent) which
+will initially be contacted. {\em dsaname} is a name which must be provided in the 
+{\em dsaptailor} file of the system as {\em dsa\_address} parameter. If {\bf -d} {\em dsaname} is
+not given, the default DSA, which is the first {\em dsa\_address} parameter in the {\em dsaptailor} 
+file, is contacted.
+Parameter {\em authlevel} (option {\bf -A}) may be provided to determine the level of authentication used when binding. If {\bf -A} {\em authlevel} is omitted, the requested 
+level of authentication is taken from the environment variable AUTHLEVEL, and is set to {\em no 
+authentication}, if no such variable exists.
+In case of simple authentication being used, the caller's distinguished name and
+X.500 password are retrieved from the PSE objects Name and QuipuPWD, respectively.
+
+If option {\bf -F} is provided, the own FCPath is considered as being trusted.
+This is useful for optimizing the verification process,
+if the originator of a digital signature and the PSE owner have a common point of trust
+within their forward certification paths, or if the PSE owner wishes to verify signatures
+generated by himself.
+
+If option {\bf -R} is provided, a check of certificate revocation lists is required for all certificates
+which are in the certification path. In case that option {\bf -D} is additionally provided, missing CRLs will
+automatically be retrieved from the Directory. In addition, whenever a CRL is consulted, the 
+nextUpdate field of the CRL is compared with the current time and date, and in case of nextUpdate
+having expired, the actual CRL will be retrieved from the Directory.
+
+If for a particular file from the list {\em file}.ctf exists and contains an ASN.1 encoded data object Certificates, 
+user certificate and forward 
+certification path for the verification process are taken from there in order to validate the signature
+of {\em file}. The final trusted key for 
+the verification process is taken from PSE-objects PKRoot or PKList of the specified PSE.
+If the file {\em file}.ctf does not exist, the own user certificate of PSE-object Cert or SignCert and
+the own forward certification path of PSE-object FCPath will be used for the verification.
+
+Parameter {\bf -k} {\em key} and {\bf -f} {\em fcpath} allow to specify 
+alternative PSE-objects being used for the verification process. This is in general only useful for
+test purposes. {\em key} may be the name of a PSE-object containing either a certificate
+or a key only, encoded as KeyInfo, or may be a key reference. If {\em key} denotes a key only,
+no further certicate chain will be checked.
+
+Option {\bf -v} renders the verify command verbose, and options {\bf -V} and {\bf -W} provide some
+further logging information. For test purposes, option {\bf -t} requests
+to control the malloc/free behaviour and option {\bf -U} requests to measure the time used for the 
+cryptographic
+algorithms. In case that a smartcard terminal is used, option {\bf -T} requests to perform each public key 
+RSA operation in the smartcard terminal instead with software in the workstation (the latter is the 
+default). 
+
+ 
+\hl{Options}
+
+\parname {{\bf -C}}
+\pardescript {The file {\em file}.ctf will be generated, containing the user certificate and the 
+forward certification path (as ASN.1-encoded data type Certificates) from the PSE-objects Cert/SignCert
+and FCPath of the signer of a file. This parameter applies for sign only.}
+
+\parname {{\bf -D}}
+\pardescript {Missing certificates will automatically be retrieved from the Directory (X.500 or .af-db). 
+This parameter applies for verify only.}
+
+\parname {{\bf -F}}
+\pardescript {Consider own FCPath as trusted. This parameter applies for verify only.}
+
+\parname {{\bf -R}}
+\pardescript {Requests that certificate revocation lists will be consulted during
+the verification process. This parameter applies for verify only.}
+
+\parname {{\bf -A} {\em authlevel}}
+\pardescript {Level of authentication to be used when the X.500 Directory is accessed. 
+This parameter applies for verify only.}
+
+\parname {{\bf -d} {\em dsaname}}
+\pardescript {Name of the DSA to be accessed for retrieving certificates and certificate revocation lists.}
+
+\parname {{\bf -p} {\em psename}}
+\pardescript {The PSE {\em psename} is used instead of the default PSE {\em .pse}.}
+
+\parname {{\bf -c} {\em cadir}}
+\pardescript {The PSE .capse contained in the CA directory {\em cadir}
+ is used instead of the default PSE {\em .pse}.}
+
+\parname {{\bf -a} {\em signalg}}
+\pardescript {The algorithm {\em signalg} is used as signature algorithm.  This parameter applies
+for sign only. md5WithRsaTimeDate is the default algorithm. {\em signalg} must be a
+signature algorithm (AlgType SIG, see INTRO(3) on available algorithms) which fits to the associated 
+algorithm
+of the signature key (e.g. the algorithm md5WithRsa cannot be used with an ElGamal key). The *TimeDate 
+algorithms
+are SecuDE-defined. With these algorithms the time and date when the signature was produced is 
+contained
+in the signature value and can be restored during the verification.}
+
+\parname {{\bf -h} {\em hashinput}}
+\pardescript {If the signature algorithm is sqmodnWithRsa, 
+{\em hashinput} denotes a public RSA key which serves as hashinput (per default the own verification 
+key is being used for this purpose). If {\em hashinput} is numeric, it denotes a key reference.
+Otherwise it denotes a PSE-object which may contain either a certificate or a key only, encoded as 
+KeyInfo. This parameter applies for sign only.}
+
+\parname {{\bf -k} {\em key}}
+\pardescript {If {\em key} is numeric, it denotes a key reference under which the signature/verification 
+key and 
+corresponding algorithm identifier was previously installed. If {\em key} contains 
+also non-numeric characters, it denotes the name of a PSE object which contains 
+the signature/verification key and corresponding algorithm identifier. In the latter case,
+the PSE-object may contain either a certificate or a key only, encoded as KeyInfo.}
+
+\parname {{\bf -f} {\em fcpath}}
+\pardescript {Name of a PSE object which contains the Forward Certification Path as ASN.1-encoded
+data type FCPath (as produced by e\_FCPath()).}
+
+\parname {{\bf -v}}
+\pardescript {Makes sign and verify verbose.}
+
+\parname {{\bf -V}}
+\pardescript {Makes sign and verify Verbose.}
+
+\parname {{\bf -t}}
+\pardescript {Enables the control of the malloc/free behaviour. For tests only.}
+
+\parname {{\bf -T}}
+\pardescript {Enforces that public key RSA operations are performed in the smartcard terminal
+instead with software in the workstation, which is the default. Applies only if smartcards
+are used.}
+
+\parname {{\bf -U}}
+\pardescript {Enables the measurement of time used for the cryptographic algorithms. For tests only.}
+
+\hl{See Also}
+af\_sign(3), af\_verify(3)
+
+\nm{1}{hsh}{hash files}
+\label{hsh}
+\hl{Synopsis}
+{\bf hsh} [ {\bf -a} {\em alg} ] [ {\bf -k} {\em pk} ] [ {\bf -c} {\em cert} ] [ {\bf -p} {\em psename} ] [ {\em file} ] [ 
+{\em hashvalue} ] \\
+\hl{Description}
+{\bf Hsh} generates an hash-value of {\em file}. The hash-value is stored in file {\em hashvalue}.
+If {\em hashvalue} is omitted, 
+the hash value is stored in the file {\em file}.hsh. If {\em file} and {\em hashvalue} are omitted, stdin is 
+hashed and 
+the hash value is written to stdout.
+
+{\em alg} must be a name of an available hash algorithm (see INTRO(3X)). If option
+{\em -a} is not given, MD4 is used.
+
+If the algorithm Sqmodn is used, {\bf -k} {\em pk} or {\bf -c} {\em cert}
+can be aditionally given. {\em pk} is the object name or key reference of a public RSA key.
+{\em cert} is the object name of a certificate which contains a public RSA
+key. The modulus of this public RSA key is used for the sqmodn function. If neither -k nor -c
+is given, the public key of the PSE object SignCert is used. 
+
+\hl{Options}
+\parname {{\bf -a} {\em alg}}
+\pardescript {Name of the hash algorithm to be used (default MD5).}
+
+\parname {{\bf -h} {\em pk}}
+\pardescript {Object name or key reference of a public RSA key. This is for Sqmodn only.}
+
+\parname {{\bf -c} {\em cert}}
+\pardescript {Object name of a certificate which contains a public RSA key. This is for Sqmodn only.}
+  
+\parname {{\bf -p} {\em psename}}
+\pardescript {PSE {\em psename} is used instead of the default PSE {\em .pse}. 
+This is for Sqmodn only.}
+ 
+\hl{See Also}
+sec\_hash(3)
+
+\nm{1}{sectool}{maintain your PSE}
+\label{sectool}
+\hl{Synopsis}
+{\bf sectool} [ {\bf -tDvVWh} ] [ {\bf -p} {\em psename} ] [ {\bf -c} {\em cadir} ] [ {\bf -d} {\em dsa} ] [{\bf -A} {\em auth\_level}] \\
+{\bf aliastool} [ {\bf -tDvVWh} ] [ {\bf -p} {\em psename} ] [ {\bf -c} {\em cadir} ] [ {\bf -d} {\em dsa} ] [{\bf -A} {\em auth\_level}] \\
+{\bf directorytool} [ {\bf -tDvVWh} ] [ {\bf -p} {\em psename} ] [ {\bf -c} {\em cadir} ] [ {\bf -d} {\em dsa} ] [{\bf -A} {\em auth\_level}]
+\addtotoc{aliastool}
+\addtotoc{directorytool}
+
+\hl{Description}
+{\em sectool} is, like psemaint,  a maintenance program which can be used by both
+certification authority administrators and users for the purpose
+of maintaining their PSEs. This includes moving information (e.g. keys,
+certificates, revocation lists etc.) from Unix files or a X.500 Directory
+into the PSE and vice versa, generating keys, changing PINs, displaying
+the content of the PSE, and maintaining the user's aliases. In contrast
+to psemaint, which is line-oriented, sectool is an OpenWindows tool.
+
+{\em Aliastool} is a subtool of sectool which only maintains the alias
+files and AliasList PSE object.
+
+{\em Directorytool} is a subtool of sectool which provides a comfortable
+interface between X.500 Directories and SecuDE, particularly for the
+exchange of security information between X.500 Directories and a PSE.
+
+Sectool is still under development. The version included in SecuDE-4.1
+is only a demonstrator version which provides a feeling how it works.
+Most functions are still not implemented. SecuDE-5.0 will offer a fully
+functional sectool.
+
+\hl{Options}
+\parname {{\bf -p} {\em psename}}
+\pardescript {PSE {\em psename} is used instead of the default PSE {\em .pse}}. 
+
+\parname {{\bf -c} {\em cadir}}
+\pardescript {The PSE .capse contained in the CA directory {\em cadir}
+ is used instead of the default PSE {\em .pse}.}
+
+\parname {{\bf -d} {\em dsa}}
+\pardescript {Object name of a certificate which contains a public RSA key. This is for Sqmodn only.}
+  
+\parname {{\bf -A} {\em auth\_level}}
+\pardescript {Level of authentication used for X.500 Directory access
+                    {\em auth\_level} may have one of the values 'SIMPLE' or 'STRONG'
+                    (default: environment variable AUTHLEVEL or 'No authentication')
+                    STRONG implies the use of signed DAP operations}
+ 
+
+\nm{1}{secxlock}{lock the local X display using strong authentication with your PSE}
+\label{secxlock}
+\hl{Synopsis}
+{\bf secxlock} [ {\bf -h} ] [ {\bf -p} {\em psename} ] [ {\bf -c} {\em cadir} ]
+
+\hl{Description}
+{\em secxlock}  Locks the local X display using strong authentication with your PSE.
+
+\nm{1}{encode}{encode/decode files}
+\addtotoc{decode}
+\label{encode}
+\hl{Synopsis}
+{\bf encode} [ {\bf -r} ] [ {\bf -x} ] [ {\bf -a} ] [ {\bf -i} {\em number} ] [ {\em sourcefile} ] [ {\em destinationfile} ]
+
+{\bf decode} [ {\bf -r} ] [ {\bf -x} ] [ {\bf -a} ] [ {\em sourcefile} ] [ {\em destinationfile} ]
+\hl{Description}
+{\bf Encode} encodes {\em sourcefile} into {\em destinationfile} according to the encoding scheme
+specified by options {\bf -r}, {\bf -x} or {\bf -a}. Only one of those three option may be given.
+Encoding means transforming the content of the file (which might be arbitrary binary information)
+into a printable ASCII representation.
+If {\em destinationfile} is omitted, the program encodes to {\bf stdout}. 
+If {\em sourcefile} is also omitted, it encodes from {\bf stdin} to {\bf stdout}.
+
+{\bf Decode} does the reverse process.
+ 
+\hl{Options}
+\parname {{\bf -r}}
+\pardescript {Encode/decode according to the PEM encoding scheme specified in RFC 1421 (see below).
+The encoded file is about one third larger than the source file. This option is the
+default value.}
+
+\parname {{\bf -x}}
+\pardescript {This encoding/decoding uses a [0 - 9, A - F] ASCII representation for each half-octet
+(4 bits). The size of the encoded file is double the size of the source file plus inserted extra NEWLINEs 
+(see option -i).}
+
+\parname {{\bf -a}}
+\pardescript {Like option -x except that a [ A - P ] ASCII representation is used.}
+
+\parname {{\bf -i} {\em number}} 
+\pardescript {NEWLINE characters are inserted into the encoded text every {\em number} characters in 
+order to allow
+the encoded text to be handled by editors and mail systems. The default {\em number} is 64. A {\em 
+number}
+of zero avoids NEWLINE insertion. This option applies only for {\em encode}. {\em Decode}
+ignores all NEWLINEs.}
+\newpage
+The PEM encoding scheme maps each 24 bit (three octet) binary group into four octets
+printable ASCII in that it maps each 6 bit binary input to one octet ASCII output
+according to the following mapping table:
+\begin{center}
+\begin{tabular} {|cc|cc|cc|cc|} \hline
+Value & Encoding & Value & Encoding & Value & Encoding & Value & Encoding \\ \hline
+ 0 & A & 17 & R & 34 & i & 51 & z \\
+ 1 & B & 18 & S & 35 & j & 52 & 0 \\
+ 2 & C & 19 & T & 36 & k & 53 & 1 \\
+ 3 & D & 20 & U & 37 & l & 54 & 2 \\
+ 4 & E & 21 & V & 38 & m & 55 & 3 \\
+ 5 & F & 22 & W & 39 & n & 56 & 4 \\
+ 6 & G & 23 & X & 40 & o & 57 & 5 \\
+ 7 & H & 24 & Y & 41 & p & 58 & 6 \\
+ 8 & I & 25 & Z & 42 & q & 59 & 7 \\
+ 9 & J & 26 & a & 43 & r & 60 & 8 \\
+10 & K & 27 & b & 44 & s & 61 & 9 \\
+11 & L & 28 & c & 45 & t & 62 & + \\
+12 & M & 29 & d & 46 & u & 63 & / \\
+13 & N & 30 & e & 47 & v &    &   \\
+14 & O & 31 & f & 48 & w & (pad) & = \\
+15 & P & 32 & g & 49 & x &    &   \\
+16 & Q & 33 & h & 50 & y &    &   \\ \hline
+\end{tabular}
+\\ [1em]
+Printable Encoding Characters \\
+\end{center}
+Input quantities less than 24 bits are padded with zeros and mapped
+to the padding character '='. \\ [1em]
+
+\hl{See Also}
+aux\_enchex(3X)
+
+\nm{1}{km}{Key and certification management and CA provision package}
+\label{km}
+\hl{Synopsis}
+Commands for the CA role:
+
+{\bf cacreate} [ {\bf -hqtvDVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\bf -a} {\em issueralg} ]
+             \\ \hspace*{1.6cm} [ {\bf -s} {\em signalg} ] [ {\bf -e} {\em encalg} ] [ {\bf -k} {\em keysize} ]
+             \\ \hspace*{1.6cm} [ {\bf -n} {\em serial} ] [ {\bf -u} {\em nextupdate} ] [ {\bf -f} {\em notbefore} ]
+	     \\ \hspace*{1.6cm} [ {\bf -l} {\em notafter} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] [ {\em Name} ] \\
+{\bf getpkroot} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\em pkroot} ] \\
+{\bf getfcpath} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\em fcpath} ] \\
+{\bf certify} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\bf -a} {\em issueralg} ] \\
+\hspace*{1.6cm} [ {\bf -f} {\em notbefore} ] [ {\bf -l} {\em notafter} ] [{\em proto} [{\em cert}]] \\
+{\bf gen\_pse} [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\bf -i} {\em scriptfile} ] [ {\bf -h} {\em 
+home} ] [ {\bf -u} {\em unixname} ] \\ 
+\hspace*{1.6cm} [ {\bf -a} {\em issueralg} ] [ {\bf -s} {\em signalg} ] [ {\bf -e} {\em encalg} ] [ {\bf -k} {\em 
+keysize} ] \\ 
+\hspace*{1.6cm} [ {\bf -f} {\em notbefore} ] [ {\bf -l} {\em notafter} ] [ {\bf -x} {\em nameprefix} ]  \\ 
+\hspace*{1.6cm} [ {\bf -P} {\em subjectpse} ] [ {\bf -C} {\em subjectca} ] [ {\bf -g} {\em serialnumber} ] \\
+\hspace*{1.6cm} [ {\bf -d} {\em dsaname} ] [ {\bf -vrDqtnh} ] [ {\em namesuffix} ] \\
+{\bf revoke} [ {\bf -htvVWD} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\bf -a} {\em issueralg} ] 
+             \\ \hspace*{1.6cm} [ {\bf -u} {\em nextupdate} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] \\
+{\bf create\_TestTree} [ {\bf -vPqt} ] \\
+{\bf delete\_TestTree}
+\\ [1em]
+Commands for the user role:
+
+{\bf psecreate} [ {\bf -hqtvVW} ] [ {\bf -p} {\em psename} ] [ {\bf -s} {\em signalg} ] 
+             \\ \hspace*{1.5cm} [ {\bf -e} {\em encalg} ] [ {\bf -k} {\em keysize} ] [ {\em Name} ] \\ 
+{\bf instpkroot} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\em pkroot} ] \\
+{\bf instfcpath} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\em fcpath} ] \\
+{\bf genkey} [ {\bf -hrtvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -a} {\em issueralg} ] \\
+\hspace*{1.6cm} [ {\bf -s} {\em signalg} ] [ {\bf -e} {\em encalg} ] [ {\bf -k} {\em keysize} ] \\ 
+\hspace*{1.6cm} [ {\em proto} ] \\
+{\bf getkey} [ {\bf -ehstvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\em proto} ] 
+\\
+{\bf instcert} [ {\bf -aehrtvVWHD} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] [ {\em cert} ] \\
+{\bf pklist} [ {\bf -ehtvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] \\
+{\bf pkadd} [ {\bf -aehitvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -d} {\em dsaname} ] \\
+\hspace*{1.6cm} [ {\bf -A} {\em authlevel} ] {\em Name} \\
+{\bf pkdel} [ {\bf -ehtvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -o} {\em owner} ] \\
+\hspace*{1.6cm} [ {\bf -i} {\em issuer} ] [ {\bf -n} {\em serial} ] \\
+{\bf showdir} [ {\bf -aehtvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -o} {\em attributeType} ] \\ \hspace*{1.6cm} [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] {\em Name} \\
+{\bf inst\_pse} {\em file} \\
+{\bf inst\_ca} {\em file} \\
+\hl{Description}
+The KM-package provides commands for the establishment of arbitrary Certification Authority (CA) trees 
+and for the key and certificate exchange between CAs and users (who may be CAs again). 
+It comprises commands for the creation of both CA PSEs and user PSEs
+including the generation and exchange of the necessary PSE objects. Recall that a PSE is
+a protected area which holds the necessary secret keys, certificates and other security
+information objects and which is only accessible by the subject which the PSE owns. A PSE
+can be either a smartcard or a DES-protected Unix-directory, or a combination of both (in
+case that the smartcard is not capable of storing all necessary information).
+
+A  SecuDE-CA is characterized by the CA directory (which is indicated through {\bf -c} {\em cadir} 
+in the KM-commands).
+This is a Unix-directory which contains the CA PSE and the CA database. The CA database
+stores all certified users, issued certificates, blacklists and the like. It is realized by means of 
+Unix ndbm. A CA can be operated by means of the commands of the KM-package and by means of the 
+commands {\em sectool(1)} or {\em psemaint(1)} (see there). Sectool(1) is an OpenLook style 
+tool which allows the manipulation of the CA PSE and the examination of the CA database, and 
+the communication with the directory.
+
+The KM-package provides commands for the CA role and commands for the user role (which can be 
+established 
+on different systems or through different User-IDs on the same system, for instance). 
+An entity plays both the CA role towards the certified users and the user role towards the certifying
+CA, if it is neither the highest CA (Root-CA) nor an end user.
+
+The package basicly provides a file interface for the exchange of keys, certificates, other
+PSE objects or entire PSEs between users and CAs. The content of these files is the ASN.1 BER data 
+representation in case of PSE objects, or a compressed tar-file in case of entire PSEs. The files
+can be exchanged by any communication means like file-transfer or electronic-mail, or                
+simply file-copy if the communicating user and CA reside in the same (may be distributed)
+file-system. They may be subject to processing through {\em sign(1)}, {\em verify(1)}, {\em encrypt(1)},
+{\em decrypt(1)}, {\em encode(1)} or {\em uuencode(1)}, {\em decode(1)} or {\em uudecode(1)}
+before and after communication, depending on the integrity/confidentiality needs in the
+communication between CA and user, or when using SMTP-mail or similar communication means 
+which are only capable of transfering printable ASCII text.
+
+The CAs of a CA tree should be created in descending order, i.e. beginning with
+the highest CA, because some PSE objects must propagate from top to bottom through the CA-system 
+from the top-level CA to the user at the leaf (the forward certification path, for
+instance, grows when going down the certification tree).
+\\ [1em]
+{\bf One or two RSA Key Pairs for Signature and Encryption Purposes}
+
+Each subject's PSE (of both CAs or users) may contain two RSA key pairs, one for signature
+purposes and one for encryption purposes. SecuDE allows the separation of these two
+functionalities through maintaining two different RSA key pairs.
+The signature keys are stored in the PSE objects
+SignSK and SignCert, the latter containing the public key as certificate. The encryption
+keys are stored in the PSE objects DecSKnew and EncCert. The use of this type of PSEs
+must be indicated through use of option {\bf -q} in the corresponding commands.
+
+Some applications, however, require the use of a single key pair for signature
+and encryption processes. In PEM, for instance, the same RSA key pair is being used
+for MIC computation and DEK exchange. Therefore, the KM-package allows to create
+PSEs with a single RSA key pair for both functionalities. This is the default option
+of the KM-package (no use of option {\bf -q} in the corresponding commands). 
+In this case, only the PSE objects SKnew and Cert are generated.
+\\[1em]
+{\bf Top-Level CA (Root CA)}
+
+The top-level CA ( or {\bf Root-CA}) can be created using {\em cacreate} (the detailed 
+description of the KM commands follows below). Root-CAs use a public keys which are
+not further certified. A Root-CA has self-signed certificates of its own public
+signature key and encryption key in its PSE objects Cert or SignCert/EncCert.
+\\ [1em]
+{\bf User-generated or CA-Generated RSA Keys}
+
+Once a Root-CA is created or exists elsewhere, one has two possibilities
+to create the next certification level down:
+\be
+\m The RSA keys are generated at the user site.
+\m The RSA keys are generated at the CA site.
+\ee
+{\bf In case of 1.}, the KM-packaged provides the commands {\em psecreate} or
+{\em cacreate}, {\bf getpkroot}, {\em instpkroot}, {\bf getfcpath}, {\em instfcpath},
+{\em genkey} or {\em getkey}, {\bf certify} and {\em instcert}. Commands in bold are
+to be performed at the CA site while commands in italic are to be performed at the user site.
+These commands generate Unix-files comprising the necessary PSE objects, 
+which can be exchanged between CA and user
+in order to build the user PSE. The Unix-files contain the ASN.1-code
+if the PSE objects. Note that it is not necessary to transmit the secret 
+RSA keys of the user between user and CA, but that, however, there is a need for an
+authentic and uncompromised transfer of the public security information
+between CA and user. The Unix-files can be exchanged by any communication means like 
+file-transfer or electronic-mail, or simply file-copy if the communicating user and CA 
+reside in the same (may be distributed) file-system. They may be subject to processing 
+through {\em sign(1)}, {\em verify(1)}, {\em encrypt(1)},
+{\em decrypt(1)}, {\em encode(1)} or {\em uuencode(1)}, {\em decode(1)} or {\em uudecode(1)}
+before and after communication, depending on the integrity/confidentiality needs in the
+communication between CA and user, or when using SMTP-mail or similar communication means 
+which are only capable of transfering printable ASCII text. The out-of-band exchange
+of transaction keys (or transport keys) between user and CA which are being used
+with encrypt/decrypt is outside the scope of the KM-package.
+
+An alternative solution for key distribution in the case that RSA keys are generated
+at user sites is offered by PEM (RFC 1424). See {\em pem (1)} for key and certificate
+distribution through PEM. 
+
+{\bf In case of 2.}, a CA may generate entire user PSEs by means of the command
+{\em gen\_pse}. This command allows to process a script file which contains
+a list of users with their distinguished names, alias names and other control
+information. The PSEs may be generated as encoded and compressed tar-files which can
+be sent by any communication means to the user who can install it using {\em inst\_pse}. 
+Gen\_pse allows also to generate
+the user PSEs directly in the HOME directories of the users if CA and users reside
+in the same system or share the same file-system in a local area network, e.g. NFS.
+A third possibility is to generate smartcards with gen\_pse. PSEs which are generated
+by gen\_pse are PIN-protected which allows a confidential transmission between
+CA and user. 
+\\ [1em]
+{\bf Updating an Existing Certification Tree}
+
+The KM-package allows also to 
+to update an existing certification tree, e.g. if new RSA key pairs shall be used,
+if existing keys shall be recertified, or if the existing certification tree shall be 
+restructured, for instance if a new Root-CA shall be superordinated to the 
+existing Root-CA.
+\\ [1em]
+{\bf Use of Directories} 
+ 
+Obtaining public security information, like public keys, certificates,
+crosscertificates and certificate revocation lists, from other persons or instances is
+done either by direct communication between these persons or instances (as it
+is the case with PEM, for instance), or by directory access. SecuDE provides the
+necessary means to write security information into the directory when this
+information is being generated and installed for use, or to read security
+information from the directory from time to time to store it in a local cache.
+This local cache is realized by means of PSE objects. 
+The command {\em instcert}, for instance, allows to enter a user
+certificate into a directory. The commands {\em pkadd} and {\em showdir}
+retrieve certificates from a directory. All necessary DUA functions are
+also available through the commands {\em sectool(1)} and {\em psemaint(1)}.
+Sectool(1) is an OpenLook style command to maintain the PSE and to provide
+the information flow between local PSE and directory, while psemaint(1) is the 
+command-line oriented equivalent.
+
+The directory access can be provided 
+by SecuDE, per decision at run time, either through access to public
+X.500 directories via DAP (Directory Access Protocol), or through access
+to a local substitute. The local substitute is a (Unix) directory
+which must be configured at \$TOP/secude/.af-db where \$TOP
+is the installation-dependant parent directory of the secude directory. 
+ 
+The .af-db directory contains one subdirectory per user. The name of this
+subdirectory is the printable character string form of the distinguished name of the user (i.e.
+the Name format which may contain blanks and shell metacharacters). It
+contains the signature and encryption certificates (i.e. the public
+keys) of that user in the files SignCert and EncCert, respectively. However, if the user owns a single 
+RSA key pair for both signature and encryption purposes, the user's certificate is stored in the file
+Cert.
+If the user is a CA, additional files are provided for within the CA's .af-db subdirectory: Crosscertificates 
+are stored in the
+file CrossCSet, while a certificate revocation list is published in the file PemCRL.
+ 
+The .af-db directory may be shared between different machines by means of NFS, but no other 
+mechanisms are supplied to propagate the directory objects. 
+ 
+See also {\bf sectool(1)} and {\bf psemaint(1)} for the access of directory located security objects.
+ 
+{\bf Generating and maintaining PSEs}
+
+The basic purpose of a PSE is to protect private information which is used
+in security applications involving cryptographic algorithms. For a detailed 
+description of the PSE see INTRO(1). The commands described in this
+section build up a PSE. The following table shows which AF PSE objects are created or updated
+by which commands:
+{\small
+\begin{tabular}{|l|l|l|} \hline 
+PSE object   & Commands            & Comment                                             \\ \hline
+Name         & psecreate,cacreate  & initial creation of PSE                             \\
+PKRoot       & psecreate,cacreate, & installing public key of top level CA               \\
+             & instpkroot,pem      &                                                     \\
+FCPath       & instfcpath,pem      & installing own certification path                   \\
+SKnew        & psecreate,cacreate  & generating a new secret key (one-keypair PSE only)  \\
+Cert         & psecreate,cacreate, & installing certificate of public key as             \\
+             & instcert,pem        & hierarchy certificate (one-keypair PSE only)        \\
+CSet         & instcert            & installing certificate of public key as             \\
+             &                     & crosscertificate (one-keypair PSE only)             \\
+SignSK       & psecreate,cacreate  & generating a new secret signature key               \\
+             &                     & (two-keypair PSE only)                              \\
+DecSKnew     & psecreate,cacreate  & generating a new secret decryption key              \\
+             &                     & (two-keypair PSE only)                              \\
+SignCert     & psecreate,cacreate, & installing certificate of public signature key as   \\
+             & instcert            & hierarchy certificate (two-keypair PSE only)        \\
+EncCert      & psecreate,cacreate, & installing certificate of public encryption key as  \\
+             & instcert            & hierarchy certificate (two-keypair PSE only)        \\
+SignCSet     & instcert            & installing certificate of public signature key as   \\
+             &                     & crosscertificate (two-keypair PSE only)             \\
+EncCSet      & instcert            & installing certificate of public encryption key as  \\
+             &                     & crosscertificate (two-keypair PSE only)             \\
+PKList       & pkadd,psemaint,pem  & adding a certificate to the list of trusted         \\
+             &                     & public keys (only verification keys in case of      \\
+             &                     &  two-keypair PSE)                                   \\
+EKList       & pkadd,psemaint      & adding a certificate to the list of trusted         \\
+             &                     & public encryption keys (two-keypair PSE only)       \\
+CrossCSet    & psemaint            & downloading a crosscertificate pair attribute       \\
+             &                     & from CA Directory entry                             \\
+CrlSet       & cacreate,revoke,    & creating or updating a CRL set                      \\
+             & psemaint,pem        &                                                     \\
+AliasList    & psemaint            & store user alias-list on PSE                        \\
+QuipuPWD     & cacreate,psemaint,  & store X.500 password for simple authentication      \\
+             & pkadd,showdir,      & on PSE                                              \\
+             & instcert            &                                                     \\
+EDBKey       & psemaint            & Symmetric encryption key for DSA database encryption \\
+SerialNumbers & cacreate,certify,  & updating the serial number of the last              \\
+             & pem                 & issued certificate (CAs only)                       \\ \hline
+\end{tabular}
+}
+
+The necessary input data for those commands (except {\em psecreate}, {\em cacreate} and {\em genkey}) 
+must be
+supplied by the CA (the results of {\em getpkroot}, {\em getfcpath}, or {\em certify}, for instance). 
+The commands {\em genkey} and {\em getkey} supply data about the certificate (the so called prototype 
+certificate)
+which is needed for certification by the CA. 
+\\ [1em]
+{\bf Commands for the CA role:} 
+\\ [1em]
+{\bf cacreate} [ {\bf -hqtvDVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\bf -a} {\em issueralg} ]
+[ {\bf -s} {\em signalg} ] 
+\\ \hspace*{2cm} [ {\bf -k} {\em keysize} ] [ {\bf -e} {\em encalg} ] [ {\bf -k} {\em keysize} ]
+[ {\bf -n} {\em serial} ] [ {\bf -u} {\em nextupdate} ] 
+\\ \hspace*{2cm} [ {\bf -f} {\em notbefore} ] [ {\bf -l} {\em notafter} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] [ {\em Name} ]
+\\ [1em]
+\addtotoc{cacreate}
+{\em cacreate} creates the CA directory {\em cadir} (default: environment variable CADIR or .ca 
+under the HOME directory)
+which contains:
+\bi
+\m the prototype PSE of that CA. The PSE name is {\em capsename} (default: environment variable CAPSE or .capse). 
+The CA
+   PSE contains the PSE object {\em Serial} (this is in contrast to a user PSE). This PSE object 
+   is an ASN.1-encoded integer which contains the serial 
+   number of the most recently issued certificate.
+   This serial number is incremented by each call of {\em certify}.
+\m a database of that CA, comprising information about all certificates
+   ever issued by that CA, and the CA's PEM revocation list. This database is built with 
+ndbm(3).
+\ei
+The CA directory must not exist. 
+The distinguished name of the CA is {\em Name}. 
+If {\em Name} is omitted, it is requested from 
+stdin. {\em Name} is stored as PSE object Name. 
+It must be quoted when containing blanks and shell metacharacters (which is normally the case).
+We recommend the use of different Name schemes for users and CAs in order to be 
+able to distinguish from the syntax of the Name whether a CA or an end user is denoted.
+One possibility is to require at least one surname or common name component
+for an end user, while a CA is required not to have any of these components. 
+ 
+If option {\bf -q} is not provided, however, the newly created CA's PSE contains one RSA keypair in the PSE 
+objects {\bf SKnew} and {\bf Cert}. This type of CA is required within the PEM context, for instance.
+
+Otherwise, if option {\bf -q} is provided, the PSE contains two keypairs 
+in the PSE objects {\bf SignSK}/{\bf SignCert} and {\bf DecSKnew}/{\bf EncCert}. {\bf Cert} or 
+{\bf SignCert}/{\bf EncCert} are self-signed prototype certificates.
+The associated subject public key algorithm name (see intro(3X) about available 
+algorithm names and their types) of {\bf Cert} or {\bf SignCert} is {\em signalg} (option {\bf -s}) or {\em rsa} 
+by default, 
+if omitted. Only algorithms of type {\em SIG} or {\em ASYM\_ENC} are valid. The optional
+parameter {\em keysize} immediately following the {\bf -s} option is used to control
+the keysize of the signature key.
+The associated subject public key algorithm name of {\bf EncCert} (if requested by option {\bf -q})
+is {\em encalg} (option {\bf -e}) or {\em rsa} by default, 
+if omitted. Only algorithms of type {\em ASYM\_ENC} are valid. The optional
+parameter {\em keysize} immediately following the {\bf -e} option is used to control
+the keysize of the encryption key.
+
+The prototype certificate Cert/SignCert is installed as PSE object PKRoot.
+
+In addition, an empty certificate revocation list is created, whose {\em lastUpdate} component is set to the 
+current time, whereas the value of the {\em nextUpdate} field may be specified by the {\em nextupdate} parameter (option {\bf -u}).
+
+The empty certificate revocation list is stored in the CA's {\em pemcrlwithcerts} database 
+and added to the 
+PSE object CrlSet in the CA's PSE.
+If option {\bf -D} is given, the empty revocation list is entered into the Directory 
+(X.500 or local substitute, respectively).
+
+The algorithm name associated with the signature of the prototype certificates 
+(issuer algorithm) can be specified by {\em issueralg} 
+(option {\bf -a}). {\em issueralg} must be a
+signature algorithm (AlgType SIG, see INTRO(3) on available algorithms) which fits to the associated 
+algorithm of the signature key (e.g., the algorithm md5WithRsa cannot be used with an ElGamal key).
+The default for {\em issueralg} is md2WithRsaEncryption.
+ 
+The period of validity of the self-signed certificate(s) may be specified by the
+{\em notbefore} (option {\bf -f}) and {\em notafter} (option {\bf -l}) times.
+
+If option {\bf -D} is provided, {\em cacreate} enters the prototype certificate(s)
+into the Directory. 
+The Directory may either be a X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}) (see also DirectoryType(5)).
+If a X.500 Directory is accessed, the prototype certificates are added to the {\em cACertificate} 
+attribute in the Root CA's X.500 directory entry.
+
+If a X.500 directory is accessed, parameter {\em dsaname} (option {\bf -d}) allows to specify 
+the name of the DSA (Directory System Agent) that
+will initially be contacted. {\em dsaname} is a name which must be contained in the 
+{\em dsaptailor} file of the system as {\em dsa\_address} parameter. If {\bf -d} {\em dsaname} is
+not given, the default DSA, which is the first {\em dsa\_address} parameter in the {\em dsaptailor} 
+file, is accessed. 
+Parameter {\em authlevel} (option {\bf -A}) may be provided to determine the level of authentication used when binding. If {\bf -A} {\em authlevel} is omitted, the requested 
+level of authentication is taken from the environment variable AUTHLEVEL, and is set to {\em no 
+authentication}, if no such variable exists.
+In case of simple authentication being used, the caller's distinguished name and
+X.500 password are retrieved from the PSE objects Name and QuipuPWD, respectively.
+
+Option {\bf -n} is used for specifying the initial value of the serial number to be used by that CA.
+ 
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the cacreate command verbose, and options {\bf -V} and {\bf -W} provide some further logging information.
+\\ [1em]
+{\bf getpkroot} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\em pkroot} ]
+\addtotoc{getpkroot}
+
+{\em getpkroot} extracts the the PSE object PKRoot from the CA's PSE
+and writes it to the file {\em pkroot} or stdout, if {\em pkroot} is omitted. 
+This file can be sent to a user of the CA by any means,
+who may then install it on his own PSE with the command instpkroot (see below). 
+ 
+The PSE from which the public root information is extracted is identified by {\bf -p} {\em capsename} and/or
+{\bf -c} {\em cadir}. 
+The default for {\em cadir} is either provided by the environment variable
+CADIR or is .ca, if no such variable exists.
+The default for {\em capsename} is either provided by the environment variable
+CAPSE or is .capse, if no such variable exists.
+
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the getpkroot command verbose, and options {\bf -V} and {\bf -W} provide some further logging information.
+\\ [1em]
+{\bf getfcpath} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\em fcpath} ]
+\addtotoc{getfcpath}
+
+{\em getfcpath} reads the CA's PSE object FCPath, adds one further level
+to it which comprises the CA's certificates Cert/SignCert and CSet/SignCSet (from the same PSE), and writes the 
+extended FCPath
+to the file {\em fcpath} or stdout, if {\em fcpath} is omitted. This file can be sent to a user 
+affiliated to this
+CA, who may then install it on his own PSE with the command instfcpath (see below). 
+ 
+The PSE from which the FCPath is extracted is identified by {\bf -p} {\em capsename} and/or
+{\bf -c} {\em cadir}. 
+The default for {\em cadir} is either provided by the environment variable
+CADIR or is .ca, if no such variable exists.
+The default for {\em capsename} is either provided by the environment variable
+CAPSE or is .capse, if no such variable exists.
+ 
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the getfcpath command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging information.
+\\ [1em]
+{\bf certify} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\bf -a} {\em issueralg} ] [ {\bf -f} {\em notbefore} ] \\
+\hspace*{2cm} [ {\bf -l} {\em notafter} ] [{\em proto} [{\em cert}]]
+\addtotoc{certify}
+
+{\em certify} reads a prototype certificate (see {\em genkey} or {\em getkey}) from {\em proto},
+replaces the issuer and serial number fields by CA values (taken from the CA's PSE), increments its 
+serial number,
+replaces the signature field by the CA's signature, and writes the resulting
+certificate to {\em cert}. 
+
+Certify reads the prototype certificate
+from the file {\em proto} or stdin, if {\em proto} is omitted, and writes the certificate
+to the file {\em cert} or stdout, if {\em cert} is omitted. 
+
+The CA's signature 
+algorithm can be specified with {\bf -a} {\em issueralg}. {\em issueralg} must be a
+signature algorithm (AlgType SIG, see INTRO(3) on available algorithms) which fits to the associated 
+algorithm of the signature key (e.g., the algorithm md5WithRsa cannot be used with an ElGamal key).
+The default for {\em issueralg} is md2WithRsaEncryption. 
+
+The file {\em cert} can be sent by any means to a user affiliated to this
+CA, who can install it on his own PSE with the command instcert (see below). 
+ 
+Before the prototype certificate is transformed into a valid certificate, the signature appended to the prototype certificate is verified with the public key held within the prototype certificate; in this way, it is 
+checked whether the public key in {\em subjectPK} is part of an RSA key pair, and whether the corresponding
+secret key is owned by the creator of the prototype certificate.
+
+{\em notbefore} (option {\bf -f}) and {\em notafter} (option {\bf -l}) are dates of validity in the 
+form 'YYMMDD'. If they are omitted, the first date on which the certificate is valid is set to the current time, 
+and the last date on which the certificate is valid is set to one year hereafter.
+ 
+The CA's PSE is identified by {\em capsename} (default: environment variable CAPSE or .capse), which resides in the CA directory {\em cadir}
+(default: environment variable CADIR or .ca in the HOME directory).
+ 
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the certify command verbose, and options {\bf -V} and {\bf -W} provide 
+some further logging information.
+\\ [1em]
+{\bf revoke} [ {\bf -htvVWD} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\bf -a} {\em issueralg} ] \\
+\hspace*{2cm} [ {\bf -u} {\em nextupdate} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ]
+\addtotoc{revoke} 
+ 
+{\em revoke} revokes one or more certificates and enters the resulting revocation list into the 
+Directory. \\
+ 
+The certificates which are to be revoked are identified by their serial numbers which are to be
+entered interactively (see also {\em caserialnumbers} and {\em cacertificate} commands, available
+with psemaint). 
+Each serial number is submitted to the same check as described for the command {\em revoke}
+available with {\em psemaint}. \\
+Only in case of at least one certificate having been revoked and added to the revocation list, the 
+{\em lastUpdate} component of the revocation list is set to the current time, whereas the value 
+of the {\em nextUpdate} component is individually specified by the revoking CA. 
+
+The extended revocation list is written back to the CA's {\em pemcrlwithcerts} database and
+added to the PSE object CrlSet in the CA's PSE.
+
+The algorithm name associated with the signature of the revocation list 
+(issuer algorithm) can be specified by {\em issueralg} 
+(option {\bf -a}). {\em issueralg} must be a
+signature algorithm (AlgType SIG, see INTRO(3) on available algorithms) which fits to the associated 
+algorithm of the signature key (e.g., the algorithm md5WithRsa cannot be used with an ElGamal key).
+The default for {\em issueralg} is md2WithRsaEncryption.
+
+The {\em lastUpdate} component of the extended revocation list is set to the 
+current time, whereas the value of the {\em nextUpdate} field may be specified by the {\em nextupdate} parameter (option {\bf -u}), or is else asked for interactively.
+ 
+Option {\bf -D} causes the revocation list to be entered into the Directory.
+The Directory may either be a X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}) (see also DirectoryType(5)).
+If a X.500 directory is accessed, parameters {\em dsaname} (option {\bf -d}) and {\em authlevel} 
+(option {\bf -A}) may be provided, with the same meaning as with {\em cacreate}.
+
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the revoke command verbose, and options {\bf -V} and {\bf -W} provide 
+some further logging information.
+\\ [1em]
+{\bf gen\_pse} [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em capsename} ] [ {\bf -i} {\em scriptfile} ] [ {\bf -h} {\em 
+home} ] [ {\bf -u} {\em unixname} ] \\ 
+\hspace*{2cm} [ {\bf -a} {\em issueralg} ] [ {\bf -s} {\em signalg} ] [ {\bf -e} {\em encalg} ] [ {\bf -k} {\em 
+keysize} ] \\ 
+\hspace*{2cm} [ {\bf -f} {\em notbefore} ] [ {\bf -l} {\em notafter} ] [ {\bf -x} {\em nameprefix} ]  \\ 
+\hspace*{2cm} [ {\bf -P} {\em subjectpse} ] [ {\bf -t} {\em subjectca} ] [ {\bf -g} {\em serialnumber} ] \\
+\hspace*{2cm} [ {\bf -d} {\em dsaname} ] [ {\bf -vrDqmn} ] [ {\em namesuffix} ]
+\addtotoc{gen\_pse}
+
+{\em gen\_pse} can be used by a CA in order to generate complete PSEs for users or underlying CAs,
+called subject in the following, at the CA site. {\em Gen\_pse} is able to work on a scriptfile
+(parameter {\bf -i} {\em scriptfile}) where a list of subjects and additional necessary
+parameters can be specified in order to generate the PSEs for these subjects through one
+call of {\em gen\_pse}. All parameters listed after {\bf -i} {\em scriptfile}, and the
+options {\bf -d} and {\bf -r} can be defined or redefined in {\em scriptfile} on a per subject
+basis. Normal use of {\em gen\_pse} would require only parameter {\bf -i} {\em scriptfile}
+and optionally {\bf -c} {\em cadir} and/or {\bf -p} {\em capsename}.
+
+If {\bf -q} is not given, a PSE is restricted to carry one RSA key pair only (for both signature and encryption 
+purposes)
+and is marked accordingly. In that case, the generated PSE contains the PSE objects Name, SKnew, Cert, 
+PKRoot, and FCPath
+(the last one only if the issuing CA is not the root CA). This type of PSE is required within the PEM context, 
+for instance.
+Otherwise, if {\bf -q} is given, each generated PSE contains the PSE objects Name, SignSK, DecSKnew, 
+SignCert,
+EncCert, PKRoot and FCPath (the last one only if the issuing CA is not the root CA).
+
+If {\bf -h} {\em dir} is not specified, the PSE is produced in the tar-format, compressed
+using {\em compress(1)}, encoded to printable ASCII characters using {\em encode(1)}, and
+stored in the subdirectory genpse of the CA directory. This file can be transported
+to the subject site by any means, e.g. electronic mail, FTAM, ftp or cp, depending on
+the local situation, and can be installed at the subject site with {\em inst\_pse}. 
+{\em gen\_pse} creates the subdirectory genpse if it does not exist.
+
+If {\bf -h} {\em dir} is specified, {\em dir} is the directory under which all user's
+home directories reside (e.g. /home). In this case, the PSE is installed immediately
+in the subject's home directory; it is not necessary to use {\em inst\_pse}.
+The PSE name is constructed by concatenating {\em dir/unixname/subjectpse}. The
+option {\bf -h} {\em dir} is intended to be used in configurations where the CA and
+the subjects reside in the same system or local area network of systems with a common
+file system (e.g. NFS), for instance if the CA is the system administrator of such
+a configuration. Watch for cases where the home directory of a subject is not constructed
+as {\em dir/unixname}.
+
+{\em cadir} is the directory of the issuing CA (default: environment variable CADIR or .ca in the HOME
+directory).
+{\em gen\_pse} requests the CA PIN from /dev/tty.
+
+{\em capsename} is the name of the CA's PSE under {\em cadir} (default: environment variable CAPSE or .capse).
+
+The subject name associated to the new PSE is divided, for the purpose of {\em gen\_pse}, 
+into two parts. A nameprefix (e.g. 'C=DE; O=GMD; OU=I2; CN=') is expected from
+{\bf -x} {\em nameprefix} or from the scriptfile. A namesuffix (e.g. the common name
+or surname, depending on how the nameprefix was chosen) is expected from parameter
+{\em namesuffix} or from the scriptfile. Both are concatenated to form the distinguished
+name of the subject. The concatenation of nameprefix and namesuffix must result in a name
+of the form {\em Name}, i.e. a printable representation of a {\em DName}.
+
+{\em unixname} is the Unix login name of the subject.
+
+{\em subjectpse} is the name of the generated subject's PSE. default is .pse.
+
+If {\em subjectca} is set a CA is generated instead of a PSE where {\em subjectca}
+is the name of the generated subject's CA.
+In this case a serialnumber can be set with {\bf -g}.
+
+{\em issueralg} denotes the signature algorithm  which is used by the CA to generate
+the certificates. If given this is used instead of the algorithm associated to
+the CA's signature key. If the CA's signature key has the associated algorithm {\em rsa},
+and {\em issueralg} is not given, {\em md2WithRsaEncryption} is used by default.
+
+{\em signalg} and {\em encalg} denote the algorithms associated to the subject's newly
+generated signature key pair and encryption key pair respectively. {\em rsa} is the
+default in either case. A {\bf -k} {\em keysize} following {\em signalg} or {\em encalg}
+denotes the respective keysize. 512 is the default.
+
+{\em notbefore} and {\em notafter} denote the dates of validity of both the generated
+signature certificate and encryption certificate. If they are omitted, {\em notbefore} is
+set to the current date, and {\em notafter} is set to one year after {\em notbefore}.
+{\em notbefore} and {\em notafter} must be given as UTCTime strings (YYMMDDhhmmssZ
+or YYMMDDhhmmss+hhmm or YYMMDDhhmmss-hhmm) or like YY:[MM:[DD:[hh:[mm:[ss:]]]]]. 
+Example: 921020163015Z is October 20, 1992,
+16:30:15 h GMT. 921020173015+0100 denotes the same time as local time CET.
+
+{\em gen\_pse} requests a transport PIN from either /dev/tty or the scriptfile on a 
+per subject basis. The transport PIN is used for the generated subject's PSE. The transport
+PIN can be changed to the final PIN when installing the generated PSE at the subject's
+site with {\em inst\_pse}, or at any time using {\em psemaint}.
+
+Option {\bf -r} replaces an existing PSE in either the subject's home directory (if {\bf -h}
+{\em dir} is used) or in {\em cadir}/genpse  (if {\bf -h} {\em dir} is not used). Without
+option {\bf -r} existing PSEs are not overwritten.
+
+Option {\bf -D} causes the generated certificates to be stored in the Directory.
+The Directory may either be a X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}) (see also DirectoryType(5)).
+
+If a X.500 Directory is accessed, parameter {\em dsaname} (option {\bf -d}) 
+indicates a non-default DSA name for this operation. 
+A default DSA name should have been installed by the system administator.
+
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders {\em gen\_pse} verbose.
+\\ [0.5cm]
+{\large\bf Format of the Scriptfile}
+
+The scriptfile consists of parameter lines and subject lines (one line per subject
+for whom a PSE shall be generated).
+Like in a shell script, the character '\#' can be used to indicate a comment until EOL.
+
+{\bf Parameter Lines}
+
+Parameter lines are indicated by a '\$' in column 1.
+A parameter line has the format
+
+\${\em parametername} [ = {\em first\_value} [ , {\em second\_value} ]].
+A parameter defined in this way is valid for all following subjects until it is redefined.
+\\ [1em]
+{\bf The following parameters are possible:}
+\\ [1em]
+\begin{tabular}{|l|l|} 
+\hline
+{\bf \$onekeypair}                                      &  One key-pair or two different key-pairs \cr
+{\bf \$twokeypairs}                                     &  for encryption and signature. \cr                          \hline
+{\bf \$issuer\_alg} = {\em alg}                         &  Issuer's signature algorithm  (default: \cr
+                                                        &  md2WithRsaEncryption or dsaWithSHA). \cr
+{\bf \$subject\_encalg} = {\em alg} [, {\em keysize} ]  &  Subject's signature algorithm (default: rsa, 512). \cr
+{\bf \$subject\_sigalg} = {\em alg} [, {\em keysize} ]  &  Subject's encryption algorithm (default: rsa, 512). \cr    \hline
+{\bf \$notbefore} = {\em date}                          &  The date and valitity value \cr
+{\bf \$notafter} = {\em date}                           &  can be given in format 920812080000+0000 \cr
+{\bf \$validity} = {\em validity}                       &  or 92:08:12:08:00:00: like described before. \cr
+                                                        &  Default validity is one year from now. \cr                 \hline
+{\bf \$enter}                                           &  Enter the certificate into the Directory \cr
+{\bf \$notenter}                                        &  Do not enter the certificate into the Directory. \cr
+{\bf \$dsa} = {\em dsaname}                             &  Name of the dsa initially approached. \cr                  \hline
+{\bf \$subject\_pse} = {\em psename}                    &  Name of the generated subject PSE. \cr
+{\bf \$home} [ = {\em pathname} ]                       &  Install the generated PSE directly in the user's home \cr
+                                                        &  directory {\em pathname}/{\em username}  \cr
+                                                        &  (default pathname: /home). Otherwise write compressed \cr
+                                                        &  and encoded tar-file to genpse/{\em username}. \cr
+{\bf \$userhome} = {\em name}                           &  Name of the subject's home directory if different \cr
+                                                        &  from {\em username}. \cr                                  \hline
+{\bf \$user}                                            &  Generate of a user PSE. \cr
+{\bf \$ca} [= {\em cadir} [, {\em serialnumber} ] ]     &  Generate a CA with the CA directory {\em cadir} \cr
+                                                        &  and the initial serialnumber {\em serialnumber}. \cr      \hline
+{\bf \$transportpin} = {\em pin}                        &  The PIN of the generated PSE. \cr                         \hline
+{\bf \$notreplace}                                      &  Do not overwrite an existing PSE \cr
+{\bf \$replace}                                         &  Overwrite an existing PSE. \cr                            \hline
+{\bf \$sc\_pse}                                         &  Generate a smartcard-based PSE. \cr
+{\bf \$sw\_pse}                                         &  Generate a SW-PSE. \cr                                    \hline
+{\bf \$create}                                          &  Generate a new PSE. \cr
+{\bf \$update} = {\em list\_of\_objects}                &  Update the given Objects in an existing PSE \cr           \hline
+{\bf \$nameprefix} = {\em prefix}                       &  Prefix of subject's DName. \cr                            \hline
+\end{tabular}
+\\ [1em]
+{\bf Subject Lines}
+
+Subject lines do not begin with a '\$' and consist of three words plus optional
+parameter definitions in the \${\em parametername} form.
+
+The first word is the unixname of the subject.
+This is added to the list of aliases as alias name of the subject's DN.
+The second word is a second alias name which can be used to introduce the subject's
+mail-address as alias.
+The third word is the namesuffix.
+A word which contains spaces or commas must be included in " ".
+
+After the namesuffix additional parameter definitions can be given. They are only
+valid for this subject.
+
+The subject line ends with the following EOL.
+An EOL included in " " is ignored.
+\\ [1em]
+
+An {\bf example} of the scriptfile is given in the following template:
+{\small
+\begin{verbatim}
+
+# Template of script-file for gen_pse
+
+# Global Parameter Definitions:
+# -----------------------------
+
+$onekeypair                          # one key pair is used for encryption and signature
+#$twokeypairs                        # two key pairs for encryption and signature
+
+$issuer_alg = md5WithRsaEncryption   # signature algorithm of CA
+#$subject_encalg = RSA, 520          # algorithm of subject's encryption algorithm
+$subject_sigalg = RSA, 520           # algorithm of subject's signature algorithm
+
+$notbefore = 920812080000+0000       # validity not before of generated certificate
+$validity = 02:00:00:                # length of validity period from notbefore
+
+$notenter                            # do not enter generated certificate into directory
+
+$subject_pse = .pse                  # subject's PSE name
+$home = /home                        # directory containing all home directories
+
+$user                                # user PSE
+
+$transportpin = uakrus               # PIN of PSE
+
+$replace                             # replace an existing PSE ( creation )
+
+$sw_pse                              # only Software PSE
+
+$update = "pkroot oldpkroot newpkroot fcpath signcert newkey encrcert newkey"
+                                     # update some objects on an existing PSE
+
+$nameprefix = "C=DE; O=GMD; CN="     # subject's name prefix
+
+# Subject Lines:
+# --------------
+
+surkau  Thomas.Surkau@gmd.de      "Thoma Surkau"       $notreplace $create $home $userhome
+schneiw Wolfgang.Schneider@gmd.de "Wolfgang Schneider" $notreplace
+\end{verbatim}
+}
+\vspace{1em}
+{\bf create\_TestTree} [ {\bf -vPqt} ] 
+\addtotoc{create\_TestTree}
+
+This is a test command for a system administrator who installs SecuDE. {\em create\_TestTree}
+creates a tree of one root CA (CA-directory {\em Root-CA}), two subordinate CAs (CA-directories
+ORG-1-CA and ORG-2-CA), two users of ORG-1-CA (PSE names ORG-1-User-1 and ORG-2-User-2),
+and two users of ORG-2-CA (PSE names ORG-2-User-1 and ORG-2-User-2), including all key generation
+and certificates. The CA-directories and PSEs are created in the subdirectory TestTree of the 
+home directory. 
+These PSEs can be used to test the installation. TestTree must not exist when
+create\_TestTree is called.
+
+Option {\bf -P} requests that RFC 1424 defined certification procedures are applied
+by using pem(1). Otherwise KM(1) utilities are used for certification.
+
+Option {\bf -q} causes the creation of PSEs with two RSA keypairs.
+
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders it verbose. \\ [1em]
+{\bf delete\_TestTree}
+\addtotoc{delete\_TestTree}
+
+{\em delete\_TestTree} deletes the previously created test tree of CAs and users. It removes
+the directory TestTree in the user's home directory.
+\\ [1em] 
+{\bf Commands for the user role:} 
+\\ [1em]
+{\bf psecreate} [ {\bf -hqtvVW} ] [ {\bf -p} {\em psename} ]
+[ {\bf -s} {\em signalg} ] [ {\bf -k} {\em keysize} ] \\ 
+\hspace*{2cm} [ {\bf -e} {\em encalg} ] [ {\bf -k} {\em keysize} ] [ '{\em Name}' ]
+\addtotoc{psecreate}
+
+{\em psecreate} creates a prototype PSE named {\em psename}. The default for {\em psename} is either
+provided by the environment variable PSE, or is .pse under the HOME directory of the user, if there
+is no such variable. The PSE directory must not exist.
+
+If option {\bf -q} is not given, the prototype PSE comprises the PSE objects 
+\bi
+\m Name, containing the distinguished name of the owner;
+\m SKnew, containing a newly generated secret asymmetric signature and decryption key;
+\m Cert, containing the corresponding public key as self-signed prototype certificate;
+\m PKRoot, containing the public key from Cert as root key.
+\ei
+This is a one keypair PSE.
+ 
+If option {\bf -q} is provided, the prototype PSE comprises the PSE objects 
+\bi
+\m Name, containing the distinguished name of the owner,
+\m SignSK, containing a newly generated secret asymmetric signature key,
+\m SignCert, containing the corresponding public verification key as self-signed prototype certificate,
+\m DecSKnew, containing a newly generated secret asymmetric decryption key,
+\m EncCert, containing the corresponding public encryption key as self-signed prototype certificate,
+\m PKRoot, containing the public key from SignCert as root key.
+\ei
+This is a two keypair PSE.
+
+The distinguished name of the owner of the PSE is {\em Name}. 
+If {\em Name} is omitted, its value is taken from the environment variable MYDNAME. If there is no
+such variable, the distinguished name is requested from 
+stdin. {\em Name} is stored as AF PSE object Name. 
+It must be quoted when containing blanks and shell metacharacters (which is normally the case).
+It is recommended to use different Name schemes for users and CAs, in order to be 
+able to distinguish from the syntax of the Name whether a CA or an end user is denoted.
+One solution would be to require at least one common name component
+for an end user, while a CA is required not to have such a component. 
+ 
+The subject public key algorithm name (see intro(3X) about available 
+algorithm names and their types) associated with {\bf Cert} or {\bf SignCert} is {\em signalg} 
+(option {\bf -s}) or {\em rsa} by default, if omitted. Only algorithms of type {\em SIG} or {\em ASYM\_ENC} are valid. 
+The optional parameter {\em keysize} immediately following the {\bf -s} option is used to control
+the keysize of the RSA signature key.
+
+The subject public key algorithm name associated with {\bf EncCert} (if requested by option {\bf -q})
+is {\em encalg} (option {\bf -e}) or {\em rsa} by default, 
+if omitted. Only algorithms of type {\em ASYM\_ENC} are valid. The optional
+parameter {\em keysize} immediately following the {\bf -e} option is used to control
+the keysize of the RSA encryption key.
+
+The algorithm name associated with the signature of the prototype certificates 
+(issuer algorithm) is {\em md2WithRsaEncryption}, if the corresponding key is an RSA key,
+or {\em dsaWithSHA}, if the corresponding key is a DSA key. 
+
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the psecreate command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging
+information.
+\\ [1em]
+{\bf instpkroot} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\em pkroot} ]
+\addtotoc{instpkroot}
+
+{\em instpkroot} reads file {\em pkroot} or stdin, if {\em pkroot} is omitted, and installs it as
+PSE object PKRoot on the PSE. A PKRoot information that already exists on the target PSE will
+be overwritten.
+ 
+The location of the target PSE is determined by {\em cadir} and {\em psename}. The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, 
+if no such variable exists.
+ 
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists.
+ 
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the instpkroot command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging
+information.
+\\ [1em] 
+{\bf instfcpath} [ {\bf -htvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\em fcpath} ]
+\addtotoc{instfcpath}
+
+{\em instfcpath} reads file {\em fcpath} or stdin, if {\em fcpath} is omitted, and installs it as
+PSE object FCPath in the PSE. A FCPath information that already exists on the target PSE will
+be overwritten.
+ 
+The location of the target PSE is determined by {\em cadir} and {\em psename}. The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, if no such
+variable exists. 
+
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists.
+
+Before the forward certification path provided is installed on the target PSE, it is checked
+whether it comprises a chain of hierarchy certificates that could be verified up the PKRoot 
+information already stored on the PSE.
+ 
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the instfcpath command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging information.
+\\ [1em]
+{\bf genkey} [{\bf -hrtvVW}] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -a} {\em issueralg} ]
+[ {\bf -s} {\em signalg} ] [ {\bf -k} {\em keysize} ] \\
+\hspace*{2cm} [ {\bf -e} {\em encalg} ] [ {\bf -k} {\em keysize} ] [ {\em proto} ]
+\addtotoc{genkey}
+
+{\em genkey} generates an asymmetric key pair and installs the secret key as PSE object
+SignSK (default or option {\bf -s}) or DecSKnew (option {\bf -e}). The public key is written to file
+{\em proto} or stdout, if {\em proto} is omitted, in form of a self-signed prototype certificate 
+(i.e., the prototype certificate is signed with the corresponding secret key). 
+The self-signed prototype certificate is stored as PSE object
+SignCert (default or option {\bf -s}) or EncCert (option {\bf -e}).
+
+The location of the PSE where secret key and prototype certificate are stored, is determined by 
+{\em cadir} and {\em psename}. The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, if no such
+variable exists.
+ 
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists.
+
+If the PSE identified by {\em cadir} and/or {\em psename} is restricted to carry one RSA key pair 
+only, the secret
+key is installed as PSE object SKnew, while the self-signed prototype certificate is stored as PSE object Cert.
+
+In case of a signature key pair being generated, {\bf -s} {\em signalg}
+denotes the algorithm associated with the public key information held within the prototype certificate.
+In case of an encryption key pair being generated, {\bf -e} {\em encalg}
+denotes the algorithm associated with the public key information held within the prototype certificate
+(see intro(3X) about available algorithm names and their types).
+Only algorithms of type {\em SIG} or {\em ASYM\_ENC} are valid in case of a signature key pair 
+being generated, while the algorithms which may be associated with the encryption key pair 
+are restricted to those of type {\em ASYM\_ENC}. 
+However, if the key pair being generated is used for both signature and encryption purposes
+(i.e., the specified PSE is a one keypair PSE), the algorithms associated with
+it are restricted to those of type {\em ASYM\_ENC}.
+If both option {\bf -s} and option {\bf -e} are omitted, a signature key pair whose
+associated algorithm name is rsa will be generated. 
+
+If the generated key pair is of type {\em ASYM\_ENC}, the algorithm name 
+associated with the signature of the prototype certificate can be specified by {\em issueralg} 
+(option {\bf -a}), or is md2WithRsaEncryption by default. 
+
+The specification of an algorithm via {\bf -s}, {\bf -e} or {\em -a} may optionally
+be followed by a {\em keysize} (option {\bf -k}), which controls the keysize of the RSA keys.
+
+{\em genkey} takes all data required for the prototype certificate from the PSE.
+ 
+Option {\bf -r} replaces a previously generated secret key, which has already been installed in 
+the PSE, by the newly generated one.
+
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the genkey command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging
+information.
+\\ [1em]
+{\bf getkey} [ {\bf -ehstvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\em proto} ]
+\addtotoc{getkey}
+
+Such as {\em genkey}, {\em getkey} creates a prototype certificate and writes its content to file
+{\em proto} or stdout, if {\em proto} is omitted. The prototype certificate may then be
+signed by a CA (e.g., by using {\em certify}). 
+
+In contrast to {\em genkey}, {\em getkey} does not
+generate keys, it just builds a prototype certificate from the public key stored in SignCert
+(option {bf -s}) or EncCert (option {\bf -e}). 
+
+The location of the PSE from which the public key information is extracted, is determined by 
+{\em cadir} and {\em psename}. The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, if no such
+variable exists.
+ 
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists.
+
+If the PSE identified by {\em cadir} and/or {\em psename} is restricted to carry 
+one RSA key pair only, however, the prototype certificate is built upon the public key contained 
+in PSE object Cert.
+
+{\em getkey} is intended to support the cross certification
+of an existing key. It can also be used when superordinating a new top-level CA over
+an existing Root-CA. In this case, the existing public keys of the previous
+Root-CA can be transformed into prototype certificates, in order to be certified by the
+new top-level CA.
+ 
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the getkey command verbose, and options {\bf -V} and {\bf -W} provide 
+some further logging
+information.
+\\ [1em] 
+{\bf instcert} [ {\bf -aehrtvVWHD} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] \\
+\hspace*{2cm} [ {\em cert} ]
+\addtotoc{instcert}
+
+{\em instcert} reads file {\em cert} or stdin, if {\em cert} is omitted, 
+and installs its content in one of the PSE objects SignCert, EncCert, SignCSet, or EncCSet, depending on
+the algorithm identifier of the subject key and option {\bf -H}. If {\bf -H} is given, the
+certificate is considered a hierarchy certificate and is installed as PSE object SignCert or
+EncCert. Otherwise, it is considered a cross certificate and is installed as (or added to) PSE object SignCSet or EncCSet.
+
+If the algorithm identifier of the subject key indicates a signature algorithm (type {\em SIG}).
+the certificate is installed in SignCert or SignCSet.
+If the algorithm identifier of the subject key is of type {\em ASYM\_ENC}, the certificate
+is installed in SignCert or SignCSet by default; if option {\bf -e} is given, however, it is
+installed as EncCert or EncCSet.
+
+The location of the target PSE is determined by {\em cadir} and {\em psename}. The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, if no such
+variable exists.
+ 
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists.
+
+If the PSE identified by {\em cadir} and {\em psename} is restricted to carry one RSA key pair only, 
+however, the certificate is installed as PSE object Cert or CSet, depending on whether or not it is considered a hierarchy certificate (option {\bf -H}).
+
+Before a hierarchy certificate (SignCert or EncCert) is installed, an additional check is 
+performed:
+A random data block is encrypted - using the certified public key of the hierarchy certificate - and then 
+decrypted
+- using the secret key of the same keytype (signature or encryption), which has already been stored on the 
+PSE 
+as object SignSK or DecSKnew, respectively. The hierarchy certificate will
+be installed only if the decrypted and the original data are identical, i.e., public and private key fit
+together.
+If a self-signed prototype certificate has already been installed as object SignCert or EncCert
+on the PSE (see {\em genkey}), the following check will be performed before installing the hierarchy 
+certificate: 
+The certified public key of the hierarchy certificate will be compared with the one contained in the prototype 
+certificate. If both public keys are identical, the certified public key of the hierarchy certificate is proved to
+fit to the secret key already stored on the PSE, and the hierarchy certificate will replace the self-signed
+prototype certificate on the PSE.
+If the PSE is restricted to carry one RSA key pair only, however, the PSE objects Cert and SKnew are 
+considered for the above consistency checks.
+ 
+If option {\bf -D} was provided, {\em instcert} additionally enters the certificate into the Directory. 
+The Directory may either be a X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}) (see also DirectoryType(5)).
+
+If a X.500 directory is accessed, options {\bf -a}, {\bf -A}, and {\bf -d} may be used:
+If option {\bf -a} is provided, the certificate is added to the {\em cACertificate} attribute in
+the caller's X.500 directory entry; otherwise, it is added to the {\em userCertificate}
+attribute.
+Parameters {\em dsaname} (option {\bf -d}) and {\em authlevel} (option {\bf -A}) have the same meaning as with {\em cacreate}.
+ 
+If the {\em .af-db} directory is accessed, the certificate is stored as file {\em SignCert}
+or {\em EncCert} in the {\em .af-db} subdirectory identified by the caller's distinguished name,
+depending on whether or not option {\bf -e} was provided; if the PSE identified by 
+{\em cadir} and {\em psename} is restricted to carry one RSA key pair only, 
+however, the certificate is stored as file {\em Cert} in the same subdirectory.
+Option {\bf -r} can be used to replace an existing 
+signature or encryption certificate stored as file {\em SignCert}, {\em EncCert}, or {\em Cert},
+in the caller's .af-db subdirectory.
+
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the instcert command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging
+information.
+\\ [1em] 
+{\bf pkadd} [ {\bf -aehitvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -d} {\em dsaname} ] [ {\bf -A} {\em authlevel} ] {\em Name}
+\addtotoc{pkadd}
+
+{\em pkadd} retrieves the signature (by default) or encryption (option {\bf -e}) certificate 
+of {\em Name} from the Directory
+and adds its ToBeSigned part to the PSE object PKList (by default) or EKList 
+(option {\bf -e}).
+{\em Name} is a distinguished name in printable form or an alias name.
+By default, only those certificates are selected from the returned set whose subject PK algorithm 
+is of type {\em SIG} or {\em ASYM\_ENC} (SIGNATURE certificates).
+With option {\bf -e}, only those certificates are selected from the returned set whose
+subject PK algorithm identifier is of type {\em ASYM\_ENC} (ENCRYPTION certificates).
+
+The location of the target PSE is determined by {\em cadir} and {\em psename}. The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, if no such
+variable exists.
+ 
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists.
+
+If the PSE identified by {\em cadir} and {\em psename} is restricted to carry 
+one RSA key pair only, just those certificates are selected from the returned set whose
+subject PK algorithm identifier is of type {\em ASYM\_ENC}; in this case, the
+ToBeSigned parts of the selected
+certificates are added to the PSE object PKList in any case, even if option {\bf -e} was given. 
+ 
+If a X.500 Directory is accessed, options {\bf -i}, {\bf -a}, {\bf -d}, and {\bf -A} may
+be provided:
+If {\bf -i} is given and more than one certificate is found for {\em Name}, the user is asked
+interactively to specify the certificate whose ToBeSigned part shall be added to his
+PKList or EKList, respectively; if option {\bf -i} is omitted, however, the ToBeSigned part
+of the first certificate among the returned set of certificates is selected by default.
+If option {\bf -a} is provided, the certificates are read from the {\em cACertificate} attribute in
+the X.500 directory entry of {\em Name}; otherwise, they are retrieved from the {\em userCertificate} attribute. (If the X.500 directory entry of {\em Name} does not contain the requested attribute,
+an appropriate error message is reported to the caller.)
+Parameters {\em dsaname} (option {\bf -d}) and {\em authlevel} (option {\bf -A}) have the same meaning as with {\em cacreate}.
+ 
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the pkadd command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging
+information.
+\\ [1em] 
+{\bf pkdel} [ {\bf -ehtvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -o} {\em owner} ] [ {\bf -i} {\em issuer} ] [ 
+{\bf -n} {\em serial} ] 
+\addtotoc{pkdel}
+
+{\em pkdel} deletes entries from PSE object PKList (by default) or EKList (option {\bf -e}). It
+either deletes all entries of the given {\em owner}, or the one entry uniquely identified
+by its {\em issuer} and {\em serial} combination. {\em owner} and {\em issuer} are distinguished
+names in printable form or alias names.
+ 
+The location of the PSE is determined by {\em cadir} and {\em psename}. The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, if no such
+variable exists.
+ 
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists.
+ 
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the pkdel command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging
+information.
+\\ [1em] 
+{\bf pklist} [ {\bf -ehtvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ]
+\addtotoc{pklist}
+
+{\em pklist} prints to stdout all entries of the PSE object PKList (by default)
+or EKList (option {\bf -e}).
+ 
+The location of the PSE is determined by {\em cadir} and {\em psename}. The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, if no such
+variable exists.
+ 
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists.
+ 
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the pklist command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging information.
+\\ [1em]
+{\bf showdir} [ {\bf -aehtvVW} ] [ {\bf -c} {\em cadir} ] [ {\bf -p} {\em psename} ] [ {\bf -o} {\em attributeType} ] [ {\bf -d} {\em dsaname} ] \\
+\hspace*{2cm} [ {\bf -A} {\em authlevel} ] {\em Name}
+\addtotoc{showdir}
+
+{\em showdir} reads the attribute of type {\em attributeType} (option {\bf -o}) from the directory entry
+identified by {\em Name} and prints its contents to stdout in a suitable form.
+{\em attributeType} is {\em cert} by default; further possible values for {\em attributeType} are
+{\em cross} (for Cross Certificate Pairs) and {\em rev} (for PEM revocation lists).
+{\em Name} may be a distinguished name in printable form or an alias name.
+The directory may either be a X.500 directory or the local substitute provided by 
+SecuDE ({\em .af-db}). (see also DirectoryType(5)).
+ 
+If a X.500 directory is accessed and {\em attributeType} is {\em cert},
+the set of certificates stored in the {\em userCertificate} (by default) or 
+{\em cACertificate} (option {\bf -a}) attribute within {\em Name}'s X.500 directory entry
+is returned, from which the signature (by default) or encryption (option {\bf -e}) certificate(s) 
+are selected.
+If the local substitute {\em .af-db} is used, however, the signature (by default) or encryption 
+(option {\bf -e}) certificate (stored in the file SignCert or EncCert, respectively) in the 
+.af-db-subdirectory identified by {\em Name} is printed to stdout. \\
+If a X.500 directory is used and {\em attributeType} is {\em cross}, the set of cross certificate 
+pairs stored in {\em Name}'s directory entry is printed to stdout; the set of 
+cross certificate pairs comprises the value(s) of the {\em crossCertificatePair} attribute. 
+If the local substitute is used, however, the set of cross certificate pairs is retrieved from the file CrossCSet in the .af-db-subdirectory identified by {\em Name}. \\
+If a X.500 directory is used and {\em attributeType} is {\em rev}, the revocation list stored 
+in {\em Name}'s directory entry is printed to stdout. 
+If the local substitute is used, however, the revocation list is 
+retrieved from the file PemCrl in the .af-db-subdirectory identified by {\em Name}.
+The format of the revocation list is that defined by PEM (see RFC 1422, Appendix A).
+ 
+If a X.500 directory is accessed, options {\bf -d} and {\bf -A} may additionally be
+provided, with the same meaning as with {\em cacreate}.
+
+The transformation of {\em Name} into a DName structure requires that you indicate a PSE
+to {\em showdir}, in order to be able to verify your own and/or the system alias databases,
+which are both signed. Furthermore, your PSE may be required for authenticating you
+to the X.500 Directory during the binding.
+
+The location of your PSE is determined by {\em cadir} and {\em psename}. The default for {\em 
+psename} is either provided by the environment variable PSE, or is .pse under the HOME directory, if no such
+variable exists.
+ 
+The default for {\em cadir} is NULL. 
+
+If {\em cadir} is specified,
+however, the PSE identified by {\em psename} resides under {\em cadir}; in this case, the default
+for {\em psename} is either provided by the environment variable CAPSE, or is .capse, if no such variable
+exists.
+
+Option {\bf -t} may be provided for testing purposes; it requests to control the malloc/free behaviour.
+
+Option {\bf -v} renders the showdir command verbose, and options {\bf -V} and {\bf -W} 
+provide some further logging
+information.
+\\ [1em]
+{\bf inst\_pse} {\em file}
+\addtotoc{inst\_pse}
+
+{\em inst\_pse} can be used to install a complete subject's PSE which has been previously
+generated by a CA using {\em gen\_pse}. {\em inst\_pse} reads the encoded and compressed 
+tar-file which comprises the PSE to be installed from {\em file}.
+\\ [1em]
+{\bf inst\_ca} {\em file}
+\addtotoc{inst\_ca}
+
+{\em inst\_ca} can be used to install a complete CA directory which has been previously
+generated by a higher CA using {\em gen\_ca}. {\em inst\_ca} reads the encoded and compressed 
+tar-file which comprises the CA directory to be installed from {\em file}.
+\newpage
+\hl{Examples of Different Methods of Key Distribution}
+
+{\bf 1. Generation of the Subject's RSA Keys at the Subject Sites}
+\\ [1em]
+{\small
+Explanation: If the different roles (root CA, ca1, ca2, user) are established under different 
+User-IDs or on different systems, one has to separate the following commands at the 
+intermediate pipes and to move the corresponding files from one site (or
+HOME directory) to the other, for instance by means of file transfer or e-mail (the
+latter requires an addional ASCII-encoding of the transmitted files).
+To illustrate this, commands which have to
+be done by the CA role are in {\bf bold}, and commands which have to be done
+by the user role are in {\em italic}.
+}
+\\ [1em]
+To install a two-level CA hierarchy consisting of a root CA on the top level and ca1, ca2
+on the second level on the same system and under the same User-ID, one can say
+\bvtab
+\1 {\bf cacreate} -c .root-ca 'C=DE; O=organization \\
+\1 {\bf cacreate} -c .ca1 'C=DE; O=organization; OU=ou1' \\
+\1 {\bf cacreate} -c .ca2 'C=DE; O=organization; OU=ou2'
+\evtab
+to create the CAs with their CA directories .root-ca, .ca1, and .ca2 under the HOME directory
+of that user. The PSEs of the CAs are located in the CA directories respectively.
+All CA PSEs are prototype PSEs at this moment, i.e. each of them contains an RSA key pair 
+(the public key as self-signed prototype certificate) and a PKRoot which consists
+of the own public key and issuer name set to the own subject name. 
+
+Now the PSE object PKRoot has to be taken from the root CA and installed in ca1 and ca2 by saying
+\bvtab
+\1 {\bf getpkroot} -c .root-ca $|$ {\em instpkroot} -c .ca1 \\
+\1 {\bf getpkroot} -c .root-ca $|$ {\em instpkroot} -c .ca2
+\evtab
+An FCPath does not exist on the first two levels of CAs (the users of ca1 and ca2, however,
+have FCPaths which have to be installed in the user PSEs; recall Vol. 1 chapter 2 for this).
+ 
+The next step is to obtain the
+respective certificates for the public keys from the root CA, and to install those 
+certificates in the ca1 and ca2 PSEs.
+\bvtab
+\1 {\em getkey} -c .ca1 $|$ {\bf certify} -c .root-ca -q $|$ {\em instcert} -c .ca1 -h \\
+\1 {\em getkey} -c .ca2 $|$ {\bf certify} -c .root-ca -q $|$ {\em instcert} -c .ca2 -h \\
+\evtab
+
+Now the creation of the CA directories .root-ca, .ca1 and .ca2 is complete.
+ 
+To create a PSE of a user of ca1, one says for instance
+\bvtab
+\1 {\em psecreate} 'C=DE; O=organization; OU=ou1; CN=username' \\
+\1 {\bf getpkroot} -c .ca1 $|$ {\em instpkroot} \\
+\1 {\bf getfcpath} -c .ca1 $|$ {\em instfcpath} \\
+\1 {\em getkey} $|$ {\bf certify} -c .ca1 -q $|$ {\em instcert} -h \\
+\evtab
+which generates the user PSE .pse under the HOME directory of the user.
+\\ [1em]
+{\bf 2. Generation of the Subject's RSA Keys at the CA Sites}
+\\ [1em]
+Utility {\em gen\_pse (1)} can be used to generate entire user PSEs at the CA
+site. This is a reasonable alternative, for instance, in the case that smartcards
+are generated and distributed through the CA. Say
+\bvtab
+\1 {\bf gen\_pse} -c .ca1 -i gen\_script  \\
+\evtab
+to generate user PSEs at CA ca1. gen\_script is the script-file which contains
+the necessary information about the users of ca1 and how their PSEs shall be generated.
+All SW-PSEs which are generated this way are stored as encoded and compressed tar-files
+in the directory .ca1/genpse. They are protected through the transport PIN which can
+be specified in the script-file. These tar-files can be transmitted to the users
+who may install them in their environment using inst\_pse(1).
+\bvtab
+\1 {\bf gen\_pse} -c .ca1 -i gen\_script -h /home \\
+\evtab
+does the same except that SP-PSEs are written directly into /home/{\em username}
+where {\em username} is the Unix name of the user as specified in the scriptfile.
+This option may be useful if the CA and the users of the CA share the same
+file-system (e.g. in a local area network with NFS). Note that gen\_pse
+must have the necessary permissions to do so.
+\\ [1em]
+{\bf 3. Key Distribution using PEM}
+\\ [1em]
+See {\em pem (1)}.

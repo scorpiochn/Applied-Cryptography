@@ -1,0 +1,2851 @@
+.text
+	.align 4
+	.global _NN_DigitMult
+	.proc	020
+_NN_DigitMult:
+	!#PROLOGUE# 0
+	save %sp,-136,%sp
+	!#PROLOGUE# 1
+	srl %i1,16,%l0
+	srl %i2,16,%l1
+	sll %i1,16,%i1
+	srl %i1,16,%i1
+	sll %i2,16,%i2
+	srl %i2,16,%i2
+	mov %i1,%o0
+	call .umul,0
+	mov %i2,%o1
+	st %o0,[%i0]
+	mov %i1,%o0
+	call .umul,0
+	mov %l1,%o1
+	mov %o0,%i1
+	sll %l0,16,%l0
+	srl %l0,16,%l2
+	mov %l2,%o0
+	call .umul,0
+	mov %i2,%o1
+	mov %o0,%l2
+	srl %l0,16,%l0
+	mov %l0,%o0
+	call .umul,0
+	mov %l1,%o1
+	mov %o0,%o1
+	add %i1,%l2,%i1
+	cmp %i1,%l2
+	bgeu L5
+	st %o1,[%i0+4]
+	sethi %hi(65536),%o0
+	add %o1,%o0,%o0
+	st %o0,[%i0+4]
+L5:
+	sll %i1,16,%l2
+	ld [%i0],%o0
+	add %l2,%o0,%o0
+	cmp %o0,%l2
+	bgeu L6
+	st %o0,[%i0]
+	ld [%i0+4],%o0
+	add %o0,1,%o0
+	st %o0,[%i0+4]
+L6:
+	srl %i1,16,%o0
+	ld [%i0+4],%o1
+	add %o0,%o1,%o0
+	st %o0,[%i0+4]
+	ret
+	restore
+	.align 4
+	.global _NN_DigitDiv
+	.proc	020
+_NN_DigitDiv:
+	!#PROLOGUE# 0
+	save %sp,-144,%sp
+	!#PROLOGUE# 1
+	srl %i2,16,%l2
+	mov %i2,%l4
+	ld [%i1],%o0
+	st %o0,[%fp-24]
+	ld [%i1+4],%o2
+	mov %l2,%o1
+	sethi %hi(65535),%o0
+	or %o0,%lo(65535),%o0
+	cmp %o1,%o0
+	bne L26
+	st %o2,[%fp-20]
+	b L27
+	srl %o2,16,%l3
+L26:
+	ld [%fp-20],%o0
+	call .udiv,0
+	add %l2,1,%o1
+	mov %o0,%l3
+L27:
+	sll %l3,16,%l0
+	srl %l0,16,%i1
+	sll %l4,16,%o1
+	mov %i1,%o0
+	call .umul,0
+	srl %o1,16,%o1
+	mov %o0,%i1
+	srl %l0,16,%l0
+	mov %l0,%o0
+	call .umul,0
+	mov %l2,%o1
+	mov %o0,%l0
+	sll %i1,16,%o2
+	ld [%fp-24],%o1
+	sub %o1,%o2,%o1
+	mov -1,%o0
+	sub %o0,%o2,%o0
+	cmp %o1,%o0
+	bleu L28
+	st %o1,[%fp-24]
+	ld [%fp-20],%o0
+	add %o0,-1,%o0
+	st %o0,[%fp-20]
+L28:
+	srl %i1,16,%o1
+	ld [%fp-20],%o0
+	sub %o0,%o1,%o0
+	sub %o0,%l0,%o0
+	st %o0,[%fp-20]
+	b L43
+	mov %l2,%o1
+L33:
+	ld [%fp-24],%o0
+	cmp %o0,%o1
+	blu L45
+	mov %l2,%o1
+	sll %l4,16,%o2
+L46:
+	ld [%fp-24],%o1
+	sub %o1,%o2,%o1
+	mov -1,%o0
+	sub %o0,%o2,%o0
+	cmp %o1,%o0
+	bleu L32
+	st %o1,[%fp-24]
+	ld [%fp-20],%o0
+	add %o0,-1,%o0
+	st %o0,[%fp-20]
+L32:
+	mov %l2,%o1
+	ld [%fp-20],%o0
+	sub %o0,%o1,%o0
+	st %o0,[%fp-20]
+	add %l3,1,%l3
+L43:
+	cmp %o0,%o1
+	bgu L46
+	sll %l4,16,%o2
+	cmp %o0,%o1
+	be L33
+	sll %l4,16,%o1
+	mov %l2,%o1
+L45:
+	sethi %hi(65535),%o0
+	or %o0,%lo(65535),%o0
+	cmp %o1,%o0
+	bne L34
+	ld [%fp-20],%o0
+	b L35
+	lduh [%fp-18],%l1
+L34:
+	sll %o0,16,%o0
+	lduh [%fp-24],%o1
+	add %o0,%o1,%o0
+	call .udiv,0
+	add %l2,1,%o1
+	mov %o0,%l1
+L35:
+	sll %l1,16,%l0
+	srl %l0,16,%i1
+	sll %l4,16,%o1
+	mov %i1,%o0
+	call .umul,0
+	srl %o1,16,%o1
+	mov %o0,%i1
+	srl %l0,16,%l0
+	mov %l0,%o0
+	call .umul,0
+	mov %l2,%o1
+	mov %o0,%l0
+	ld [%fp-24],%o1
+	sub %o1,%i1,%o1
+	mov -1,%o0
+	sub %o0,%i1,%o0
+	cmp %o1,%o0
+	bleu L36
+	st %o1,[%fp-24]
+	ld [%fp-20],%o0
+	add %o0,-1,%o0
+	st %o0,[%fp-20]
+L36:
+	sll %l0,16,%o2
+	ld [%fp-24],%o1
+	sub %o1,%o2,%o1
+	mov -1,%o0
+	sub %o0,%o2,%o0
+	cmp %o1,%o0
+	bleu L37
+	st %o1,[%fp-24]
+	ld [%fp-20],%o0
+	add %o0,-1,%o0
+	st %o0,[%fp-20]
+L37:
+	srl %l0,16,%o1
+	ld [%fp-20],%o0
+	sub %o0,%o1,%o0
+	st %o0,[%fp-20]
+L44:
+	cmp %o0,0
+	bne L40
+	ld [%fp-24],%o0
+	cmp %o0,%i2
+	blu L39
+	sll %l3,16,%o1
+L40:
+	ld [%fp-24],%o1
+	sub %o1,%i2,%o1
+	mov -1,%o0
+	sub %o0,%i2,%o0
+	cmp %o1,%o0
+	bleu L41
+	st %o1,[%fp-24]
+	ld [%fp-20],%o0
+	add %o0,-1,%o0
+	st %o0,[%fp-20]
+L41:
+	add %l1,1,%l1
+	b L44
+	ld [%fp-20],%o0
+L39:
+	sll %l1,16,%o0
+	srl %o0,16,%o0
+	add %o1,%o0,%o1
+	st %o1,[%i0]
+	ret
+	restore
+	.align 4
+	.global _NN_Decode
+	.proc	020
+_NN_Decode:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	addcc %o3,-1,%o3
+	bneg L62
+	mov 0,%g1
+	mov 0,%o5
+L68:
+	mov 0,%o4
+	cmp %o3,0
+	bl L65
+	mov 0,%g3
+	ldub [%o2+%o3],%g2
+L73:
+	sll %g2,%g3,%g2
+	or %o4,%g2,%o4
+	addcc %o3,-1,%o3
+	bneg L65
+	add %g3,8,%g3
+	cmp %g3,31
+	bleu,a L73
+	ldub [%o2+%o3],%g2
+L65:
+	st %o4,[%o5+%o0]
+	add %o5,4,%o5
+	cmp %o3,0
+	bge L68
+	add %g1,1,%g1
+L62:
+	cmp %g1,%o1
+	bgeu L70
+	sll %g1,2,%g2
+	sll %o1,2,%o1
+	st %g0,[%g2+%o0]
+L74:
+	add %g2,4,%g2
+	cmp %g2,%o1
+	blu,a L74
+	st %g0,[%g2+%o0]
+L70:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.global _NN_Encode
+	.proc	020
+_NN_Encode:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	cmp %o3,0
+	be L90
+	add %o1,-1,%o1
+	mov 0,%o4
+	sll %o3,2,%o3
+	ld [%o4+%o2],%o5
+L102:
+	cmp %o1,0
+	bl L91
+	mov 0,%g3
+	srl %o5,%g3,%g2
+L101:
+	stb %g2,[%o0+%o1]
+	addcc %o1,-1,%o1
+	bneg L91
+	add %g3,8,%g3
+	cmp %g3,31
+	bleu L101
+	srl %o5,%g3,%g2
+L91:
+	add %o4,4,%o4
+	cmp %o4,%o3
+	blu,a L102
+	ld [%o4+%o2],%o5
+L90:
+	cmp %o1,0
+	bl L98
+	nop
+	stb %g0,[%o0+%o1]
+L103:
+	addcc %o1,-1,%o1
+	bpos,a L103
+	stb %g0,[%o0+%o1]
+L98:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.global _NN_Assign
+	.proc	020
+_NN_Assign:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	cmp %o2,0
+	be L111
+	mov 0,%g3
+	sll %o2,2,%o2
+	ld [%g3+%o1],%g2
+L114:
+	st %g2,[%g3+%o0]
+	add %g3,4,%g3
+	cmp %g3,%o2
+	blu,a L114
+	ld [%g3+%o1],%g2
+L111:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.global _NN_AssignZero
+	.proc	020
+_NN_AssignZero:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	cmp %o1,0
+	be L122
+	mov 0,%g2
+	sll %o1,2,%o1
+	st %g0,[%g2+%o0]
+L125:
+	add %g2,4,%g2
+	cmp %g2,%o1
+	blu,a L125
+	st %g0,[%g2+%o0]
+L122:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.global _NN_Assign2Exp
+	.proc	020
+_NN_Assign2Exp:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	cmp %o2,0
+	be L134
+	mov %o0,%o3
+	mov 0,%g3
+	sll %o2,2,%g2
+	st %g0,[%g3+%o3]
+L140:
+	add %g3,4,%g3
+	cmp %g3,%g2
+	blu,a L140
+	st %g0,[%g3+%o3]
+L134:
+	sll %o2,5,%g2
+	cmp %o1,%g2
+	bgeu L133
+	srl %o1,5,%g2
+	sll %g2,2,%g2
+	and %o1,31,%o0
+	mov 1,%g3
+	sll %g3,%o0,%g3
+	st %g3,[%o3+%g2]
+L133:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.global _NN_Add
+	.proc	017
+_NN_Add:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	mov %o0,%o5
+	mov 0,%o0
+	cmp %o0,%o3
+	bgeu L152
+	mov 0,%o4
+	sll %o3,2,%o3
+	ld [%o4+%o1],%g2
+L159:
+	add %o0,%g2,%g3
+	cmp %g3,%o0
+	bgeu,a L154
+	ld [%o4+%o2],%g2
+	b L155
+	ld [%o4+%o2],%g3
+L154:
+	add %g3,%g2,%g3
+	cmp %g3,%g2
+	addx %g0,0,%o0
+L155:
+	st %g3,[%o4+%o5]
+	add %o4,4,%o4
+	cmp %o4,%o3
+	blu,a L159
+	ld [%o4+%o1],%g2
+L152:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.global _NN_Sub
+	.proc	017
+_NN_Sub:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	mov %o0,%g1
+	mov 0,%o0
+	cmp %o0,%o3
+	bgeu L171
+	mov -1,%o5
+	mov 0,%o4
+	sll %o3,2,%o3
+	ld [%o4+%o1],%g2
+L178:
+	sub %g2,%o0,%g3
+	sub %o5,%o0,%g2
+	cmp %g3,%g2
+	bleu,a L173
+	ld [%o4+%o2],%g2
+	ld [%o4+%o2],%g2
+	b L174
+	sub %o5,%g2,%g3
+L173:
+	sub %g3,%g2,%g3
+	sub %o5,%g2,%g2
+	cmp %g2,%g3
+	addx %g0,0,%o0
+L174:
+	st %g3,[%o4+%g1]
+	add %o4,4,%o4
+	cmp %o4,%o3
+	blu,a L178
+	ld [%o4+%o1],%g2
+L171:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.global _NN_Mult
+	.proc	020
+_NN_Mult:
+	!#PROLOGUE# 0
+	save %sp,-376,%sp
+	!#PROLOGUE# 1
+	add %fp,-280,%l2
+	sll %i3,1,%o1
+	cmp %o1,0
+	be L203
+	mov %l2,%o2
+	mov 0,%o0
+	sll %o1,2,%o1
+	st %g0,[%o0+%o2]
+L225:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L225
+	st %g0,[%o0+%o2]
+L203:
+	mov %i1,%o0
+	call _NN_Digits,0
+	mov %i3,%o1
+	mov %o0,%l4
+	mov %i2,%o0
+	call _NN_Digits,0
+	mov %i3,%o1
+	mov %o0,%l3
+	cmp %i1,%i2
+	bne L209
+	sll %i3,1,%l1
+	cmp %l4,5
+	bgu L208
+	cmp %l3,0
+L209:
+	mov 0,%l1
+	cmp %l1,%l4
+	bgeu L214
+	add %fp,-16,%l5
+	add %fp,-280,%l0
+	mov 0,%l2
+L213:
+	mov %l0,%o0
+	mov %l0,%o1
+	ld [%l2+%i1],%o2
+	mov %i2,%o3
+	call _NN_AddDigitMult,0
+	mov %l3,%o4
+	add %l1,%l3,%o1
+	sll %o1,2,%o1
+	add %o1,%l5,%o1
+	ld [%o1-264],%o2
+	add %o0,%o2,%o0
+	st %o0,[%o1-264]
+	add %l0,4,%l0
+	add %l1,1,%l1
+	cmp %l1,%l4
+	blu L213
+	add %l2,4,%l2
+	b L226
+	sll %i3,1,%o1
+L208:
+	be L214
+	mov 0,%i2
+L219:
+	ld [%i1],%l0
+	mov %l2,%o0
+	mov %l1,%o1
+	mov %i1,%o2
+	mov 1,%o3
+	call _XXXMultiplyDigit,0
+	mov %l0,%o4
+	cmp %i2,0
+	be L218
+	mov %l2,%o0
+	mov %l1,%o1
+	mov %i1,%o2
+	mov 1,%o3
+	call _XXXAdd,0
+	mov 0,%o4
+L218:
+	add %l3,-1,%l3
+	add %i1,4,%i1
+	add %l2,8,%l2
+	add %l1,-2,%l1
+	add %l0,%l0,%o4
+	add %l2,-4,%o0
+	add %l1,1,%o1
+	mov %i1,%o2
+	mov %l3,%o3
+	call _XXXMultiplyDigit,0
+	add %o4,%i2,%o4
+	cmp %l3,0
+	bne L219
+	srl %l0,31,%i2
+L214:
+	sll %i3,1,%o1
+L226:
+	cmp %o1,0
+	be L220
+	add %fp,-280,%o3
+	mov 0,%o2
+	sll %o1,2,%o1
+	ld [%o2+%o3],%o0
+L227:
+	st %o0,[%o2+%i0]
+	add %o2,4,%o2
+	cmp %o2,%o1
+	blu,a L227
+	ld [%o2+%o3],%o0
+L220:
+	add %fp,-280,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	ret
+	restore
+	.align 4
+	.global _NN_Mod
+	.proc	020
+_NN_Mod:
+	!#PROLOGUE# 0
+	save %sp,-376,%sp
+	!#PROLOGUE# 1
+	add %fp,-280,%l0
+	mov %l0,%o0
+	mov %i0,%o1
+	mov %i1,%o2
+	mov %i2,%o3
+	mov %i3,%o4
+	call _NN_Div,0
+	mov %i4,%o5
+	mov %l0,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	ret
+	restore
+	.align 4
+	.global _NN_ModMult
+	.proc	020
+_NN_ModMult:
+	!#PROLOGUE# 0
+	save %sp,-640,%sp
+	!#PROLOGUE# 1
+	add %fp,-280,%l5
+	mov %l5,%l6
+	add %fp,-544,%l2
+	sll %i4,1,%o1
+	cmp %o1,0
+	be L257
+	mov %l2,%o2
+	mov 0,%o0
+	sll %o1,2,%o1
+	st %g0,[%o0+%o2]
+L280:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L280
+	st %g0,[%o0+%o2]
+L257:
+	mov %i1,%o0
+	call _NN_Digits,0
+	mov %i4,%o1
+	mov %o0,%l4
+	mov %i2,%o0
+	call _NN_Digits,0
+	mov %i4,%o1
+	mov %o0,%l3
+	cmp %i1,%i2
+	bne L263
+	sll %i4,1,%l1
+	cmp %l4,5
+	bgu L262
+	cmp %l3,0
+L263:
+	mov 0,%l1
+	cmp %l1,%l4
+	bgeu L281
+	sll %i4,1,%o0
+	add %fp,-544,%l0
+	mov 0,%l2
+L267:
+	mov %l0,%o0
+	mov %l0,%o1
+	ld [%l2+%i1],%o2
+	mov %i2,%o3
+	call _NN_AddDigitMult,0
+	mov %l3,%o4
+	add %l1,%l3,%o1
+	sll %o1,2,%o1
+	add %o1,%l6,%o1
+	ld [%o1-264],%o2
+	add %o0,%o2,%o0
+	st %o0,[%o1-264]
+	add %l0,4,%l0
+	add %l1,1,%l1
+	cmp %l1,%l4
+	blu L267
+	add %l2,4,%l2
+	b L281
+	sll %i4,1,%o0
+L262:
+	be L268
+	mov 0,%i2
+L273:
+	ld [%i1],%l0
+	mov %l2,%o0
+	mov %l1,%o1
+	mov %i1,%o2
+	mov 1,%o3
+	call _XXXMultiplyDigit,0
+	mov %l0,%o4
+	cmp %i2,0
+	be L272
+	mov %l2,%o0
+	mov %l1,%o1
+	mov %i1,%o2
+	mov 1,%o3
+	call _XXXAdd,0
+	mov 0,%o4
+L272:
+	add %l3,-1,%l3
+	add %i1,4,%i1
+	add %l2,8,%l2
+	add %l1,-2,%l1
+	add %l0,%l0,%o4
+	add %l2,-4,%o0
+	add %l1,1,%o1
+	mov %i1,%o2
+	mov %l3,%o3
+	call _XXXMultiplyDigit,0
+	add %o4,%i2,%o4
+	cmp %l3,0
+	bne L273
+	srl %l0,31,%i2
+L268:
+	sll %i4,1,%o0
+L281:
+	cmp %o0,0
+	be L274
+	add %fp,-544,%o3
+	mov 0,%o1
+	sll %o0,2,%o2
+	ld [%o1+%o3],%o0
+L282:
+	st %o0,[%o1+%l5]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L282
+	ld [%o1+%o3],%o0
+L274:
+	add %fp,-544,%l0
+	mov %l0,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	add %fp,-280,%l1
+	mov %l0,%o0
+	mov %i0,%o1
+	mov %l1,%o2
+	sll %i4,1,%o3
+	mov %i3,%o4
+	call _NN_Div,0
+	mov %i4,%o5
+	mov %l0,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	mov %l1,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	ret
+	restore
+	.align 4
+	.global _NN_ModExp
+	.proc	020
+_NN_ModExp:
+	!#PROLOGUE# 0
+	save %sp,-1224,%sp
+	!#PROLOGUE# 1
+	st %i0,[%fp-1084]
+	st %i2,[%fp-1092]
+	st %i3,[%fp-1100]
+	st %i4,[%fp-1108]
+	cmp %i5,0
+	be L438
+	add %fp,-416,%o3
+	mov 0,%o1
+	sll %i5,2,%o2
+	ld [%o1+%i1],%o0
+L592:
+	st %o0,[%o1+%o3]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L592
+	ld [%o1+%i1],%o0
+L438:
+	add %fp,-416,%l2
+	add %fp,-816,%l6
+	mov %l6,%l7
+	add %fp,-1080,%l3
+	sll %i5,1,%o1
+	cmp %o1,0
+	be L445
+	mov %l3,%o2
+	mov 0,%o0
+	sll %o1,2,%o1
+	st %g0,[%o0+%o2]
+L593:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L593
+	st %g0,[%o0+%o2]
+L445:
+	mov %l2,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l5
+	mov %i1,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l4
+	cmp %l2,%i1
+	bne L451
+	sll %i5,1,%l1
+	cmp %l5,5
+	bgu L450
+	cmp %l4,0
+L451:
+	mov 0,%l1
+	cmp %l1,%l5
+	bgeu L594
+	sll %i5,1,%o0
+	add %fp,-1080,%l0
+	mov 0,%l3
+L455:
+	mov %l0,%o0
+	mov %l0,%o1
+	ld [%l3+%l2],%o2
+	mov %i1,%o3
+	call _NN_AddDigitMult,0
+	mov %l4,%o4
+	add %l1,%l4,%o1
+	sll %o1,2,%o1
+	add %o1,%l7,%o1
+	ld [%o1-264],%o2
+	add %o0,%o2,%o0
+	st %o0,[%o1-264]
+	add %l0,4,%l0
+	add %l1,1,%l1
+	cmp %l1,%l5
+	blu L455
+	add %l3,4,%l3
+	b L594
+	sll %i5,1,%o0
+L450:
+	be L456
+	mov 0,%l5
+L461:
+	ld [%l2],%l0
+	mov %l3,%o0
+	mov %l1,%o1
+	mov %l2,%o2
+	mov 1,%o3
+	call _XXXMultiplyDigit,0
+	mov %l0,%o4
+	cmp %l5,0
+	be L460
+	mov %l3,%o0
+	mov %l1,%o1
+	mov %l2,%o2
+	mov 1,%o3
+	call _XXXAdd,0
+	mov 0,%o4
+L460:
+	add %l4,-1,%l4
+	add %l2,4,%l2
+	add %l3,8,%l3
+	add %l1,-2,%l1
+	add %l0,%l0,%o4
+	add %l3,-4,%o0
+	add %l1,1,%o1
+	mov %l2,%o2
+	mov %l4,%o3
+	call _XXXMultiplyDigit,0
+	add %o4,%l5,%o4
+	cmp %l4,0
+	bne L461
+	srl %l0,31,%l5
+L456:
+	sll %i5,1,%o0
+L594:
+	cmp %o0,0
+	be L462
+	add %fp,-1080,%o3
+	mov 0,%o1
+	sll %o0,2,%o2
+	ld [%o1+%o3],%o0
+L595:
+	st %o0,[%o1+%l6]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L595
+	ld [%o1+%o3],%o0
+L462:
+	add %fp,-1080,%l1
+	mov %l1,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	add %fp,-816,%l0
+	mov %l1,%o0
+	add %fp,-284,%o1
+	mov %l0,%o2
+	sll %i5,1,%o3
+	ld [%fp-1108],%o4
+	call _NN_Div,0
+	mov %i5,%o5
+	mov %l1,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	mov %l0,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	add %fp,-284,%l3
+	mov %l0,%l7
+	sll %i5,1,%o1
+	cmp %o1,0
+	be L470
+	mov %l1,%o2
+	mov 0,%o0
+	sll %o1,2,%o1
+	st %g0,[%o0+%o2]
+L596:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L596
+	st %g0,[%o0+%o2]
+L470:
+	mov %l3,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l6
+	mov %i1,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l5
+	cmp %l3,%i1
+	bne L476
+	sll %i5,1,%l4
+	cmp %l6,5
+	bgu L475
+	cmp %l5,0
+L476:
+	mov 0,%l2
+	cmp %l2,%l6
+	bgeu L597
+	sll %i5,1,%o0
+	add %fp,-1080,%l1
+	mov 0,%l4
+L480:
+	mov %l1,%o0
+	mov %l1,%o1
+	ld [%l4+%l3],%o2
+	mov %i1,%o3
+	call _NN_AddDigitMult,0
+	mov %l5,%o4
+	add %l2,%l5,%o1
+	sll %o1,2,%o1
+	add %o1,%l7,%o1
+	ld [%o1-264],%o2
+	add %o0,%o2,%o0
+	st %o0,[%o1-264]
+	add %l1,4,%l1
+	add %l2,1,%l2
+	cmp %l2,%l6
+	blu L480
+	add %l4,4,%l4
+	b L597
+	sll %i5,1,%o0
+L475:
+	be L481
+	mov 0,%l6
+L486:
+	ld [%l3],%l2
+	mov %l1,%o0
+	mov %l4,%o1
+	mov %l3,%o2
+	mov 1,%o3
+	call _XXXMultiplyDigit,0
+	mov %l2,%o4
+	cmp %l6,0
+	be L485
+	mov %l1,%o0
+	mov %l4,%o1
+	mov %l3,%o2
+	mov 1,%o3
+	call _XXXAdd,0
+	mov 0,%o4
+L485:
+	add %l5,-1,%l5
+	add %l3,4,%l3
+	add %l1,8,%l1
+	add %l4,-2,%l4
+	add %l2,%l2,%o4
+	add %l1,-4,%o0
+	add %l4,1,%o1
+	mov %l3,%o2
+	mov %l5,%o3
+	call _XXXMultiplyDigit,0
+	add %o4,%l6,%o4
+	cmp %l5,0
+	bne L486
+	srl %l2,31,%l6
+L481:
+	sll %i5,1,%o0
+L597:
+	cmp %o0,0
+	be L487
+	add %fp,-1080,%o3
+	mov 0,%o1
+	sll %o0,2,%o2
+	ld [%o1+%o3],%o0
+L598:
+	st %o0,[%o1+%l0]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L598
+	ld [%o1+%o3],%o0
+L487:
+	add %fp,-1080,%l0
+	mov %l0,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	add %fp,-816,%l1
+	mov %l0,%o0
+	add %fp,-152,%o1
+	mov %l1,%o2
+	sll %i5,1,%o3
+	ld [%fp-1108],%o4
+	call _NN_Div,0
+	mov %i5,%o5
+	mov %l0,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	mov %l1,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	cmp %i5,0
+	be L493
+	add %fp,-552,%o2
+	mov 0,%o0
+	sll %i5,2,%o1
+	st %g0,[%o0+%o2]
+L599:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L599
+	st %g0,[%o0+%o2]
+L493:
+	mov 1,%o0
+	st %o0,[%fp-552]
+	ld [%fp-1092],%o0
+	call _NN_Digits,0
+	ld [%fp-1100],%o1
+	st %o0,[%fp-1100]
+	addcc %o0,-1,%g3
+	bneg L499
+	st %g3,[%fp-1116]
+	add %fp,-816,%l7
+	sll %i5,1,%i0
+	add %fp,-1080,%l6
+	sll %g3,2,%g3
+	st %g3,[%fp-1124]
+L585:
+	ld [%fp-1124],%g2
+	ld [%fp-1092],%g3
+	ld [%g2+%g3],%i2
+	ld [%fp-1100],%g2
+	add %g2,-1,%o0
+	ld [%fp-1116],%g3
+	cmp %g3,%o0
+	bne L501
+	mov 32,%i4
+	b L600
+	srl %i2,30,%o0
+L504:
+	add %i4,-2,%i4
+	srl %i2,30,%o0
+L600:
+	cmp %o0,0
+	be,a L504
+	sll %i2,2,%i2
+L501:
+	mov 0,%i3
+	cmp %i3,%i4
+	bgeu L601
+	ld [%fp-1124],%g2
+L584:
+	add %fp,-552,%i1
+	mov %i1,%l0
+	add %fp,-1080,%l2
+	cmp %i0,0
+	be L510
+	mov %l2,%o2
+	mov 0,%o0
+	sll %i0,2,%o1
+	st %g0,[%o0+%o2]
+L602:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L602
+	st %g0,[%o0+%o2]
+L510:
+	mov %i1,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l4
+	add %fp,-552,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l3
+	cmp %i1,%l0
+	bne L516
+	sll %i5,1,%l1
+	cmp %l4,5
+	bgu L515
+	cmp %l3,0
+L516:
+	mov 0,%l0
+	cmp %l0,%l4
+	bgeu L603
+	cmp %i0,0
+	mov %l6,%l1
+	mov 0,%l2
+L520:
+	mov %l1,%o0
+	mov %l1,%o1
+	ld [%l2+%i1],%o2
+	add %fp,-552,%o3
+	call _NN_AddDigitMult,0
+	mov %l3,%o4
+	add %l0,%l3,%o1
+	sll %o1,2,%o1
+	add %o1,%l7,%o1
+	ld [%o1-264],%o2
+	add %o0,%o2,%o0
+	st %o0,[%o1-264]
+	add %l1,4,%l1
+	add %l0,1,%l0
+	cmp %l0,%l4
+	blu L520
+	add %l2,4,%l2
+	b L603
+	cmp %i0,0
+L515:
+	be L521
+	mov 0,%l4
+L526:
+	ld [%i1],%l0
+	mov %l2,%o0
+	mov %l1,%o1
+	mov %i1,%o2
+	mov 1,%o3
+	call _XXXMultiplyDigit,0
+	mov %l0,%o4
+	cmp %l4,0
+	be L525
+	mov %l2,%o0
+	mov %l1,%o1
+	mov %i1,%o2
+	mov 1,%o3
+	call _XXXAdd,0
+	mov 0,%o4
+L525:
+	add %l3,-1,%l3
+	add %i1,4,%i1
+	add %l2,8,%l2
+	add %l1,-2,%l1
+	add %l0,%l0,%o4
+	add %l2,-4,%o0
+	add %l1,1,%o1
+	mov %i1,%o2
+	mov %l3,%o3
+	call _XXXMultiplyDigit,0
+	add %o4,%l4,%o4
+	cmp %l3,0
+	bne L526
+	srl %l0,31,%l4
+L521:
+	cmp %i0,0
+L603:
+	be L527
+	mov 0,%o1
+	sll %i0,2,%o2
+	ld [%o1+%l6],%o0
+L604:
+	st %o0,[%o1+%l7]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L604
+	ld [%o1+%l6],%o0
+L527:
+	mov %l6,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	mov %l6,%o0
+	add %fp,-552,%o1
+	mov %l7,%o2
+	sll %i5,1,%o3
+	ld [%fp-1108],%o4
+	call _NN_Div,0
+	mov %i5,%o5
+	mov %l6,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	mov %l7,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	add %fp,-552,%i1
+	mov %i1,%l0
+	mov %l6,%l2
+	cmp %i0,0
+	be L535
+	mov %l2,%o2
+	mov 0,%o0
+	sll %i0,2,%o1
+	st %g0,[%o0+%o2]
+L605:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L605
+	st %g0,[%o0+%o2]
+L535:
+	mov %i1,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l4
+	add %fp,-552,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l3
+	cmp %i1,%l0
+	bne L541
+	sll %i5,1,%l1
+	cmp %l4,5
+	bgu L540
+	cmp %l3,0
+L541:
+	mov 0,%l0
+	cmp %l0,%l4
+	bgeu L606
+	cmp %i0,0
+	mov %l6,%l1
+	mov 0,%l2
+L545:
+	mov %l1,%o0
+	mov %l1,%o1
+	ld [%l2+%i1],%o2
+	add %fp,-552,%o3
+	call _NN_AddDigitMult,0
+	mov %l3,%o4
+	add %l0,%l3,%o1
+	sll %o1,2,%o1
+	add %o1,%l7,%o1
+	ld [%o1-264],%o2
+	add %o0,%o2,%o0
+	st %o0,[%o1-264]
+	add %l1,4,%l1
+	add %l0,1,%l0
+	cmp %l0,%l4
+	blu L545
+	add %l2,4,%l2
+	b L606
+	cmp %i0,0
+L540:
+	be L546
+	mov 0,%l4
+L551:
+	ld [%i1],%l0
+	mov %l2,%o0
+	mov %l1,%o1
+	mov %i1,%o2
+	mov 1,%o3
+	call _XXXMultiplyDigit,0
+	mov %l0,%o4
+	cmp %l4,0
+	be L550
+	mov %l2,%o0
+	mov %l1,%o1
+	mov %i1,%o2
+	mov 1,%o3
+	call _XXXAdd,0
+	mov 0,%o4
+L550:
+	add %l3,-1,%l3
+	add %i1,4,%i1
+	add %l2,8,%l2
+	add %l1,-2,%l1
+	add %l0,%l0,%o4
+	add %l2,-4,%o0
+	add %l1,1,%o1
+	mov %i1,%o2
+	mov %l3,%o3
+	call _XXXMultiplyDigit,0
+	add %o4,%l4,%o4
+	cmp %l3,0
+	bne L551
+	srl %l0,31,%l4
+L546:
+	cmp %i0,0
+L606:
+	be L552
+	mov 0,%o1
+	sll %i0,2,%o2
+	ld [%o1+%l6],%o0
+L607:
+	st %o0,[%o1+%l7]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L607
+	ld [%o1+%l6],%o0
+L552:
+	mov %l6,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	mov %l6,%o0
+	add %fp,-552,%o1
+	mov %l7,%o2
+	sll %i5,1,%o3
+	ld [%fp-1108],%o4
+	call _NN_Div,0
+	mov %i5,%o5
+	mov %l6,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	mov %l7,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	srl %i2,30,%o1
+	cmp %o1,0
+	be L507
+	sll %o1,5,%o0
+	add %fp,-548,%l4
+	add %o0,%o1,%o0
+	sll %o0,2,%o0
+	add %l4,%o0,%l4
+	add %fp,-552,%l2
+	mov %l6,%i1
+	cmp %i0,0
+	be L561
+	mov %i1,%o2
+	mov 0,%o0
+	sll %i0,2,%o1
+	st %g0,[%o0+%o2]
+L608:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L608
+	st %g0,[%o0+%o2]
+L561:
+	mov %l2,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l5
+	mov %l4,%o0
+	call _NN_Digits,0
+	mov %i5,%o1
+	mov %o0,%l3
+	cmp %l2,%l4
+	bne L567
+	sll %i5,1,%l1
+	cmp %l5,5
+	bgu L566
+	cmp %l3,0
+L567:
+	mov 0,%l0
+	cmp %l0,%l5
+	bgeu L609
+	cmp %i0,0
+	mov %l6,%l1
+	mov 0,%i1
+L571:
+	mov %l1,%o0
+	mov %l1,%o1
+	ld [%i1+%l2],%o2
+	mov %l4,%o3
+	call _NN_AddDigitMult,0
+	mov %l3,%o4
+	add %l0,%l3,%o1
+	sll %o1,2,%o1
+	add %o1,%l7,%o1
+	ld [%o1-264],%o2
+	add %o0,%o2,%o0
+	st %o0,[%o1-264]
+	add %l1,4,%l1
+	add %l0,1,%l0
+	cmp %l0,%l5
+	blu L571
+	add %i1,4,%i1
+	b L609
+	cmp %i0,0
+L566:
+	be L572
+	mov 0,%l4
+L577:
+	ld [%l2],%l0
+	mov %i1,%o0
+	mov %l1,%o1
+	mov %l2,%o2
+	mov 1,%o3
+	call _XXXMultiplyDigit,0
+	mov %l0,%o4
+	cmp %l4,0
+	be L576
+	mov %i1,%o0
+	mov %l1,%o1
+	mov %l2,%o2
+	mov 1,%o3
+	call _XXXAdd,0
+	mov 0,%o4
+L576:
+	add %l3,-1,%l3
+	add %l2,4,%l2
+	add %i1,8,%i1
+	add %l1,-2,%l1
+	add %l0,%l0,%o4
+	add %i1,-4,%o0
+	add %l1,1,%o1
+	mov %l2,%o2
+	mov %l3,%o3
+	call _XXXMultiplyDigit,0
+	add %o4,%l4,%o4
+	cmp %l3,0
+	bne L577
+	srl %l0,31,%l4
+L572:
+	cmp %i0,0
+L609:
+	be L578
+	mov 0,%o1
+	sll %i0,2,%o2
+	ld [%o1+%l6],%o0
+L610:
+	st %o0,[%o1+%l7]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L610
+	ld [%o1+%l6],%o0
+L578:
+	mov %l6,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	mov %l6,%o0
+	add %fp,-552,%o1
+	mov %l7,%o2
+	sll %i5,1,%o3
+	ld [%fp-1108],%o4
+	call _NN_Div,0
+	mov %i5,%o5
+	mov %l6,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	mov %l7,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+L507:
+	add %i3,2,%i3
+	cmp %i3,%i4
+	blu L584
+	sll %i2,2,%i2
+	ld [%fp-1124],%g2
+L601:
+	add %g2,-4,%g2
+	st %g2,[%fp-1124]
+	ld [%fp-1116],%g3
+	addcc %g3,-1,%g3
+	bpos L585
+	st %g3,[%fp-1116]
+L499:
+	cmp %i5,0
+	be L586
+	add %fp,-552,%o3
+	mov 0,%o2
+	sll %i5,2,%o1
+	ld [%o2+%o3],%o0
+L611:
+	ld [%fp-1084],%g2
+	st %o0,[%o2+%g2]
+	add %o2,4,%o2
+	cmp %o2,%o1
+	blu,a L611
+	ld [%o2+%o3],%o0
+L586:
+	add %fp,-416,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 396,%o2
+	add %fp,-552,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	ret
+	restore
+	.align 4
+	.global _NN_ModInv
+	.proc	020
+_NN_ModInv:
+	!#PROLOGUE# 0
+	save %sp,-1624,%sp
+	!#PROLOGUE# 1
+	st %i0,[%fp-1500]
+	st %i2,[%fp-1508]
+	cmp %i3,0
+	be L704
+	add %fp,-560,%o2
+	mov 0,%o0
+	sll %i3,2,%o1
+	st %g0,[%o0+%o2]
+L794:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L794
+	st %g0,[%o0+%o2]
+L704:
+	mov 1,%o0
+	st %o0,[%fp-560]
+	cmp %i3,0
+	be L811
+	add %fp,-832,%o2
+	mov 0,%o0
+	sll %i3,2,%o1
+	st %g0,[%o0+%o2]
+L795:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L795
+	st %g0,[%o0+%o2]
+	cmp %i3,0
+L811:
+	be L714
+	add %fp,-696,%o3
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%o1+%i1],%o0
+L796:
+	st %o0,[%o1+%o3]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L796
+	ld [%o1+%i1],%o0
+L714:
+	cmp %i3,0
+	be L719
+	add %fp,-968,%o3
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%fp-1508],%g1
+L797:
+	ld [%o1+%g1],%o0
+	st %o0,[%o1+%o3]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu L797
+	ld [%fp-1508],%g1
+L719:
+	mov 1,%g1
+	st %g1,[%fp-1516]
+	add %fp,-968,%l6
+	add %fp,-152,%g1
+	st %g1,[%fp-1524]
+	add %fp,-1232,%l5
+	add %fp,-832,%i0
+	sll %i3,1,%l7
+	add %fp,-1496,%i5
+	add %fp,-288,%i4
+	add %fp,-560,%i2
+L724:
+	mov %l6,%o0
+	call _NN_Zero,0
+	mov %i3,%o1
+	cmp %o0,0
+	bne L725
+	ld [%fp-1516],%g1
+	ld [%fp-1524],%o0
+	add %fp,-424,%o1
+	add %fp,-696,%o2
+	mov %i3,%o3
+	mov %l6,%o4
+	call _NN_Div,0
+	mov %i3,%o5
+	ld [%fp-1524],%l3
+	add %fp,-1496,%i1
+	cmp %l7,0
+	be L727
+	mov %i1,%o2
+	mov 0,%o0
+	sll %l7,2,%o1
+	st %g0,[%o0+%o2]
+L798:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L798
+	st %g0,[%o0+%o2]
+L727:
+	mov %l3,%o0
+	call _NN_Digits,0
+	mov %i3,%o1
+	mov %o0,%l4
+	add %fp,-832,%o0
+	call _NN_Digits,0
+	mov %i3,%o1
+	mov %o0,%l2
+	cmp %l3,%i0
+	bne L733
+	sll %i3,1,%l0
+	cmp %l4,5
+	bgu L732
+	cmp %l2,0
+L733:
+	mov 0,%i1
+	cmp %i1,%l4
+	bgeu L799
+	cmp %l7,0
+	mov %i5,%l0
+	mov 0,%l1
+L737:
+	mov %l0,%o0
+	mov %l0,%o1
+	ld [%l1+%l3],%o2
+	add %fp,-832,%o3
+	call _NN_AddDigitMult,0
+	mov %l2,%o4
+	add %i1,%l2,%o1
+	sll %o1,2,%o1
+	add %o1,%l5,%o1
+	ld [%o1-264],%o2
+	add %o0,%o2,%o0
+	st %o0,[%o1-264]
+	add %l0,4,%l0
+	add %i1,1,%i1
+	cmp %i1,%l4
+	blu L737
+	add %l1,4,%l1
+	b L799
+	cmp %l7,0
+L732:
+	be L738
+	mov 0,%l4
+L743:
+	ld [%l3],%l1
+	mov %i1,%o0
+	mov %l0,%o1
+	mov %l3,%o2
+	mov 1,%o3
+	call _XXXMultiplyDigit,0
+	mov %l1,%o4
+	cmp %l4,0
+	be L742
+	mov %i1,%o0
+	mov %l0,%o1
+	mov %l3,%o2
+	mov 1,%o3
+	call _XXXAdd,0
+	mov 0,%o4
+L742:
+	add %l2,-1,%l2
+	add %l3,4,%l3
+	add %i1,8,%i1
+	add %l0,-2,%l0
+	add %l1,%l1,%o4
+	add %i1,-4,%o0
+	add %l0,1,%o1
+	mov %l3,%o2
+	mov %l2,%o3
+	call _XXXMultiplyDigit,0
+	add %o4,%l4,%o4
+	cmp %l2,0
+	bne L743
+	srl %l1,31,%l4
+L738:
+	cmp %l7,0
+L799:
+	be L744
+	mov 0,%o1
+	sll %l7,2,%o2
+	ld [%o1+%i5],%o0
+L800:
+	st %o0,[%o1+%l5]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L800
+	ld [%o1+%i5],%o0
+L744:
+	add %fp,-1496,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	cmp %i3,0
+	be L812
+	mov 0,%o3
+	mov 0,%o2
+	sll %i3,2,%o4
+	ld [%o2+%i2],%o0
+L801:
+	add %o3,%o0,%o1
+	cmp %o1,%o3
+	bgeu,a L753
+	ld [%o2+%l5],%o0
+	b L754
+	ld [%o2+%l5],%o1
+L753:
+	add %o1,%o0,%o1
+	cmp %o1,%o0
+	addx %g0,0,%o3
+L754:
+	st %o1,[%o2+%i4]
+	add %o2,4,%o2
+	cmp %o2,%o4
+	blu,a L801
+	ld [%o2+%i2],%o0
+	cmp %i3,0
+L812:
+	be L804
+	cmp %i3,0
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%o1+%i0],%o0
+L803:
+	st %o0,[%o1+%i2]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L803
+	ld [%o1+%i0],%o0
+	cmp %i3,0
+	be L804
+	nop
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%o1+%i4],%o0
+L805:
+	st %o0,[%o1+%i0]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L805
+	ld [%o1+%i4],%o0
+	cmp %i3,0
+L804:
+	be L768
+	add %fp,-696,%o3
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%o1+%l6],%o0
+L806:
+	st %o0,[%o1+%o3]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L806
+	ld [%o1+%l6],%o0
+L768:
+	cmp %i3,0
+	be L773
+	add %fp,-424,%o3
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%o1+%o3],%o0
+L807:
+	st %o0,[%o1+%l6]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L807
+	ld [%o1+%o3],%o0
+L773:
+	ld [%fp-1516],%g1
+	sub %g0,%g1,%g1
+	b L724
+	st %g1,[%fp-1516]
+L725:
+	cmp %g1,0
+	bge L778
+	cmp %i3,0
+	add %fp,-560,%g3
+	be L788
+	mov 0,%g2
+	mov -1,%o7
+	mov 0,%o4
+	sll %i3,2,%o1
+	ld [%fp-1508],%g1
+L808:
+	ld [%o4+%g1],%o0
+	sub %o0,%g2,%o2
+	sub %o7,%g2,%o0
+	cmp %o2,%o0
+	bleu,a L783
+	ld [%o4+%g3],%o0
+	ld [%o4+%g3],%o0
+	b L784
+	sub %o7,%o0,%o2
+L783:
+	sub %o2,%o0,%o2
+	sub %o7,%o0,%o0
+	cmp %o0,%o2
+	addx %g0,0,%g2
+L784:
+	ld [%fp-1500],%g1
+	st %o2,[%o4+%g1]
+	add %o4,4,%o4
+	cmp %o4,%o1
+	blu L808
+	ld [%fp-1508],%g1
+	b L809
+	add %fp,-152,%o0
+L778:
+	be L788
+	add %fp,-560,%o3
+	mov 0,%o2
+	sll %i3,2,%o1
+	ld [%o2+%o3],%o0
+L810:
+	ld [%fp-1500],%g1
+	st %o0,[%o2+%g1]
+	add %o2,4,%o2
+	cmp %o2,%o1
+	blu,a L810
+	ld [%o2+%o3],%o0
+L788:
+	add %fp,-152,%o0
+L809:
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	add %fp,-288,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	add %fp,-424,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	add %fp,-560,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	add %fp,-696,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	add %fp,-832,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	add %fp,-968,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	add %fp,-1232,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	ret
+	restore
+	.align 4
+	.global _NN_Gcd
+	.proc	020
+_NN_Gcd:
+	!#PROLOGUE# 0
+	save %sp,-784,%sp
+	!#PROLOGUE# 1
+	cmp %i3,0
+	be L879
+	add %fp,-288,%o3
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%o1+%i1],%o0
+L871:
+	st %o0,[%o1+%o3]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L871
+	ld [%o1+%i1],%o0
+	cmp %i3,0
+L879:
+	be L848
+	add %fp,-424,%o3
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%o1+%i2],%o0
+L872:
+	st %o0,[%o1+%o3]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L872
+	ld [%o1+%i2],%o0
+L848:
+	add %fp,-424,%i1
+	add %fp,-288,%i2
+	add %fp,-688,%l0
+	add %fp,-152,%l1
+	mov %i1,%o0
+L880:
+	call _NN_Zero,0
+	mov %i3,%o1
+	cmp %o0,0
+	bne L854
+	cmp %i3,0
+	mov %l0,%o0
+	add %fp,-152,%o1
+	mov %i2,%o2
+	mov %i3,%o3
+	mov %i1,%o4
+	call _NN_Div,0
+	mov %i3,%o5
+	mov %l0,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 264,%o2
+	cmp %i3,0
+	be L880
+	mov %i1,%o0
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%o1+%i1],%o0
+L874:
+	st %o0,[%o1+%i2]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L874
+	ld [%o1+%i1],%o0
+	cmp %i3,0
+	be L880
+	mov %i1,%o0
+	mov 0,%o1
+	sll %i3,2,%o2
+	ld [%o1+%l1],%o0
+L876:
+	st %o0,[%o1+%i1]
+	add %o1,4,%o1
+	cmp %o1,%o2
+	blu,a L876
+	ld [%o1+%l1],%o0
+	b L880
+	mov %i1,%o0
+L854:
+	be L866
+	add %fp,-288,%o3
+	mov 0,%o2
+	sll %i3,2,%o1
+	ld [%o2+%o3],%o0
+L878:
+	st %o0,[%o2+%i0]
+	add %o2,4,%o2
+	cmp %o2,%o1
+	blu,a L878
+	ld [%o2+%o3],%o0
+L866:
+	add %fp,-152,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	add %fp,-288,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	add %fp,-424,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+	ret
+	restore
+	.align 4
+	.global _NN_Cmp
+	.proc	04
+_NN_Cmp:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	addcc %o2,-1,%o2
+	bneg L890
+	sll %o2,2,%g2
+	add %g2,%o1,%o3
+	sll %o2,2,%g2
+	add %g2,%o0,%o0
+L894:
+	ld [%o0],%g3
+	ld [%o3],%g2
+	cmp %g3,%g2
+	bleu L892
+	nop
+	b L895
+	mov 1,%o0
+L892:
+	bgeu L891
+	add %o3,-4,%o3
+	b L895
+	mov -1,%o0
+L891:
+	cmp %o3,%o1
+	bge L894
+	add %o0,-4,%o0
+L890:
+	mov 0,%o0
+L895:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.global _NN_Zero
+	.proc	04
+_NN_Zero:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	cmp %o1,0
+	be,a L908
+	mov 1,%o0
+	mov 0,%g3
+	sll %o1,2,%o1
+	ld [%g3+%o0],%g2
+L909:
+	cmp %g2,0
+	be L905
+	add %g3,4,%g3
+	b L908
+	mov 0,%o0
+L905:
+	cmp %g3,%o1
+	blu,a L909
+	ld [%g3+%o0],%g2
+	mov 1,%o0
+L908:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.global _NN_Bits
+	.proc	016
+_NN_Bits:
+	!#PROLOGUE# 0
+	save %sp,-112,%sp
+	!#PROLOGUE# 1
+	mov %i0,%l0
+	mov %l0,%o0
+	call _NN_Digits,0
+	mov %i1,%o1
+	orcc %o0,%g0,%i0
+	be L913
+	sll %i0,2,%o0
+	add %o0,%l0,%o0
+	call _NN_DigitBits,0
+	ld [%o0-4],%o0
+	add %i0,-1,%i0
+	sll %i0,5,%i0
+	b L914
+	add %i0,%o0,%i0
+L913:
+	mov 0,%i0
+L914:
+	ret
+	restore
+	.align 4
+	.global _NN_Digits
+	.proc	016
+_NN_Digits:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	mov %o0,%o2
+	addcc %o1,-1,%o0
+	bneg L923
+	sll %o0,2,%g3
+L926:
+	ld [%g3+%o2],%g2
+	cmp %g2,0
+	bne L923
+	nop
+	addcc %o0,-1,%o0
+	bpos L926
+	add %g3,-4,%g3
+L923:
+	retl
+	add %o0,1,%o0
+	.align 4
+	.proc	020
+_NN_Div:
+	!#PROLOGUE# 0
+	save %sp,-624,%sp
+	!#PROLOGUE# 1
+	st %i0,[%fp-444]
+	st %i1,[%fp-452]
+	addcc %i5,-1,%o1
+	bneg L1036
+	st %i5,[%fp-460]
+	sll %o1,2,%o2
+L1039:
+	ld [%o2+%i4],%o0
+	cmp %o0,0
+	bne L1127
+	addcc %o1,1,%l4
+	addcc %o1,-1,%o1
+	bpos L1039
+	add %o2,-4,%o2
+L1036:
+	addcc %o1,1,%l4
+L1127:
+	be L1033
+	sll %l4,2,%o0
+	add %o0,%i4,%o0
+	call _NN_DigitBits,0
+	ld [%o0-4],%o0
+	mov 32,%o1
+	sub %o1,%o0,%l5
+	cmp %l4,0
+	be L1041
+	add %fp,-288,%o2
+	mov 0,%o0
+	sll %l4,2,%o1
+	st %g0,[%o0+%o2]
+L1128:
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L1128
+	st %g0,[%o0+%o2]
+L1041:
+	cmp %l5,31
+	bleu L1047
+	add %fp,-288,%g2
+	b L1046
+	mov 0,%o2
+L1047:
+	mov 32,%o0
+	mov 0,%o2
+	cmp %o2,%i3
+	bgeu L1046
+	sub %o0,%l5,%o5
+	mov 0,%o1
+	sll %i3,2,%o4
+	ld [%o1+%i2],%o3
+L1129:
+	sll %o3,%l5,%o0
+	or %o0,%o2,%o0
+	st %o0,[%o1+%g2]
+	cmp %l5,0
+	be L1051
+	mov 0,%o2
+	srl %o3,%o5,%o2
+L1051:
+	add %o1,4,%o1
+	cmp %o1,%o4
+	blu,a L1129
+	ld [%o1+%i2],%o3
+L1046:
+	sll %i3,2,%o0
+	add %fp,-16,%o1
+	add %o0,%o1,%o0
+	st %o2,[%o0-272]
+	cmp %l5,31
+	bgu L1054
+	add %fp,-424,%g2
+	mov 32,%o0
+	sub %o0,%l5,%o5
+	cmp %l4,0
+	be L1054
+	mov 0,%o3
+	mov 0,%o1
+	sll %l4,2,%o4
+	ld [%o1+%i4],%o2
+L1130:
+	sll %o2,%l5,%o0
+	or %o0,%o3,%o0
+	st %o0,[%o1+%g2]
+	cmp %l5,0
+	be L1059
+	mov 0,%o3
+	srl %o2,%o5,%o3
+L1059:
+	add %o1,4,%o1
+	cmp %o1,%o4
+	blu,a L1130
+	ld [%o1+%i4],%o2
+L1054:
+	sll %l4,2,%o1
+	add %fp,-16,%o0
+	add %o0,%o1,%o0
+	ld [%o0-412],%o0
+	cmp %i3,0
+	be L1062
+	st %o0,[%fp-468]
+	mov 0,%o0
+	sll %i3,2,%o1
+	ld [%fp-444],%g4
+L1131:
+	st %g0,[%o0+%g4]
+	add %o0,4,%o0
+	cmp %o0,%o1
+	blu,a L1131
+	ld [%fp-444],%g4
+L1062:
+	subcc %i3,%l4,%i5
+	bneg L1132
+	ld [%fp-460],%g4
+	add %fp,-16,%i0
+	add %fp,-432,%l1
+	add %fp,-428,%g1
+	st %g1,[%fp-476]
+	ld [%fp-468],%g4
+	add %g4,1,%i1
+	mov -1,%l6
+	sub %l6,%i1,%g1
+	st %g1,[%fp-484]
+	add %fp,-424,%l7
+	sll %i5,2,%g4
+	st %g4,[%fp-492]
+	add %i5,%l4,%g1
+	st %g1,[%fp-500]
+L1109:
+	ld [%fp-468],%g4
+	cmp %g4,-1
+	bne L1070
+	add %fp,-292,%o1
+	ld [%fp-460],%g1
+	add %i5,%g1,%o0
+	sll %o0,2,%o0
+	add %o0,%i0,%o0
+	ld [%o0-272],%o0
+	b L1071
+	st %o0,[%fp-428]
+L1070:
+	ld [%fp-500],%g4
+	sll %g4,2,%o0
+	add %o1,%o0,%o1
+	srl %i1,16,%i4
+	mov %i1,%l2
+	ld [%o1],%o0
+	st %o0,[%fp-440]
+	ld [%o1+4],%o1
+	mov %i4,%o0
+	sethi %hi(65535),%g1
+	or %g1,%lo(65535),%g1
+	cmp %o0,%g1
+	bne L1073
+	st %o1,[%fp-436]
+	b L1074
+	srl %o1,16,%l3
+L1073:
+	ld [%fp-436],%o0
+	call .udiv,0
+	add %i4,1,%o1
+	mov %o0,%l3
+L1074:
+	sll %l3,16,%l0
+	srl %l0,16,%i2
+	sll %l2,16,%o1
+	mov %i2,%o0
+	call .umul,0
+	srl %o1,16,%o1
+	mov %o0,%i2
+	srl %l0,16,%l0
+	mov %l0,%o0
+	call .umul,0
+	mov %i4,%o1
+	mov %o0,%l0
+	sll %i2,16,%o0
+	ld [%fp-440],%o1
+	sub %o1,%o0,%o1
+	sub %l6,%o0,%o0
+	cmp %o1,%o0
+	bleu L1075
+	st %o1,[%l1-8]
+	ld [%fp-436],%o0
+	add %o0,-1,%o0
+	st %o0,[%l1-4]
+L1075:
+	srl %i2,16,%o0
+	ld [%fp-436],%o1
+	sub %o1,%o0,%o1
+	st %o1,[%l1-4]
+	ld [%fp-436],%o0
+	sub %o0,%l0,%o0
+	st %o0,[%l1-4]
+	b L1125
+	mov %i4,%o1
+L1080:
+	ld [%fp-440],%o0
+	cmp %o0,%o1
+	blu L1133
+	mov %i4,%o0
+	sll %l2,16,%o0
+L1134:
+	ld [%fp-440],%o1
+	sub %o1,%o0,%o1
+	sub %l6,%o0,%o0
+	cmp %o1,%o0
+	bleu L1079
+	st %o1,[%l1-8]
+	ld [%fp-436],%o0
+	add %o0,-1,%o0
+	st %o0,[%l1-4]
+L1079:
+	mov %i4,%o1
+	ld [%fp-436],%o0
+	sub %o0,%o1,%o0
+	st %o0,[%l1-4]
+	add %l3,1,%l3
+L1125:
+	ld [%fp-436],%o0
+	cmp %o0,%o1
+	bgu,a L1134
+	sll %l2,16,%o0
+	cmp %o0,%o1
+	be L1080
+	sll %l2,16,%o1
+	mov %i4,%o0
+L1133:
+	sethi %hi(65535),%g4
+	or %g4,%lo(65535),%g4
+	cmp %o0,%g4
+	bne L1081
+	ld [%fp-436],%o0
+	b L1082
+	lduh [%fp-434],%i3
+L1081:
+	sll %o0,16,%o0
+	lduh [%fp-440],%o1
+	add %o0,%o1,%o0
+	call .udiv,0
+	add %i4,1,%o1
+	mov %o0,%i3
+L1082:
+	sll %i3,16,%l0
+	srl %l0,16,%i2
+	sll %l2,16,%o1
+	mov %i2,%o0
+	call .umul,0
+	srl %o1,16,%o1
+	mov %o0,%i2
+	srl %l0,16,%l0
+	mov %l0,%o0
+	call .umul,0
+	mov %i4,%o1
+	mov %o0,%l0
+	ld [%fp-440],%o1
+	sub %o1,%i2,%o1
+	sub %l6,%i2,%o0
+	cmp %o1,%o0
+	bleu L1083
+	st %o1,[%l1-8]
+	ld [%fp-436],%o0
+	add %o0,-1,%o0
+	st %o0,[%l1-4]
+L1083:
+	sll %l0,16,%o0
+	ld [%fp-440],%o1
+	sub %o1,%o0,%o1
+	sub %l6,%o0,%o0
+	cmp %o1,%o0
+	bleu L1084
+	st %o1,[%l1-8]
+	ld [%fp-436],%o0
+	add %o0,-1,%o0
+	st %o0,[%l1-4]
+L1084:
+	srl %l0,16,%o0
+	ld [%fp-436],%o1
+	sub %o1,%o0,%o1
+	st %o1,[%l1-4]
+L1126:
+	ld [%fp-436],%o0
+	cmp %o0,0
+	bne L1135
+	ld [%fp-440],%o0
+	cmp %o0,%i1
+	blu L1086
+	sll %l3,16,%o1
+L1135:
+	sub %o0,%i1,%o0
+	st %o0,[%l1-8]
+	ld [%fp-484],%g1
+	cmp %o0,%g1
+	bleu L1088
+	ld [%fp-436],%o0
+	add %o0,-1,%o0
+	st %o0,[%l1-4]
+L1088:
+	b L1126
+	add %i3,1,%i3
+L1086:
+	sll %i3,16,%o0
+	srl %o0,16,%o0
+	add %o1,%o0,%o1
+	ld [%fp-476],%g4
+	st %o1,[%g4]
+L1071:
+	add %fp,-288,%o1
+	ld [%fp-492],%g1
+	add %o1,%g1,%o1
+	mov %o1,%o0
+	ld [%fp-428],%o2
+	add %fp,-424,%o3
+	call _NN_SubDigitMult,0
+	mov %l4,%o4
+	ld [%fp-500],%g4
+	sll %g4,2,%o2
+	add %o2,%i0,%o2
+	ld [%o2-272],%o1
+	sub %o1,%o0,%o1
+	st %o1,[%o2-272]
+	sll %g4,2,%o0
+	add %o0,%i0,%o5
+	ld [%fp-492],%o0
+	add %o0,%i0,%o7
+	add %o7,-272,%o7
+	add %o0,%i0,%g3
+	add %g3,-272,%g3
+	add %o0,%i0,%g2
+	add %g2,-272,%g2
+L1090:
+	ld [%o5-272],%o0
+	cmp %o0,0
+	bne,a L1136
+	ld [%fp-428],%o0
+	addcc %l4,-1,%o1
+	bneg L1095
+	sll %o1,2,%o0
+	add %o0,%l7,%o2
+	sll %o1,2,%o0
+	add %o0,%o7,%o3
+	mov %l7,%o4
+L1099:
+	ld [%o3],%o1
+	ld [%o2],%o0
+	cmp %o1,%o0
+	bgu,a L1093
+	mov 1,%o0
+	blu L1124
+	add %o2,-4,%o2
+	cmp %o2,%o4
+	bge L1099
+	add %o3,-4,%o3
+L1095:
+	mov 0,%o0
+L1093:
+	cmp %o0,0
+	bl L1091
+	ld [%fp-428],%o0
+L1136:
+	add %o0,1,%o0
+	mov 0,%o3
+	cmp %o3,%l4
+	bgeu L1102
+	st %o0,[%fp-428]
+	mov 0,%o2
+	sll %l4,2,%o4
+	ld [%o2+%g2],%o0
+L1137:
+	sub %o0,%o3,%o1
+	sub %l6,%o3,%o0
+	cmp %o1,%o0
+	bleu,a L1104
+	ld [%o2+%l7],%o0
+	ld [%o2+%l7],%o0
+	b L1105
+	sub %l6,%o0,%o1
+L1104:
+	sub %o1,%o0,%o1
+	sub %l6,%o0,%o0
+	cmp %o0,%o1
+	addx %g0,0,%o3
+L1105:
+	st %o1,[%o2+%g3]
+	add %o2,4,%o2
+	cmp %o2,%o4
+	blu,a L1137
+	ld [%o2+%g2],%o0
+L1102:
+	ld [%o5-272],%o0
+	sub %o0,%o3,%o0
+	b L1090
+	st %o0,[%o5-272]
+L1124:
+	b L1093
+	mov -1,%o0
+L1091:
+	ld [%fp-492],%g1
+	ld [%fp-444],%g4
+	st %o0,[%g1+%g4]
+	add %g1,-4,%g1
+	st %g1,[%fp-492]
+	ld [%fp-500],%g1
+	add %g1,-1,%g1
+	addcc %i5,-1,%i5
+	bpos L1109
+	st %g1,[%fp-500]
+	ld [%fp-460],%g4
+L1132:
+	cmp %g4,0
+	be L1138
+	cmp %l5,31
+	mov 0,%o0
+	sll %g4,2,%i5
+	ld [%fp-452],%g1
+L1139:
+	st %g0,[%o0+%g1]
+	add %o0,4,%o0
+	cmp %o0,%i5
+	blu,a L1139
+	ld [%fp-452],%g1
+	cmp %l5,31
+L1138:
+	bgu L1115
+	add %fp,-288,%o5
+	mov 32,%o0
+	sub %o0,%l5,%o4
+	addcc %l4,-1,%o0
+	bneg L1115
+	mov 0,%o3
+	sll %o0,2,%o1
+	ld [%o1+%o5],%o2
+L1140:
+	srl %o2,%l5,%o0
+	or %o0,%o3,%o0
+	ld [%fp-452],%g4
+	st %o0,[%o1+%g4]
+	cmp %l5,0
+	be L1120
+	mov 0,%o3
+	sll %o2,%o4,%o3
+L1120:
+	addcc %o1,-4,%o1
+	bpos,a L1140
+	ld [%o1+%o5],%o2
+L1115:
+	add %fp,-288,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 268,%o2
+	add %fp,-424,%o0
+	mov 0,%o1
+	call _R_memset,0
+	mov 132,%o2
+L1033:
+	ret
+	restore
+	.align 4
+	.proc	017
+_NN_AddDigitMult:
+	!#PROLOGUE# 0
+	save %sp,-152,%sp
+	!#PROLOGUE# 1
+	mov %i0,%i5
+	cmp %i2,0
+	bne L1154
+	st %i1,[%fp-28]
+	b L1165
+	mov 0,%i0
+L1154:
+	mov 0,%i0
+	cmp %i0,%i4
+	bgeu L1165
+	add %fp,-24,%l5
+	srl %i2,16,%o1
+	sll %i2,16,%o0
+	srl %o0,16,%l6
+	sll %o1,16,%l7
+	srl %l7,16,%i1
+	mov %i5,%l3
+	mov 0,%l4
+L1164:
+	ld [%l4+%i3],%l0
+	srl %l0,16,%l1
+	sll %l0,16,%l0
+	srl %l0,16,%l0
+	mov %l6,%o0
+	call .umul,0
+	mov %l0,%o1
+	st %o0,[%fp-24]
+	mov %l6,%l2
+	mov %l2,%o0
+	call .umul,0
+	mov %l1,%o1
+	mov %o0,%l2
+	srl %l7,16,%i2
+	mov %i2,%o0
+	call .umul,0
+	mov %l0,%o1
+	mov %o0,%i2
+	mov %i1,%o0
+	call .umul,0
+	mov %l1,%o1
+	mov %o0,%o1
+	add %l2,%i2,%l2
+	cmp %l2,%i2
+	bgeu L1159
+	st %o1,[%fp-20]
+	sethi %hi(65536),%o0
+	add %o1,%o0,%o0
+	st %o0,[%fp-20]
+L1159:
+	sll %l2,16,%i2
+	ld [%fp-24],%o0
+	add %i2,%o0,%o0
+	cmp %o0,%i2
+	bgeu L1160
+	st %o0,[%l5]
+	ld [%fp-20],%o0
+	add %o0,1,%o0
+	st %o0,[%l5+4]
+L1160:
+	srl %l2,16,%o0
+	ld [%fp-20],%o1
+	add %o0,%o1,%o0
+	st %o0,[%l5+4]
+	ld [%fp-28],%o2
+	ld [%l4+%o2],%o0
+	add %i0,%o0,%o0
+	st %o0,[%l3]
+	cmp %o0,%i0
+	addx %g0,0,%i0
+	ld [%fp-24],%o1
+	add %o0,%o1,%o0
+	st %o0,[%l3]
+	ld [%fp-24],%o1
+	cmp %o0,%o1
+	blu,a L1163
+	add %i0,1,%i0
+L1163:
+	ld [%fp-20],%o0
+	add %i0,%o0,%i0
+	add %l3,4,%l3
+	sll %i4,2,%o0
+	add %o0,%i5,%o0
+	cmp %l3,%o0
+	blu L1164
+	add %l4,4,%l4
+L1165:
+	ret
+	restore
+	.align 4
+	.proc	017
+_NN_SubDigitMult:
+	!#PROLOGUE# 0
+	save %sp,-160,%sp
+	!#PROLOGUE# 1
+	mov %i0,%i5
+	st %i1,[%fp-28]
+	cmp %i2,0
+	bne L1179
+	st %i3,[%fp-36]
+	b L1190
+	mov 0,%i0
+L1179:
+	mov 0,%i0
+	cmp %i0,%i4
+	bgeu L1190
+	add %fp,-24,%l5
+	srl %i2,16,%o1
+	sll %i2,16,%o0
+	srl %o0,16,%l6
+	sll %o1,16,%l7
+	srl %l7,16,%i3
+	mov -1,%i1
+	mov %i5,%l3
+	mov 0,%l4
+L1189:
+	ld [%fp-36],%o2
+	ld [%l4+%o2],%l0
+	srl %l0,16,%l1
+	sll %l0,16,%l0
+	srl %l0,16,%l0
+	mov %l6,%o0
+	call .umul,0
+	mov %l0,%o1
+	st %o0,[%fp-24]
+	mov %l6,%l2
+	mov %l2,%o0
+	call .umul,0
+	mov %l1,%o1
+	mov %o0,%l2
+	srl %l7,16,%i2
+	mov %i2,%o0
+	call .umul,0
+	mov %l0,%o1
+	mov %o0,%i2
+	mov %i3,%o0
+	call .umul,0
+	mov %l1,%o1
+	mov %o0,%o1
+	add %l2,%i2,%l2
+	cmp %l2,%i2
+	bgeu L1184
+	st %o1,[%fp-20]
+	sethi %hi(65536),%o0
+	add %o1,%o0,%o0
+	st %o0,[%fp-20]
+L1184:
+	sll %l2,16,%i2
+	ld [%fp-24],%o0
+	add %i2,%o0,%o0
+	cmp %o0,%i2
+	bgeu L1185
+	st %o0,[%l5]
+	ld [%fp-20],%o0
+	add %o0,1,%o0
+	st %o0,[%l5+4]
+L1185:
+	srl %l2,16,%o0
+	ld [%fp-20],%o1
+	add %o0,%o1,%o0
+	st %o0,[%l5+4]
+	ld [%fp-28],%o2
+	ld [%l4+%o2],%o1
+	sub %o1,%i0,%o1
+	st %o1,[%l3]
+	sub %i1,%i0,%o0
+	cmp %o0,%o1
+	addx %g0,0,%i0
+	ld [%fp-24],%o0
+	sub %o1,%o0,%o1
+	st %o1,[%l3]
+	ld [%fp-24],%o0
+	sub %i1,%o0,%o0
+	cmp %o1,%o0
+	bgu,a L1188
+	add %i0,1,%i0
+L1188:
+	ld [%fp-20],%o0
+	add %i0,%o0,%i0
+	add %l3,4,%l3
+	sll %i4,2,%o0
+	add %o0,%i5,%o0
+	cmp %l3,%o0
+	blu L1189
+	add %l4,4,%l4
+L1190:
+	ret
+	restore
+	.align 4
+	.proc	016
+_NN_DigitBits:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	mov %o0,%g2
+	mov 0,%o0
+L1202:
+	cmp %g2,0
+	be L1199
+	nop
+	add %o0,1,%o0
+	cmp %o0,31
+	bleu L1202
+	srl %g2,1,%g2
+L1199:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+	.proc	017
+_XXXAdd:
+	!#PROLOGUE# 0
+	!#PROLOGUE# 1
+	sub %o1,%o3,%o1
+	addcc %o3,-1,%o3
+	bneg L1230
+	cmp %o4,0
+	ld [%o0],%g2
+L1231:
+	add %o4,%g2,%o4
+	cmp %o4,%g2
+	bgeu,a L1222
+	ld [%o2],%g2
+	ld [%o2],%g2
+	st %g2,[%o0]
+	add %o2,4,%o2
+	add %o0,4,%o0
+	b L1220
+	mov 1,%o4
+L1222:
+	add %o2,4,%o2
+	add %o4,%g2,%o4
+	st %o4,[%o0]
+	add %o0,4,%o0
+	cmp %o4,%g2
+	addx %g0,0,%o4
+L1220:
+	addcc %o3,-1,%o3
+	bpos,a L1231
+	ld [%o0],%g2
+	cmp %o4,0
+L1230:
+	bne L1226
+	cmp %o1,0
+	b L1225
+	mov 0,%o0
+L1226:
+	bne L1232
+	addcc %o1,-1,%o1
+	b L1225
+	mov 1,%o0
+L1228:
+	addcc %o1,-1,%o1
+L1232:
+	bneg,a L1225
+	srl %o1,31,%o0
+	ld [%o0],%g2
+	add %g2,1,%g2
+	st %g2,[%o0]
+	cmp %g2,0
+	be L1228
+	add %o0,4,%o0
+	srl %o1,31,%o0
+L1225:
+	retl
+	sub %sp,-0,%sp
+	.align 4
+.proc	14
+_XXXMultiplyDigit:
+!#PROLOGUE# 0
+!#PROLOGUE# 1
+	tst	%o4
+	bne	LMDnonzero
+	cmp	%o4,1
+	retl
+	mov	0,%o0
+LMDnonzero:
+	bne	LMD0
+	mov	0,%o5
+	b	_XXXAdd		! shortcut to XXXAdd
+	mov	0,%o4		! carry in = 0
+LMD0:
+	save	%sp,-96,%sp
+	tst	%i3
+	be	L77007
+	sub	%i1,%i3,%l1
+LMD1:
+	ld	[%i0],%l7
+	mov	%i4,%y
+	ld	[%i2],%l0
+	addcc	%g0,%g0,%o0	! initialize
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%l0,%o0;	mulscc	%o0,%l0,%o0;
+	mulscc	%o0,%g0,%o0	! align
+	tst	%l0
+	blt,a	LMDsignfix
+	add	%o0,%i4,%o0
+LMDsignfix:
+	mov	%o0,%o1
+	mov	%y,%o0
+	addcc	%o0,%i5,%i1
+	inc	4,%i2
+	addx	%o1,%g0,%i5
+	addcc	%l7,%i1,%l7
+	addx	%g0,%i5,%i5
+	st	%l7,[%i0]
+	deccc	%i3
+	bgt	LMD1
+	inc	4,%i0
+L77007:
+	tst	%i5
+	be	LMDexit
+	deccc	%l1
+LY3:					! [internal]
+	blt	LMDexit
+	inc	4,%i0
+	ld	[%i0-4],%i1
+	addcc	%i1,%i5,%i1
+	addxcc	%g0,%g0,%i5
+	st	%i1,[%i0-4]
+	bne,a	LY3
+	deccc	%l1
+LMDexit:
+	ret
+	restore	%g0,%i5,%o0

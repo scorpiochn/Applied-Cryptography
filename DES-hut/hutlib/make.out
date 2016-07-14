@@ -1,0 +1,21 @@
+cc -g -O -Ilibdir  -c getpass.c
+
+uopt: Warning: file not optimized; use -g3 if both optimization and debug wanted
+cc -g -O -Ilibdir  -c next_field.c
+
+uopt: Warning: file not optimized; use -g3 if both optimization and debug wanted
+cc -g -O -Ilibdir  -c read-passwd.c
+
+uopt: Warning: file not optimized; use -g3 if both optimization and debug wanted
+cc -g -O -Ilibdir  -c strerror.c
+
+uopt: Warning: file not optimized; use -g3 if both optimization and debug wanted
+cc -g -O -Ilibdir  -c strsave.c
+
+uopt: Warning: file not optimized; use -g3 if both optimization and debug wanted
+cc -g -O -Ilibdir  -c xalloc.c
+
+uopt: Warning: file not optimized; use -g3 if both optimization and debug wanted
+ar ru libhut.a getline.o getpass.o next_field.o read-passwd.o strerror.o strsave.o xalloc.o
+ar: Warning: creating libhut.a
+ranlib libhut.a

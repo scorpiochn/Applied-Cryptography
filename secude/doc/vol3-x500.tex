@@ -1,0 +1,641 @@
+\section{Secure X.500 Directory}
+\markboth{Directory Services}{Directory Services}
+\thispagestyle{myheadings}
+\label{ds}
+\subsection{System Description}
+The X.500 Directory is an OSI application which has been developed
+jointly by CCITT and ISO. The CCITT version is specified in the
+X.500 series of Recommendations; the ISO version is known as
+International Standard 9594.
+
+The directory is a system holding information about various entities
+(referred to as {\em objects}) and providing users with services for
+accessing the information. Examples of entities likely to be
+represented in the directory are countries, organizations,
+organizational subdivisions, people, etc.
+The information held on a particular person may include the
+person's name, postal address, telephone number, and electronic mail
+address; the information about a particular organization may
+comprise that organization's name, address, telephone number, and
+telex number.
+The information held in the directory is used to facilitate communication
+between entities.
+The complete set of information to which the directory provides
+access is known as the {\em Directory Information Base} (DIB).
+\\ [1em]
+The directory can be used to support the following services:
+\\ [1em]
+{\bf Look-up}
+
+The directory supports human users in obtaining, among other things,
+telephone and address information of organizations and other users.
+\\ [1em]
+{\bf Message Handling Support}
+
+The directory can be used in message handling (based on CCITT's
+X.400 standard) where it provides the mapping of user-friendly names
+(supplied to the directory) onto machine oriented O/R addresses
+(returned from the directory). The directory also provides the means
+by which two MHS functional entities (two MTAs, or a UA and a MTA)
+may establish the identity of each other.
+\\ [1em]
+{\bf Support of Authentication Process}
+
+The directory meets the needs for authentication and other security
+services (e.g. content confidentiality, content integrity) as it is the
+place from where communicating peers can obtain
+knowledge on each other. The directory provides two approaches to
+authentication:
+\bi
+\m The {\em simple authentication} approach relies on the directory holding
+a password for any user that wishes to be able to authenticate itself
+to a service.
+\m The {\em strong authentication} approach is based on public-key
+cryptography; here the directory acts as a repository of {\em public keys}
+within {\em certificates}.
+\ei
+A certificate can be revoked by being added to a
+{\em revocation list}.
+It is of vital importance that certificates and revocation lists be
+easily available to a distributed community; this is achieved by placing
+them in a X.500 Directory.
+\\ [1ex]
+The need for authentication may be uni- or bilateral: In the first case
+a user may wish to authenticate itself to an application in order
+to be permitted to carry out some action; in the latter case two
+communicating entities (applications and/or users) may wish to establish
+the identity of each other.
+(The directory itself requires its users to
+authenticate themselves before enabling them to access confidential
+information or to modify some of the directory information.)
+
+
+\subsubsection{The Directory Model}
+
+The directory is comprised of a set of one or more application
+processes known as {\em Directory System Agents} (DSAs). In case
+of the directory being composed of more than one DSA, it is said to
+be {\em distributed}. In a distributed directory each DSA holds
+only a fragment of the total directory information.
+\\ [1ex]
+Each DSA provides zero, one, or more {\em access points} to the directory
+at which users may interact with the directory. A user accesses the
+directory by means of an application process known as a {\em Directory
+User Agent} (DUA), running in the user's system.
+The interaction between a DUA and a DSA is carried out by means of a
+directory protocol called {\em Directory Access Protocol} (DAP).
+\\ [1ex]
+A basic feature of a distributed directory is that a user
+should potentially be able to access any directory information
+(subject to access control) irrespective of the access point at which
+his request originates and without knowledge of the physical location
+of the required information. It is required that the distribution
+of the directory information among multiple DSAs be hidden from the
+user, thereby giving the user the impression that each DSA holds
+the whole of the DIB. This is achieved by each DSA (holding
+a fragment of the DIB) having some knowledge about the location
+of the rest of the DIB.
+\\ [1ex]
+As a consequence, a DUA need only have direct access to a single DSA to
+which it can submit the user's request: If that DSA cannot
+satisfy the request, it will be able to locate the DSA holding
+the requested information and either return that knowledge to the
+requestor or pass on the request to the appropriate DSA. (The former
+mode of interaction is known as {\em referral}, the latter one
+is known as {\em chaining}.) The interaction between two DSAs is
+defined by the {\em Directory System Protocol} (DSP).
+
+
+\subsubsection{The Information Model}
+
+The information model describes the logical structure of the DIB; in
+this context the physical distribution of the DIB across multiple DSAs
+is not considered.
+
+The DIB is composed of {\em entries}, each representsing one
+(directory) object and containing the information on that object.
+An entry is structured as a set of {\em attributes}, each with an
+{\em attribute type} and one or more {\em attribute values}.
+
+The DIB is hierarchically structured by arranging its entries
+in a tree, known as the {\em Directory Information Tree} (DIT).
+The DIT reflects the hierarchical relationship commonly found
+among objects. For example, a person works for a department,
+which belongs to an organization, which has its head office
+in some country. As a consequence, objects representing countries
+will be found close to the root of the DIT, whereas entries representing
+people or application processes will be located in the leaves of the DIT.
+
+The DIT provides a means of assigning each entry a {\em Distinguished
+Name} (DN) which unambiguously identifies that entry; this means that
+no two entries may have the same DN.
+Naming is accomplished by assigning a {\em Relative Distinguished Name}
+(RDN) to each entry. The RDN of an entry is made up of specially
+nominated attribute values (the {\em distinguished values}) of the
+entry.
+
+The DN of an entry is then defined as being the sequence of RDNs of the
+entry and of all its superiors in descending order from the root.
+
+The second hierarchy which rules the DIB is that of the object classes.
+An object class represents a family of objects which share certain
+characteristics. Every object belongs to at least one object class.
+An object class defines which attributes must be present ({\em mandatory}
+attributes) and which attributes may be present ({\em optional}
+attributes) in an entry of the object class.
+
+Example:
+
+The object class {\em person} defines the attributes {\em commonName}
+and {\em surname} as being mandatory and the attributes {\em description},
+{\em seeAlso}, {\em telephoneNumber}, and {\em userPassword} as being
+optional in an entry of that object class.
+
+An object class may be a {\em subclass} of another object class. In
+this case the members of the subclass share all the characteristics
+of the {\em superclass} and additional characteristics possessed
+by none of the members of the superclass. As a consequence, an object
+belonging to a particular object class does not only contain
+the mandatory attributes of that object class, but also the
+mandatory attributes of all the superclasses of that object class.
+(The same applies to the optional attributes.)
+
+
+
+\subsection{System Security Policy}
+
+The X.500 Directory appears both as user of security services in order to
+protect its stored information from unauthorized access and to protect its 
+communication, and as part of the security infrastructure in that it provides 
+security related information to users which enable them to use security 
+services for other applications.
+
+Security policies for Directories described in this chapter emphasize the 
+first aspect, the protection of the Directory itself. They aim at three 
+major goals:
+
+\be
+\m to protect the information base of the Directory,
+\m to protect the internal and external communication of the Directory
+   via DAP and DSP,
+\m to protect the resources of the Directory.
+\ee
+
+With SecuDE we strictly rely on standardized security services and 
+mechanisms. Therefore, Directory security policies of SecuDE  only 
+require services and mechanisms which are defined in X.500 and other 
+related standards. The X.500 security model for Directories focuses on 
+the protection of the Directory information base when remotely accessing 
+to it via DAP and/or DSP. Local access to the DIB, for instance through
+DSA managers, and integrity or confidentiality of the information itself 
+with respect to the originator of the information, is out of scope of
+X.500 defined security features.
+ 
+DSA and DUA capabilities and their communication via DAP and DSP are 
+according to X.500-88. X.500-92 access control facilities, for instance, 
+are out of scope of SecuDE.
+
+
+\subsection{Authentication and Authorization Policies}
+
+The Directory information base is distributed over a large number of DSAs,
+each of them maintaining a particular part of the DIB. Remote access to
+a particular entry of the DIB is done either through direct DUA access
+to the serving DSA (which maintains either the master entry or a shadow 
+entry) via DAP, or through chained DSA access to the serving DSA via DSP 
+on behalf of the requesting DUA.
+
+This operation can be protected in terms of authentication and authorization.
+An authentication policy is used to describe how the providers and the users
+of Directory services are to be identified each other in order to gain a 
+required level of trust between them. Different authentication methods are
+defined in X.500. An authorization policy is then used to derive access rights 
+from the authenticated identities, in order to grant or deny access to the
+requested entry. 
+
+\subsection{Directory Authentication}
+
+
+\subsubsection{Authentication during Directory Bind or DSABind}
+\label{bind}
+
+When a remote entity binds to a DSA, it shall prove its identity to the
+DSA by suitable means. The initiating remote entity may be a DUA, or another 
+DSA performing chained operations. One of the following authentication
+methods may apply:
+
+\bi
+
+\m No Authentication
+
+  The initiator provides only his distinguished name (DN), but no further
+  credential. In that case it is impossible to authenticate the initiator's 
+  identity, with the effect that this kind of access is equivalent to an
+  anonymous access.
+
+\m Simple Unprotected Authentication
+
+  The initiator provides his DN together with a plaintext password to the
+  DSA. This authentication method requires a shared secret between initiator 
+  and DSA.
+
+\m Simple Protected Authentication
+
+  The initiator provides his DN, a time-stamp, a random number and a message
+  digest to the DSA. He generates the message digest by hashing the 
+  time-stamp, the random number and his password with a predefined one-way hash 
+  function. The DSA authenticates the initiator by doing the same process and 
+  comparing his hash result with the provided message digest. This authentication
+  method requires a shared secret between initiator and DSA, but avoids the 
+  cleartext transmission of the password.
+
+\m Strong Authentication
+
+  The initiator provides a digitally signed security token, optional together
+  with a set of certificates comprising the forward certification path, to the 
+  DSA. The DSA verifies the digital signature through finally applying a public 
+  key which he trusts. This authentication method does not require a shared secret
+  between initiator and DSA if the digital signatures are based on asymmetric 
+  cryptography. It requires a common point of trust between initiator and DSA and 
+  the ability to gain the certification path between them when digital signatures 
+  are to be verified.
+\ei
+In any of the authentication methods it is possible that credentials are
+not only passed from the initiator to the responder, but also from the responder
+to the initiator, in order to provide mutual authentication between the entities.
+
+X.500 also allows the use of credentials based on an externally-defined and 
+bilaterally-agreed scheme.
+
+
+\subsubsection{Signed Directory Operations}
+
+
+If an association between initiator and DSA has been established using strong
+authentication, the subsequent Directory operations may be digitally signed.
+Signed Directory operations consist of
+\bi
+\m the original unprotected operation,
+\m the algorithm identifier of the algorithm used for the digital signature,
+\m the signature itself.
+\ei
+It is possible to indicate in an operation request that the operation result
+shall be signed.
+
+If an association between initiator and DSA has been established using simple
+or no authentication methods, only subsequent unprotected Directory operations 
+are possible.
+
+
+\subsection{Directory Authorization}
+\label{authorization}
+
+
+Directory authorization is the process of providing/refusing Directory services 
+or granting/denying access rights to DIB entries depending on the result of a
+preceding authentication of the identity of the requestor. Whenever a Directory
+operation is requested either via DAP or DSP, an authorization policy is consulted.
+A DSA may refuse any service or Directory operation independent of the identity of 
+the requestor and regardless of the established access rights if the method of 
+authentication appears inadequate, i.e. it doesn't meet the requirements of the
+security policy in force.
+
+X.500-88 provides guidance, but does not provide any mechanism or regulation on
+how to enforce authorization. This is a local DSA matter. In order to be able
+to carry out security policies appropriately, a DSA should have the capability,
+for instance through maintaining access control lists, 
+\bi
+\m to grant or deny access to a particular entry on the basis of the identity 
+  of the requestor (for instance to allow access to particular attributes only
+  if the name of the requestor matches certain conditions),
+\m to grant or deny access to a particular entry on the basis of the method of 
+  authentication of the requestor(for instance to allow access to particular 
+  attributes only if strong authentication has been used),
+\m to provide or refuse a particular type of operation on the basis of the identity
+  of the requestor (for instance to allow modify operations only to the owner
+  of the entry),
+\m to provide or refuse a particular type of operation on the basis of the method
+  of authentication of the requestor (for instance to allow modify operations
+  only if strong authentication has been used),
+\m to provide or refuse service on the basis of the identity of the requestor (for
+  instance if a DSA and the part of the DIB it maintains only serve  to
+  a closed group of users),
+\m to provide or refuse service on the basis of the method of authentication
+  of the requestor (for instance to restrict any access to a part of the DIB
+  to strongly authenticated users only).
+\ei
+A DSA should be able to handle any combination of the above conditions correctly.
+
+
+\subsection{Distributed Directory Operations}
+
+
+The enforcement of the necessary service control or access control measures
+depending on the security policy is easy if the DSA which is accessed by a user
+via DAP holds the requested DIB entry, i.e. if no chained DSP operations are
+necessary.
+
+If this is not the case, i.e. if the DSA has to chain the request via DSP to
+another DSA, things are more complicated. In this case we can distinguish 
+four different types of entities which are involved in the Directory operation:
+\be
+\m The originating DUA. This is the user who requests the Directory operation.
+   He approaches a DSA and offers one of the authentication credentials listed
+   in~\ref{bind} during the DirectoryBind.
+
+\m The authenticating DSA. This is the DSA which is approached by the requesting 
+   DUA via DAP. This DSA has to authenticate the requesting user during the 
+   DirectoryBind, i.e. it has to accept or refuse the DAP association, and then, 
+   in the positive case, to initiate the chained operation to another DSA via DSP. 
+ 
+   In case of simple unprotected authentication methods being applied, the 
+   authenticating DSA will initiate a chainedCompare operation to the DSA which 
+   holds the master entry of the requesting user for the purpose of authentication
+   during DirectoryBind.
+
+   In case of simple protected authentication methods being applied, the 
+   authenticating DSA will initiate a chainedCompare operation to the DSA which 
+   holds the master entry of the requesting user, too. However, defect reports 
+   have shown that the current X.500 standard is deficient in that respect and that 
+   additional definitions have to be introduced in order to be able to perform simple 
+   protected authentication in the distributed case.
+
+   In case of strong authentication methods being applied, the authenticating DSA
+   will verify itself the digital signature of the requesting user without the
+   help of other DSAs. 
+   
+\m Intermediate DSAs. They neither authenticate the requesting user nor satisfy 
+   the Directory operation. Distributed Directory operations do not necessarily
+   involve intermediate DSAs.
+
+\m The serving DSA. This is the DSA which finally satisfies the Directory operation, 
+   i.e. the DSA which holds the requested entry of the DIB. This can be a DSA which 
+   holds the master entry or one which holds a shadow entry.
+\ee
+
+\subsubsection{DSA - DSA Authentication}
+
+
+When performing the chained DSP operation, the DSAs involved  may also authenticate
+each other during DSABind, applying one of the authentication methods listed in 
+\ref{bind}.
+
+\subsubsection{Signed Distributed Directory Operations}
+
+
+In addition to authentication during DirectoryBind and DSABind, each distributed 
+Directory operation may be optionally signed. Two signatures may be involved:
+\be
+\m The signature of the original requestor is transferred through all chaining DSAs 
+   to the serving DSA, i.e. the serving DSA is able to verify the signature of 
+   the original requestor. This allows the serving DSA to consult its authorization 
+   policy and to decide whether or not to perform the requested Directory operation.
+
+\m Each chained operation between two DSAs, which consists of ChainingArguments and 
+   the originally requested Directory operation, may be signed by the initiating
+   DSA. This is an additional measure to assure that only trusted DSAs are 
+   performing distributed Directory operations.
+\ee
+It is possible to indicate in an operation request that the operation result
+shall be signed.
+
+
+\subsubsection{Navigation Knowledge Information}
+
+
+While a particular DSA may store only a portion of the DIB, it must have some 
+knowledge about the location of the rest of the DIB in order to be able to do 
+reasonable chained operations. Proper distributed operation of the Directory as 
+a whole relies on carefully maintained and uncompromised navigation knowledge 
+information. If navigation information is altered by unauthorized users,
+the provision of reliable Directory services can be seriously jeopardized.
+Functionality, formats and operations on navigation knowledge information,
+however, is not standardized by X.500. Local implementation measures are to
+be used to provide a high degree of security in this area.
+
+
+\subsubsection{Some Consequences on Security Policies}
+
+
+The X.500 DSP does not provide any means of transferring the knowledge about the
+method of authentication between the originating DUA and the authenticating DSA
+(during DirectoryBind) to the serving DSA. It also does not provide any means
+of transferring the name of the authenticating DSA to the serving DSA. It does provide,
+however, the possibility of transferring the name of the original requestor to the
+serving DSA. This leads to the following consequences:
+\bi
+\m If a security policy requires the use of strong authentication in order to
+  allow a particular Directory operation, signed Directory operations must be
+  used. Only in this case is the serving DSA  in a position to know that strong
+  authentication has been used and to verify the signature of the original 
+  requestor. Signed Directory operations, in turn, require a strong authentication
+  DirectoryBind between DUA and authenticating DSA. If a serving DSA receives an 
+  unsigned Directory operation, it must assume that the method of authentication 
+  is no better than simple.
+
+\m An authenticating DSA should insert the name of the original requestor into
+  the chained operation only if the method of authentication is at least simple.
+  If the original requestor did not provide any credential, this name should
+  remain empty. Thus, a serving DSA
+\bi
+\m may assume strong authentication only if it receives a signed Directory
+    operation,
+\m may assume simple (unprotected or protected) authentication if it receives
+    an unsigned Directory operation which contains the name of the original
+    requestor,
+\m must assume that no authentication has been used if it receives an unsigned
+    Directory operation which does not contain the name of the original requestor.
+\ei
+\ei
+\subsection{Objectives of Directory Security Policies}
+
+The objectives of Directory security policies are to ensure the protection of 
+particular DSAs and their data information base against a number of threats
+while being part of the global Directory. This protection is mainly being
+provided through allowing only authorized entities to carry out specific
+Directory operations via DAP or DSP, while unauthorized entities are prevented 
+from doing so.
+
+
+\subsubsection{Threats to the Directory}
+
+
+There are many possible threats to Directory security. Some of them are covered
+by the X.500 security model, some of them must be countered by local implementation
+and maintainance measures. The following text on threats is taken from 
+EWOS/EGDIR/92/266. It is based on Annex A of X.509-88. 
+
+\bi
+\m Identity Interception
+
+The identity of one or more of the users involved in a communication is observed
+for misuse.
+
+The Directory provides no inherent protection. In particular, note that as use of
+the Directory may involve chaining, it is difficult to even bound the end-points
+of the communications.
+
+
+\m Masquerade
+
+
+A user pretends to be a different user in order to gain access to information or
+to acquire additional privileges. This is considered to be the main threat
+against Directory services.
+
+Use of simple protected or strong credentials, or signed Directory operations, 
+provides protection.
+
+
+\m Replay
+
+
+This is the recording and subsequent replay of a communication at some later date
+(with the intent of masquerade). The use of simple protected or strong credentials,
+combined with signed Directory operations, provides some protection.
+
+ 
+\m Data Interception
+
+
+This is the observation of user data during a communication by an unauthorized user.
+
+The Directory provides no inherent protection. However, a data confidentiality 
+service could be used to provide this. Further, if strong credentials are used, then
+a session key may be exchanged for use with the data confidentiality service. Note
+that in the absence of a data confidentiality service, a DSA may refuse to disclose
+information or allow security-related information to be modified.
+
+
+\m Manipulation
+
+
+This is the replacement, insertion, deletion or misordering of user data during a
+communication by an unauthorized user.
+
+Use of strong credentials combined with signed Directory operations provides protection.
+
+
+\m Repudiation
+
+This is the denial by a user of having participated in part or all of a
+communication.
+
+Use of strong credentials with signed Directory operations provides protection.
+
+
+\m Denial of Service
+
+This is the prevention of interruption of a communication or the delay of
+time-critical operations. 
+
+The Directory provides no inherent protection. This topic is outside the scope
+of this document. However, competent systems programming often provides adequate
+protection against common variants of this threat, e.g, a DSA may refuse
+to process queries which it considers too expensive.
+
+
+\m Mis-Routing
+
+
+This is the mis-routing of a communication path intended for one user to another.
+
+The Directory provides no inherent protection. However, the use of strong
+credentials coupled with signed Directory operations sometimes permits detection
+of this threat at the receiving end.
+
+
+\m Traffic Analysis
+
+This is the observation of information about a communication between users
+(e.g. absence/presence, frequency, direction, sequence, type, amount, etc.).
+
+The Directory provides no inherent protection. This topic is outside the scope
+of this document. However, low-layer encryption, e.g. at the data link layer,
+may provide adequate protection in some environments.
+
+
+\subsubsection{Countermeasures and Mechanisms}
+
+The primary threat to Directories which can be countered by X.500 defined
+security measures is presumed to be that of masquerade. Therefore, we will
+support security policies which require DSA capabilities listed in~\ref{authorization}.
+
+In particular, the following DUA and DSA functionality will be provided:
+\bi
+\m DUAs which are able to to strongly authenticate towards
+  a DSA during DirectoryBind, based on user request at the user interface.
+
+\m DUAs which are able to strongly authenticate a DSA when
+  processing a DirectoryBindResult.
+
+\m DUAs which are able to perform digitally signed Directory
+  operations, both actively and passively, based on user request at the user 
+  interface.
+
+\m DSAs which are able to perform the according strong 
+  authentication procedures during DirectoryBind via DAP.
+
+\m DSAs which are able to verify Directory operations which are
+  digitally signed by the original requestor when acting as serving DSA , and
+  which are able to produce digitally signed operation results.
+
+\m DSAs which are able to transfer signed directory operations
+  through chained operations, i.e. to transfer an original requestor's signature
+  to the serving DSA.
+
+\m DUAs and DSAs which are able to provide the forward certification
+  path when offering strong credentials.
+\ei
+The following DSA functionality will be provided optionally:
+\bi
+\m DSAs which strongly authenticate each other during DSABind when performing
+  chained operations via DSP.
+
+\m DSAs which digitally sign chained Directory operations when communicating
+  to other DSAs via DSP.
+\ei
+The reason for making this provision optional is both that they are regarded 
+to be less essential, and that their realization would require
+enormous effort and would make interworking with the non-secure X.500 world
+very complicated.
+
+X.500 components with the above capabilities are regarded as secure X.500 components.
+X.500 components which do not provide the above capabilities are regarded as
+non-secure X.500 components. In particular, X.500 components which are only able
+to perform simple authentication methods or less are regarded unsecure.
+
+
+\subsection{Source Integrity and Source Confidentiality}
+
+Signed Directory operations as described above only provide integrity protection
+of the Directory information for the purpose of their communication via
+DSP and DAP. They do not provide any integrity protection with respect to
+the source of the information. The storage of signed information in the 
+Directory would be an appropriate measure to gain more security to the user.
+
+The only attribute types, however, which are stored in the Directory in signed 
+form are Certificates and Certificate Revocation Lists., i.e. their source
+integrity can be verified when receiving them from the Directory. The use of
+other signed Directory information is out of the scope of X.500. However, it can
+be regarded as an important security issue which must be solved in the future.
+
+The situation is similar when considering confidentiality issues with Directories.
+The storage of encrypted information in the Directory is out of the scope of
+X.500. The encryption of Directory information for the purpose of their
+communication via DAP and DSP is out of the scope of X.500, too.
+
+\subsection{Local Protection of the DIB and the DSA Resources in a particular DSA}
+
+Beside remote Directory operations via DAP and DSP, a particular DSA
+and its part of the DIB is subject to manipulation through site personell
+like DSA managers. There is a considerable potential threat through
+possible insider attacks. In addition, since DSAs are connected to
+public networks, there is a potential threat through possible communication
+channels to the DSA other than those controlled by Directory protocols.
+For instance, if an attacker is able to remotely log into a DSA via rlogin,
+X.29, or ftp, and gains access to DSA resources or the information base,
+the effect could be disastrous.
+
+Threats of this kind are out of the scope of X.500. Local protection has to
+be employed to counter this kind of threat.

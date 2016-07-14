@@ -1,0 +1,115 @@
+                                   Example Certificate
+ 
+                                  Burton S. Kaliski Jr.
+ 
+                                  RSA Data Security Inc.
+                                 Redwood City, CA  94065
+ 
+                                       May 8, 1990
+ 
+1 INTRODUCTION
+ 
+This note gives an example ASN.1 certificate.
+ 
+2 CERTIFICATE
+ 
+Mike Roe of University College London, through Pam Cochrane of Trusted Information Systems
+Inc., provided the example certificate shown in Figure 1.
+ 
+The subject of the certificate is
+ 
+David M. Balenson
+Trusted Information Systems
+US
+ 
+The subject's public key is
+ 
+(modulus) 79 55 0b 56 66 01 c8 78 79 f4 4d 0a 2a 1f 59 52 f9 de c3 e9 f5 59 cd e8 c9 c8 a3
+cf e7 e1 51 1c 71 58 7c 1c 90 7d 0d 4a fe c6 7d d7 e3 26 b6 46 a4 1d bf 76 4e 92 f5 07 4e
+72 87 a2 bf 72 fb 6b
+(exponent) 1 00 01
+ 
+The issuer is
+ 
+University College London
+GB
+ 
+The validity period is
+ 
+(not before) 5:27:34 p.m. August 31, 1989
+(not after) 5:27:34 p.m. August 31, 1990
+ 
+The example is decoded in Figure 2.
+ 
+For reference, the issuer's public key is
+ 
+(modulus) e2 7f 6c 8f d8 f6 6c 02 a3 9d 0a 10 07 09 68 1c e1 3c 8d b5 fe 4d ac ce 00 e3 87
+6b 8e f6 09 05 f2 56 39 40 d4 37 f4 64 69 0d 54 75 da 0e 0f c6 d0 6e 49 0a 16 09 a1 6a 81
+d7 5d c9 36 46 cf 89
+(exponent) 1 00 01
+ 
+30 80 30 80 02 01 01 30 0a 06 04 55 08 03 01 02 02 02 00 30 31 31 0b 30 09 06 03 55 04 06
+13 02 47 42 31 22 30 20 06 03 55 04 0a 13 19 55 6e 69 76 65 72 73 69 74 79 20 43 6f 6c 6c
+65 67 65 20 4c 6f 6e 64 6f 6e 30 1e 17 0d 38 39 30 38 33 31 31 37 32 37 33 34 5a 17 0d 39
+30 30 38 33 31 31 37 32 37 33 34 5a 30 4f 31 0b 30 09 06 03 55 04 06 13 02 55 53 31 24 30
+22 06 03 55 04 0a 13 1b 54 72 75 73 74 65 64 20 49 6e 66 6f 72 6d 61 74 69 6f 6e 20 53 79
+73 74 65 6d 73 31 1a 30 18 06 03 55 04 03 13 11 44 61 76 69 64 20 4d 2e 20 42 61 6c 65 6e
+73 6f 6e 30 58 30 0a 06 04 55 08 03 02 02 02 02 00 03 4a 00 30 47 02 40 79 55 0b 56 66 01
+c8 78 79 f4 4d 0a 2a 1f 59 52 f9 de c3 e9 f5 59 cd e8 c9 c8 a3 cf e7 e1 51 1c 71 58 7c 1c
+90 7d 0d 4a fe c6 7d d7 e3 26 b6 46 a4 1d bf 76 4e 92 f5 07 4e 72 87 a2 bf 72 fb 6b 02 03
+01 00 01 00 00 30 0a 06 04 55 08 03 01 02 02 02 00 03 41 00 2e 7f f9 81 f9 6b b1 1b ed f7
+56 4e a7 fa 00 90 43 67 cd fc f9 ac c4 a4 01 b2 86 f0 e0 cf e3 7b 73 8d a2 af f3 6f f4 c5
+71 83 98 02 43 a1 e3 a6 c1 12 43 1f 19 f8 5d c5 27 f9 6e 9f 1f ab 53 a2 00 00
+ 
+                     Figure 1. Example certificate (in hexadecimal).
+ 
+SEQUENCE {                    30 80
+ SEQUENCE {                    30 80
+  [0] INTEGER DEFAULT 0,
+  INTEGER,                      02 01 01                    serial number 1
+  SEQUENCE {                    30 0a
+   OBJECT IDENTIFIER,            06 04 55 08 03 01          RSA/quadrature
+   ANY},                         02 02 02 00                512 bits
+  CHOICE {
+   SEQUENCE OF                   30 31
+    SET OF                        31 0b
+     SEQUENCE {                    30 09
+      OBJECT IDENTIFER,             06 03 55 04 06          country name
+      ANY}}                         47 42                   Great Britain (GB)
+                                  31 22
+                                   30 20
+                                    06 03 55 04 0a          organization name
+                                    13 19 55 6e 69...6f 6e  University College London
+  SEQUENCE {                    30 1e
+   UTCTime,                      17 0d 38 39 30 38...34 5a  89/08/31 17:27:34 GMT
+   UTCTime},                     17 0d 39 30 30 38...34 5a  90/08/31 17:27:34 GMT
+  CHOICE {
+   SEQUENCE OF                   30 4f
+    SET OF                        31 0b
+     SEQUENCE {                    30 09
+      OBJECT IDENTIFER,             06 03 55 04 06          country name
+      ANY}}                         55 53                   United States (US)
+                                  31 24
+                                   30 22
+                                    06 03 55 04 0a          organization name
+                                    13 1b 54 72 75...6d 73  Trusted Information Systems
+                                  31 1a
+                                   30 18
+                                    06 03 55 04 03          common name
+                                    44 61 76 69 64...6f 6e  David M. Balenson
+  SEQUENCE {                    30 58
+   SEQUENCE {                    30 0a
+    OBJECT IDENTIFER,             06 04 55 08 03 02         RSA/RSA-MD2
+    ANY},                         02 02 02 00               512 bits
+   BIT STRING}}                  03 4a 00
+                                  30 47
+                                   02 40 79 55 0b...fb 6b   modulus 79550b...fb6b
+                                   02 03 01 00 01           exponent 10001
+ },                            00 00                        (end of contents)
+ SEQUENCE {                    30 0a
+  OBJECT IDENTIFER,             06 04 55 08 03 01           RSA/quadrature
+  ANY},                         02 02 02 00                 512 bits
+ BIT STRING                    03 41 00 2e 7f f9 81...53 a2 signature 2e7ff981...53a2
+}                             00 00                         (end of contents)
+ 
+                              Figure 2. Decoded certificate.

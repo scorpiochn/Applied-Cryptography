@@ -1,0 +1,42 @@
+echo "Examples of Encrypted Data using IDEA" > out
+echo "=====================================" >> out
+echo "" >> out
+echo "input data" >> out
+dumphex in >> out
+echo "idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -ecb" >> out
+idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -ecb in temp
+dumphex temp >> out
+echo "idea -k AaBcDeFgHiJkLmNoPqRsTuVwXyZz0123456789 -e -ecb" >> out
+idea -k AaBcDeFgHiJkLmNoPqRsTuVwXyZz0123456789 -e -ecb in temp
+dumphex temp >> out
+echo "idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -cbc" >> out
+idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -cbc in temp
+dumphex temp >> out
+echo "idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -cbc3" >> out
+idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -cbc3 in temp
+dumphex temp >> out
+echo "idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -cfb" >> out
+idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -cfb in temp
+dumphex temp >> out
+echo "idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -cfb4" >> out
+idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -cfb4 in temp
+dumphex temp >> out
+echo "idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -ofb" >> out
+idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -ofb in temp
+dumphex temp >> out
+echo "idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -ofb5" >> out
+idea -K 112233445566778899AABBCCDDEEFF:1:2:3:4:5 -e -ofb5 in temp
+dumphex temp >> out
+echo "idea -K 112233445566778899AABBCCDDEEFF -h -tan" >> out
+echo "" >> out
+idea -K 112233445566778899AABBCCDDEEFF -h -tan in >> out
+echo "" >> out
+echo "" >> out
+echo "idea -K 112233445566778899AABBCCDDEEFF -h -abr" >> out
+echo "" >> out
+idea -K 112233445566778899AABBCCDDEEFF -h -abr in >> out
+echo "" >> out
+rm temp
+
+echo ""
+echo "check now if the files 'out' and 'Examples' are identical!"

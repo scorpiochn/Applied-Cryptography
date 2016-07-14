@@ -1,0 +1,163 @@
+Function return values:
+	  Some functions return a `bigerr_t' that can have one of
+	the following values:
+
+		BIG_OK		- All is well
+
+		BIG_MEMERR	- Memory problems.  Probably out of it.
+
+		BIG_ARGERR	- Argument error.  `q' and `r' points to the
+				  same structure when dividing, or the base
+				  when converting to/from a string of digits
+				  is less than 2 or bigger than 36.  Or other
+				  erroneous behaviour.
+
+		BIG_DIV_ZERO	- Attempted to divide by zero.
+
+	  The function `big_sign' returns one of the values BIG_SIGN_MINUS,
+	BIG_SIGN_0 or BIG_SIGN_PLUS, depending on the value of the bignum.
+
+	  Please read bignum.h for a description of all functions.  More
+	descriptive information will be placed in this file later on.
+
+
+Internal format:
+	  Bignums are represented in sign-and-magnitude format, but
+	that shouldn't be visible for the user.  In the future, when
+	implementing shift and bitwise operations on bignums they are
+	going to behave as if the bignums were in two's complement form,
+	so don't use `big_bitcount' on negative values - it will (probably)
+	not return the same value in future versions.
+	  The algorithms used when implementing these functions are
+	straight-forward, and should be easy to modify and expand if
+	ever the need arises.  The code is not optimized, and would
+	gain a great deal if it was.
+
+
+Writing code:
+	  The files `bigutils.c' and `pi.c' are a good source to look at
+	when writing code for personal use.
+	  You will have to include `bignum.h', and link with `bignum.o'
+	when creating your applications.
+	  Remember to call `big_init_pkg' before doing any operations on
+	bignums.  You don't have to do `big_release_pkg' before terminating
+	the program, but it looks better.
+	  Always do `big_create' on each local bignum structure when
+	entering a function, and `big_destroy' on the same structure
+	when leaving a function.  If you are going to return a bignum
+	from a function, make it a reference argument.
+	  When you put constant integers as arguments to functions that
+	take a `long' or an `unsigned long', you'll have to cast the
+	number to that type if you want portable code.  There exist systems
+	where an `int' is smaller than a `long'.	
+
+
+  Assume the following variable declarations:
+
+	bignum a, b, c, q, r;
+	bigerr_t res;
+	long lng;
+	unsigned ulng;
+	int bool;
+	char *num_str;
+	int base, sgn, cmp;
+
+  Then the following function calls are valid:
+
+    res = big_init_pkg();		- Initialize some internal variables.
+    					  Call this function as the first
+					  thing in your programs using bignums.
+
+    big_release_pkg();			- De-initialize internal variables,
+					  and return their space to the system.
+
+    res = big_create(&a);		- Set up `a' for use as a bignum.
+    					  This allocates some room.  As a side
+					  effect, `a' will be set to 0.
+
+    big_destroy(&a);			- Release space occupied by `a'.
+					  `a' mustn't be used after this.
+
+    ulng = big_bitcount(&a);		- Find out the position of the
+					  leftmost 1-bit in `a'.
+
+    res big_set_big(&a, &b);		- `b = a'  Assignment.
+
+    big_set_long(lng, &a);		- `a = lng'
+
+    big_set_ulong(ulng, &a);		- `a = ulng'
+
+    res = big_set_string(num_str, base, &a);
+					- Set a to the value represented by
+					  the string's digits (represented in
+					  base `base').
+
+    bool = big_long(&a, &lng);		- Convert `a' to a long.  Return 0
+					  on failure, and 1 on success.
+
+    bool = big_ulong(&a, &ulng);	- Convert `a' to an unsigned long.
+					  Return 0 on failure, and 1 on
+					  success.
+
+    num_str = big_string(&a, base); 	- Convert `a' to a sequence of digits.
+					  Return a pointer to the internal
+					  area where it begins.  The same area
+					  is reused, so you can't call
+					  `big_string' two times and expecting
+					  the first pointer to be valid.  Copy
+					  the strings you want to keep.
+
+    sgn = big_sign(&a);			- Return the sign of `a'.
+
+    res = big_abs(&a, &b);		- `b = abs(a)'
+
+    res = big_negate(&a, &b);		- `b = -a'
+
+    cmp = big_compare(&a, &b);		- Return negative if `a < b', 0 if
+					  `a == b', and positive if `a > b'.
+
+    bool = big_lessp(&a, &b);		- `a < b'
+
+    bool = big_leqp(&a, &b);		- `a <= b'
+
+    bool = big_equalp(&a, &b);		- `a == b'
+
+    bool = big_geqp(&a, &b);		- `a >= b'
+
+    bool = big_greaterp(&a, &b);	- `a > b'
+
+    bool = big_zerop(&a);		- `a == 0'
+
+    bool = big_evenp(&a);		- True if `a' is even.
+
+    bool = big_oddp(&a);		- True if `a' is odd.
+
+    res = big_add(&a, &b, &c);		- `c = a + b'
+
+    res = big_sub(&a, &b, &c);		- `c = a - b'
+
+    res = big_mul(&a, &b, &c);		- `c = a * b'
+
+    res = big_trunc(&a, &b, &q, &r);	- `q = a / b' truncated towards zero.
+
+    res = big_floor(&a, &b, &q, &r);	- `q = a / b' truncated towards
+					  negative infinity.
+    res = big_ceil(&a, &b, &q, &r);
+					- `q = a / b' truncated towards
+					  positive infinity.
+    res = big_round(&a, &b, &q, &r);	- `q = a / b' truncated towards nearest
+					  integer.
+
+    res = big_random(&a, &b);		- `b' is set to a number in the
+					  interval from 0 (inclusive) to `a'
+					  (exclusive).  `b' gets the same
+					  sign as `a'.
+
+    res = big_expt(&a, ulng, &b);	- `b = a ^ ulng'.  Exponentiation.
+
+    res = big_exptmod(&a, &b, &c, &d);	- d = a ^ b % c
+
+    res = big_gcd(&a, &b, &c);		- `c = gcd(a, b)'.  Greteast Common
+					  Divisor.
+
+

@@ -1,0 +1,552 @@
+
+			Internet PEM Questions
+
+		Steve Crocker (TIS), IETF Security AD
+			     Aug 4, 1991
+
+
+This note contains the principal open questions regarding the trust
+characteristics, certificate hierarchy and contractual arrangements
+for Internet PEM.  These matters go beyond the usual engineering
+design issues, so it is not surprising that there is a strong
+diversity of opinion.  In order to reach resolution, a useful first
+step is to recognize this diversity and attempt to bring all of the
+positions into a common framework.  [This is a first attempt, and I
+consider myself a biased participant.  I fully expect others will
+contribute to both the framing of the questions and the description of
+the individual positions.  I would like to see additional people join
+in the authorship of this or a replacement document.]
+
+The following is written at two levels.  The first section is an
+executive summary.  It contains a terse description of the questions
+and positions.  The second section expands on this in more detail.  In
+the second section, individuals who have expressed agreement with
+particular positions are noted.  The intent is only to note which
+individuals have agreed that his or her position is accurately
+represented.  It is not intended to add the weight of a "vote" or
+the individual's personal stature.
+
+To initiate this exercise, the first position under each question is
+taken from the existing specifications [keymgmt].
+
+
+I. Executive Summary
+
+A. How much trust in the identification system?
+
+1. A high and uniform level of trust is desired throughout the
+   Internet PEM community.  As a general rule, the identity listed in
+   a certificate should match the true current identity of the
+   individual so named.  The level of trust should be sufficient to
+   serve as the basis of contracts.  If a discrepancy occurs in the
+   identification system, it should mean that someone violated a law
+   or was grossly negligent.  [This is a synthesis of words from
+   [keymgmt] and words I have heard over time.  It may be bit stronger
+   than the designers intended; I invite correction.]  In order to
+   achieve this high and uniform level of trust, strong controls are
+   placed on the operation of the TLCA, requirements for becoming an
+   Issuing Authority, operational rules for Issuing Authorities, rules
+   for cross certification with other TCLAs, and use and assignment of
+   distinguished names.
+
+2. Taken from [Linn]: "With respect to many aspects of PEM's design,
+   there's a continuum of alternatives ranging (in terms of required
+   administration and technology) from open and flexible to tightly,
+   uniformly controlled. Tight, uniform controls enhance certain
+   aspects of security, but appear likely to exclude at least some
+   number of potential PEM users from the PEM community.  We don't yet
+   have operational experience to quantify how many prospective users
+   may be impacted by particular proposed requirements; as questions
+   of interconnecting sets of users for PEM purposes via
+   cross-certification arise, I think that the burden of proof should
+   favor enabling connectivity rather than enforcing constraints which
+   preclude significant communities from participation."
+
+
+B. What is the role of the TLCA in establishing and enforcing the
+   procedural rules and safeguards required of Issuing Authorities?
+
+1. [keymgmt] delegates considerable authority and responsibility to
+   the TLCA.  Appendix B of [keymgmt] contains portions of a
+   contractual document, viz the "Organizational Agreement", to be
+   executed by prospective Issuing Authorities operating under RSADSI.
+   The TLCA has the authority to investigate organizations which apply
+   to become Issuing Authorities, and it has the authority to reject
+   such applications.  The TLCA also has the authority to resolve
+   disputes regarding the use of distinguished names assigned to
+   organizations.
+
+2. Permissible rules of operation for Issuing Authorities should be
+   specified entirely in the Internet standard.  Issuing Authorities
+   should have the latitude to restrict or ease their rules of
+   operation within the scope of the standard.  A TLCA should operate
+   in conformance with the Internet standard, but should not establish
+   the rules for the community.  Assignment and approval of
+   distinguished names should be outside the scope of the TLCA's
+   authority.
+
+
+C. What is the proper mechanism for selection or designation of TLCAs?
+
+1. The current specification [keymgmt] specifies that RSADSI is to be
+   the TLCA for non-governmental U.S.  community.  Implicit in the
+   wording is that this selection derives from RSADSI's patent on the
+   algorithm.
+
+2. Although the patent on the technology is held by RSADSI, selection
+   of TLCAs should remain the prerogative of the IAB or some other
+   representative of the user community, e.g. the forthcoming Internet
+   Society.  It is entirely possible that there should be more than
+   one TLCA serving the same community.  The TLCA may hire a
+   contractor to carry out the actual processing of requests to become
+   an Issuing Authority, and RSADSI is an entirely reasonable
+   candidate to serve in this role.
+
+
+
+
+II. Expanded Discussion
+
+A. How much trust in the identification system?
+
+1. A high and uniform level of trust is desired throughout the
+   Internet PEM community.  As a general rule, the identity listed in
+   a certificate should match the true current identity of the
+   individual so named.  The level of trust should be sufficient to
+   serve as the basis of contracts.  If a discrepancy occurs in the
+   identification system, it should mean that someone violated a law
+   or was grossly negligent.  [This is a synthesis of words from
+   [keymgmt] and words I have heard over time.  It may be bit stronger
+   than the designers intended; I invite correction.]  In order to
+   achieve this high and uniform level of trust, strong controls are
+   placed on the operation of the TLCA, requirements for becoming an
+   Issuing Authority, operational rules for Issuing Authorities, rules
+   for cross certification with other TCLAs, and use and assignment of
+   distinguished names.
+
+   <<This section needs to be expanded.>>
+
+
+
+2. Taken from [Linn]: "With respect to many aspects of PEM's design,
+   there's a continuum of alternatives ranging (in terms of required
+   administration and technology) from open and flexible to tightly,
+   uniformly controlled. Tight, uniform controls enhance certain
+   aspects of security, but appear likely to exclude at least some
+   number of potential PEM users from the PEM community.  We don't yet
+   have operational experience to quantify how many prospective users
+   may be impacted by particular proposed requirements; as questions
+   of interconnecting sets of users for PEM purposes via
+   cross-certification arise, I think that the burden of proof should
+   favor enabling connectivity rather than enforcing constraints which
+   preclude significant communities from participation.
+
+   "The bullets in the Executive Summary section (page 2) identify
+   several principles motivating design decisions.  The first two
+   bullets presume that a sufficiently strong and uniform baseline
+   assurance level can be achieved as to obviate the need for
+   individual users to assess the trustworthiness of other
+   PEM-identified organizations.  I believe that PEM should recognize
+   that the administrations which it will span will be highly
+   heterogeneous, and should therefore seek to provide strong
+   firewalling between administrations rather than to attempt to
+   constrain those administrations' internal workings.
+
+   "Text in this I-D is prescriptive with regard to the set of
+   distinguished name attributes which are to be acceptable by a PEM
+   implementation.  I believe that such restrictions are not
+   fundamental to security, and may jeopardize PEM's ability to evolve
+   into interworking with an international hierarchy.  Section 3.3.4
+   exemplifies the conflict, by noting (correctly) that `if a user is
+   already registered in an X.500 directory, his distinguished name is
+   defined by that registration'; such a user would be excluded from
+   PEM participation (at least under the same distinguished name) if
+   the naming authority responsible for his/her X.500 directory
+   employed naming attributes other than those authorized (per section
+   3.6) within this Internet-Draft. (See also the `Distinguished Name
+   Conventions' annex to this note.)  Per section 3.4.1.1, I'm trying
+   to distinguish the user key protection characteristics which are
+   deemed to be requirements from other features and approaches
+   suggested as guidance to implementors and users. Based on the text
+   of this section, I see the following stated requirements as the set
+   proposed for imposition on UA and associated software: (1) `A UA
+   process supporting PEM must protect the private component of its
+   associated entity ... from disclosure, though the means by which
+   this is effected is a local matter'. (2) `It is critically
+   important that the component pair generation procedure be effected
+   in as secure a fashion as possible...'.  I firmly endorse both of
+   these goals, but note that the quality with which an implementation
+   satisfies these requirements cannot be established through
+   conformance testing or other non-subjective procedure.  I believe,
+   therefore, that it is appropriate for individual PEM implementors
+   to support key protection and generation functions as they deem
+   suitable within the context of their implementations, and that all
+   such implementations should be construed as conformant to the
+   requirements imposed by this section.
+
+   "Section 3.4.2, first paragraph: ON independence from the users on
+   whose behalf certificates are ordered, and ON trust within an
+   organization, are both valuable characteristics.  Since their
+   implementation will be dependent on individual organizations'
+   procedures and cultures, the degrees of independence and
+   trustworthiness offered can't be quantified in a manner meaningful
+   outside an ON's own organization.  As such, I believe that the
+   benefits which administrative restrictions in this area offer to
+   PEM communicants in other domains are limited.
+
+   "p. 17-18, secs. 3.4.3.2 and 3.4.3.3: Should PERSONA and GUEST
+   certificates be recognized on the basis of having (as stated) any
+   organizationalUnit attributes within the subject DN which possess
+   the designator value, or (more closely analogous to the NOTARY
+   convention) should the designator value always appear in the final
+   organizationalUnit attribute?  More broadly (and perhaps as a
+   matter for future evolution), I think it would be more in the X.500
+   representational spirit to tag such cases by defining new
+   attributes to be used as alternatives to commonName, rather than by
+   using reserved values for existing attributes.  Use of a reserved
+   organizationalUnit value to indicate a characteristic of an
+   associated commonName seems like an inappropriate semantic to load
+   onto the organizationalUnit RDN.
+
+   "p. 24-25, Sec. 3.5.1: There's an inconsistency here.  On page 24,
+   the idea of having each TLCA sign certificates for all CAs within
+   its domain is recommended, but not required.  On page 25, it's
+   stated that `a user will be able to validate any user certificate
+   in at most two or three steps'.  This statement is true only if the
+   remote CA is in fact directly certified by its TLCA. I think that
+   TLCA certification of all descendant CAs is a useful convenience,
+   but need not be a functional requirement.
+
+   "p. 26, first two full paragraphs: The first paragraph (discussing
+   display of originator identities on received PEM messages) states
+   that an originator's DN should be displayed for a recipient user
+   and cites no other acceptable display forms.  The second paragraph
+   (discussing display of recipient identities for originators of
+   ENCRYPTED messages) proposes alternative use of a tightly
+   controlled binding between local aliases and the DNs.  I believe
+   that display based on PEM-supported authentication is basic in both
+   directions, and that the form of such display is a local matter so
+   alias-translated name representations should be acceptable in both
+   directions.
+
+   "p. 28, 2nd full para: The text here requires that `no certificate
+   may contain any DN attribute other than those defined in Section
+   3.6 (or authorized in a subsequent PEM RFC).'  I continue to
+   believe (per the `Distinguished Name Conventions' annex to this
+   note) that naming authorities, not PEM designers, are the
+   appropriate source for naming schema definitions, and that there is
+   no security requirement dictating that such definitions need be
+   pre-authorized by a PEM RFC.  Unambiguous display, which is a clear
+   security requirement, need not require predefinition of a specific
+   constrained attribute set.
+
+   "p. 29, 3rd-4th paras: This text recognizes (appropriately) the
+   need for naming schema evolution.  I think that PEM implementations
+   should be free to accommodate the evolution of naming schemas
+   directly, rather than being precluded from doing so until
+   explicitly permitted (with unavoidable attendant delays) by a
+   subsequent PEM-specific document.  If a PEM implementation is
+   required to employ a different naming attribute set than the set
+   accepted for other naming purposes, this will force divergence
+   between PEM activities and the OSI directory activities with which
+   PEM should naturally be integrated.
+
+   "p. 36, first full para: This text states that RSADSI will
+   cross-certify other TLCAs if those TLCAs employ `security
+   procedures and technology comparable to those employed by RSADSI'.
+   Where is the determination of what constitutes suitably
+   `comparable' (in terms of procedural and/or technical issues) to be
+   made, and against what criteria? I believe that any such
+   determination should properly be made not on the basis of
+   comparison against the technology as used to implement the RSADSI
+   infrastructure, but rather against a requirements set to be
+   reviewed and agreed upon by the PEM community. If RSADSI employs
+   technology engineered to satisfy requirements which are a superset
+   of those agreed as functionally required for PEM, this fact should
+   not compel other TLCAs to adopt technology equivalent to that
+   employed by RSADSI as a prerequisite to cross-certification.
+
+   "p. 36, final para: CA key pair generation is an infrequent
+   operation. For the (presumably most common) case of a CSU serving a
+   single CA, the text's recommendation implies that each CSU should
+   incorporate costly and specialized hardware features which would be
+   invoked exactly once in the course of that CSU's operational
+   lifetime.  I don't think it's appropriate to preclude all options
+   involving either CA key generation by ancillary software or
+   hardware outside the CSU (analogous to the choices recommended for
+   user keys in Section 3.4.1.1) or software generation within the
+   CSU.
+
+   "p. 37, para continuing from prior page, last sentence: Indeed, it
+   would be bad for an organization if its CA's private component were
+   compromised, necessitating revocation of all subordinate
+   certificates.  Prevention (through suitable local means) of such
+   compromise is clearly in the organization's interests.  The scope
+   of such a compromise is clearly delineated and does not bring the
+   integrity of broader portions of the certification system into
+   question. I believe that the means elected for such protection
+   should be evaluable by participant organizations according to their
+   own cost-benefit metrics.
+
+   "p. 40, first full paragraph: The occurrence of an organizational
+   DN change (as would arise in the event of corporate reorganizations
+   or mergers) isn't a remote prospect, and often has no direct effect
+   on the roles and responsibilities of affected individuals.  I don't
+   think that the PEM users in an reorganizing organization should be
+   forced into immediate PEM excommunication (awaiting action on
+   recertification) along with all the other stresses they're
+   doubtless enduring concurrently.  I think that a graceful rollover
+   should be permitted, allowing such users to continue use of their
+   currently-valid certificates until they are replaced by
+   certificates reflecting their new names.
+
+   "p. 41, bullet iv: RFCs in general, and 1113-1115 in particular,
+   are highly technical documents.  The administrators likely to be
+   designated as ONs are unlikely to be expert technologists.  I don't
+   think it's reasonable to expect a non-technical person to vouch in
+   a meaningful sense that they have read and understand all of the
+   requirements conferred by the texts of these RFCs.
+
+   "p. 42, B.6.1. a: A requirement (under the co-issuer scenario) that
+   prototype CRLs be submitted exactly on one particular day (not
+   before, not after) conflicts with realities of corporate operations
+   and availability of specifically-designated personnel.  The
+   procedures discussed in B.6.2 under the CSU scenario provide
+   (appropriately and in contrast) for notice to the organization
+   before initiating organizational revocation.
+
+   "p. 44, B.7.1, 2nd para: If (as stated) the contemplated CSU is
+   generally loaded with cryptosystem keys by the CSU vendor prior to
+   installation, why (per prior comment against p. 36) does the CSU
+   need to implement and use hardware or other internal facilities to
+   generate such keys itself?
+
+   "p. 46, B.8, first para: A dual-control requirement for issuance of
+   any certificate seems excessive in general (does this mean that all
+   organizations must have at least two designated, suitable ONs?),
+   and I believe should be a matter for per-organizational
+   determination.
+
+   "ANNEX: COMMENTS ON DISTINGUISHED NAME CONVENTIONS
+
+   "[The text in this subsection is adapted from a message I sent to
+   the pem-dev list on 30 November 1990.]
+
+   "I think that PEM's adoption of X.509 certificates (using
+   applicable external standards rather than defining PEM-specific
+   representations for necessary information) is a significant and
+   valuable characteristic, and that it's important to pursue the
+   benefits of standardization and compatibility which this compliance
+   permits.  To accomplish this, I believe that PEM should view itself
+   as a user of naming architectures defined elsewhere rather than as
+   a definer for such architectures. PEM will be an early Internet
+   user not only for these certificates, but also for the X.500 DNs
+   which the certificates contain and for the emerging OSI directories
+   which will act as certificate repositories.  While PEM will be an
+   early user, it won't be the only user and we should strive for
+   graceful coexistence with other users of common name service
+   facilities. To this end, I think it's important to delineate
+   clearly the set of definitions provided most suitably by PEM from
+   the set of definitions more appropriately established elsewhere.
+
+   "I don't think that specification of appropriate schemas and RDN
+   attributes is a task best performed in conjunction with PEM, or in
+   a fashion specific to other customers of a naming architecture.
+   This course of action could quickly lead down a path in which users
+   need to register, name, and perhaps certify themselves many times
+   to satisfy different applications' constraints.  Directory
+   administrators would have to manage their users' entries in
+   multiple subtrees, and users would have to manage the use of
+   different DNs for themselves as they perform different types of
+   operations.  It seems far more attractive for a user to have a
+   single globally-known name, implying that interoperating
+   administrations should establish their naming schema in conjunction
+   with a single naming architecture. UCL documents forming the basis
+   for discussion in the IETF OSI Directory WG propose a dynamic
+   procedure to manage evolution of a naming structure for the
+   Internet; I believe that PEM implementations and other Internet
+   naming service customers should strive to adopt such naming-driven
+   schema definitions as they evolve rather than imposing
+   application-specific constraints.
+
+   "The RSADSI-rooted certification hierarchy will be cross-certified
+   with other hierarchies, extending the set of interoperating PEM
+   users on an international basis.  Clearly, the RSADSI hierarchy
+   must adopt a suitable schema to represent the users it certifies.
+   For interoperability's sake, all PEM implementations should be
+   prepared to display that schema's attributes in a user-friendly
+   fashion.  Other hierarchies will be administered separately,
+   satisfying their organizational characteristics and the
+   requirements of non-PEM applications, and may in general use other
+   schema with different attributes.
+
+   "What action should be taken if a PEM message is received which
+   carries unrecognized attributes, even though the receiving
+   implementation can acquire and successfully process the necessary
+   certificates to extract the keys required to validate its
+   signature? Even under a common schema management umbrella, it's
+   inevitable that there will be time windows where an update hasn't
+   propagated simultaneously to all participants. I'd rather that a
+   PEM implementation display the DN contents as best it can (even if
+   an unrecognized attribute has to be dumped in numeric form), giving
+   me the opportunity to make my own judgment about the identity
+   authenticated for the originator, than that a PEM implementation
+   refuse to process a message because its DN contains an unrecognized
+   attribute.  While recourse to numeric display of unfamiliar AVAs is
+   user-unpleasant, such display (given the fact that AVAs include
+   OIDs) should be unambiguous."
+
+
+
+
+B. What is the role of the TLCA in establishing and enforcing the
+   procedural rules and safeguards required of Issuing Authorities?
+
+1. [keymgmt] delegates considerable authority and responsibility to
+   the TLCA.  Appendix B of [keymgmt] contains portions of a
+   contractual document, viz the "Organizational Agreement", to be
+   executed by prospective Issuing Authorities operating under RSADSI.
+   The TLCA has the authority to investigate organizations which apply
+   to become Issuing Authorities, and it has the authority to reject
+   such applications.  The TLCA also has the authority to resolve
+   disputes regarding the use of distinguished names assigned to
+   organizations.
+
+2. Permissible rules of operation for Issuing Authorities should be
+   specified entirely in the Internet standard.  Issuing Authorities
+   should have the latitude to restrict or ease their rules of
+   operation within the scope of the standard.  A TLCA should operate
+   in conformance with the Internet standard, but should not establish
+   the rules for the community.  Assignment and approval of
+   distinguished names should be outside the scope of the TLCA's
+   authority.
+
+
+C. What is the proper mechanism for selection or designation of TLCAs?
+
+1. The current specification [keymgmt] specifies that RSA Data
+   Security Inc. (RSADSI) is to be the TLCA for non-governmental U.S.
+   community.  Implicit in the wording is that this selection derives
+   from RSADSI's patent on the algorithm.
+
+2. Although the patent on the technology is held by RSADSI, selection
+   of TLCAs should remain the prerogative of the IAB or some other
+   representative of the user community, e.g. the forthcoming Internet
+   Society.  It is entirely possible that there should be more than
+   one TLCA serving the same community.  The TLCA may hire a
+   contractor to carry out the actual processing of requests to become
+   an Issuing Authority, and RSADSI is an entirely reasonable
+   candidate to serve in this role.
+
+   I believe the patent situation is the following.  (Usual disclaimer: I
+   am not a lawyer, and I have not studied this issue in close detail.
+   Someone from RSADSI should correct or acknowledge this description.)
+
+   The patent on the RSA algorithm is held by RSADSI.  Anyone who
+   makes or uses software that performs the RSA calculations for the
+   purpose of public key cryptography within the U.S., except for the
+   U.S. government (or MIT?), must have a license.
+
+   Within the proposed PEM system, RSADSI plays two roles.  First, they
+   must license the use of any software that uses the RSA algorithm in
+   PEM processing.  Second, they are scheduled to become the Top Level
+   Certification Authority.  They will sell certificates directly to end
+   users and they will license others, usually organizations, to become
+   Issuing Authorities.
+
+   There seems to be little controversy over the first role.  As the
+   patent holder, RSADSI is entitled to receive royalties for the use of
+   its technology.  However, its role as the proposed TLCA is less clear.
+   The following questions have come up.
+
+   a. Why is RSADSI being written into the Internet standards as the
+      TLCA?
+
+   b. How does someone else become a TLCA?  Who sets the rules for
+      becoming a TLCA?
+
+   c. Must all TLCAs cross-certify with each other?  If not, what is
+      the basis for each TLCA's decision?  If they do cross-certify,
+      how does this affect the overall trust characteristics of the
+      PEM system?
+
+   It has been suggested that RSADSI is making software available
+   free of charge in exchange for the business of being the TLCA.  If
+   so, this may be a reasonable basis for selecting RSADSI as the sole
+   TLCA in the non-governmental U.S. community.  However, this is
+   essentially a monetary exchange, and it's entirely possible that
+   other organizations may be able to provide comparable or better
+   deals.  For example, Tony Lauck from Digital suggested that
+   Digital's license of RSA technology would enable them to provide
+   comparable services and comparable software without further
+   negotiation with RSADSI.
+
+   A closely related matter is the source of CSUs.  (Note this is
+   different from whether CSUs should be required.  That's addressed
+   above.)  At the moment, only one supplier for CSUs exists, BBN.  No
+   specifications are available for CSUs, nor is alternate technology
+   acknowledged.
+
+	Disclosure: TIS makes and sells Trusted Xenix.  Trusted Xenix
+	has been evaluated by the National Computer Security Center to
+	meet the B2 level of specifications of the Trusted Systems
+	Evaluation Criteria (TCSEC).  B2 systems are generally
+	appropriate for multi-level classified operation in which not
+	all users are cleared for the highest level of material on the
+	machine.  TIS believes it is entirely appropriate to use
+	Trusted Xenix (or any other similarly trusted system) for
+	functions like certificate issuance.
+
+
+
+
+
+
+
+
+
+GLOSSARY
+
+CSU		Certificate Signing Unit.  Sometimes called a
+		Certificate Generation Unit (CGU).  This is a sealed
+		system that generates certificates in accordance with
+		rules imposed by the TLCA.  It is intended that most
+		large Issuing Authorities will use CSUs in issuing
+		certificates to their users.
+
+ON		Organization Notary.  This is the term for the person
+		within an organization who attests to the correctness
+		of the information supplied by the user in his
+		application for a certificate.  The ON either operates
+		the CSU to sign a certificate, or, if a CSU is not
+		being employed, forwards a partial certificate to
+		RSADSI for co-signing.
+
+RSA		Initials of Rivest, Shamir and Adelman, the inventors
+		of a public key cryptography system based on
+		exponentiation of large numbers.  This invention is
+		patented in the U.S. but not outside the U.S.  The
+		U.S. government holds separate rights to the
+		technology and is not subject to the patent.
+
+RSADSI		RSA Data Security Inc., Redwood Shores, CA.  RSADSI is
+		the current patent holder of the RSA patent.
+
+TLCA		Top Level Certification Authority.  The TLCA is the
+		top of a certification hierarchy.  The TLCA issues
+		certificates to Issuing Authorities, who in turn issue
+		certificates to end users.
+
+
+
+REFERENCES
+
+[keymgmt]	Internet Draft: draft-ietf-pem-keymgmt-00.txt
+		Privacy Enhancement for Internet Electronic Mail:
+		Part II: Certificate-Based Key Management,
+		Steve Kent, 28 June 91
+
+[Linn]		pem-dev message
+		Comments on RFC-1114 draft successor I-D (long message)
+		"John Linn. 17-Jul-1991 1232" <linn@zendia.enet.dec.com>
+		Wed, 17 Jul 91 09:34:39 PDT

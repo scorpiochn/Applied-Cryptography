@@ -1,0 +1,134 @@
+NAME
+     idea - encrypt and decrypt using IDEA
+
+SYNOPSIS
+     idea [ -e | -d ] [ -r ] [ -ecb | -cbcN | -cfbN | -ofbN ]
+          ( -k keyString | -K keyHexString )
+          [ inputFile [ ouputFile ] ]
+
+     idea [ -h | -H ] [ -tan | -abr ]
+          [ -k keyString | -K keyHexString ]
+          [ inputFile [ [ ouputFile ] hashvalFile ]
+
+DESCRIPTION
+     Idea reads inputFile and writes  the  en/decrypted  data  to
+     outputFile or writes the hash value to hashvalFile.  If file
+     name is not given in command line, idea uses standard  input
+     or  output.   If  the  input file name is given as '-', idea
+     reads from the standard input.
+
+     IDEA (International Data Encryption Algorithm)  is  a  block
+     cipher  developed  by  Dr.  Xuejia  Lai  and Prof. Dr. J. L.
+     Massey at the Swiss Federal Institute of Technology.
+
+OPTIONS
+     -e   Encrypt data. (default)
+
+     -d   Decrypt data.
+
+     -r   InputFile is a raster-file.
+
+     -k   Key is specified with keyString.
+
+     -K   Key and initial values are specified with keyHexString.
+
+     -h   Compute a 128 bit hash value from the input  data.  The
+          hash  value is written to hashvalFile (or standard out-
+          put).
+
+     -H   Compute a 128 bit hash value from the input  data.  The
+          input  is copied to outputFile (or standard output) and
+          the hash value is written to hashvalFile  (or  standard
+          error).
+
+     Notation:
+          N           = interleave factor (1 is default)
+          z           = 128 bit key
+          x[i]        = 64 bit plaintext block
+          y[i]        = 64 bit ciphertext block
+          x[1]..x[L]  = plaintext  (last  block  is  filled  with
+                        zeros)
+          x[L+1]      = length of plaintext in bits
+          y[1]..y[L+1]= ciphertext
+          IDEA(z, .)  = encryption function
+          IIDEA(z, .) = decryption function
+          x = IIDEA(z, IDEA(z ,x))
+
+     Encryption / Decrypion Modes:
+
+     -ecb electronic code book mode
+          y[i] = IDEA(z, x[i])
+          x[i] = IIDEA(z, y[i])
+
+     -cbc cipher block chaining mode (cbc1 is default)
+          y[i] = IDEA(z, x[i] ^ y[i-N])
+          x[i] = IIDEA(z, y[i]) ^ y[i-N]
+
+     -cfb ciphertext feedback mode
+          y[i] = x[i] ^ IDEA(z, y[i-N])
+          x[i] = y[i] ^ IDEA(z, y[i-N])
+
+     -ofb output feedback mode
+          h[i] = IDEA(z, h[i-N])
+          y[i] = x[i] ^ h[i]
+          x[i] = y[i] ^ h[i]
+
+     Hash Functions:
+          If no key is given, idea uses the all zero key.
+          hash value = h[L+1] * 2**64 + g[L+1]
+          h[0] = z / 2**64
+          g[0] = z % 2**64
+
+     -tan tandem DM-scheme (default)
+          w = IDEA(g[i-1] * 2**64 + x[i], h[i-1])
+          h[i] = h[i-1] ^ w
+          g[i] = g[i-1] ^ IDEA(x[i] * 2**64 + w, g[i-1])
+
+     -abr abreast DM-scheme
+          h[i] = h[i-1] ^ IDEA(g[i-1] * 2**64 + x[i], h[i-1])
+          g[i] = g[i-1] ^ IDEA(x[i] * 2**64 + h[i-1], ~ g[i-1])
+
+     Key Formats:
+          keyHexString = { '0'..'9' | 'a'..'f' | 'A'..'F' | ':' }
+          keyHexString = z:y[1-N]:y[2-N]:y[3-N]..
+          keyString = { '!'..'~' } = z
+
+EXAMPLES
+     To encrypt and decrypt a file in cipher block chaining  mode
+     with an interleave factor of 8:
+
+          idea -e -cbc8 -K 12345:67:89::ab:cDEf data data.cr
+          idea -d -cbc8 -K 12345:67:89::ab:cDef data.cr data.ori
+          data and data.ori are identical
+
+     To compute the hash value with tandem DM-scheme:
+
+          idea -h data
+
+     To compute the hash value and encrypt the data in one step:
+
+          idea -Hk "k e y" data | idea -K 123:9a::eF - data.cr
+
+PATENT
+     IDEA is registered as the international patent  WO  91/18459
+     "Device for Converting a Digital Block and the Use thereof".
+     For commercial use of IDEA, one should contact
+
+     ASCOM TECH AG
+     Freiburgstrasse 370
+     CH-3018 Bern, Switzerland
+
+AUTHOR
+     Richard De Moliner (demoliner@isi.ee.ethz.ch)
+     Signal and Information Processing Laboratory
+     Swiss Federal Institute of Technology
+     CH-8092 Zurich, Switzerland
+
+BUGS
+     This program is at most as strong as  IDEA  itself.  So,  we
+     urge  the user to use this program only after he has assured
+     himself that IDEA is strong  enough  AND  he  has  read  the
+     source  code  of  this  program and its libraries AND he has
+     compiled the program himself with a troyan-free compiler. WE
+     DO  NOT  GUARANTEE  THAT THIS PROGRAM IS A DECENT ENCRYPTION
+     PROGRAM.

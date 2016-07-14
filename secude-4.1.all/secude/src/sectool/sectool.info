@@ -1,0 +1,145 @@
+# 
+# sectool.info - User interface object help text.
+# 
+:alias_controls
+    SecuDE Tool 2.1   Alias Services
+
+The Alias subtool of SecTool provides comfor-
+table alias file maintaining functions.
+
+User aliases can be installed, changed, and
+deleted, System aliases can be displayed.
+
+SecTool takes care of save access to alias 
+files (thus it's not advisable to edit them manually) and performs several consistency 
+checks. 
+
+# 
+:alias_type_setting
+Alias type setting:
+
+ - Choose one of four possible alias types
+   of which aliases shall be displayed in the 
+   AliasList.
+ - If type is not available in the selected
+   alias file (User/System/both), the alias
+   is displayed as "???".
+ - If both files are selected, User's aliases
+   are printed prior to System aliases if a 
+   DName has several aliases of the same type 
+   in different files.
+
+# 
+:alias_file_setting
+Alias File setting:
+
+ - Choose origin of displayed DNames:
+     User's own aliases
+     System aliases (not editable)
+     or both
+
+# 
+:alias_find_button
+Alias Find button:
+
+ - Pattern string taken from alias clipboard
+   is searched in all attributes of alias entry's 
+   alias string.
+ - Comparisons are non-case-sensitive.
+ - On success, the entry is selected and dis-
+   played (if entry's origination file is not
+   the actual one, switch setting to see selec- 
+   tion).
+ - Available options are Find next and Find top 
+   down.
+ - Find next moves in the alphabetical sorted
+   internal AliasList structure, which is not
+   necessarily equal to the displayed list
+   (see help on AliasList panel for details).
+
+# 
+:alias_list
+AliasList panel:
+
+ - Show User/System-aliases for DNames.
+ - DNames are sorted in alphabetical order. 
+ - All lines in the AliasList panel are marked
+   with a symbol to notifiy their DName's origi-
+   nation file.
+ - If an AliasList panel entry is selected (after
+   find, add, or via  mouse click), its DName's 
+   set of aliases is displayed, and editing 
+   functions are allowed.  
+
+# 
+:alias_names_button
+Alias Names button:
+
+ - Used to install aliases that are needed
+   along with the three standard types.
+ - An alias given in alias name textfield is
+   appended to entry's aliases (with lowest
+   priority) via mouse click on menu button
+   or choice of <Insert> in the button menu.
+ - Extra aliases are listed in the button menu
+ - If a DName has no entry in User's file,
+   insert installs DName.
+ - Extra aliases are taken for missing standard
+   aliases, they don't appear in the menu list;
+   in the same way extra aliases can replace
+   standard aliases that where deleted by a
+   change process.
+ - Changes take place directly (i.e. Change
+   button activation has no effect now).
+ - Changes are made to User's entries only.
+
+# 
+:alias_apply_button
+Alias Apply button:
+
+ - All changed data are saved to User's alias
+   file (System's alias file is read-only).
+ - Changes of AliasList are notified by the
+   note "Save needed" in the window's right 
+   bottom corner.
+
+# 
+:alias_reset_button
+Alias Reset button:
+
+ - The AliasList is read again from files.
+
+# 
+:alias_add_button
+Alias Add button:
+
+ - A new DName with at least one guilty alias,
+   all taken from the textfields, is added to 
+   AliasList.
+ - If a System entry is selected and there are 
+   new aliases entered, Add copies the DName 
+   and new aliases to User's entries.
+
+# 
+:alias_change_button
+Alias Change button:
+
+ - Accept changes of User's Local name, Inter- 
+   net Mail, and X.400 Mail aliases for DName, 
+   all taken from the textfields. Empty fields
+   delete that standard alias (if there was one
+   before), while available extra aliases of the
+   respective type can move up.
+
+ - Notice: Extra names are dealed with Name 
+   button.
+
+# 
+:alias_delete_button
+Alias Delete button:
+
+ - Selected DName entry and its aliases are 
+   removed from the AliasList (User's entry only).
+
+ - Notice: Deletion of single aliases are made
+   via Change button or Mames button.

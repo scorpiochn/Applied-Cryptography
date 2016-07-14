@@ -1,0 +1,274 @@
+
+                                 TIS/PEM FAQ
+                          Last updated 11 May 1994
+             Send questions and comments to tispem-support@tis.com
+
+Questions answered:
+
+   1) What is Privacy Enhanced Mail (PEM)?
+*  2) Where are the PEM standards defined?
+   3) Is there a forum for PEM developers and others interested in the
+      PEM standards?
+   4) Are there implementations of PEM available?
+   5) How do I get TIS/PEM?
+   6) Why is TIS/PEM only available in the US and Canada?
+   7) Are special privileges (e.g., root access) required to install
+      TIS/PEM?
+*  8) What about integrating TIS/PEM into mail user agents?
+   9) What about DOS and other non-UNIX platforms?
+  10) What about certificates?
+  11) What is a distinguished name?
+  12) What is a Certification Authority (CA)?
+  13) What does a PCA do and how are they differentiated?
+  14) What PCAs are available?
+* 15) How much does it cost to sign up under a PCA?
+  16) What if I have questions about TIS PCA?
+  17) Is there a mailing list for TIS/PEM users?
+  18) What if I have questions about or problems with TIS/PEM?
+* 19) Can PEM be used with MIME?
+
+ * means that this entry has been recently updated.
+ + means that this entry has been added recently.
+
+1
+Q: What is Privacy Enhanced Mail (PEM)?
+
+A: PEM is an Internet standard for providing security services to
+   electronic mail.  It uses cryptographic techniques to provide
+   message integrity checking, originator authentication, and
+   confidentiality.  It lets you know that a message hasn't been
+   changed, who it's from, and, optionally, allows you to keep it
+   secret from all but the intended recipients.
+
+2
+Q: Where are the PEM standards defined?
+
+A: There is a set of Proposed Standard RFCs (Internet standards
+   documents) that specify PEM.  The four documents are RFCs 1421
+   (obsoletes 1113), 1422 (obsoletes 1114), 1423 (obsoletes 1115), and
+   1424 (new).  These documents may be found in your favorite RFC
+   repository.  Details on obtaining RFCs via FTP or EMAIL may be
+   obtained by sending an EMAIL message to "rfc-info@ISI.EDU" with the
+   message body "help: ways_to_get_rfcs".  For example:
+
+        To: rfc-info@ISI.EDU
+        Subject: getting rfcs
+
+        help: ways_to_get_rfcs
+
+   The integration of MIME (Multipurpose Internet Mail Extensions) and
+   PEM will either produce a new RFC for message format or cause RFC
+   1421 to be updated.
+
+   An overview of PEM was presented in the August 1993 issue (Volume
+   36, Number 8) of "Communications of the ACM" in an article entitled
+   "Internet Privacy Enhanced Mail" by Stephen T. Kent.
+
+3
+Q: Is there a forum for PEM developers and others interested in the
+   PEM standards?
+
+A: Yes, there is an electronic mailing list that is used to discuss
+   the PEM specifications, implementation issues, and it is used to
+   conduct some of the business of the Internet Engineering Task Force
+   (IETF) PEM working group.  Send a message to
+   "pem-dev-request@tis.com" if you would like to be added to the
+   list.
+
+4
+Q: Are there implementations of PEM available?
+
+A: Yes, implementations are being made available as you read this.
+   Trusted Information Systems (TIS), under ARPA sponsorship and in
+   cooperation with RSA Data Security Incorporated (RSADSI), has
+   released a reference implementation of Privacy Enhanced Mail
+   (TIS/PEM) to the Internet community.  
+
+   TIS/PEM is a UNIX-based implementation that has been integrated
+   with Rand MH 6.7.2 and is easily integrated into other mail user
+   agents.  TIS/PEM is distributed in source form.  It is openly
+   available within the United States and Canada for non-commercial
+   use (not for resale).
+
+   The current version of TIS/PEM is 6.1.  If you are running an
+   earlier version, we suggest that you install 6.1.  6.1 contains
+   many bug fixes and functionality not available in previous
+   versions.
+
+   Vendors interested in including TIS/PEM functionality in their
+   products can contact Trusted Information Systems about licensing
+   Trusted Mail (tm).
+
+5
+Q: How do I get TIS/PEM?
+
+A: TIS/PEM is available via anonymous ftp in the United States and
+   Canada to US and Canadian citizens and people with a US "green
+   card."  To retrieve TIS/PEM please FTP to
+
+     host:   ftp.tis.com
+     login:  anonymous
+
+   and retrieve the files
+
+     pub/PEM/README
+     pub/PEM/LICENSE
+     pub/PEM/BUGS
+
+   The README file contains further instructions.  
+
+   The current version of TIS/PEM is 6.1.  If you are running an
+   earlier version, we suggest that you install 6.1.  6.1 contains
+   many bug fixes and functionality not available in previous
+   versions.
+
+6
+Q: Why is TIS/PEM only available in the US and Canada?
+
+A: The export from the United States of the cryptography used in
+   TIS/PEM is controlled by the United States government.
+
+7
+Q: Are special privileges (e.g., root access) required to install TIS/PEM?
+
+A: TIS/PEM can be installed in multi-user mode, which is identified by
+   the use of a single, system-wide, shared database of cryptographic
+   and administrative information maintained by one or more privileged
+   users called certificate administrators, and single-user mode,
+   which allows individuals to maintain their own databases of
+   cryptographic and administrative information.  Multi-user mode
+   installation requires privileges, while single-user mode
+   installation does not.
+
+8
+Q: What about integrating TIS/PEM into mail user agents?
+
+A: TIS/PEM has been integrated with MH 6.7.2 and is easily integrated
+   with other mail user agents.  If you integrate TIS/PEM with a
+   popular mail user agent, we would be happy to make it available to
+   others.  
+
+   Future versions of TIS/PEM will follow the MIME-PEM intntegration
+   standard that is currently being developed and will be integrated
+   with newer versions of MH.
+
+   Additionally, a set of filters, similar to the UNIX cat command,
+   that allow you to apply and remove PEM enhancements (enhance and
+   de-enhance) text files are provided.  These filters make it
+   possible to use PEM with mail user agents that are not PEM aware.
+
+   Future versions of TIS/PEM will provide programs and shell scripts
+   that will make the intergation of MIME-PEM into other user agents
+   an easier task.
+
+9
+Q: What about DOS and other non-UNIX platforms?
+
+A: TIS/PEM is currently limited to UNIX, but we are pursuing porting
+   it to other operating systems.
+
+10
+Q: What about certificates?
+
+A: While PEM uses X.509 certificates to bind distinguished names to
+   RSA public keys, it is not necessary to join the Internet
+   certification hierarchy or otherwise pay to use TIS/PEM.  TIS/PEM
+   is capable of generating the certificates that you need.  Joining
+   the Internet certification hierarchy has the benefit of making it
+   easier to verify others' mail and for them to verify yours.  To
+   join the Internet certification hierarchy, you must sign up your
+   Certification Authority (CA) under a Policy-level Certification
+   Authority (PCA).  
+
+11
+Q: What is a distinguished name?
+
+A: A distinguished name is a hierarchical, globally unique name used
+   to identify something or someone.  RFC 1255 and several North
+   American Directory Forum (NADF) documents describe how to select
+   appropriate distinguished names.  The distinguished name for Earl
+   Sinclair (a fictional character, geographically displaced) might be
+
+     Country=US
+     State or Province=CA 
+     Organization=Wesayso Corporation
+     Organizational Unit=Tree Pushing Division
+     Common Name=Earl Sinclair
+
+12
+Q: What is a Certification Authority (CA)?
+
+A: A Certification Authority (CA) vouches for the binding between
+   users' distinguished names and RSA public keys within an
+   organization or organizational unit.  The CA's distinguished name
+   is that of the organization or organizational unit and users'
+   distinguished names are created by starting with the CA
+   distinguished name and adding something to uniquely and
+   unambiguously identify the user, like a common name.
+
+13
+Q: What does a PCA do and how are they differentiated?
+
+A: PCAs vouch for the binding between a CA's distinguished name and
+   RSA public key.  By joining a PCA, others can verify your PEM
+   messages by following the certification path to the Internet
+   Policy-level Certification Authority certificate without having to
+   have retrieved your RSA public key using secure, out of band
+   means.  PCAs may also make CA Certificate Revocation Lists (CRLs)
+   and certificates available and provide other services for its
+   members.
+
+   PCAs can be differentiated by the policy that they advertise.  The
+   policy includes the level of effort -- and associated assurance --
+   that a PCA uses to insure the correctness of the binding and the
+   requirements they place on CAs which issue certificates under them.
+   They can also be differentiated by the other services they offer
+   and their price.
+
+14
+Q: What PCAs are available?
+
+A: Several PCAs exist as part of the Internet certification hierarchy,
+   including PCAs at RSADSI and TIS, and more may come online in the
+   near future.
+
+15
+Q: How much does it cost to sign up under a PCA?
+
+A: Individual PCAs will have their own price schedules.  Signing up
+   under the TIS PCA is half price during 1994.  Send a note to 
+   tispca-info@tis.com for a copy of the price schedule.
+
+16
+Q: What if I have questions about TIS PCA?
+
+A: Sent them to tispca-info@tis.com.
+
+17
+Q: Is there a mailing list for TIS/PEM users?
+
+A: Yes, it's tispem-users@tis.com.  Send mail to
+   tispem-users-request@tis.com to be added to or deleted from the
+   list.
+
+18
+Q: What if I have questions about or problems with TIS/PEM?
+
+A: Send them to tispem-support@tis.com.
+
+19
+Q: Can PEM be used with MIME?
+
+A: Yes.  The body of PEM message, as defined by RFC 1421, could be
+   placed inside a MIME body part labelled "application/pem-1421".  
+
+   In addition, the PEM working group of the IETF is working on a
+   specification for an integration that will allow PEM to take
+   advantage of the structure framework provided by MIME.  A new
+   standard for the format of MIME-PEM messages was introduced at the
+   most recent IETF meeting and it is likely that when the standard is
+   finalized it will replace RFC 1421 or cause it to be updated.
+
+   You may ask for more information on the PEM developers mailing
+   list, "pem-dev@tis.com".  To be added to the list, send your
+   request to "pem-dev-request@tis.com".

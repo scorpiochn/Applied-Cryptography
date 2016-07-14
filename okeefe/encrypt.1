@@ -1,0 +1,77 @@
+.TH ENCRYPT 1 local
+.SH NAME
+decrypt, encrypt, recrypt \- encryption/decryption filters
+.SH SYNOPSIS
+.B encrypt
+.I key
+<clear\-text
+>encrypted
+.PP
+.B decrypt
+.I key
+<encrypted
+>clear\-text
+.PP
+.B recrypt
+.I keyin
+.I keyout
+<input
+>output
+.SH DESCRIPTION
+All three commands are filters, reading from the standard input and
+writing on the standard output.
+.B encrypt
+takes a clear text and encrypts it using the given
+.I key.
+.B decrypt
+takes a text which was encrypted using the given
+.I key
+and produces the original clear text.
+.B recrypt
+decrypts its standard input using
+.I keyin
+and re-encrypts it using
+.I keyout
+to its standard output.  It has the same effect as
+.PP
+	decrypt keyin | encrypt keyout
+.PP
+except that it is more convenient, and on systems where pipes are
+implemented as temporary files it reduces the chance of the clear text
+becoming visible.
+.PP
+A
+.I key
+is a string of at least 14 ASCII characters (excluding NUL).  Only the
+first 14 characters are significant.  The internal 52-bit form of a key
+is never revealed.  Alphabetic case in a key is ignored, so the same key
+may be used in a system where the command scanner ignores alphabetic case.
+.PP
+The encryption method used is quite fast (around 5000 characters per
+second on an 11/750).  There is good reason to suppose that
+its most vulnerable point is the physical security of the key.
+.SH DIAGNOSTICS
+"command must be {de,en,re}crypt" \- there is actually only one program.
+It uses the command name to tell it what to do.  This message means that
+the name you used didn't start with any letter in "dDeErR".
+.PP
+"missing decryption key"
+.br
+"decryption key shorter than 14 characters"
+.br
+"missing encryption key"
+.br
+"encryption key shorter than 14 characters" \- unlike the standard UNIX
+program crypt(1) these programs will
+.I not
+read a key from the terminal.  When a key is provided it must be at
+least 14 characters long (but need not be any longer).
+.PP
+"file name arguments are not accepted" \- these commands are pure
+filters, they do
+.I not
+accept file names as arguments like cat(1).
+.SH "SEE ALSO
+crypt(1), crypt(3)
+.SH AUTHOR
+Richard A. O'Keefe, DAI Edinburgh

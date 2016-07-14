@@ -1,0 +1,47 @@
+.TH HASHNEWS 1 LOCAL
+.SH NAME
+hashnews \- add a Snefru hash to a Usenet article
+.SH SYNOPSIS
+.B hashnews
+[
+.B \-n
+] [
+.I input
+]
+.SH DESCRIPTION
+.I Hashnews
+reads an article intended for Usenet posting and calls
+.IR snefru (1L)
+to generate a one-way hash code for the article.
+.PP
+If a file is named on the command line, then
+.I hashnews
+will overwrite the named file after inserting the Snefru hashcode.
+If no file is named, the program will read the article from standard
+input, and write the new article on standard output; this makes it
+convenient to do ``:%!hashnews'' from
+.IR vi (1)
+just before exiting the editor with your article in it.
+.PP
+By default,
+.I hashnews
+will try to read the file ``.signature'' in your home directory and
+append it to the article.
+It tries to simulate the actions of B2.11
+.IR inews (8).
+To suppress this check (for example, if you append your own signature),
+use the ``\-n'' flag.
+.SH WARNING
+.I Hashnews
+will only prove if an article has been tampered with; it does not
+provide any authentication.
+Also, see the warnings in the
+.I snefru
+manpage.
+.SH AUTHOR
+.nf
+Rich $alz <rsalz@bbn.com>
+$Header: hashnews.1,v 1.1 90/03/22 12:58:39 rsalz Exp $
+.fi
+.SH "SEE ALSO"
+checkhash(1L), snefru(1L).

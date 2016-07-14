@@ -1,0 +1,165 @@
+% russian-des-preface.tex - Cover letter for the translation of
+% GOST 28147---89, the Russian equivalent of the U.S. Data Encryption
+% Standard.
+
+% Load a variety of files that provide functions not in plain TeX.
+
+\input basic		% useful functions not in plain TeX
+\input misc		% miscellaneous (non-fundamental) TeX macros
+\input list		% simple list mechanism
+
+% Increase the size of the type to about 14 points.
+
+		\magnification=\magstep2
+
+% In order to facilitate an open style of layout in the TeX
+% manuscript, carriage return is made equivalent to a space 
+
+			\catcode'15=10	
+
+% so that double carriage returns don't break paragraphs.  Paragraph
+% breaking is done by explicit \par markers.
+
+% Provide extra space between paragaraphs.
+
+		\parskip=1ex plus 1ex
+
+% Use lower case roman numerals in page numbers
+
+\footline={\hss\tenrm\romannumeral\pageno\hss\llap{DRAFT - \datetime}}
+
+% End a line with a horizontall fill.  The effect is much like \rightline,
+% but can occur in the middle of text.
+
+		\def\endline{\hfill\break}
+
+% beginning of cover letter
+%\null%\vskip 1ex
+
+\centerline{Government Standard of the U.S.S.R. 28147---89}
+\centerline{Cryptographic Protection for Data Processing Systems}
+\vskip 3ex
+
+\centerline{Translated from the Russian by}
+\vskip 1ex
+\centerline{Aleksandr Malchik}
+\vskip 1ex
+\centerline{Sun Microsystems Laboratories}
+\centerline{Mountain View, California}
+\vskip 2ex
+\centerline{with editorial and typographic assistance from}
+\vskip 1ex
+\centerline{Whitfield Diffie}
+\vskip 1ex
+\centerline{Sun Microsystems}
+\centerline{Mountain View, California.}%
+\vskip 6ex
+\centerline{Preface to the English Translation}%
+\vskip 2ex
+
+    The Government Standard of the U.S.S.R. 28147---89, Cryptographic
+Protection for Data Processing Systems, appears to have played a role
+in the Soviet Union similar to that played by the U.S. Data Encryption
+Standard (FIPS 46).  When issued, it bore the minimal classification
+`For Official Use,' but is now said to be widely available in software
+both in the Former Soviet Union and elsewhere.  In apparent contrast
+to DES's explicit limitation to unclassified information, the
+introduction to GOST 28147---89 contains the intriguing remark that
+the cryptographic transformation algorithm ``does not place any
+limitations on the secrecy level of the protected information.'' \par
+
+    The algorithms are similar in that both operate on 64-bit blocks
+by successively modifying half of the bits with a function of the
+other half.  Beyond that, the similarity declines and several
+differences are visible.
+
+ \vskip 1ex
+ \list{\bullets}
+  \item The Soviet system has 32 rounds rather than the 16 of DES.
+
+  \item Each round is somewhat simpler than a round of DES.  In the
+	`f' function, 32 bits of text are added modulo 32 to 32
+	bits of key, transformed by a block of eight, 4-bit to 4-bit
+	S-boxes and rotated 11 bits to the left.
+
+  \item In contrast to DES's meager 56 bits of key, GOST 28147---89
+	has 256 bits of primary key and 512 bits of secondary key.
+	The secondary key is the block of eight S-boxes, which are
+	specific to individual networks and are not included in the
+	standard.
+
+  \item In place of the complex key schedule of DES, the primary key
+	is divided into eight 32-bit words.  For the first twenty-four
+	rounds, these are used cyclically in ascending order.  For
+	the last eight, they are used in descending order.
+  \endlist
+
+\noindent The standard is also somewhat broader that FIPS46.  It 
+includes output feedback and cipher feedback modes of operation,
+both limited to 64-bit blocks, and a mode for producing message
+authentication codes. \par
+
+    The translation is intentionally colloquial, preferring standard
+English terms to charmingly quaint cognates of the Russian.  The
+objective is to make it easy for English speaking cryptographers to
+identify what is novel with minimal effort.  In some places,
+particularly the glossary, this has changed the wording considerably
+and a few remarks on some of the freeer choices, seems in order. \par
+
+ \list{}
+  \item In Russian, the expression `the GAMMA of a cipher' means the
+	keystream and the term for an additive keystream cipher is
+	`GAMMIROVANIA.'  This has been translated as `output feedback,'
+	because that is the way in which their keystream is generated
+	and is the name of the corresponding mode in FIPS81.
+
+  \item The Russian term that literally translates `keystream mode
+	with feedback' corresponds to `cipher feedback mode' and that
+	term has been used throughout.
+
+  \item The Russian term for authentication translates, not unreasonably,
+	as `imitation insertion protection.'  The term for authenticator,
+	however, is literally the `imitation insertion.'  This has been
+	rendered as `message authentication code.'
+  \endlist
+
+    Because of the substantial amount of mathematical notation, the
+translation has been typeset in \TeX.  The numbers in boxes in the
+margins show the approximate page boudaries in the original document.
+\par
+
+    Aside from the elimination of errors, which are undoubtedly still
+numerous, the translation is complete except for the diagrams, which
+will be added when a flowchart program with {\TeX} compatible
+Postscript output is located.
+
+    Please send comments and corrections by email to: %\endline
+\hbox{whitfield.diffie@Eng.Sun.Com} or on paper to me at:
+
+$$ \vbox{\halign{\lft{#}\cr
+	 Sun Microsystems, MTV14-203 \cr
+	 2550 Garcia Avenue \cr
+	 Mountain View, CA 94043 \cr}} $$
+
+\par\vskip 3ex
+
+\leftline{\hskip 3in Whitfield Diffie}
+\leftline{\hskip 3in Distinguished Engineer}
+\leftline{\hskip 3in October 1993}
+
+\vskip 6ex
+\centerline{References}
+\vskip 1ex
+
+ \list{}
+  \item Data Encryption Standard, National Bureau of Standards,
+	Federal Information Processing Standard Publication
+	No. 46, January 1977.
+
+  \item DES Modes of Operation, , National Bureau of Standards, 
+	Federal Information Processing Standards Publication
+	No. 81, September 1980.
+  \endlist
+
+\bye
+

@@ -1,0 +1,135 @@
+ SecuDE-4.1             11.8.93             (c) GMD Darmstadt 1993
+
+
+
+ INSTALLATION OF SecuDE
+ ======================
+
+ Preparation
+ -----------
+ To install SecuDE, first cd to the secude/src/config directory in
+ order  to  make  an appropriate CONFIG.make file for your system.
+ Some  templates  are  included  (sun3.make, sun4.make etc.) which
+ could  give  a rough approach to what you need. Particularly, the
+ selection  of the appropriate arithmetic routines for RSA and DSA
+ by ARCH is important.
+
+ SecuDE  contains  also  a  collection  of  ISODE-8.0  routines in
+ secude/src/isode.   These  routines  are  needed  for  the  ASN.1
+ processing.  Therefore it could be necessary to make some changes
+ in secude/src/include/isode/config.h. If you have your own ISODE-
+ 8.0   installation,  you  can  switch  off  the  isode  stuff  in
+ CONFIG.make  (unset  DISODE)  and  use  your  own ISODE libraries
+ instead. Check LDL in CONFIG.make in this case.
+
+ Compile Options
+ ---------------
+
+ X.500 DUA Functionality
+ -----------------------
+ SecuDE-4.1 provides access to  directory-stored  public  security
+ attributes.  Either  access  to  X.500 directories or access to a
+ non-X.500  local  substitute  can  be  selected  at compile time,
+ controlled  by  DX500  in  CONFIG.make.  X.500  directory  access
+ requires  a  full ISODE-8.0 QUIPU installation and, if used in an
+ open distributed environment, public network connectivity.
+
+ X.500 DUA with Strong Authentication
+ ------------------------------------
+ SecuDE-4.1  can also  provide  the use of  strong  authentication
+ methods  when  accessing public X.500  Directories (make variable
+ STRONG in CONFIG.make). In this case, a security-enhanced version
+ of ISODE-8.0 is necessary.  This  is  available via anonymous ftp
+ from ftp.darmstadt.gmd.de, file  pub/secude/isode8-secude4.tar.Z.
+ It comprises a complete  ISODE-8  distribution with  security en-
+ hencements for the libdsap library. 
+
+ Smartcard Support
+ -----------------
+ SecuDE  supports  the use of the GMD/GAO STARCOS smartcard system
+ for algorithmic processing and storing of personal security data.
+ This  system  supports  RSA  and  DES processing in the smartcard
+ reader. RSA/DES processing by software and by STARCOS can be used
+ simultaneously.  You  can  decide  at  compile  time  by  DSCA in
+ CONFIG.make whether to use this system or not.
+
+ X based window tools
+ --------------------
+ The subdirectory src/sectool  contains a  demonstrator version of
+ our Openwindow3 based tool sectool which provides the user inter-
+ face to the  personal security environment  (PSE).  This is still
+ under development and has most of the intended functions  yet not
+ implemented.  It only provides you a feeling what you can expect.
+ Sectool requires an Openwindow3  installation and  will therefore
+ be executable only on SUN systems. The use of Motif is under con-
+ sideration.
+
+ The subdirectory secxlock contains an  xlock  version which locks
+ and unlocks your local X display on the basis of strong authenti-
+ cation (with digital signatures) instead of your login password.
+ It requires an X11R4 installation on your system. 
+
+ Shared Libraries
+ ----------------
+ If  you want to use shared libraries instead of static libraries,
+ check   the   corresponding   section   on  shared  libraries  in
+ CONFIG.make.
+
+ Installation
+ ------------
+ Now cd to secude/src and say 'make'.  Don't  mind  warnings  when 
+ assembling div.s in the case ARCH = sparc.
+
+ PATH environment variable
+ -------------------------
+ Make sure that your  PATH  examines the  current directory first.
+ If this is not possible, say ./make instead of make. You can also 
+ say 'install_secude' to avoid any problem with your  environment. 
+
+ For   more   specific  make's  you  can  cd  to  each  particular
+ secude/src-directory (e.g. secude/src/af or secude/src/crypt/rsa)
+ and say 'make'.  This  makes  the  current  src-directory and all  
+ underlying   directories  recursively.  Again  you  have  to  say 
+ './make'  if your PATH environment variable does not start with a
+ dot or colon.
+
+ SecuDE Libraries
+ ----------------
+ After  installation, the secude/lib directory contains the SecuDE
+ library libsecude.a which  comprises all  functions of SecuDE. In 
+ addition, if the use of shared libraries is selected, it contains 
+ the corresponding .so file.  To reconstruct the libsecude library 
+ from the src directory cd to secude/src and say 'make lib'.  This
+ puts all SecuDE .o files into the library  regardless of the date
+ of the last change.
+
+ SecuDE Utilities
+ ----------------
+ The secude/bin directory will contain all executable programs. In
+ order to enforce the capability of gen_pse to create  subdirecto-
+ ries in user's home directories (see  vol.2  section 1  parameter
+ [ -H dir ] ),  this  utility  must be  installed with appropriate
+ set-uid or set-gid flags. 
+
+ SecuDE Documentation
+ --------------------
+ The  secude/doc  directory  contains  all available documentation
+ including the  .tex,  .dvi and .ps files. The currently available 
+ PEM-RFC's and drafts are collected in secude/doc/pem.
+
+ Known Problems
+ --------------
+ If you want to install SecuDE-4.1 on a  Sun/4 platform with SunOS 
+ 4.1.1 using the arithmetic SPARC  assembler programs (ARCH=SPARC)
+ and shared libraries, you will either get a core dump or an infi-
+ nite loop during RSA key generation.  The  problem does not occur
+ when you use SunOS 4.1.2 or 4.1.3.  
+
+ To  bypass  this  problem you  should replace the 4.1.1 generated 
+ object file  arintf.o from the libsecude.a  library  by the 4.1.3 
+ pregenerated  object file in secude/lib/IMPORTS/arintf.o.  Simply 
+ decommenting the line 
+
+ #LIBIMPORTS = yes
+
+ in CONFIG.make does the same.

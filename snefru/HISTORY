@@ -1,0 +1,106 @@
+This is Snefru, derived from the Xerox Secure Hash Function.
+Snefru is a one-way hash function that provides authentication.
+It does not provide secrecy.
+
+Snefru is named after a Pharaoh of ancient Egypt.
+
+It is based on code that is:
+    Copyright (c) Xerox Corporation 1989.  All rights reserved.
+
+    License to copy and use this software is granted provided that it
+    is identified as the 'Xerox Secure Hash Function' in all material
+    mentioning or referencing this software or this hash function.
+
+    License is also granted to make and use derivative works provided
+    that such works are identified as 'derived from the Xerox Secure
+    Hash Function' in all material mentioning or referencing the
+    derived work.
+
+    Xerox Corporation makes no representations concerning either the
+    merchantability of this software or the suitability of this
+    software for any particular purpose.  It is provided "as is"
+    without express or implied warranty of any kind.
+
+    These notices must be retained in any copies of any part of this
+    software.
+
+Based on the reference implementation (no algorithm changes) of
+version 2.0, July 31, 1989.  Implementor:  Ralph C. Merkle.
+This edition is by Rich $alz, <rsalz@bbn.com>.
+$Header: HISTORY,v 1.1 90/03/22 12:57:43 rsalz Exp $
+
+
+REVISION HISTORY
+----------------
+Version 2.0 is algorithmically different from versions 1.4 and 1.3.
+
+In particular, version 2.0 makes the following changes:
+1)  The S-boxes in version 2.0 have been computed in accordance with a
+    publicly known algorithm.
+
+2)  The special case handling of inputs shorter than 64 bytes has been
+    deleted.  This special case code offered little performance advantage
+    and increased the complexity of the algorithm.  In addition,
+    Coppersmith noticed a weakness that affected the
+    128-bit-input/128-bit-output version of Snefru (though not the 512-bit
+    input/128-bit or 256-bit output version).
+
+3)  The parameters p0, p1, and p2 have been eliminated.  There are several
+    reasons for this change.  The principle reason is that they increase
+    the complexity both of the code and the conceptual complexity of the
+    hash function, and provide only modest improvement in security.
+
+4)  Because the parameter mechanism was used to distinguish between inputs
+    that differ only in the number of trailing 0 bits, a different
+    mechanism has been adopted.  This new mechanism simply counts the
+    number of bits in the input, and then places this 64-bit bit-count
+    into the rightmost 64-bits of the last block hashed.  A slightly
+    different method of applying the hash also been adopted.
+
+5)  Several people requested a larger output (to provide greater
+    security). Because this will not always be needed, the algorithm was
+    modified to generate either 128 bits or 256 bits of output, depending
+    on a command line option.  Notice that 128 bits of output only
+    provides 64 "real" bits of security (because of square root attacks)
+    and similarly 256 bits of output provides only 128 "real" bits of
+    security. Use of the higher security 256-bit output will slow down the
+    algorithm by about 1/3 (32 bytes per application of Hash512 versus 48
+    bytes per application of Hash512).
+
+    A 128 bit output should provide adequate security for most commercial
+    applications (barring discovery of some unexpected weakness in the
+    algorithm).  Where higher security is desired, the 256-bit output size
+    can be used.
+
+6)  Other non-algorithmic changes have been made to the code, in keeping
+    with various criticisms and comments.
+
+Version 1.4
+    New wording of the export notice; 1.3 forbids export entirely.
+
+Version 1.3
+    Fixes a security bug in handling short files (64 bytes or less).  Such
+    files should use the length of the file as a parameter to the hash, to
+    prevent two files of different lengths from producing the same hash
+    value if one file is a prefix of another.  This had been done for long
+    files (greater than 64 bytes in length) but was overlooked for short
+    files.
+
+    Improves the way in which the parameter is mixed into the hash.  In
+    essence, the change mixes in the parameter one more time. Although a
+    similar effect can be achieved by increasing the security parameter by
+    1 (e.g., from 2 to 3) this also increases the amount of computation
+    required by 50%.
+
+    Make some more changes in the notices that accompany the code.
+
+Version 1.2
+    No changes in the code; only the notices that accompany the code have
+    changed, and some changes in the comments.
+
+Version 1.1
+    Added the 'convertBytes' to convert an array of 'char' into an array
+    of unsigned long int.  This conversion is a no-op on the SUN and many
+    other computers, but will have an effect on the VAX and computers with
+    'backwards' byte ordering.  It will also SLOW DOWN THE HASH FUNCTION,
+    so it should be removed whenever possible if speed is an issue.

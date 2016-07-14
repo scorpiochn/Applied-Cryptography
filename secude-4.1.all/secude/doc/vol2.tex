@@ -1,0 +1,25 @@
+\documentstyle[11pt,dina4,twoside]{article}
+\marginparsep5mm
+
+\input{vol2-makro}
+\def\authors{
+        Edited by Wolfgang Schneider \\ \\
+}
+\begin{document}
+
+\secudetitlepage{Vol. 2: Security Commands, Functions and Interfaces}{Unix Manual Pages}
+
+\newcounter{Abb}
+\pagestyle{plain}
+\pagenumbering{roman}
+\tableofcontents
+
+\cleardoublepage
+
+\parskip 1ex
+
+\include{manual}
+\include{vol2-5}
+
+\equote
+\end{document}

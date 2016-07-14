@@ -1,0 +1,32 @@
+Announcing the availability of RIPEM/SIG, an exportable signature-only
+version of RIPEM, a public-key encryption program.
+
+RIPEM/SIG is a version of RIPEM 1.2 with encryption and decryption
+taken out.  RSA Data Security has obtained a State Department
+Commodity Jurisdiction ruling determining that RIPEM/SIG is
+exportable from the USA.  While this ruling certainly does 
+not fully address the concerns of myself and many others regarding
+the USA's overly restrictive export laws, it does ease things a bit
+for individuals wishing to exchange authenticated messages across
+international borders.
+
+RIPEM/SIG is built from RIPEM 1.2a sources; thus, RIPEM/SIG
+source code is not exportable.  The executables are exportable.
+I have compiled RIPEM/SIG for several popular architectures
+and have placed the executables on ripem.msu.edu, available
+for anonymous FTP from /pub/crypt/ripem/ripemsig/binaries.
+Other USA and Canada citizens are welcome to obtain the RIPEM 1.2a
+source distribution and create and export executables for 
+other platforms.
+
+I also wish to announce the availability of RIPEM 1.2a.
+There were no algorithic changes between 1.2 and 1.2a;
+simply code changes to create RIPEM/SIG and to accomodate 
+some brain-dead C compilers.
+
+RIPEM is available via non-anonymous FTP from ripem.msu.edu;
+RIPEM/SIG is, as mentioned above, available from the same site
+via anonymous FTP.
+/mrr
+
+

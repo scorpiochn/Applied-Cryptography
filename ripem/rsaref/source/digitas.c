@@ -1,0 +1,268 @@
+/* DIGITAS.C -- Add and Subtract Digit with Multiply routines.
+ * Originally part of RSAREF's NN.C.
+ * Moved into a new file by Mark Riordan, April 1993,
+ * to isolate frequently-changed code.
+ *
+ * Modified by Mark Riordan, April 1993:
+ *   Enhanced with Intel 386 assembler and GNU CC "long long"
+ *   extensions to increase performanace.  Define USE_386_ASM
+ *   for Intel inline assembler.  Define GCC and RS6000 for
+ *   "long long" extensions.
+ * Modified by Mark Henderson, April 1993:
+ *   Added GCC-compatible assembler syntax version of above mods.
+ *   for unix/linux 386 version with gcc/gas define both GCC and i386
+ *   as with intel version, faster with USE_BIGNUM off.
+ */
+/* Copyright (C) 1991-2 RSA Laboratories, a division of RSA Data
+   Security, Inc. All rights reserved.
+ */
+#include "global.h"
+#include "rsaref.h"
+#include "nn.h"
+#include "digit.h"
+
+/* Computes a = b + c*d, where c is a digit. Returns carry.
+
+   Lengths: a[digits], b[digits], d[digits].
+ */
+NN_DIGIT NN_AddDigitMult (a, b, c, d, digits)
+NN_DIGIT *a, *b, c, *d;
+unsigned int digits;
+{
+  register NN_DIGIT carry;
+#ifndef USE_386_ASM
+  NN_DIGIT t[2];
+  unsigned int i;
+#endif
+
+  if (c == 0)
+    return (0);
+
+#ifdef USE_386_ASM
+	/* Register assignments:
+  	 *
+	 *	EAX	
+	 *	EBX	i
+	 *	ECX	carry
+	 * EDX	
+	 * ESI	&a
+	 * EDI	scratch register for array base addresses
+	 */
+  _asm {
+		sub	ebx,ebx	;i=0
+		sub	ecx,ecx	;carry=0
+		mov	esi,a		;esi=&a
+		cmp	digits,0
+		jz		endloop	;jump if digits=0
+	mulloop:;
+		mov	edi,b		;edi=&b
+		add	ecx,[edi+4*ebx]	;carry += b[i]
+		mov	[esi+4*ebx],ecx	;a[i] = carry+b[i]
+		mov	ecx,0		;carry=0
+		jnc	nocar_add	;jump if addition did not carry
+		inc	ecx		;carry=1
+	nocar_add:;
+		mov	eax,c		;eax=c
+		mov	edi,d		;edi=&d
+		mul	dword ptr [edi+4*ebx]	;edx:eax = c*d[i]
+
+		add	[esi+4*ebx],eax	;a[i] += low order product
+		jnc	nocarry
+		inc	ecx		;carry++
+	nocarry:;
+		add	ecx,edx	;carry += high order product		
+		inc	ebx		;i++
+		cmp	ebx,digits
+		jb		mulloop	;jump if i<digits
+	endloop:;	
+		mov	carry,ecx
+	};
+#else
+#if defined(GCC) && defined(i386)
+	asm("subl %%ebx,%%ebx; \
+	subl %%ecx,%%ecx; \
+	movl %1,%%esi	; \
+	cmpl $0, %2	; \
+	jz endloop; \
+mulloop:; \
+	movl %3,%%edi; \
+	addl (%%edi, %%ebx, 4),%%ecx; \
+	movl %%ecx,(%%esi,%%ebx,4); \
+	movl $0, %%ecx; \
+	jnc nocarr_add; \
+	incl %%ecx; \
+nocarr_add:; \
+	movl %4, %%eax; \
+	movl %5, %%edi; \
+	mull (%%edi,%%ebx,4); \
+	addl %%eax,(%%esi,%%ebx,4); \
+	jnc nocarry; \
+	incl %%ecx; \
+nocarry:; \
+	addl %%edx,%%ecx; \
+	incl %%ebx; \
+	cmpl %2,%%ebx ;\
+	jl mulloop; \
+endloop:; \
+	mov %%ecx,%0"
+:"=g"(carry)
+:"g"(&a[0]), "g" (digits), "g" (&b[0]), "g" (c), "g" (&d[0]) :
+"edi", "ecx", "ebx", "eax", "edx", "esi");
+
+#else
+  carry = 0;
+  for (i = 0; i < digits; i++) {
+#if defined(RS6000) && defined(GCC)
+	 union {
+      unsigned long long int64;
+	   NN_DIGIT int32[2];
+    } prod64; 
+
+	 prod64.int64 = (unsigned long long)c * (unsigned long long) d[i];
+	 
+    if ((a[i] = b[i] + carry) < carry)
+      carry = 1;
+    else
+      carry = 0;
+    if ((a[i] += prod64.int32[1]) < prod64.int32[1])
+      carry++;
+    carry += prod64.int32[0];
+#else
+    NN_DigitMult (t, c, d[i]);
+    if ((a[i] = b[i] + carry) < carry)
+      carry = 1;
+    else
+      carry = 0;
+    if ((a[i] += t[0]) < t[0])
+      carry++;
+    carry += t[1];
+#endif
+  }
+#endif
+#endif
+  
+  return (carry);
+}
+
+/* Computes a = b - c*d, where c is a digit. Returns borrow.
+
+   Lengths: a[digits], b[digits], d[digits].
+ */
+NN_DIGIT NN_SubDigitMult (a, b, c, d, digits)
+NN_DIGIT *a, *b, c, *d;
+unsigned int digits;
+{
+  register NN_DIGIT borrow;
+#ifndef USE_386_ASM
+  NN_DIGIT t[2];
+  unsigned int i;
+#endif
+
+  if (c == 0)
+    return (0);
+#ifdef USE_386_ASM
+	/* Register assignments:
+  	 *
+	 *	EAX	Scratch reg for multiply
+	 *	EBX	i
+	 *	ECX	borrow
+	 * EDX	Scratch reg for multiply
+	 * ESI	&a
+	 * EDI	scratch register for array base addresses
+	 */
+  _asm {
+		sub	ebx,ebx	;i=0
+		sub	ecx,ecx	;borrow=0
+		mov	esi,a		;esi=&a
+		cmp	digits,0
+		jz		endloop	;jump if digits=0
+	mulloop:;
+		mov	edi,b		;edi=&b
+		mov	eax,[edi+4*ebx]	;eax=b[i]
+		sub	eax,ecx	;eax=b[i]-borrow
+		mov	[esi+4*ebx],eax	;a[i] = b[i]-borrow
+		mov	ecx,0		;borrow=0
+		jnc	noborrow_sub	;jump if subtract did not borrow
+		inc	ecx		;borrow=1
+	noborrow_sub:;
+		mov	eax,c		;eax=c
+		mov	edi,d		;edi=&d
+		mul	dword ptr [edi+4*ebx]	;edx:eax = c*d[i]
+
+		sub	[esi+4*ebx],eax	;a[i] -= low order product
+		jnc	noborrow
+		inc	ecx		;borrow++
+	noborrow:;
+		add	ecx,edx	;borrow += high order product		
+		inc	ebx		;i++
+		cmp	ebx,digits
+		jb		mulloop	;jump if i<digits
+	endloop:;	
+		mov	borrow,ecx
+	};
+#else
+#if defined(GCC) && defined(i386)
+	asm("subl %%ebx,%%ebx; \
+	subl %%ecx,%%ecx; \
+	movl %1,%%esi	; \
+	cmpl $0, %2	; \
+	jz sendloop; \
+smulloop:; \
+	movl %3,%%edi; \
+	movl (%%edi,%%ebx,4),%%eax; \
+	subl %%ecx,%%eax; \
+	movl %%eax,(%%esi,%%ebx,4); \
+	movl $0, %%ecx; \
+	jnc noborrow_sub; \
+	incl %%ecx; \
+noborrow_sub:;\
+	movl %4, %%eax; \
+	movl %5, %%edi; \
+	mull (%%edi,%%ebx,4); \
+	subl %%eax,(%%esi,%%ebx,4); \
+	jnc noborrow; \
+	incl %%ecx; \
+noborrow:; \
+	addl %%edx,%%ecx; \
+	incl %%ebx; \
+	cmpl %2,%%ebx ;\
+	jl smulloop; \
+sendloop:; \
+	mov %%ecx,%0"
+:"=g"(borrow)
+:"g"(&a[0]), "g" (digits), "g" (&b[0]), "g" (c), "g" (&d[0]) :
+"edi", "ecx", "ebx", "eax", "edx", "esi");
+
+#else
+
+  borrow = 0;
+  for (i = 0; i < digits; i++) {
+#if defined(RS6000) && defined(GCC)
+	 union {
+      unsigned long long int64;
+	   NN_DIGIT int32[2];
+    } prod64; 
+
+	 prod64.int64 = (unsigned long long)c * (unsigned long long) d[i];
+    if ((a[i] = b[i] - borrow) > (MAX_NN_DIGIT - borrow))
+      borrow = 1;
+    else
+      borrow = 0;
+    if ((a[i] -= prod64.int32[1]) > (MAX_NN_DIGIT - prod64.int32[1]))
+      borrow++;
+    borrow += prod64.int32[0];
+#else
+    NN_DigitMult (t, c, d[i]);
+    if ((a[i] = b[i] - borrow) > (MAX_NN_DIGIT - borrow))
+      borrow = 1;
+    else
+      borrow = 0;
+    if ((a[i] -= t[0]) > (MAX_NN_DIGIT - t[0]))
+      borrow++;
+    borrow += t[1];
+#endif
+  }
+#endif
+#endif
+  return (borrow);
+}

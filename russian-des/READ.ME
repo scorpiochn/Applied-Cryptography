@@ -1,0 +1,44 @@
+    This directory contains a translation of the Russian equivalent
+of the U.S. Data Encryption Standard.  It incorporates:
+
+	READ.ME			this file
+	basic.tex		useful functions not in plain TeX
+	borders.tex		white borders and black frames
+	errata.tex		list of errors corrected
+	list.tex		a simple list mechanism
+	misc.tex		miscellaneous macros
+	page-layout.tex		page headers and footers
+	receive-instructions	unpacking uuencoded, compressed, tar file
+	russian-des-preface.tex	notes on the standard and the translation
+	russian-des.tex		GOST GOST 28147---89 in TeX
+	send-instructions	preparing uuencoded, compressed, tar file
+
+
+(A) To print the preface for Russian DES type:
+
+	tex russian-des-preface
+
+followed (on a system in which the printers expect postscript) by the
+commands:
+
+	dvi2ps russian-des-preface.dvi > russian-des-preface.ps
+
+and 
+
+	lpr russian-des-preface.ps
+
+
+(B) To print Russian DES type:
+
+	tex russian-des
+
+followed (on a system in which the printers expect postscript) by the
+commands:
+
+	dvi2ps russian-des.dvi > russian-des.ps
+
+and 
+
+	lpr russian-des.ps
+
+

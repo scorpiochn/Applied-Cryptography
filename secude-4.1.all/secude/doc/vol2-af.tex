@@ -1,0 +1,3797 @@
+\subsection{Authentication Framework Functions}         
+
+\subsubsection{af\_pse\_open}
+\nm{3X}{af\_pse\_open}{Open PSE with AF objects}
+\label{af_pse_open}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+PSESel {\bf *af\_pse\_open} {\em (object, createflag)} \\
+ObjId {\em *object} \\
+Boolean {\em createflag}
+\hl{Description}
+{\em af\_pse\_open()} opens the PSE identified by the global structure {\em AF\_pse}.
+It calls sec\_open({\em pse\_sel}) (see sec\_open(3X)) 
+with {\em pse\_sel} filled from the global structure {\em AF\_pse}.
+The main purpose is to check the existence of the PSE or PSE object and
+to provide access to it through PIN check.
+{\em object} is the object identifier of the AF object to be opened.
+If {\em object} is NULL, the entire PSE is opened by setting pse\_sel\pf object.name
+to NULL prior to the call of sec\_open().
+If {\em object} is not NULL and {\em createflag} is TRUE, the object identified by {\em object}
+is created if it does not exist.
+ 
+In case of success, {\em af\_pse\_open} returns the address of the PSESel structure which came back from
+the call to sec\_open, and {\em AF\_pse.pin}, {\em AF\_pse.app\_id} and, in case of
+{\em object} is not NULL, {\em AF\_pse.object[..].pin} are set to those values returned
+by sec\_open(). The memory of the returned PSESel structure can be released using free().
+If {\em af\_pse\_open()} is not successful, i.e. if the object does not exist or the
+PIN check fails, NULL is returned.
+\\ [1em]
+If the PSE or object is already open, sec\_open (which does the PIN check) is not called, 
+and only the corresponding PSESel structure is returned, i.e. the PSE or an object
+can be opened more than once, but PIN checking is done only the first time. 
+{\em AF\_pse.pin} is used as indicator whether the PSE is already open. If {\em AF\_pse.pin} is not NULL,
+the PSE is considered to be already open. {\em af\_pse\_open()} sets {\em AF\_pse.pin} to the value returned
+by sec\_open, which is either the address of the PIN if the connected PSE returns the PIN (the
+SW-PSE returns the PIN, smartcard based PSEs probably not), or a pointer to a NULL terminated
+string if the PSE or object does not require a PIN or the PSE does not return the PIN.
+AF\_pse.pin is reset to NULL by {\em af\_pse\_close()}.
+ 
+Similarly, {\em AF\_pse.object[..].pin} of the object identified by {\em object} is used as
+indicator whether the object is already open or not.
+\\ [1em]
+All af\_pse routines which access PSE objects
+open the corresponding object using af\_pse\_open(), but they do not
+close the object. This allows to access several PSE objects within one program (or process)
+and do PIN checking only once when accessing the first time. If PIN checking is required explicitly,
+af\_pse\_close() should be used before accessing an object.
+
+\subsubsection{af\_pse\_create}
+\nm{3X}{af\_pse\_create}{Create PSE with AF objects}
+\label{af_pse_create}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+PSESel {\bf *af\_pse\_create} {\em (object)} \\
+ObjId {\em *object}
+\hl{Description}
+{\em af\_pse\_create()} creates the PSE identified by the global structure {\em AF\_pse}.
+It calls sec\_create({\em pse\_sel}) (see sec\_create(3X)) 
+with {\em pse\_sel} filled from the global structure {\em AF\_pse}.
+{\em object} is the object identifier of the AF object to be created.
+If {\em object} is NULL, the entire PSE is created by setting pse\_sel\pf object.name
+to NULL prior to the call of sec\_create().
+{\em af\_pse\_create()} returns NULL if the object or PSE to be created already exists.
+ 
+In case of success, {\em af\_pse\_create} returns the address of the PSESel structure which came back from
+the call to sec\_create, and {\em AF\_pse.pin}, {\em AF\_pse.app\_id} and, in case of
+{\em object} is not NULL, {\em AF\_pse.object[..].pin} are set to those values returned
+by sec\_create(). The memory of the returned PSESel structure can be released using free().
+
+\subsubsection{af\_pse\_close}
+\nm{3X}{af\_pse\_close}{Close PSE with AF objects}
+\label{af_sc_close}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_pse\_close} {\em (object)} \\
+ObjId {\em *object}
+\hl{Description}
+af\_pse\_close calls sec\_close({\em pse\_sel}) (see sec\_close(3X)) 
+with {\em pse\_sel} filled from the global structure {\em AF\_pse}. If the PSE
+or the object identified by {\em object} is not open (see af\_pse\_open()), -1 is returned.
+If {\em object} is NULL, {\em af\_pse\_close()} resets the global variable {\em AF\_pse.pin} to NULL.
+Otherwise {\em AF\_pse.object[..].pin} is reset to NULL. A subsequent {\em af\_pse\_open()}
+to the same PSE or object will do a PIN check again.
+
+\subsubsection{af\_pse\_get\_Name}
+\nm{3X}{af\_pse\_get\_Name}{Get Name from PSE}
+\label{af_get_Name}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+DName *{\bf af\_pse\_get\_Name} {\em ()} \\
+\hl{Description}
+af\_pse\_get\_Name returns the content of PSE object Name (which
+contains the distinguished name of the owner of the PSE).
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_Name()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_get\_Certificate}
+\nm{3X}{af\_pse\_get\_Certificate}{Get Certificate from PSE}
+\label{af_get_Certificate}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+Certificate *{\bf af\_pse\_get\_Certificate} {\em (type, issuer, serial)} \\
+KeyType {\em type}; \\
+DName	{\em *issuer}; \\
+int	{\em serial};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the certificate: \\
+                    SIGNATURE: user certificate of the signature key \\
+                    ENCRYPTION: user certificate of the encryption key.} 
+
+\parname  {{\em issuer}}
+\pardescript  {name of the issuer of a requested cross
+		certificate}
+
+\parname  {{\em serial}}
+\pardescript  {serial number of a requested cross
+		certificate.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of Certificate or NULL pointer.}
+\hl{Description}
+af\_pse\_get\_Certificate returns the address of a Certificate which contains
+either a user certificate of the public signature key 
+or a user certificate of the public encryption key, depending on {\em type}. 
+
+If {\em issuer} is given, i.e. {\em issuer} is not NULL, a cross certificate issued
+by {\em issuer} is searched from the corresponding certificate set in PSE objects 
+{\em SignCSet} or {\em EncCSet} and returned in the return value. 
+If {\em serial} is additionally given, a cross
+certificate with that serial number is searched. Otherwise, if {\em issuer}
+is NULL, the hierarchy certificate from PSE objects {\em SignCert} or {\em EncCert}
+is returned.
+
+If the PSE from which the certificate is retrieved is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, the requested certificate is returned
+from PSE objects {\em CSet} or {\em Cert}, depending on whether a cross certificate or a hierarchy
+certificate is requested. In this case, {\em type} will not be evaluated.
+
+NULL is returned if the requested certificate is not found.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_Certificate()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_get\_CertificateSet}
+\nm{3X}{af\_pse\_get\_CertificateSet}{Get CertificateSet from PSE}
+\label{af_get_CertificateSet}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+SET\_OF\_Certificate *{\bf af\_pse\_get\_CertificateSet} {\em (type)} \\
+KeyType {\em type}; \\\
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the certificate: \\
+                    SIGNATURE: user certificate of the signature key \\
+                    ENCRYPTION: user certificate of the encryption key.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of CertificateSet or NULL pointer.}
+\hl{Description}
+af\_pse\_get\_CertificateSet returns the address of a CertificateSet which contains
+either all cross certificates of the public signature key 
+or all cross certificates of the public encryption key, depending on {\em type}.
+
+The certificate set is stored in the PSE object
+{\em SignCSet} or {\em EncCSet}, respectively.
+
+If the PSE from which the certificate set is retrieved is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, the requested certificate set is returned
+from PSE object {\em CSet}. In that case, {\em type} will not be evaluated.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_CertificateSet()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_get\_CertificatePairSet}
+\nm{3X}{af\_pse\_get\_CertificatePairSet}{Get Set of Cross Certificate Pairs from PSE}
+\label{af_get_CertificatePairSet}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+SET\_OF\_CertificatePair *{\bf af\_pse\_get\_CertificatePairSet} {\em ()} \\
+\hl{Description}
+af\_pse\_get\_CertificatePairSet returns the address of a set which contains all 
+cross certificate pairs by which the certification authority owning the PSE and other
+certification authorities certify each other's public signature keys.
+
+Each cross certificate pair is composed of two components: one forward and one
+reverse certificate. Forward and reverse certificates are related to each other in the 
+following way: The owner (subject) of the forward certificate (the certification authority
+which is the owner of the PSE) is the issuer of the reverse certificate belonging to the same
+pair (and vice versa).
+
+The set of cross certificate pairs is stored in the PSE object {\em CrossCSet}.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_CertificatePairSet()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_get\_FCPath}
+\nm{3X}{af\_pse\_get\_FCPath}{Get forward certification path from PSE}
+\label{af_get_FCPath}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+FCPath *{\bf af\_pse\_get\_FCPath} {\em (name)} \\
+DName *{\em name};
+\hl{Parameter}
+\parname  {{\em name}}
+\pardescript  {DName of the certification authority of an intended recipient or NULL pointer.}
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of FCPath or NULL pointer.}
+\hl{Description}
+af\_pse\_get\_FCPath returns the address of an FCPath containing the forward certification path.
+
+The forward certification path is stored on the PSE object
+{\em FCPath}.
+
+If {\em name} is the NULL pointer, the complete forward certification path is returned. Otherwise
+the DName of an issuer can be specified in {\em name}. In this case a reduced forward 
+certification path is returned:
+\be
+\m The level where the certificate of issuer {\em name} is found contains only this certificate.
+\m Below this level all cross certificates are omitted.
+\m Above this level all certificates are omitted.
+\ee
+If {\em name} is specified but not found in the PSE, the NULL pointer is returned.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_FCPath()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_get\_Certificates}
+\nm{3X}{af\_pse\_get\_Certificates}{Get Certificates from PSE}
+\label{af_get_Certificates}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+Certificates *{\bf af\_pse\_get\_Certificates} {\em (type, name)} \\
+KeyType {\em type}; \\
+DName *{\em name};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the user certificate of Certificates: \\
+                    SIGNATURE: user certificate of the signature key \\
+                    ENCRYPTION: user certificate of the encryption key.} 
+
+\parname  {{\em name}}
+\pardescript  {DName of the certification authority of an intended recipient or NULL pointer.}
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of Certificates or NULL pointer.}
+\hl{Description}
+af\_pse\_get\_Certificates returns the address of a Certificates containing an user certificate and the 
+related forward 
+certification path. The user certificate is either the certificate of the signature key,
+or the certificate of the encryption key, depending on {\em type}.
+
+User certificate and forward certification path are both stored
+in the PSE objects {\em SignCert} or {\em EncCert}, and {\em FCPath}. If the PSE from which the originator certificate 
+is retrieved is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, the user certificate is stored in PSE object {\em Cert}; in this case, 
+{\em type} will not be evaluated.
+
+If {\em name} is the NULL pointer, Certificates contains the complete forward certification path. Otherwise
+the DName of an issuer can be specified in {\em name}. In this case Certificates containes a reduced forward 
+certification path:
+\be
+\m If {\em name} is the name of the issuer of the user certificate, no forward certification path
+   is returned. 
+\m Otherwise, the level (of the forward certification path) where the certificate of issuer {\em name} is found
+   contains only this certificate.
+\m Below this level all cross certificates are omitted.
+\m Above this level all certificates are omitted.
+\ee
+If {\em name} is specified but not found in the PSE, the NULL pointer is returned.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_Certificates()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_get\_PKRoot}
+\nm{3X}{af\_pse\_get\_PKRoot}{Get top level verification key from PSE}
+\label{af_get_PKRoot}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+PKRoot *{\bf af\_pse\_get\_PKRoot} ()
+\hl{Parameter}
+\parname  {{\em Return Value}}
+\pardescript  {Address of PKRoot or NULL pointer.}
+\hl{Description}
+af\_pse\_get\_PKRoot returns the address of PKRoot. This contains DName, public key, and a corresponding
+serial number of the top level certification authority (highest verification key).
+The corresponding serial number is the lowest serial number of all certificates to be 
+verified with this key.
+
+Both public key and serial number are available in an actual version and in a version which was
+actual before.
+
+The top level verification keys are stored in the PSE object
+{\em PKRoot}.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_PKRoot()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_get\_PKList}
+\nm{3X}{af\_pse\_get\_PKList}{Get list of public verification or encryption keys from PSE}
+\label{af_get_PKList}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+PKList *{\bf af\_pse\_get\_PKList} {\em (type)} \\
+KeyType {\em type};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the list: \\
+                    SIGNATURE: List of known public signature verification keys of communication partners. \\
+                    ENCRYPTION: List of known public encryption keys of
+                                communication partners.}
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of PKList or NULL pointer.}
+\hl{Description}
+af\_pse\_get\_PKList returns the address of PKList, containing either a chained list of all known
+public verification keys or a list of all known public encryption keys of communication partners,
+depending on {\em type}.
+Each list element is a ToBeSigned field from the certificate which belongs to the public key.
+ 
+The list is stored on the PSE object {\em PKList} or {\em EKList}, respectively.
+
+If the PSE from which the PKList is retrieved is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, the list is in any case retrieved from PSE oject {\em PKList},
+no matter what the value of {\em type} is.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_PKList()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_get\_CrlSet}
+\nm{3X}{af\_pse\_get\_CrlSet}{Get set of Revocation Lists from PSE}
+\label{af_get_CrlSet}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+CrlSet *{\bf af\_pse\_get\_CrlSet} {\em ()} \\
+\hl{Description}
+af\_pse\_get\_CrlSet returns the address of the set of revocation lists of all
+certification authorities known to the owner of the PSE.
+
+Each member of this set represents a revocation list which has been retrieved from 
+the Directory (X.500) and stored in the set using a simplified format: It comprises the distinguished
+name of the issuer of a revocation list, a {\em nextUpdate} field specifying when the next
+revocation list of that issuer is scheduled to be issued, and the serial numbers of all revoked
+certificates contained in that revocation list. The {\em nextUpdate} field of a specific 
+revocation list informs the owner of the PSE of when next to access the 
+Directory in order to maintain the most current revocation list available from a given
+certification authority. 
+
+The set of revocation lists is stored in the PSE object {\em CrlSet}.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_CrlSet()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_get\_SerialNumbers}
+\nm{3X}{af\_pse\_get\_SerialNumbers}{Get sequence of serialnumbers from PSE}
+\label{af_get_SerialNumbers}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+SerialNumbers *{\bf af\_pse\_get\_SerialNumbers} {\em ()} \\
+\hl{Description}
+af\_pse\_get\_SerialNumbers returns the address of the sequence of serialnumbers
+used by the owner of the PSE (which must be a certification authority).
+
+The sequence of serialnumbers is composed of two integers {\em initial} and {\em actual}:
+{\em initial} contains the value of the serialnumber assigned to the first
+certificate issued by the CA, whereas {\em actual}
+holds the value of the serialnumber which will be assigned to the certificate that will next be issued
+by the CA.
+
+The sequence of serialnumbers is stored in the PSE object {\em SerialNumbers}.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_SerialNumbers()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_get\_AliasList}
+\nm{3X}{af\_pse\_get\_AliasList}{Get AliasList from PSE}
+\label{af_get_AliasList}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+AliasList *{\bf af\_pse\_get\_AliasList} {\em ()} \\
+\hl{Description}
+af\_pse\_get\_AliasList returns the content of PSE object AliasList (which
+comprises the alias database of the owner of the PSE).
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_AliasList()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_get\_QuipuPWD}
+\nm{3X}{af\_pse\_get\_QuipuPWD}{Read X.500 Password from PSE}
+\label{af_get_QuipuPWD}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+char *{\bf af\_pse\_get\_QuipuPWD} {\em ()} \\
+\hl{Description}
+af\_pse\_get\_QuipuPWD returns the content of PSE object QuipuPWD (which
+comprises the X.500 password of the PSE owner, used for simple authentication to the
+X.500 Directory).
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_QuipuPWD()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_update\_Certificate}
+\nm{3X}{af\_pse\_update\_Certificate}{Update Certificate in the PSE}
+\label{af_update_Certificate}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_pse\_update\_Certificate} {\em (type, cert, hierarchy)} \\
+KeyType {\em type}; \\
+Certificate *{\em cert}; \\
+Boolean {\em hierarchy};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the certificate: \\
+                    SIGNATURE: user certificate of the signature key \\
+                    ENCRYPTION: user certificate of the encryption key.} 
+
+\parname  {{\em cert}}
+\pardescript  {user certificate.} \\
+\parname  {{\em hierarchy}}
+\pardescript  {TRUE if cert is hierarchy certificate, FALSE if cert is cross certificate.} \\
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_update\_Certificate stores Certificate {\em cert} in the PSE.
+\\ [1em]
+{\em Cert} contains either a user certificate of the public signature key 
+or a user certificate of the public encryption key, depending on {\em type}.
+\\ [1em]
+The certificate is stored in the PSE object {\em SignCert} or 
+{\em EncCert} respectively, if it is a hierarchy certificate, i.e. if it is a certificate
+issued by a CA of the own CA tree. This is indicated by {\em hierarchy} $=$ TRUE. 
+\\ [1em]
+Otherwise, if {\em hierarchy} $=$ FALSE, {\em cert} is a cross certificate of the user's
+public signature or encryption key. It is stored in this case in the PSE object {\em SignCSet} or 
+{\em EncCSet} respectively.
+If {\em cert} does not exist in the appropriate certificate set,
+it is added to the set.
+\\ [1em]
+If the PSE where the certificate is to be stored is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, the certificate is stored in PSE object {\em CSet} or {\em Cert},
+depending on whether the certificate is considered a cross certificate or a hierarchy certificate. In that case, {\em type} will not
+be evaluated.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_Certificate()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_update\_FCPath}
+\nm{3X}{af\_pse\_update\_FCPath}{Update forward certification path in the PSE}
+\label{af_update_FCPath}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_pse\_update\_FCPath} {\em (fcpath)} \\
+FCPath *{\em fcpath};
+\hl{Parameter}
+\parname  {{\em fcpath}}
+\pardescript  {Forward Certification Path.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_update\_FCPath stores FCPath {\em fcpath} in the PSE object
+{\em FCPath}.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_FCPath()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_update\_PKRoot}
+\nm{3X}{af\_pse\_update\_PKRoot}{Update top level verification key in the PSE}
+\label{af_update_PKRoot}
+
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_pse\_update\_PKRoot} {\em (pkroot)} \\
+PKRoot *{\em pkroot};
+\hl{Parameter}
+\parname  {{\em pkroot}}
+\pardescript  {Top level verification keys (new/old).}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+
+\hl{Description}
+af\_pse\_update\_PKRoot stores PKRoot {\em pkroot} in the PSE object {\em PKRoot}.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_PKRoot()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_update\_DName}
+\nm{3X}{af\_pse\_update\_DName}{Update Name in the PSE}
+\label{af_update_DName}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_pse\_update\_PKRoot} {\em (dname)} \\
+DName *{\em dname};
+\hl{Parameter}
+\parname  {{\em dname}}
+\pardescript  {Distinguished name of the PSE owner}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_update\_DName stores DName {\em dname} (which comprises the distinguished name
+of the PSE owner) in the PSE object {\em Name}.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_DName()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_update\_PKList}
+\nm{3X}{af\_pse\_update\_PKList}{Update list of public verification or encryption keys in the PSE}
+\label{af_update_PKList}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_pse\_update\_PKList} {\em (type, list)} \\
+KeyType {\em type}; \\
+PKList *{\em list};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the list: \\
+                    SIGNATURE: List of known public signature verification keys of communication partners. \\
+                    ENCRYPTION: List of known public encryption keys of
+                                communication partners.}
+
+\parname  {{\em list}}
+\pardescript  {Chained list of public keys.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_update\_PKList stores {\em list}, which is either a PKList or an EKList, 
+on the PSE. {\em list} is stored in the PSE object {\em PKList} or {\em EKList}, depending
+on {\em type}.
+If the PSE where {\em list} is to be stored is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, {\em list} is in any case stored in PSE object {\em PKList}, no
+matter what the value of {\em type} is.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_PKList()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_update\_CrlSet}
+\nm{3X}{af\_pse\_update\_CrlSet}{Update set of Revocation Lists in the PSE}
+\label{af_update_CrlSet}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_pse\_update\_CrlSet} {\em (crlset)} \\
+CrlSet *{\em crlset}; \\
+\hl{Parameter}
+\parname  {{\em crlset}}
+\pardescript  {Set of revocation lists.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_update\_CrlSet stores {\em crlset} in the PSE object {\em CrlSet} 
+where {\em crlset} is the set of revocation lists of all certification authorities 
+known to the owner of the PSE.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_CrlSet()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_update\_SerialNumbers}
+\nm{3X}{af\_pse\_update\_SerialNumbers}{Update sequence of serialnumbers on the PSE}
+\label{af_update_SerialNumbers}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_pse\_update\_SerialNumbers} {\em (serialnums)} \\
+SerialNumbers *{\em serialnums}; \\
+\hl{Parameter}
+\parname  {{\em serialnums}}
+\pardescript  {Sequence of serialnumbers.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_update\_SerialNumbers stores {\em serialnums} in the PSE object {\em SerialNumbers},
+where {\em serialnums} is the sequence of serialnumbers used by the PSE owning certification
+authority. 
+
+af\_pse\_update\_SerialNumbers is called after a certification authority has issued a
+certificate and thereby increased the value of the {\em actual} component of its sequence of
+serialnumbers. The value of the {\em initial} component remains unchanged.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_SerialNumbers()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_add\_CertificatePairSet}
+\nm{3X}{af\_pse\_add\_CertificatePairSet}{Add set of cross certificate pairs to the set of cross certificate pairs in the PSE}
+\label{af_add_CertificatePairSet}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_pse\_add\_CertificatePairSet} {\em (cpairset)} \\
+SET\_OF\_CertificatePair *{\em cpairset};
+\hl{Parameter}
+\parname  {{\em cpairset}}
+\pardescript  {Set of cross certificate pairs to be added.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_add\_CertificatePairSet adds the set of cross certificate pairs {\em cpairset}
+to the set of cross certificate pairs in the PSE object {\em CrossCSet}. 
+If any of the cross certificate pairs in {\em cpairset} already exists in the set of cross
+certificate pairs stored as value in the PSE object {\em CrossCSet}, it will not be added there.
+If all cross certificate pairs in {\em cpairset} already exist in the required set,
+the PSE object {\em CrossCSet} is not updated and -1 is returned; otherwise, the respective 
+PSE object is updated. 
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_add\_CertificatePairSet()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_update\_CertificatePairSet}
+\nm{3X}{af\_pse\_update\_CertificatePairSet}{Update Set of Cross Certificate Pairs in the PSE}
+\label{af_update_CertificatePairSet}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_pse\_update\_CertificatePairSet} {\em (cpairset)} \\
+SET\_OF\_CertificatePair *{\em cpairset};
+\hl{Parameter}
+\parname  {{\em cpairset}}
+\pardescript  {Set of Cross Certificate Pairs.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_update\_CertificatePairSet stores the set of cross certificate pairs {\em cpairset} 
+in the PSE object {\em CrossCSet}.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_CertificatePairSet()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_update\_AliasList}
+\nm{3X}{af\_pse\_update\_AliasList}{Update user-defined aliases in the PSE}
+\label{af_update_AliasList}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_pse\_update\_AliasList} {\em (alist)} \\
+AliasList *{\em alist};
+\hl{Parameter}
+\parname  {{\em alist}}
+\pardescript  {List of alias names.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+
+af\_pse\_update\_AliasList selects from the supplied alias list {\em alist} all user-defined aliases, i.e.,
+all aliases whose corresponding {\em aliasf} field is set to {\em useralias}. It stores the
+resulting alias list in the PSE object {\em AliasList}.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_AliasList()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_update\_QuipuPWD}
+\nm{3X}{af\_pse\_update\_QuipuPWD}{Update X.500 Password in the PSE}
+\label{af_update_QuipuPWD}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_pse\_update\_QuipuPWD} {\em (pwd)} \\
+char *{\em pwd};
+\hl{Parameter}
+\parname  {{\em pwd}}
+\pardescript  {X.500 password, used for simple authentication.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+
+af\_pse\_update\_QuipuPWD stores the user's X.500 password, identified by the string {\em pwd}, in the PSE object {\em QuipuPWD}. The characters of {\em pwd} are restricted to those of {\em GraphicString} syntax.  
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_update\_QuipuPWD()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_add\_PK}
+\nm{3X}{af\_pse\_add\_PK}{Add public key to the list of public verification or encryption keys in the PSE}
+\label{af_add_PK}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_pse\_add\_PK} {\em (type, tbs)} \\
+KeyType {\em type}; \\
+ToBeSigned *{\em tbs};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the key: \\
+                    SIGNATURE: public signature verification key of a communication partner. \\
+                    ENCRYPTION: public encryption key of a 
+                                communication partner.}
+
+\parname  {{\em tbs}}
+\pardescript  {ToBeSigned part of the certificate to be added.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_add\_PK adds a public key to the list of known 
+verification keys (PKList) or to the list of known encryption keys (EKList), depending
+on {\em type}.
+If the PSE where the public key is to be stored is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, only the PKList will be considered for storing the public key,
+no matter what the value of {\em type} is.
+PKList and EKList are chained lists of ToBeSigned-structures which contain the
+whole ToBeSigned field of the certificate which belongs to a public key.
+af\_pse\_add\_PK adds the ToBeSigned-structure specified by {\em tbs} to the list.
+It updates the respective PSE object. No update is done and -1 is returned if
+either the same issuer/serialnumber combination or the same public key as in {\em tbs}
+already exists in the required list.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_add\_PK()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_add\_PemCRL}
+\nm{3X}{af\_pse\_add\_PemCRL}{Add Revocation List to the set of Revocation Lists in the PSE}
+\label{af_add_PemCRL}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_pse\_add\_PemCRL} {\em (crlpse)} \\
+CrlPSE *{\em crlpse}; \\
+\hl{Parameter}
+\parname  {{\em crlpse}}
+\pardescript  {Revocation List to be added.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_add\_PemCRL adds a revocation list specified by {\em crlpse} to the set
+of revocation lists stored in the PSE object {\em CrlSet}. It updates that PSE object. 
+If a revocation list with the same issuer as in {\em crlpse} is already contained 
+in the required list, it will be overwritten by {\em crlpse} in order to maintain
+the most current revocation list available from that issuer.
+
+{\em crlpse} identifies a revocation list with PEM format which has been retrieved from
+the Directory (X.500 or .af-db). It has a simplified format in that it only comprises the distinguished
+name of the issuer of that revocation list, an indication of its next scheduled update,
+as well as the serial numbers of all revoked certificates contained in that revocation list.
+ 
+A revocation list retrieved from the Directory will be added to the set of revocation lists
+stored in the PSE only in case of its verification having succeeded. 
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_add\_PemCRL()
+(see af\_pse\_open(3X)).
+
+
+\subsubsection{af\_pse\_delete\_PemCRL}
+\nm{3X}{af\_pse\_delete\_PemCRL}{Remove Revocation List from the set of Revocation Lists in the PSE}
+\label{af_delete_PemCRL}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_pse\_delete\_PemCRL} {\em (issuer)} \\
+DName *{\em issuer}; \\
+\hl{Parameter}
+\parname  {{\em issuer}}
+\pardescript  {Issuer whose Revocation List is to be removed from PSE object CrlSet.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_delete\_PemCRL removes the revocation list issued by {\em issuer} from the set
+of revocation lists stored in the PSE object {\em CrlSet} and updates that PSE object. 
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_delete\_PemCRL()
+(see af\_pse\_open(3X)).
+
+
+
+\subsubsection{af\_pse\_exchange\_PK}
+\nm{3X}{af\_pse\_exchange\_PK}{Exchange entry in the list of trusted public keys (PKList/EKList) from PSE}
+\label{af_change_PK}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_pse\_exchange\_PK} {\em (type, tbs)} \\
+KeyType {\em type}; \\
+ToBeSigned *{\em tbs};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the key: \\
+                    SIGNATURE: public signature verification key of a communication partner. \\
+                    ENCRYPTION: public encryption key of a
+                                communication partner.} 
+
+\parname  {{\em tbs}}
+\pardescript  {ToBeSigned part of the certificate to be exchanged.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_exchange\_PK exchanges a ToBeSigned-entry in the list of known 
+verification keys (PKList) or in the list of known encryption keys (EKList), depending
+on {\em type}. The entry to be exchanged is identified by the partner name (subject name
+contained in {\em tbs}) and, if this is not unique, by the issuer name contained in {\em tbs}.
+It updates the respective PSE object.
+If the PSE where the ToBeSigned-entry is to be exchanged is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, only the PKList will be considered for exchanging the identified ToBeSigned-entry,
+no matter what the value of {\em type} is.
+No update is done and -1 is returned if
+the entry cannot be found in the required list.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_exchange\_PK()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_delete\_PK}
+\nm{3X}{af\_pse\_delete\_PK}{Delete entry from the list of trusted public keys (PKList/EKList) from PSE}
+\label{af_del_PK}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_pse\_delete\_PK} {\em (type, name, issuer, serial)} \\
+KeyType {\em type}; \\
+DName *{\em name}; \\
+DName *{\em issuer}; \\
+inr {\em serial}
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the key: \\
+                    SIGNATURE: public signature verification key of a communication partner. \\
+                    ENCRYPTION: public encryption key of a
+                                communication partner.}
+
+\parname  {{\em name}}
+\pardescript  {DName of the partner.}
+
+\parname  {{\em issuer}}
+\pardescript  {DName of the issuer.}
+
+\parname  {{\em serial}}
+\pardescript  {Serial number.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_pse\_delete\_PK deletes an entry from the list of trusted 
+verification keys (PKList) or to the list of trusted encryption keys (EKList), depending
+on {\em type}. It updates the respective PSE object. In case of the last entry of the required
+list being deleted the respective PSE object is deleted, too.
+If the PSE from where the entry is to be removed is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, only the PKList will be considered for deleting the identified entry,
+no matter what the value of {\em type} is.
+
+PKList and EKList are chained lists of ToBeSigned-structures which contain the
+whole ToBeSigned field of the certificate which belongs to the public key. If 
+{\em name} is not NULL and {\em issuer} is NULL, all entries which have the same partner name (or
+subject name) are deleted. Otherwise, {\em issuer} and {\em serial} must not
+be NULL, and the entry which has the same issuer name and serial number is
+deleted.  
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_delete\_PK()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_get\_owner}
+\nm{3X}{af\_pse\_get\_owner}{Search public key in the list of trusted public keys (PKList/EKList) from PSE}
+\label{af_search_PK}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+DName *{\bf af\_pse\_get\_owner} {\em (type, pk)} \\
+KeyType {\em type}; \\
+KeyInfo *{\em pk};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the key: \\
+                    SIGNATURE: public signature verification key of a communication partner. \\
+                    ENCRYPTION: public encryption key of a
+                                communication partner.}
+
+\parname  {{\em pk}}
+\pardescript  {public key (X.509 SubjectPublicKeyInfo).}
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of DName or NULL.}
+\hl{Description}
+af\_pse\_get\_owner searches {\em pk} in the list of known 
+verification keys (PKList) or in the list of known encryption keys (EKList), depending
+on {\em type}, and returns the name of its owner (address of DName).
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_owner()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_get\_PK}
+\nm{3X}{af\_pse\_get\_PK}{Get KeyInfo from the list of trusted public keys (PKList/EKList) from PSE}
+\label{af_search_Name}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+KeyInfo *{\bf af\_pse\_get\_PK} {\em (type, subject, issuer, serial)} \\
+KeyType {\em type}; \\
+DName *{\em subject}; \\
+DName *{\em issuer}; \\
+int {\em serial};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the key: \\
+                    SIGNATURE: public signature verification key of a communication partner. \\
+                    ENCRYPTION: public encryption key of a
+                                communication partner.} 
+
+\parname  {{\em subject}}
+\pardescript  {DName of the partner.}
+
+\parname  {{\em issuer}}
+\pardescript  {DName of the issuer of the partner.}
+
+\parname  {{\em serial}}
+\pardescript  {serial number.}
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of KeyInfo or NULL.}
+\hl{Description}
+af\_pse\_get\_PK returns the PublicKeyInfo of an entry in the list of trusted 
+verification keys (PKList) or in the list of trusted encryption keys (EKList), depending
+on {\em type}.
+If the PSE from which the required PublicKeyInfo is retrieved is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, only the PKList will be considered for returning the required PublicKeyInfo,
+no matter what the value of {\em type} is.
+
+Both PKList and EKList may contain multiple entries per subject name, however,
+each entry is uniquely identified by the issuer-serialnumber pair.
+
+If {\em subject} is not NULL and {\em issuer} is NULL, PK of the first entry which
+matches parameter {\em subject} is returned.
+
+If {\em subject} is not NULL and {\em issuer} is not NULL, PK of that entry which 
+matches all three parameters {\em subject}, {\em issuer} and {\em serial} is returned.
+ 
+If {\em subject} is NULL and {\em issuer} is not NULL, PK of that entry which matches the
+parameters {\em issuer} and {\em serial} is returned.
+
+NULL is returned if the specified entry cannot be found.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_PK()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_pse\_get\_TBS}
+\nm{3X}{af\_pse\_get\_TBS}{Get ToBeSigned from the list of trusted public keys (PKList/EKList) from PSE}
+\label{af_search_tbs_Name}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+ToBeSigned *{\bf af\_pse\_get\_TBS} {\em (type, subject, issuer, serial)} \\
+KeyType {\em type}; \\
+DName *{\em subject}; \\
+DName *{\em issuer}; \\
+int {\em serial};
+\hl{Parameter}
+\parname  {{\em type}}
+\pardescript  {Type of the key: \\
+                    SIGNATURE: public signature verification key of a communication partner. \\
+                    ENCRYPTION: public encryption key of a
+                                communication partner.}
+
+\parname  {{\em subject}}
+\pardescript  {DName of the partner.}
+
+\parname  {{\em issuer}}
+\pardescript  {DName of the issuer.}
+
+\parname  {{\em serial}}
+\pardescript  {serial number.}
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of KeyInfo or NULL.}
+\hl{Description}
+af\_pse\_get\_TBS returns an entry (which is a ToBeSigned) from the list of trusted 
+verification keys (PKList) or in the list of trusted encryption keys (EKList), depending
+on {\em type}.
+If the PSE from which the required entry is retrieved is restricted to hold a single RSA key pair
+for both signature and encryption purposes, however, only the PKList will be considered for returning the requested entry,
+no matter what the value of {\em type} is.
+
+Both PKList and EKList may contain multiple entries per subject name, however,
+each entry is uniquely identified by the issuer-serialnumber pair.
+
+If {\em subject} is not NULL and {\em issuer} is NULL, the first entry which
+matches the parameter {\em subject} is returned.
+
+If {\em subject} is not NULL and {\em issuer} is not NULL, the entry which 
+matches all three parameters {\em subject}, {\em issuer} and {\em serial} is returned.
+ 
+If {\em subject} is NULL and {\em issuer} is not NULL, the entry which matches the
+parameters {\em issuer} and {\em serial} is returned.
+
+NULL is returned if the specified entry cannot be found.
+\\ [1em]
+A call of af\_pse\_open() is not required before calling af\_pse\_get\_TBS()
+(see af\_pse\_open(3X)).
+
+\subsubsection{af\_encrypt}
+\nm{3X}{af\_encrypt}{Encrypt octetstring using AF PSE objects}
+\label{af_encrypt}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_encrypt} {\em (in\_octets, out\_bits, more, key, dname)} \\
+OctetString *{\em in\_octets}; \\
+BitString *{\em out\_bits}; \\
+More {\em more}; \\
+Key *{\em key}; \\
+DName *{\em dname};
+\hl{Parameter}
+\parname  {{\em in\_octets}}
+\pardescript  {OctetString of the data to be encrypted.}
+
+\parname  {{\em out\_bits}}
+\pardescript  {BitString of the encrypted data. Memory must be provided by the calling program.}
+
+\parname  {{\em more}}
+\pardescript  {MORE: More data will follow for this encryption process. \\
+                  END: Last data of this encryption process.}
+
+\parname  {{\em key}}
+\pardescript  {Structure which identifies the encryption key.}
+
+\parname  {{\em dname}}
+\pardescript  {DName of the intended recipient of the data.}
+
+\parname  {{\em Return Value}}
+\pardescript  {Number of encrypted bits in {\em out\_bits}, or -1.}
+\hl{Description}
+af\_encrypt encrypts the input data of octetstring {\em in\_octets} and returns the encrypted data
+in {\em out\_bits}. Several successive calls of af\_encrypt can be chained
+to one encryption process by means of {\em more}.
+
+The number of octets in {\em in\_octets} is arbitrary. The number of bits in {\em out\_bits}
+corresponds in case of {\em more} $=$ MORE to the parameters of the indicated algorithm
+(e.g. a multiple of 64 in case of DES or DES3 algorithms and a multiple of keysize
+in case of RSA). The remaining bits are collected by af\_encrypt.
+
+af\_encrypt puts the encrypted data into {\em out\_bits}\pf bits at the offset
+{\em out\_bits}\pf nbits and returns the number of encrypted bits. In addition, this number is added 
+to {\em out\_bits}\pf nbits.
+The calling program must provide {\em out\_bits}\pf nbits and {\em out\_bits}\pf bits and sufficient
+memory in {\em out\_bits}\pf bits.
+The amount of memory should be not less than
+{\em in\_octets}\pf noctets $+$ ({\em out\_bits}\pf nbits) $/$ 8 $+$ $n$ with $n = 8$ 
+in case of DES or DES3 algorithms and $n = keysize / 8$ in case of RSA.
+
+Encryption key and corresponding algorithm are determined by parameters {\em key} and {\em dname} as follows:
+\be
+\m If {\em key} is the NULL pointer and {\em dname} is the NULL pointer,
+   the own public encryption key, which is part of the user certificate stored in the PSE object
+   {\em EncCert}, is used.
+   If a single RSA key pair is used for both signature and encryption purposes, however, the own public encryption key
+   is retrieved from PSE object {\em Cert}.
+\m If {\em key} is the NULL pointer and {\em dname} is not the NULL pointer,
+   the public encryption key of {\em dname} is searched in the PSE object {\em EKList}.
+   If a single RSA key pair is used for both signature and encryption purposes, however, the public encryption key of 
+   {\em dname} is searched in the PSE object {\em PKList}.
+\m If {\em key}\pf key is not the NULL pointer, the structure it points to
+   contains algorithm identifier and key.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $>$ 0,
+   key and algorithm identifier which are referenced by this number are used. This is a key
+   previously installed under this reference with {\em af\_gen\_key} or 
+   {\em af\_put\_EncryptedKey}.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $=$ 0,
+   {\em key}\pf pse\_sel indicates the PSE object which contains key and algorithm.
+\ee
+
+{\bf In case of RSA algorithm:}
+\be
+\m The encryption key which is of type BitString is supposed to be
+   a {\bf public key}. It consists of the substructure described in
+   SEC-PSE-OBJECTS(4),
+   which in case of a public key consists of the
+   modulus and the public exponent. af\_encrypt uses internally the
+   decoding function {\em d\_KeyBits} to get the modulus {\em n} and the exponent {\em e}.
+\m The octetstring passed through {\em in\_octets} is internally blocked into portions of
+   {\em blocksize} bits. These blocks are encrypted into blocks of {\em keysize} bits
+   (padded with trailing ZEROES) which in turn are combined into the bitstring {\em out\_bits}, i.e
+   the bitstring of the encrypted data consists of more bits than the octetstring of the cleartext data
+   according to the relation between {\em blocksize} and {\em keysize}.
+   The length of the encrypted data is always a multiple of {\em keysize} bits.
+   {\em blocksize} is derived from {\em keysize} as the largest multiple of octets which consists of
+   less bits than {\em keysize} (for instance $keysize = 512$ leads to $blocksize = 63$).
+\m There is no special mechanism to encode the length of the original plaintext prior
+   to encryption. Decrypting encrypted (with {\em af\_encrypt}) data with {\em af\_decrypt}
+   leads to a result with a length of a multiple of {\em blocksize} octets, i.e. the decrypted
+   plaintext is longer than the original plaintext with trailing zeroes.
+\ee
+{\bf In case of DES or DES3 algorithm:}
+   The length of the encryption result is always a multiple of 64 bits.
+
+   In case of {\bf desCBC\_pad}, {\bf desECB\_pad}, {\bf desCBC3\_pad} or 
+   {\bf desECB3\_pad} algorithm, additional encoding which allows 
+   {\em af\_decrypt} to restore the plaintext length is added prior
+   to encryption in case of {\em more} $=$ MORE. If $n$ is the plaintext length,
+   8 - $n$ $mod$ 8 octets are padded with
+   the last octet of the last block containing the number of 
+   valid octets of that block (between 0 and 7), i.e. if the plaintext consists 
+   of a multiple of eight octets, one extra block is added with the last octet set to zero.
+
+   In case of {\bf desCBC\_pem} or {\bf desECB\_pem} algorithm, 
+   padding as defined in RFC 1424 is applied prior to encrypting
+   which again enables {\em af\_decrypt} to restore the plaintext length.
+
+   In case of {\bf desCBC}, {\bf desECB}, {\bf desCBC3} or {\bf desECB3} algorithm,
+   trailing zeroes are padded prior to encrypting until an eight-octet boundary is reached, i.e.
+   no octets are padded if the plaintext length is a multiple of eight.
+   Measures which allow to restore the original plaintext length must
+   be taken by the application (of {\em af\_encrypt} and {\em af\_decrypt}).
+
+\subsubsection{af\_decrypt}
+\nm{3X}{af\_decrypt}{Decrypt bitstring using AF PSE objects}
+\label{af_decrypt}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_decrypt} {\em (in\_bits, out\_octets, more, key)} \\
+BitString *{\em in\_bits}; \\
+OctetString *{\em out\_octets}; \\
+More {\em more}; \\
+Key *{\em key};
+\hl{Parameter}
+\parname  {{\em in\_bits}}
+\pardescript  {BitString of the data to be decrypted.}
+
+\parname  {{\em out\_octets}}
+\pardescript  {OctetString of the decrypted data. Memory must be provided by the calling program.}
+
+\parname  {{\em more}}
+\pardescript  {MORE: More data will follow for this decryption process. \\
+                  END: Last data of this decryption process.}
+
+\parname  {{\em key}}
+\pardescript  {Structure which identifies the decryption key.}
+
+\parname  {{\em Return Value}}
+\pardescript  {Number of decrypted octets in {\em out\_octets}, or -1.}
+\hl{Description}
+af\_decrypt decrypts the input data of bitstring {\em in\_bits} and returns the decrypted data
+in {\em out\_octets}. Several successive calls of af\_decrypt can be chained
+to one decryption process by means of {\em more}.
+
+The number of bits in {\em in\_bits} is arbitrary. The number of octets in {\em out\_octets}
+corresponds in case of {\em more} $=$ MORE to the parameters of the indicated algorithm
+(e.g. a multiple of eight in case of DES or DES3 algorithms and a multiple of blocksize/8
+in case of RSA). The remaining octets are collected by af\_decrypt.
+
+af\_decrypt puts the decrypted data into {\em out\_octets}\pf octets at the offset
+{\em out\_octets}\pf noctets and returns the number of decrypted octets. In addition, this number is added 
+to {\em out\_octets}\pf noctets.
+The calling program must provide {\em out\_octets}\pf noctets and {\em out\_octets}\pf octets and sufficient
+memory in {\em out\_octets}\pf octets.
+The amount of memory should be not less than
+({\em in\_bits}\pf nbits) $/$ 8 $+$ {\em out\_octets}\pf noctets $+$ $n$ with $n = 8$ 
+in case of DES or DES3 algorithms and $n = keysize / 8$ in case of RSA.
+
+Decryption key and corresponding algorithm are determined by parameter {\em key} as follows:
+\be
+\m If {\em key} is the NULL pointer,
+   the own secret decryption key, which is stored in the PSE object
+   {\em DecSKnew} or {\em DecSKold}, respectively, is used. 
+   In this case, the decryption follows
+   the procedure described in Vol. 1, Principles of Security Operations, {\em Operation of
+   Encryption Keys}.
+   If a single RSA key pair is used for both signature and encryption purposes, however, the own secret key is
+   obtained from PSE object {\em SKnew} or {\em SKold}, respectively.
+\m If {\em key}\pf key is not the NULL pointer, the structure it points to
+   contains algorithm identifier and key.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $>$ 0,
+   key and algorithm identifier which are referenced by this number are used. This is a key
+   previously installed under this reference with {\em af\_gen\_key} or 
+   {\em af\_put\_EncryptedKey}.
+\m If {\em key}\pf key is the NULL pointer and {\em key}\pf keyref $=$ 0,
+   {\em key}\pf pse\_sel indicates the PSE object which contains key and algorithm.
+\ee
+
+{\bf In case of RSA algorithm:}
+\be
+\m The decryption key which is of type BitString is supposed to be
+   a {\bf secret key}. It consists of the substructure described in
+   SEC-PSE-OBJECTS(4),
+   which in case of a secret key consists of the secret
+   prime factors. af\_decrypt uses internally the
+   decoding function {\em d\_KeyBits} to get the prime factors {\em p} and {\em q}.
+\m The bitstring passed through {\em in\_bits} is internally blocked into portions of
+   {\em keysize} bits. These blocks are decrypted into blocks of {\em blocksize} bits
+   (padded with trailing ZEROES) which in turn are combined into the octetstring {\em out\_octets}, i.e
+   the octetstring of the decrypted data consists of less bits than the bitstring of the encrypted data
+   according to the relation between {\em blocksize} and {\em keysize}.
+   {\em blocksize} is derived from {\em keysize} as the largest multiple of octets which consists of
+   less bits than {\em keysize} (for instance $keysize = 512$ leads to $blocksize = 63$).
+\m af\_decrypt does not assume any specific padding prior encrypting in order to be able to
+   restore the original plaintext length. This must be done by the application before 
+   calling  af\_encrypt and after calling af\_decrypt.
+\m Since there is no special mechanism to encode the length of the original plaintext prior
+   to encryption, decrypting encrypted (with {\em af\_encrypt}) data with {\em af\_decrypt}
+   leads to a result which is longer than the original plaintext with trailing zeroes.
+\ee
+{\bf In case of DES or DES3 algorithm:} \\ [1em]
+   While the number of bits in {\em in\_bits} is arbitrary for each single call to
+   {\em af\_decrypt}, the number of bits of the input data for the whole
+   decryption process (until {\em more} $=$ END) must be a multiple of 64.
+
+   In case of {\bf desCBC\_pad}, {\bf desECB\_pad}, {\bf desCBC3\_pad} or 
+   {\bf desECB3\_pad} algorithm, {\em af\_decrypt} considers 
+   the last octet of the last block as the number of 
+   valid octets of that block (between 0 and 7) which enables {\em af\_decrypt}
+   to restore the original octetstring. If the last octet of the last block has not
+   a value between 0 and 7 after decryption, an error is indicated.
+
+   In case of {\bf desCBC\_pem} or {\bf desECB\_pem} algorithm, {\em af\_decrypt} assumes
+   that padding as defined in RFC 1423 has been applied prior to encrypting
+   which again enables {\em af\_decrypt}
+   to restore the original octetstring.
+
+   In case of {\bf desCBC}, {\bf desECB}, {\bf desCBC3} or {\bf desECB3} algorithm, {\em af\_decrypt} does
+   not assume any specific padding prior to encrypting. The decrypting result is a multiple
+   of 8 octets, and measures which allow to restore the original plaintext length are 
+   assumed to be taken by the application (of {\em af\_encrypt} and {\em af\_decrypt}).
+
+\subsubsection{af\_sign}
+\nm{3X}{af\_sign}{sign octetstring with own signature key}
+\label{af_sign}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_sign} {\em (in\_octets, signature, more)} \\
+OctetString *{\em in\_octets}; \\
+Signature *{\em signature}; \\
+More {\em more};
+\hl{Parameter}
+\parname  {{\em in\_octets}}
+\pardescript  {OctetString of the data to be signed.} 
+
+\parname  {{\em signature}}
+\pardescript  {Returned signature. Memory is provided by the called program.}
+
+\parname  {{\em more}}
+\pardescript  {MORE: More data will follow for this sign process. \\
+                  END: Last data of this sign process.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+In case of {\em more} $=$ MORE or END af\_sign hashes {\em in\_octets} onto
+an internal hash value, using the algorithm as described below.
+In case of {\em more} $=$ END this hash value is encrypted using key and
+algorithm as described below and returned as BitString in {\em signature}\pf signature.
+All necessary memory for returned information will be provided by the
+called program.
+
+As signature key the own secret signature key, which is stored in the PSE
+object {\em SignSK}, is used. If a single RSA key pair is used for both signature and encryption purposes, however,
+the own secret signature key is stored in the PSE object {\em SKnew}. 
+
+The algorithm to be used is determined as follows:
+\be
+\m if {\em signature}\pf signAI\pf objid is not the NULL pointer, the algorithm
+   determined by this object identifier is used.
+\m otherwise, i.e. if either {\em signature}\pf signAI or {\em signature}\pf signAI\pf objid 
+   is the NULL pointer, the algorithm
+   associated to the own secret signature key is used.
+   In addition, this algorithm identifier is returned in {\em signature}\pf aignAI\pf objid.
+   All necessary memory allocation is done by the called program.
+\ee
+
+\subsubsection{af\_sign}
+\nm{3X}{af\_sign}{sign octetstring with own signature key}
+\label{af_sign}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_sign} {\em (in\_octets, signature, more)} \\
+OctetString *{\em in\_octets}; \\
+Signature *{\em signature}; \\
+More {\em more};
+
+RC {\bf af\_OctetString2SignedFile} {\em (file, ostr, withcerts, signai)} \\
+char *{\em file};
+OctetString *{\em ostr}; \\
+Boolean {\em withcerts}; \\
+AlgId *{\em sigai};
+
+\hl{Parameter}
+\parname  {{\em in\_octets}}
+\pardescript  {OctetString of the data to be signed.} 
+
+\parname  {{\em signature}}
+\pardescript  {Returned signature. Memory is provided by the called program.}
+
+\parname  {{\em more}}
+\pardescript  {MORE: More data will follow for this sign process. \\
+                  END: Last data of this sign process.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+{\bf af\_sign} is the general purpose sign routine which signs the given
+{\em in\_octets} and produces the signature {\em signature}.
+In case of {\em more} $=$ MORE or END af\_sign hashes {\em in\_octets} onto
+an internal hash value, using the algorithm as described below.
+In case of {\em more} $=$ END this hash value is encrypted using key and
+algorithm as described below and returned as BitString in {\em signature}\pf signature.
+All necessary memory for {\em signature}\pf signature and {\em signature}\pf signAI
+will be provided by the called program.
+
+The own secret signature key, which is stored in the PSE
+object {\em SKnew} or {\em SignSK}, is used as signature key. 
+
+The algorithm to be used is determined as follows:
+\be
+\m if {\em signature}\pf signAI\pf objid is not the NULL pointer, the algorithm
+   determined by this object identifier is used.
+\m otherwise, i.e. if either {\em signature}\pf signAI or {\em signature}\pf signAI\pf objid 
+   is the NULL pointer, the algorithm
+   associated to the own secret signature key is used.
+   In addition, this algorithm identifier is returned in {\em signature}\pf aignAI\pf objid.
+   All necessary memory allocation is done by the called program.
+\ee
+
+{\bf af\_OctetString2SignedFile} signs the given OctetString {\em ostr}, writes {\em ostr}
+to the file {\em file}, and writes the signature as ASN.1-encoded Signature to {\em file}.sig.
+If {\em withcerts} is TRUE, the file {\em file}.ctf containing the ASN.1-encoded Certificates
+from the PSE (which is the user certificate and the forward certification path) is additionally
+written. Files are created, if they don't exist.
+
+\subsubsection{af\_verify}
+\nm{3X}{af\_verify}{Verify signature and certificates}
+\addtotoc{af\_verify\_Certificates}
+\addtotoc{af\_check\_validity}
+\addtotoc{af\_SignedFile2OctetString}
+\label{af_verify}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+extern Boolean af\_chk\_crl, af\_access\_directory; \\
+extern Verficationresult *verifresult; \\ [1em]
+RC {\bf af\_verify} {\em (in\_octets, signature, more, or\_cert, time, pkroot)} \\
+OctetString *{\em in\_octets}; \\
+Signature *{\em signature}; \\
+More {\em more}; \\
+Certificates *{\em or\_cert}; \\
+UTCTime *{\em time}; \\
+PKRoot *{\em pkroot};
+
+RC {\bf af\_verify\_Certificates} {\em (or\_cert, time, pkroot)} \\
+Certificates *{\em or\_cert}; \\
+UTCTime *{\em time}; \\
+PKRoot *{\em pkroot};
+
+RC {\bf af\_check\_validity\_of\_Certificate} {\em (time, certificate)} \\
+UTCTime *{\em time}; \\
+Certificate *{\em certificate};
+
+RC {\bf af\_check\_validity\_of\_PKRoot} {\em (time, pkroot)} \\
+UTCTime *{\em time}; \\
+PKRoot *{\em pkroot};
+
+RC {\bf af\_check\_validity\_of\_ToBeSigned} {\em (time, tobesigned)} \\
+UTCTime *{\em time}; \\
+ToBeSigned *{\em tobesigned};
+
+OctetString {\bf *af\_SignedFile2OctetString} {\em (file)} \\
+char *{\em file};
+
+\hl{Parameter}
+\parname  {{\em in\_octets}}
+\pardescript  {OctetString of the input data for the verification.}
+
+\parname  {{\em signature}}
+\pardescript  {Signature to be verified.}
+
+\parname  {{\em more}}
+\pardescript  {MORE: More input data will follow for this verification process. \\
+                  END: Last input data of this verification process.}
+
+\parname  {{\em or\_cert}}
+\pardescript  {Originator Certificate (in form of an X.509 Certificates).}
+
+\parname  {{\em time}}
+\pardescript  {Verification time.}
+
+\parname  {{\em pkroot}}
+\pardescript  {Structure containing the top level verification key, or NULL pointer.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 (Verification positive) or -1.}
+\hl{Description}
+{\bf af\_verify} is the general purpose verification routine which verifies the given
+{\em signature} of a given {\em in\_octets}, and the whole certification path given
+in {\em or\_cert}. 
+In case of {\em more} $=$ MORE or END, {\bf af\_verify} hashes {\em in\_octets} onto
+an internal hash value, using the algorithm as described below.
+In case of {\em more} $=$ END the signature given in {\em signature}\pf signature
+is decrypted with the PK contained in the user certificate which in turn is part of the
+originator certificate, and the result is compared
+with the previously computed internal hash value. The algorithm to be used is either 
+{\em signature}\pf signAI, if {\em signature}\pf signAI\pf objid is not the
+NULL pointer, or the algorithm belonging to PK of the user certificate. If both hash values
+are equal, the verification strategy described below is performed, i.e. the whole certification path
+contained in {\em or\_cert} is verified, with the last uncertified public key
+contained in {\em pkroot}. If the verification succeeds finally, a return value
+of 0 is returned. Otherwise, a return value of -1 is returned, and the certificate which could
+not be verified is indicated in af\_error.cert. In either case, it generates the external
+variable {\em verifresult} which provides more information about the verification process (see C. Verification Result below).
+{\em verifresult} can be printed using aux\_fprint\_VerificationResult(), and can be released
+using aux\_free\_VerificationResult(). If {\em verifresult} is not NULL when af\_verify is
+called with more $=$ END, af\_verify assumes that this is the verification result of a former call to
+af\_verify and releases this address with aux\_free\_VerificationResult.
+
+If {\em time} is not the NULL pointer, it specifies date and time of verification. Otherwise
+time and date of verification is the current time.
+
+If {\em pkroot} is not the NULL pointer, it specifies the top level public verification key.
+Otherwise the top level verification key is taken from the PSE object {\em PKRoot}. \\ [1em]
+{\bf af\_verify\_Certificates} verifies only the the originator certificate {\em or\_cert}.
+It produces also the external variable {\em verifresult}.
+\\ [1em]
+{\bf af\_check\_validity\_of\_Certificate} returns 0 if {\em time} is within the validity interval
+of {\em certificate}, otherwise it returns -1.
+\\ [1em]
+{\bf af\_check\_validity\_of\_PKRoot} returns 0 if {\em time} is within the validity interval
+of {\em pkroot}, otherwise it returns -1.
+\\ [1em]
+{\bf af\_check\_validity\_of\_ToBeSigned} returns 0 if {\em time} is within the validity interval
+of {\em tobesigned}, otherwise it returns -1.
+\\ [1em]
+{\bf af\_SignedFile2OctetString} returns the content of file {\em file} as OctetString
+if it can be validated with the signature in {\em file}.sig.
+ 
+If {\em file}.ctf exists, the
+content of this file is assumed to be an ASN.1-encoded Certificates (user certificate and
+forward certification path) and is being used for the verification. Otherwise the
+user certificate Cert/SignCert and the forward certification path FCPath from the PSE
+is being used for the verification.
+
+A NULL pointer is returned if {\em file}.sig doesn't exist, or if the verification
+fails for any reason.
+ 
+af\_SignedFile2OctetString produces, like af\_verify, the external variable {\em verifresult}. 
+
+\hl{Verification Strategy}
+
+The verification process is ruled by the parameters
+{\em or\_cert} and {\em pkroot} and the PSE objects {\em PKList} and {\em FCPath} (if
+existent). It is also dependant on the point of time provided by parameter {\em time}, which
+specifies the time and date of verification; if there
+is no time provided, the verification time is set to the current time.
+In addition, the verification process can be controlled by the global boolean variables
+{\em af\_chk\_crl}, {\em af\_FCPath\_is\_trusted}, and {\em af\_access\_directory}.
+\\ [1em]
+{\em pkroot} contains the top level verification key, where top 
+level does not necessarily refer to the top level of a certification tree 
+(that is, pkroot does not necessarily need to correspond to the
+public key of a Root-CA). Instead, {\em top level} refers to that level 
+of the certification tree where the recipient wants the verification 
+process to terminate; it may identify any of the verifier's points of trust.
+{\em top level verification key} then represents the 
+public key involved in the last verification step.
+If {\em pkroot} is empty, the top level verification key is 
+taken from the PSE object {\em PKRoot}.
+\\ [1em]
+Before the verification process starts, it is checked whether the information stored
+in {\em pkroot} has expired (see af\_check\_validity\_of\_PKRoot(3X)). An expired
+{\em pkroot} information is indicated by its {\em notafter} field having already
+passed.
+\\ [1em]
+If there is no originator certificate {\em or\_cert} to be evaluated 
+by the verifier, the signature contained in {\em signature} is 
+validated with the top level verification key derived from {\em pkroot}, 
+with no further verification step being applied. In order that the 
+verification of {\em signature} be successful, {\em pkroot} must contain the 
+originator's public key; the originator who has 
+generated the signature may be a user, a CA, or a Root-CA.
+If {\em pkroot} is empty, however, the top level verification key is 
+taken from the PSE object {\em PKRoot}.
+\\ [1em]
+If the originator certificate {\em or\_cert} is not empty, it
+comprises at least one user certificate and optionally one
+forward certification path. If af\_verify was called, the user certificate 
+contains the public key required for validating the signature supplied in 
+{\em signature}; otherwise, the user certificate identifies the
+certificate which is to be validated with the optionally appended
+forward certification path.
+\\ [1em]
+There are two ways of constructing a certification path, starting with the 
+originator's certificate and ending with the public key of a CA which the 
+verifier trusts: \\
+The certification path may be extracted completely from a given certification 
+path supplied by the originator (this is discussed in section A). 
+However, if the originator has not provided a certification path, or the recipient 
+fails to identify a trusted CA within an incoming 
+certification path, a Directory (X.500 or .af-db) is accessed in order to build 
+(complete) the originator's certification path (this is discussed in detail 
+in section B).
+\\ [1em]
+
+{\bf A. Construction of a Certification Path from a given Forward Certification Path}
+\\ [1em]
+If the originator has supplied a FCPath (a detailed discussion on the structure 
+of a FCPath is given in Volume 1), the verification
+process run by the recipient has to extract an optimal chain of certificates 
+from the given FCPath; the chain is optimal if it is as short as possible.
+\\ [1em]
+The selection of a chain of certificates from a given FCPath is performed
+from bottom to top, using a stack of certificates whose initial value
+is represented by the user certificate.
+\\ [1em]
+The PKList and FCPath checks described below are only performed in case that {\em af\_chk\_crl}
+is set to FALSE, i.e., no revocation lists are to be consulted. As a further restriction, 
+the verifier's PSE object {\em FCPath} is only
+considered if {\em af\_FCPath\_is\_trusted} is set to TRUE. Note that the
+FCPath check described below will first reduce the verifier's FCPath (stored in PSE object
+{\em FCPath}) to a chain of hierarchy certificates (see reduce\_FCPath\_to\_HierarchyPathwhich()) 
+which may all be trusted. The FCPath check is useful for optimizing the verification process,
+if the originator of the digital signature and its recipient have a common point of trust
+within their forward certification paths.
+\\ [1em]
+If af\_verify was called, the user certificate is considered as follows (if
+af\_verify\_Certificates was called, however, the user certificate is considered in the
+same manner, except that the PKList and FCPath checks are omitted):
+\be
+\m Validity \\
+It is checked whether the time and date of verification specified by {\em time} lies 
+within the validity time frame of the user certificate.
+\m CRL Check \\
+If {\em af\_chk\_crl} is set to TRUE, the user certificate is checked against the current 
+revocation list of its issuer, to ensure that it has not been revoked.
+\m PKList \\
+If the originator's public signature key held within the user certificate
+is trusted and has already been stored in the recipient's PKList (whose
+corresponding information was found not to have expired),
+the signature is validated with this public key, with there being no stack of 
+certificates to be evaluated.
+\m FCPath \\
+If the user certificate is found in the recipient's PSE object {\em FCPath} (whose
+corresponding certificate was found not to have expired), its public
+key may be trusted and used for validating the signature, with there being no stack of 
+certificates to be evaluated.
+\m PKRoot \\
+If the issuer of the user certificate corresponds to the CA at the top level
+({\em pkroot}), the top level verification key is derived from {\em pkroot}. It is 
+used for verifying the user certificate which is the only element of the stack.
+\m Cross Check \\
+If the issuer of the user certificate has been cross-certified by the own Root CA, the 
+reverse component of the relevant cross certificate pair (which may be found in PSE
+object {\em CrossCSet}) is appended to the user certificate (added to the stack of certificates), 
+and the top level verification key is derived from {\em pkroot} (which then corresponds
+to the own Root CA).
+\ee
+If none of that applies to the user certificate, the incoming forward certification path
+is processed from bottom to top, as long as the hierarchy levels being encountered contain
+a single certificate only. The processing of the forward certification path stops
+at the first hierarchy level that is multi-valued, i.e., that contains more than one
+certificate.
+Each certificate belonging to a single-valued hierarchy level is considered as described
+above, with an additional check on whether it can be verified using the public key held 
+within the certificate at the next level above.
+\\ [1em]
+The following part describes how the certificates of multi-valued FCPath levels are selected
+to form part of the chain of certificates which is then submitted to the validation process:
+\\ [1em]
+Each level of the FCPath contributes exactly one certificate to the stack.
+At any level, there are two ways of selecting the certificate which is next to be 
+added to the stack: one way shall be called {\em horizontal mode} and refers to the 
+set of certificates at that particular level of the FCPath; the other one shall be 
+called {\em vertical mode} and refers to the set of certificates at the next level 
+above. \\
+The certificate that was last added to the stack (starting with the first certificate 
+at the first FCPath level that is multi-valued) is considered in the 
+following way:
+\\ [1em]
+Condition A.1: PKList \\
+If the public key of the CA representing that level has already been stored in 
+the recipient's PKList (whose corresponding information was found not to have expired),
+the certificate last added to the stack (owned by that CA) need not be verified 
+and is therefore removed from the stack. The CA's public key is used as the 
+top level verification key. That completes the construction of the chain of
+certificates.
+\\ [1em]
+Condition A.2: FCPath \\
+If the certificate is found in the recipient's PSE object {\em FCPath} (whose corresponding 
+information was found not to have expired), its public
+key may be trusted and used for validating the signature, with there being no stack of 
+certificates to be evaluated.
+\\ [1em]
+Condition A.3: PKRoot \\
+If the issuer of that certificate corresponds to the CA at the top level
+({\em pkroot}), the top level verification key is derived from {\em pkroot}.
+That completes the construction of the chain of certificates.
+\\ [1em]
+Condition A.4: Cross Check \\
+If the issuer of the certificate being considered has been cross-certified by the own Root CA, the 
+reverse component of the relevant cross certificate pair (which may be found in PSE
+object {\em CrossCSet}) is added to the stack of certificates, 
+and the top level verification key is derived from {\em pkroot} (which then corresponds
+to the own Root CA).
+\\ [1em]
+Condition A.5: Cross or Hierarchy certificate? 
+\bi
+\m Cross certificate \\
+If the certificate last added to the stack is
+a cross certificate which does not satisfy any of the conditions A.1 to A.4,
+it is removed from the stack, and the next certificate (if existent) within the 
+set of certificates at that level is put on top of the stack 
+({\em horizontal mode}) and examined in the way described above.
+This is repeated until any of the remaining certificates at that level satisfies 
+any of the conditions A.1 to A.4, or until a hierarchy certificate is encountered. 
+In the latter case, the construction of the stack is continued at the next level 
+above ({\em vertical mode}).
+\m Hierarchy certificate \\
+If the certificate last added to the stack is
+a hierarchy certificate, the first certificate in the set of certificates at
+the next level above is put on top of the stack and examined in the way
+described above ({\em vertical mode}).
+\ei
+If at a particular level of the FCPath there is no way of selecting
+the hierarchy certificate (i.e., the FCPath is incomplete), all certificates at 
+that particular level are considered as cross certificates. If they all do not 
+satisfy any of the conditions A.1 to A.4, the hierarchy certificate at the previous level 
+is removed from the stack, and the construction of the stack is resumed at
+the previous level.
+It is then examined whether any of the remaining cross certificates at that 
+(previous) level satisfies any of the conditions A.1 to A.4 ({\em horizontal mode}).
+\\ [1em]
+If the hierarchy certificate at the first level of the FCPath has been 
+removed from the stack (according to the rule described above), and 
+the remaining cross certificates at that level do not satisfy any of the conditions A.1 to A.4, 
+the verification process terminates with an error message reporting that 
+no chain of certificates could be extracted from the given FCPath, unless
+the {\em af\_access\_directory} flag is set (see section B).
+\\ [1em]
+If a CA trusted by the recipient was identified within an incoming FCPath, the certificates
+extracted from the multi-valued hierarchy levels of the forward certification path are
+submitted to the following checks:
+\bi
+\m Each certificate of the constructed stack of certificates is verified using the public 
+key held within the
+certificate at the next level above, and the highest certificate is  
+verified by the top level verification key.
+\m If the {\em af\_chk\_crl} flag is set to TRUE, one additional validation step
+is required for the certificates establishing the constructed stack of certificates: 
+Each certificate is checked against the current revocation list from the 
+certificate's issuer to ensure that revoked certificates are not employed. 
+This requires at worst one directory access per certificate of a chain. One 
+revoked certificate within the certification path discredits all certificates 
+below and the user signature as well. If a revoked certificate is encountered,
+the verifier is warned, and the verification process terminates with an 
+appropriate error message being displayed. \\ [1em]
+\ei
+
+{\bf B. Construction of a Certification Path with Directory Support (X.500 or .af-db)}
+\\ [1em] 
+The recipient may use the information stored in a Directory (X.500 or .af-db) in order to 
+construct or complete a certification path from the originator up to one of the recipient's
+trusted CAs.
+\\ [1em]
+A Directory is accessed if the following holds true:
+\bi
+\m The {\em af\_access\_directory} flag is set;
+\m There is no FCPath supplied by the originator, or the FCPath supplied 
+by the originator does not contain a certification path that would contain a 
+CA trusted by the recipient.
+\ei
+The originator must supply to the recipient at least its user certificate. An optionally
+provided forward certification path is considered as described in section A.
+The certificate first submitted to the directory support routine may either be
+\bi
+\m the user certificate itself (in case that the originator has not provided
+its forward certification path, or its forward certification path does not contain a 
+CA which the recipient trusts),
+\m or the certificate of the highest single-valued level of the originator's FCPath.
+\ei
+The directory support is carried out as follows:
+\\ [1em]
+Step 1: Access the directory entry of the issuer of the certificate submitted
+to the directory support routine, and return the set of certificates stored in 
+its {\em cACertificate} attribute.
+\\ [1em]
+Step 2: Again, the certification path is built step by step, using a stack of
+certificates which in the following is referred to as {\em stack A}.
+In addition, a second stack (referred to as {\em stack B}) is managed whose 
+elements represent set of certificates. The set of certificates last retrieved 
+from the Directory is put on top of this stack. The set of certificates returned 
+as result of the first {\em read}-operation (see step 1) forms the initial value 
+of stack B.
+\\ [1em]
+Step 3: A certificate (starting with the first) within the set of certificates
+on top of stack B is added to stack A, provided that
+\\ [1em]
+B.1: it is not yet contained in this stack (this is done in order to avoid
+loops in the certification path);
+
+B.2: its validity time frame intersects with the validity time frame of all
+certificates contained in this stack;
+
+B.3: it certifies the public key required for the validation of the certificate
+at the previous level or the text signature 
+(this check has to be performed as certificates held within directory entries 
+may refer to different key pairs owned by the same directory object).
+\\ [1em]
+The certificate last added to stack A is considered in the same way as
+described for the case where no directory support is required (see section A): 
+\bi
+\m If it does not satisfy any of the conditions A.1 to A.4, the {\em cACertificate} attribute 
+within the directory entry of its issuer is accessed, and the returned set of 
+certificates is put on top of stack B. Then, the procedure described above 
+(step 3) is repeated.
+\m If it satisfies condition A.1 (PKList), it is removed from stack A, and its 
+public key is used as the top level verification key. That completes 
+the construction of the certification path.
+\m If it satisfies condition A.2 (FCPath), it is removed from stack A, and its 
+public key is used as the top level verification key. That completes 
+the construction of the certification path.
+\m If it satisfies condition A.3 (PKRoot), the top level verification key is 
+derived from {\em pkroot}. That completes the construction of the 
+certification path.
+\m If it satisfies condition A.4 (Cross Check), the 
+reverse component of the relevant cross certificate pair (which may be found in PSE
+object {\em CrossCSet}) is added to the stack of certificates, and the top level verification key is 
+derived from {\em pkroot}. That completes the construction of the 
+certification path.
+\ei
+
+Step 4: The certificates within the set of certificates on top of stack B
+are checked one after the other, until one certificate is found that
+satisfies requirements B.1 to B.3 and is therefore added to stack A.
+\\ [1em]
+Step 5: If none of the certificates within the set of certificates on top
+of stack B fulfil requirements B.1 to B.3, it is
+examined whether there is a {\em CrossCertificatePair} attribute contained
+in the owner's directory entry, where owner refers to the owner ({\em subject})
+of the set of certificates which has been completely exploited.
+(By taking the {\em CrossCertificatePair} attribute into account, it is ensured
+that the certification path under construction terminates at some CA in the
+recipient's certification tree, even if the originator belongs to a 
+different certification tree.) If the entry under consideration contains such
+an attribute, it is checked whether
+any of the issuers of the forward certificates are known to the recipient
+(PKRoot, PKList, FCPath). If such an issuer is found, its public key represents the
+top level verification key; that completes the construction of the 
+certification path.
+
+Otherwise (or in case that there is no {\em CrossCertificatePair} attribute 
+found within the owner's directory entry), the top elements of the two stacks
+are removed from their respective stacks. Then, the procedure described
+as step 3 is resumed, its input being the next certificate within the
+set of certificates now on top of stack B (for the meaning of {\em next}
+see step 4). If there are no further certificates to be considered 
+within that set of certificates, the procedure under step 5 is carried out.
+\\ [1em]
+If all the certificates within the set of certificates representing
+the initial value of stack B and even the forward certificates 
+retrieved from the {\em CrossCertificatePair} attribute within the
+directory entry initially accessed turn out to be inappropriate 
+for being members of a certification path, the verification process
+terminates with an appropriate error message being displayed.
+\\ [1em]
+If a chain of certificates has been found, it is validated as described for the
+case where no directory support was required. \\ \\
+{\bf C. Verification Result}
+\\ [1em]
+The following C-structures are used for collecting any data generated by the af\_verify
+af\_verify\_Certificates routines, monitoring the verification process itself: 
+
+{\small
+\btab
+\1      typedef struct VerificationResult \{ \\
+\2		VerificationStep \2 **verifstep; \\
+\2		int \2	             trustedKey; \\
+\2		Boolean \2	     success; \\
+\2		Boolean \2	     textverified; \\
+\2		Name \2		    *top\_name; \\
+\2		UTCTime \2 	    *date; \\
+\2		int \2		     top\_serial; \\
+\1       \} VerificationResult; \\
+\etab
+}
+with: \\ \\
+{\small
+\btab
+\1      typedef struct VerificationStep \{ \\
+\2		Certificate \2	*cert; \\
+\2		int \2		crlcheck; \\
+\2		UTCTime	\2	*date; \\
+\2		int \2		supplied; \\
+\1       \} VerificationStep; \\
+\etab
+}
+
+The {\em verifstep} component within the {\em VerificationResult} structure identifies a 
+linked list of elements of type {\em VerificationStep}.
+Each element of the linked list
+\bi
+\m identifies a certificate which forms part of the originator's certification path and
+that was either successfully verified or failed to be verified
+({\em cert});
+\m indicates whether the certificate {\em cert} was checked against its issuer's revocation 
+list ({\em crlcheck});
+\m indicates whether the certificate {\em cert} was supplied within the received certification
+path or was retrieved from a Directory (X.500 or .af-db) ({\em supplied});
+\m provides the revocation date, in case of the certificate {\em cert} having been revoked
+({\em date});
+\m provides the next scheduled date of issue, in case of the relevant revoction list being 
+obsolete ({\em date}).
+\ei
+
+The routine {\bf aux\_fprint\_VerificationResult} is used for printing the contents of the
+{\em VerificationResult} structure in a user-friendly manner. Memory allocated for
+a {\em VerificationResult} structure can be freed by the {\bf aux\_free\_VerificationResult}
+routine.
+
+\subsubsection{af\_gen\_key}
+\nm{3X}{af\_gen\_key}{Generate DES key or RSA key pair}
+\label{af_gen_key}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_gen\_key} {\em (key, ktype, replace)} \\
+Key *{\em key}; \\
+KeyType {\em ktype}; \\
+Boolean {\em replace};
+\hl{Parameter}
+\parname  {{\em key}}
+\pardescript  {Structure which determines the generated key.}
+
+\parname  {{\em ktype}}
+\pardescript{type of the key pair:
+		    SIGNATURE: signature key pair \\
+		    ENCRYPTION: encryption key pair.}
+
+\parname  {{\em replace}}
+\pardescript  {if FALSE, do not overwrite existing key.}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+af\_gen\_key generates a
+\bi
+\m  DES key, 
+    if the algorithm encryption method 
+    of {\em key}\pf key\pf subjectAI (as returned by aux\_ObjId2AlgEnc()) is DES.
+ 
+    A DES key is a 64 bit long BitString.
+\m  DES3 key, 
+    if the algorithm encryption method 
+    of {\em key}\pf key\pf subjectAI (as returned by aux\_ObjId2AlgEnc()) is DES3.
+ 
+    DES3 is triple block encryption in the fashion encryption(k1)-decryption(k2)-encryption(k1).
+    A DES3 key is a 128 bit long BitString, the first 64 bits comprising k1 and the
+    second 64 bits comprising k2.
+\m  RSA key pair, 
+    if the algorithm encryption method 
+    of {\em key}\pf key\pf subjectAI (as returned by aux\_ObjId2AlgEnc()) is RSA. 
+
+    An RSA public key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       n INTEGER,   \\
+    \4  \2       e INTEGER  \\
+    \4  \} \\
+    \evtab
+    $n$ is the modulus and $e$ is the public exponent.
+    
+
+    An RSA secret key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       p INTEGER,   \\
+    \4  \2       q INTEGER  \\
+    \4  \} \\
+    \evtab
+    $p$ and $q$ are the two prime factors of the modulus.
+
+\m  DSA key pair, 
+    if the algorithm encryption method 
+    of {\em key}\pf key\pf subjectAI (as returned by aux\_ObjId2AlgEnc()) is DSA. 
+
+    A DSA public key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       key INTEGER, - - y (public key)   \\
+    \4  \2       params DSAParameters OPTIONAL  \\
+    \4  \} \\
+    \evtab
+    with
+    \bvtab
+    DSAParameters ::= SEQUENCE \{ \\
+    \4  \2       prime1 [0] INTEGER, - - p \\
+    \4  \2       prime2 [1] INTEGER, - - q \\
+    \4  \2       base [2] INTEGER, - - g \\
+    \4  \} \\
+    \evtab
+    
+    A DSA secret key is a BitString
+    which contains the ASN.1 DER code of
+    \bvtab
+    \4  SEQUENCE \{ \\
+    \4  \2       key INTEGER, - - x (secret key)   \\
+    \4  \2       params DSAParameters OPTIONAL  \\
+    \4  \} \\
+    \evtab
+    with
+    \bvtab
+    DSAParameters ::= SEQUENCE \{ \\
+    \4  \2       prime1 [0] INTEGER, - - p \\
+    \4  \2       prime2 [1] INTEGER, - - q \\
+    \4  \2       base [2] INTEGER, - - g \\
+    \4  \} \\
+    \evtab
+
+\ei
+
+The key is returned as follows in case of a DES key or DES3 key:
+
+If {\em key}\pf keyref $=$ 0 and {\em key}\pf pse\_sel is not the NULL pointer, the generated key
+is stored in the PSE object specified by {\em key}\pf pse\_sel. The object will be
+created first. 
+If the object already exists and {\em replace} is FALSE, {\em af\_gen\_key}
+does not overwrite the object and returns -1.
+ 
+If {\em key}\pf keyref $>$ 0, the generated key is stored under this key reference, until it is
+deleted with sec\_del\_key. 
+If the key reference already exists and {\em replace} is FALSE, {\em af\_gen\_key}
+does not overwrite the key and returns -1.
+ 
+If {\em key}\pf keyref $=$ -1, the generated key is stored under a key reference which is generated 
+by af\_gen\_key and returned in {\em key}\pf keyref. The key remains there until it is deleted
+with sec\_del\_key. \\ [0.5cm]
+The keys are returned as follows in case of an RSA Key Pair:
+
+The public key is returned in {\em key}\pf key\pf subjectkey. Memory is provided by the called program.
+The secret key is handled according to the parameter {\em key} as follows: 
+
+If {\em key}\pf keyref $= 0$ and {\em key}\pf pse\_sel is the NULL pointer, the
+generated secret key is stored in the PSE object {\em SignSK} or
+{\em DecSKnew}, depending on {\em ktype}. 
+If the PSE where the keypair is stored is restricted to carry one RSA keypair only, 
+the generated secret key is stored in the PSE object {\em SKnew}, instead.
+
+If {\em key}\pf keyref $=$ 0 and {\em key}\pf pse\_sel is not the NULL pointer, the generated secret key
+is stored in the PSE object specified by {\em key}\pf pse\_sel. The object will be
+created first. 
+If the object already exists and {\em replace} is FALSE, {\em af\_gen\_key}
+does not overwrite the object and returns -1.
+ 
+If {\em key}\pf keyref $>$ 0, the generated secret key is stored under this key reference until it is
+deleted with sec\_del\_key. 
+If the key reference already exists and {\em replace} is FALSE, {\em af\_gen\_key}
+does not overwrite the key and returns -1.
+ 
+If {\em key}\pf keyref $=$ -1, the generated secret key is stored under a key reference which is generated 
+by af\_gen\_key and returned in {\em key}\pf keyref. The key remains there until it is deleted
+with sec\_del\_key.
+
+\subsubsection{af\_create\_Certificate}
+\nm{3X}{af\_create\_Certificate}{Create a prototype certificate from the
+public key info.}
+\label{af_make_certificate}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+Certificate *{\bf af\_create\_Certificate}{\em (keyinfo, sig\_alg, obj\_name, subject)} \\
+KeyInfo *{\em keyinfo}; \\
+AlgId *{\em sig\_alg}; \\
+char *{\em obj\_name}; \\
+DName {\em *subject};
+\hl{Parameter}
+\parname{{\em keyinfo}}
+\pardescript{ the public key info.}
+
+\parname{{\em sig\_alg}}
+\pardescript{ signature algorithm }
+
+\parname{{\em obj\_name}}
+\pardescript{ name of PSE object where secret signature key resides }
+
+\parname{{\em subject}}
+\pardescript{ the intended owner of the certificate }
+
+\parname{{\em Return Value}}
+\pardescript{ the pseudo certificate or NULL.}
+\hl{Description}
+{\em af\_create\_Certificate} builds a prototype certificate around the
+public key identified by {\em keyinfo}. A prototype certificate is a self-signed
+certificate of the own public (signature or encryption) key. The 
+prototype certificate can be sent to a certification authority, which may check
+or exchange some of the data (e.g. the signature algorithm, serialnumber or the validity time frame)
+and replace the signature by its own signature, in order to produce a real certificate.
+\\ [1em]
+The version is set to the default. The serialnumber is set to $0$.
+The subject name is taken from parameter {\em subject}. If parameter {\em subject} is NULL, however, it is 
+retrieved from PSE object {\em Name}. The issuer name is set to the subject name.
+The signature algorithm identifier is set to the
+own signature algorithm; however, if the own signature 
+key is of type {\em ASYM\_ENC}, the algorithm name associated with the certificate's signature is derived
+from parameter {\em sig\_alg}. The validity is set to the interval
+from now on for one year. Finally, the signature will be created
+with the secret key which resides in the PSE object specified by parameter {\em obj\_name}.
+The creation of a prototype certificate according to this procedure enables a
+certification authority to verify the prototype certificate with
+the public key in {\em subjectPK}, i.e. to check whether the public
+key is part of an RSA key pair and the secret key is in the hand of the
+creator of the prototype certificate (this is a rather weak proof
+which does not prevent intelligent attacks but which may help to prevent
+unintentional key mismanagement).
+\\ [1em]
+The return value contains the pointer to the created prototype certificate or
+the NULL pointer in case of errors.
+\\ [1em]
+All necessary memory of the return value is provided by the called function.
+The memory of the returned {\em certificate} my be released with 
+{\em aux\_free\_Certificate()}.
+
+
+\subsubsection{af\_get\_EncryptedKey}
+\nm{3X}{af\_get\_EncryptedKey}{Encrypt key}
+\label{af_get_EncryptedKey}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_get\_EncryptedKey} {\em (encrypted\_key, plain\_key, encryption\_key, name, encryption\_key\_algid)} \\
+EncryptedKey *{\em encrypted\_key}; \\
+Key *{\em plain\_key}; \\
+Key *{\em encryption\_key}; \\
+DName *{\em name}; \\
+AlgId *{\em encryption\_key\_algid};
+\hl{Parameter}
+\parname  {{\em encrypted\_key}}
+\pardescript  {Encrypted key.} 
+
+\parname  {{\em plain\_key}}
+\pardescript  {Structure which identifies the key to be encrypted.} 
+
+\parname  {{\em encryption\_key}}
+\pardescript  {Structure which identifies the encryption key.} 
+
+\parname  {{\em name}}
+\pardescript  {DName of the intended recipient of the encrypted key.} 
+
+\parname  {{\em encryption\_key\_algid}}
+\pardescript  {Algorithm according to which the encryption will be performed.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+
+\hl{Description}
+
+The key identified by {\em plain\_key} is encrypted with the key and algorithm identified by
+{\em encryption\_key} or {\em name} and returned in 
+{\em encrypted\_key}. Memory is provided by the called program. 
+
+If {\em encryption\_key} is the NULL pointer and {\em name} is the NULL pointer,
+the own public encryption key is used, which is part of the user certificate stored in the PSE object
+{\em EncCert} or {\em Cert} (depending on whether or not a single RSA key pair is used for both signature and
+encryption purposes). 
+
+If {\em encryption\_key} is the NULL pointer and {\em name} 
+is not the NULL pointer, the public encryption key of {\em name} is searched in 
+the PSE object {\em EKList} (or {\em PKList}, depending on whether or not a single RSA key pair is used for both signature and
+encryption purposes), and used for the encryption of {\em plain\_key}.
+
+If {\em encryption\_key} is not the NULL pointer, the key identified by this structure
+is used for the encryption of {\em plain\_key}. 
+
+The algorithm identified by {\em encryption\_key\_algid} may be used to determine the algorithm
+according to which the encryption of {\em plain\_key} shall be performed. {\em encryption\_key\_algid}
+supersedes the algorithm identifier inherent to the key used as {\em encryption\_key}. 
+
+This function is intended to support the so called ``Hybrid method'' where information which
+has to be transmitted confidentially is encrypted with the DES algorithm while the corresponding DES key
+is transmitted in RSA encrypted form. af\_get\_EncryptedKey is useful for the sender
+of such a key.
+
+\subsubsection{af\_put\_EncryptedKey}
+\nm{3X}{af\_put\_EncryptedKey}{Decrypt key}
+\label{af_put_EncryptedKey}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$ 
+
+RC {\bf af\_put\_EncryptedKey} {\em (encrypted\_key, plain\_key, decryption\_key\_algid)} \\
+EncryptedKey *{\em encrypted\_key}; \\
+Key *{\em plain\_key}; \\
+AlgId *{\em decryption\_key\_algid};
+\hl{Parameter}
+\parname  {{\em encrypted\_key}}
+\pardescript  {Encrypted key.} 
+
+\parname  {{\em plain\_key}}
+\pardescript  {Structure which determines the decrypted key.} 
+
+\parname  {{\em decryption\_key\_algid}}
+\pardescript  {Algorithm according to which the decryption will be performed.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+
+\hl{Description}
+
+The encrypted key given in {\em encrypted\_key} is decrypted using the
+the own secret decryption key, which is stored in the PSE object
+{\em DecSKnew} or {\em DecSKold}, respectively. If a single RSA key pair is used for both signature and encryption
+purposes, however, the own secret key is stored in the PSE object {\em SKnew} or {\em SKold}, respectively.
+The decryption follows the procedure described in Vol. 1, Principles of Security Operations, 
+{\em Operation of Encryption}.
+The decrypted key is handled according to {\em plain\_key} as follows:
+
+If {\em plain\_key}\pf keyref $=$ 0 and {\em plain\_key}\pf pse\_sel is the NULL pointer, the decrypted key is
+returned as BitString in {\em plain\_key}\pf key\pf subjectkey. Memory is provided by the called program. 
+
+If {\em plain\_key}\pf keyref $>$ 0, the decrypted key is stored under this key reference until it is
+deleted with sec\_del\_key. 
+
+If {\em plain\_key}\pf keyref $=$ -1, the decrypted key is stored under a key reference which is generated 
+by af\_put\_EncryptedKey and returned in {\em plain\_key}\pf keyref. The key remains there until it is deleted
+with sec\_del\_key. 
+
+The algorithm identified by {\em decryption\_key\_algid} may be used to determine the algorithm
+according to which the decryption of {\em encrypted\_key} shall be performed. {\em decryption\_key\_algid}
+supersedes the algorithm identifier inherent to the own secret decryption key.
+
+This function is intended to support the so called ``Hybrid method'' where information which
+has to be transmitted confidentially is encrypted with the DES algorithm while the corresponding DES key
+is transmitted in RSA encrypted form. af\_put\_EncryptedKey is useful for the receiver
+of such a key.
+
+\subsubsection{af\_dir\_enter\_Certificate}
+\nm{3X}{af\_dir\_enter\_Certificate}{Enter Certificate into Directory}
+\addtotoc{af\_afdb\_enter\_Certificate}
+\label{af_enter_Certificate}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_dir\_enter\_Certificate} {\em (cert, type)} \\
+Certificate {\em *cert}; \\
+CertificateType {\em type}; 
+
+RC {\bf af\_afdb\_enter\_Certificate} {\em (cert, keytype, replace)} \\
+Certificate {\em *cert}; \\
+KeyType {\em keytype}; \\
+Boolean {\em replace};
+\hl{Parameter}
+\parname  {{\em cert}}
+\pardescript  {The certificate to be stored in the Directory. } 
+
+\parname  {{\em type}}
+\pardescript  {Type of certificate to be stored in the X.500 Directory: \\
+                    usercert: {\em userCertificate} \\
+                    cacert: {\em cACertificate}.} 
+
+\parname  {{\em keytype}}
+\pardescript  {Type of the certified key (.af-db Directory only): \\
+                    SIGNATURE: {\em signature key certificate} \\
+                    ENCRYPTION: {\em encryption key certificate}.} 
+
+\parname  {{\em replace}}
+\pardescript  {Flag which determines whether or not an already existing certificate of the same {\em keytype} shall be replaced in the .af-db Directory} 
+
+\parname  {{\em Return Value}}
+\pardescript {0 or -1.}
+\hl{Description}
+{\em af\_dir\_enter\_Certificate} enters the certificate {\em cert} into the X.500 Directory 
+entry associated with the certificate owner. The certificate {\em cert} is added as value
+to the {\em userCertificate} attribute or to the {\em cACertificate} attribute,
+depending on {\em type}.
+
+The caller of {\em af\_dir\_enter\_Certificate} must be the owner of the certificate 
+which is to be entered into the Directory; otherwise, the Directory access 
+control will refuse this operation.
+
+In case of the {\em userCertificate} attribute being addressed, the Directory entry
+associated with the certificate owner must belong to the object class
+{\em strongAuthenticationUser}; in the other case, it must belong to the
+object class {\em certificationAuthority}. Otherwise, an attribute error will be
+reported.
+
+The return value is 0 if the Directory entry succeeds.
+
+The return value is -1 for one of the following reasons:
+\bi
+\m the Directory service does not respond (ENODIR);
+\m the certificate owner's distinguished name does not identify a Directory object (ENAMEDIR);
+\m no attribute of the requested type ({\em userCertificate} or {\em cACertificate}) is found 
+in the entry, that is, the Directory entry associated with the certificate owner does not
+belong to the object class being required ({\em strongAuthenticationUser} or 
+{\em certificationAuthority}) (EATTRDIR);
+\m the certificate {\em cert} already exists in the Directory entry associated with 
+its owner (ECREATEOBJ);
+\m the Directory access control refuses this operation (EACCDIR).
+\ei
+{\em af\_afdb\_enter\_Certificate} enters the certificate {\em cert} into the local .af-db
+Directory 
+entry associated with the certificate owner. The certificate {\em cert} is added as file {\em SignCert}
+or {\em EncCert}, depending on {\em keytype}. If a certificate of the requested {\em keytype} already
+exists in the relevant .af-db Directory entry, it will not be replaced, unless {\em replace} is set to TRUE.
+If a single RSA key pair is used for both signature and encryption purposes, however, the certificate {\em cert} is added as
+file {\em Cert} to the local .af-db Directory entry associated with the certificate owner. If a certificate already
+exists in the relevant .af-db Directory entry, it will not be replaced, unless {\em replace} is set to TRUE.
+
+
+
+\subsubsection{af\_dir\_retrieve\_Certificate}
+\nm{3X}{af\_dir\_retrieve\_Certificate}{Retrieve Certificate from Directory}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+SET\_OF\_Certificate {\bf *af\_dir\_retrieve\_Certificate} {\em (dname, type)} \\
+DName {\em *dname}; \\
+CertificateType {\em type}; 
+
+SET\_OF\_Certificate {\bf *af\_afdb\_retrieve\_Certificate} {\em (dname, keytype)} \\
+DName {\em *dname}; \\
+KeyType {\em keytype};
+\hl{Parameter}
+\parname  {{\em dname}}
+\pardescript  {Distinguished name of certificate owner} 
+
+\parname  {{\em type}}
+\pardescript  {Type of certificate to be retrieved from the X.500 Directory: \\
+                    usercert: {\em userCertificate} \\
+                    cacert: {\em cACertificate}.} 
+
+\parname  {{\em keytype}}
+\pardescript  {Type of requested certified key (.af-db Directory only): \\
+                    SIGNATURE: {\em signature certificate} \\
+                    ENCRYPTION: {\em encryption certificate}.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {The set of certificates or NULL pointer.}
+\hl{Description}
+{\em af\_dir\_retrieve\_Certificate} returns a set of certificates stored in the 
+X.500 Directory entry identified by {\em dname}. The set of certificates comprises the
+value(s) of the {\em userCertificate} attribute or the {\em cACertificate} attribute,
+depending on {\em type}. \\
+In most cases, the set contains the certificate of the public signature key and the 
+certificate of the public encryption key. After this function having returned 
+its result, the calling process is in the position to select one certificate 
+by comparing the algorithm identifier of the subject public key info.
+
+The return value is the NULL pointer for one of the following reasons:
+\bi
+\m the Directory service does not respond (ENODIR);
+\m the parameter {\em dname} does not identify a Directory object (ENAMEDIR);
+\m no attribute of the requested type ({\em userCertificate} or {\em cACertificate})
+is found in the Directory entry, that is, the Directory entry identified by {\em dname} 
+does not belong to the object class being required ({\em strongAuthenticationUser} or  
+{\em certificationAuthority}) (EATTRDIR).
+\ei
+{\em af\_afdb\_retrieve\_Certificate} returns a set of certificates stored in the 
+local .af-db Directory entry identified by {\em dname}.
+The returned set of certificates comprises the certificate value stored as file {\em Cert}
+within the selected .af-db directory. If no such file exists
+in the selected .af-db directory, the set of certificates comprises either the
+value of the signature certificate or the value of the encryption certificate, 
+depending on {\em keytype}.
+
+
+
+\subsubsection{af\_dir\_delete\_Certificate}
+\nm{3X}{af\_dir\_delete\_Certificate}{Remove Certificate from Directory}
+\addtotoc{af\_afdb\_delete\_Certificate}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_dir\_delete\_Certificate} {\em (serial, issuer, type)} \\
+int {\em serial}; \\
+DName {\em *issuer}; \\
+CertificateType {\em type}; 
+
+RC {\bf af\_afdb\_delete\_Certificate} {\em (dname, keytype)} \\
+DName {\em *dname}; \\
+KeyType {\em keytype};
+\hl{Parameter}
+\parname  {{\em serial}}
+\pardescript  {Serial number of the certificate which is to be removed
+from the Directory.} 
+
+\parname  {{\em issuer}}
+\pardescript  {Issuer's distinguished name.} 
+
+\parname  {{\em type}}
+\pardescript  {Type of certificate to be removed from the X.500 Directory: \\
+                    usercert: {\em userCertificate} \\
+                    cacert: {\em cACertificate}.} 
+
+\parname  {{\em dname}}
+\pardescript  {Owner's distinguished name (.af-db Directory only).} 
+
+\parname  {{\em keytype}}
+\pardescript  {Type of certificate to be removed from the Directory (.af-db Directory only): \\
+                    SIGNATURE: {\em signature certificate} \\
+                    ENCRYPTION: {\em encryption certificate}.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+{\em af\_dir\_delete\_Certificate} removes the certificate which is universally 
+identified by its serial number {\em serial} and its issuer {\em issuer} from the 
+caller's X.500 Directory entry. The caller's distinguished name is derived from
+the global variable {\em bind\_dname} which is used to authenticate the caller to the
+Directory System Agent (DSA) initially contacted.
+The specified certificate is removed as value from the
+{\em userCertificate} attribute or the {\em cACertificate} attribute, depending
+on {\em type}.
+If the serial number of the certificate which is to be removed from the Directory 
+is unique among the serial numbers of all certificates stored in the requested attribute, 
+it is sufficient to identify the obsolete certificate by its serial number, that is, 
+the issuer's distinguished name may be omitted.
+
+The caller of {\em af\_dir\_delete\_Certificate} must be the owner of the certificate
+which is to be removed from the Directory; otherwise, the Directory access control
+will refuse this operation.
+
+The return value is 0 if the Directory entry succeeds.
+
+The return value is -1 for one of the following reasons:
+\bi
+\m the Directory service does not respond (ENODIR);
+\m the caller's distinguished name does not identify a Directory object (ENAMEDIR);
+\m no attribute of the requested type ({\em userCertificate} or {\em cACertificate})
+is found in the Directory entry associated with the caller, that is, the Directory entry
+associated with the caller does not belong to the object class being required
+({\em strongAuthenticationUser} or {\em certificationAuthority}) (EATTRDIR);
+\m the specified certificate does not exist in the Directory entry 
+identified by the caller's distinguished name (EOBJ);
+\m the Directory access control refuses this operation (EACCDIR).
+\ei
+{\em af\_afdb\_delete\_Certificate} removes the certificate which is
+identified by {\em keytype} from the 
+local .af-db Directory entry of {\em dname}. If a single RSA key pair is used for both signature and encryption purposes, however,
+{\em keytype} will not be evaluated. In this case, the certificate stored as file {\em Cert} within the
+local .af-db Directory entry of {\em dname} is removed.
+
+
+
+\subsubsection{af\_dir\_enter\_CertificatePair}
+\nm{3X}{af\_dir\_enter\_CertificatePair}{Enter Pair of Cross Certificates into Directory}
+\addtotoc{af\_afdb\_enter\_CertificatePair}
+\hl{Synopsis}
+\#include $<$af.h$>$ 
+
+RC {\bf af\_dir\_enter\_CertificatePair} {\em (cpair, dname)} \\
+CertificatePair {\em *cpair};
+DName {\em *dname};
+
+RC {\bf af\_afdb\_enter\_CertificatePair} {\em (cpair, dname)} \\
+CertificatePair {\em *cpair}; \\ 
+DName {\em *dname};
+\hl{Parameter}
+\parname  {{\em dname}}
+\pardescript  {Distinguished name of the certification authority which wants to store
+the cross certificate pair in its Directory entry.} 
+
+\parname  {{\em cpair}}
+\pardescript  {The cross certificate pair to be stored in the Directory. } 
+
+\parname  {{\em Return Value}}
+\pardescript {0 or -1.}
+\hl{Description}
+{\em af\_dir\_enter\_CertificatePair} enters the cross certificate pair {\em cpair} 
+into the X.500 Directory entry identified by {\em dname}. At least one of the two components 
+(forward or reverse certificate) of the cross certificate pair must be present.
+
+An attribute of type {\em crossCertificatePair} is optional within a Directory entry
+belonging to the object class {\em certificationAuthority}. If the Directory entry of
+the certification authority identified by {\em dname} already contains an attribute of
+type {\em crossCertificatePair}, the certificate pair {\em cpair} is added as value
+to that attribute; otherwise, an attribute of type {\em crossCertificatePair} will be
+created in the Directory entry, its value being specified by {\em cpair}.
+
+The caller of {\em af\_dir\_enter\_CertificatePair} must correspond to the Directory
+object identified by {\em dname}; otherwise, the Directory access control will refuse 
+this operation.
+
+The Directory entry identified by {\em dname} must belong to the object class
+{\em certificationAuthority}; otherwise, an attribute error will be reported.
+
+The return value is 0 if the Directory entry succeeds.
+
+The return value is -1 for one of the following reasons:
+\bi
+\m the Directory service does not respond (ENODIR);
+\m the parameter {\em dname} does not identify a Directory object (ENAMEDIR);
+\m the Directory entry identified by {\em dname} does not belong to the object class
+{\em certificationAuthority} (EOBJCLASS);
+\m the Directory access control refuses this operation (EACCDIR).
+\ei
+{\em af\_afdb\_enter\_CertificatePair} enters the cross certificate pair {\em cpair} 
+into the local .af-db Directory entry identified by {\em dname}. At least one of the two components 
+(forward or reverse certificate) of the cross certificate pair must be present.
+
+
+
+\subsubsection{af\_dir\_retrieve\_CertificatePair}
+\nm{3X}{af\_dir\_retrieve\_CertificatePair}{Retrieve Pair of Cross Certificates from Directory}
+\addtotoc{af\_afdb\_retrieve\_CertificatePair}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$ 
+
+SET\_OF\_CertificatePair {\bf *af\_dir\_retrieve\_CertificatePair} {\em (dname)} \\
+DName {\em *dname};
+
+SET\_OF\_CertificatePair {\bf *af\_afdb\_retrieve\_CertificatePair} {\em (dname)} \\
+DName {\em *dname};
+\hl{Parameter}
+\parname  {{\em dname}}
+\pardescript  {Distinguished name of certification authority which is the owner of the requested
+cross certificate pairs} 
+
+\parname  {{\em Return Value}}
+\pardescript  {The set of cross certificate pairs or NULL pointer.}
+\hl{Description}
+{\em af\_dir\_retrieve\_CertificatePair} returns the set of cross certificate pairs 
+stored in the X.500 Directory entry identified by {\em dname}. The set of cross certificate pairs 
+comprises the value(s) of the (multi-valued) {\em crossCertificatePair} attribute. \\
+Each cross certificate pair is composed of one forward certificate and one reverse certificate;
+at least one of the two components must be present in a cross certificate pair.
+
+The return value is the NULL pointer for one of the following reasons:
+\bi
+\m the Directory service does not respond (ENODIR);
+\m the parameter {\em dname} does not identify a Directory object (ENAMEDIR);
+\m no attribute of type {\em crossCertificatePair} is found in the Directory entry
+identified by {\em dname} (EATTRDIR).
+\ei
+{\em af\_afdb\_retrieve\_CertificatePair} returns the set of cross certificate pairs 
+stored in the local .af-db Directory entry identified by {\em dname}. 
+The set of cross certificate pairs 
+comprises the value of the CrossCertificatePair entry. \\
+Each cross certificate pair is composed of one forward certificate and one reverse certificate;
+at least one of the two components must be present in a cross certificate pair.
+
+
+
+\subsubsection{af\_dir\_delete\_CertificatePair}
+\nm{3X}{af\_dir\_delete\_CertificatePair}{Remove Certificate Pair from Directory}
+\addtotoc{af\_afdb\_delete\_CertificatePair}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$
+
+RC {\bf af\_dir\_delete\_CertificatePair} {\em (cpair)} \\
+CertificatePair {\em *cpair};
+
+RC {\bf af\_afdb\_delete\_CertificatePair} {\em (dname, cpair)} \\
+DName {\em *dname}; \\
+CertificatePair {\em *cpair};
+\hl{Parameter}
+\parname  {{\em cpair}}
+\pardescript  {The cross certificate pair which is to be removed from the Directory.} 
+
+\parname  {{\em dname}}
+\pardescript  {DName of the owner of the Directory entry (.af-db Directory only).} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+{\em af\_dir\_delete\_CertificatePair} removes the cross certificate pair {\em cpair} 
+as value from the {\em crossCertificatePair} attribute within the caller's Directory 
+entry. The caller's distinguished name is derived from
+the global variable {\em bind\_dname} which is used to authenticate the caller to the
+Directory System Agent (DSA) initially contacted. At least one of the two components 
+(forward or reverse certificate) of the cross 
+certificate pair must be present. Each component is identified by its serial number
+and its issuer.
+
+The caller of {\em af\_dir\_delete\_CertificatePair} must be the owner of the Directory
+entry from where the cross certificate pair {\em cpair} is to be removed; otherwise, the 
+Directory access control will refuse this operation.
+
+If {\em cpair} is the only value of the {\em crossCertificatePair} attribute, the 
+{\em crossCertificatePair} attribute will be removed from the Directory entry.
+
+The return value is 0 if the Directory entry succeeds.
+
+The return value is -1 for one of the following reasons:
+\bi
+\m the Directory service does not respond (ENODIR);
+\m the caller's distinguished name does not identify a Directory object (ENAMEDIR);
+\m no attribute of type {\em crossCertificatePair} is found in the Directory entry 
+associated with the caller (EATTRDIR);
+\m the specified cross certificate pair does not exist in the Directory entry 
+identified by the caller's distinguished name (EOBJ);
+\m the Directory access control refuses this operation (EACCDIR).
+\ei
+{\em af\_afdb\_delete\_CertificatePair} removes the cross certificate pair {\em cpair} 
+from the local .af-db Directory entry identified by {\em dname}. At least one of the two components 
+(forward or reverse certificate) of the cross certificate pair must be present.
+
+
+
+\subsubsection{af\_dir\_enter\_PemCrl}
+\nm{3X}{af\_dir\_enter\_PemCrl}{Enter PEM Revocation List into Directory}
+\addtotoc{af\_afdb\_enter\_PemCrl}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$
+
+RC {\bf af\_dir\_enter\_PemCrl} {\em (pemcrl)} \\
+PemCrl {\em *pemcrl};
+
+RC {\bf af\_afdb\_enter\_PemCrl} {\em (pemcrl)} \\
+PemCrl {\em *pemcrl};
+\hl{Parameter}
+\parname  {{\em pemcrl}}
+\pardescript  {Pointer to a revocation list with PEM syntax which is to replace the existing 
+attribute value.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1.}
+\hl{Description}
+{\em af\_dir\_enter\_PemCrl} enters the revocation list {\em pemcrl} into 
+the Directory entry associated with the issuer of that revocation list.
+The format of the revocation list is that defined by PEM (see RFC 1422).
+
+The caller of {\em af\_dir\_enter\_PemCrl} must be the issuer of the revocation list
+{\em pemcrl}; otherwise, the Directory access control will 
+refuse this operation.
+
+The caller of {\em af\_dir\_enter\_PemCrl} must belong to the object class 
+{\em certificationAuthority}.
+
+The return value is 0 if the Directory entry succeeds.
+
+The return value is -1 for one of the following reasons:
+\bi
+\m the Directory service does not respond (ENODIR);
+\m the distinguished name of the issuer of the revocation list does not identify a Directory 
+object (ENAMEDIR);
+\m the Directory entry associated with the issuer of {\em pemcrl} does not belong to the
+object class {\em certificationAuthority} (EATTRDIR);
+\m the Directory access control refuses this operation (EACCDIR).
+\ei
+{\em af\_afdb\_enter\_PemCrl} enters the revocation list {\em pemcrl} 
+into the local .af-db Directory entry associated with the issuer of {\em pemcrl}.
+
+
+
+\subsubsection{af\_dir\_retrieve\_PemCrl}
+\nm{3X}{af\_dir\_retrieve\_PemCrl}{Retrieve PEM Revocation List from Directory}
+\addtotoc{af\_afdb\_retrieve\_PemCrl}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$
+
+PemCrl {\bf *af\_dir\_retrieve\_PemCrl} {\em (dname)} \\
+DName {\em *dname};
+
+PemCrl {\bf *af\_afdb\_retrieve\_PemCrl} {\em (dname)} \\
+DName {\em *dname};
+\hl{Parameter}
+\parname  {{\em dname}}
+\pardescript  {Distinguished name of the certification authority which is the issuer of 
+the requested revocation list.} 
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of a PEM revocation list or NULL pointer.}
+\hl{Description}
+{\em af\_dir\_retrieve\_PemCrl} reads the attribute of type {\em pemCRL} from the Directory entry 
+identified by {\em dname}, and interprets its value as a revocation list whose underlying
+syntax is that defined by PEM (see RFC 1422).
+{\em af\_dir\_retrieve\_PemCrl} returns the address of that revocation list.
+
+The return value is the NULL pointer for one of the following resons:
+\bi
+\m the Directory service does not respond (ENODIR);
+\m the parameter {\em dname} does not identify a Directory object (ENAMEDIR);
+\m no attribute of type {\em pemCRL} is found in the Directory entry, that is, the 
+Directory entry identified by {\em dname} does not belong to 
+the object class {\em certificationAuthority} (EATTRDIR).
+\ei
+{\em af\_afdb\_retrieve\_PemCrl} returns the revocation list 
+stored in the local .af-db Directory entry identified by {\em dname}.
+
+
+
+\subsubsection{af\_cadb\_add\_user}
+\nm{3X}{af\_cadb\_add\_user}{Add User to CA Database}
+\label{af_cadb_add_user}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$
+
+RC {\bf af\_cadb\_add\_user} {\em (name, cadir)} \\
+Name {\em *name}; \\
+char {\em *cadir};
+\hl{Parameter}
+\parname  {{\em name}}
+\pardescript  {Name of the user who is to be stored in the CA database} 
+
+\parname  {{\em cadir}}
+\pardescript  {Name of the CA directory, where the CA database resides}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+af\_cadb\_add\_user inserts the name {\em name} as new entry into the calling CA's {\em user} 
+database which resides in the CA directory {\em cadir}.
+
+A  zero return indicates no error.
+A -1 return indicates an error.
+
+
+
+\subsubsection{af\_cadb\_get\_user}
+\nm{3X}{af\_cadb\_get\_user}{Get all Certificates issued to a User}
+\label{af_cadb_get_user}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+SET\_OF\_IssuedCertificate *{\bf af\_cadb\_get\_user} {\em (name, cadir)} \\
+Name {\em *name}; \\
+char {\em *cadir};
+\hl{Parameter}
+\parname  {{\em name}}
+\pardescript  {Name of the user whose certificates are requested} 
+
+\parname  {{\em cadir}}
+\pardescript  {Name of the CA directory, where the CA database resides}
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of a Set of Issued Certificates or NULL pointer}
+\hl{Description}
+af\_cadb\_get\_user returns the address of a set whose elements represent the certificates 
+which have been issued to the user identified by {\em name}. Each member of the set identifies
+a certificate by its serial number and indicates the certificate's date of issue.
+
+A NULL pointer return indicates
+\bi
+\m that there is no entry with key {\em name} stored in the CA's {\em user} database.
+\m an error.
+\ei
+
+
+
+\subsubsection{af\_cadb\_add\_Certificate}
+\nm{3X}{af\_cadb\_add\_Certificate}{Add Certificate to CA Database}
+\label{af_cadb_add_Certificate}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_cadb\_add\_Certificate} {\em (keytype, newcert, cadir)} \\
+KeyType     {\em keytype}; \\
+Certificate {\em *newcert}; \\
+char	    {\em *cadir};
+\hl{Parameter}
+\parname  {{\em keytype}}
+\pardescript  {Type of the certificate: \\
+                    SIGNATURE: user certificate of the signature key \\
+                    ENCRYPTION: user certificate of the encryption key} 
+
+\parname  {{\em newcert}}
+\pardescript  {Certificate which is to be inserted into the CA database}
+
+\parname  {{\em cadir}}
+\pardescript  {Name of the CA directory, where the CA database resides} 
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+af\_cadb\_add\_Certificate inserts the certificate identified by {\em newcert} into the 
+calling CA's database which resides in the CA directory {\em cadir}. 
+
+The certificate identified by {\em newcert} is first inserted into the CA's {\em cert} database;
+the key under which the certificate is placed is derived from the certificate's serial number.
+
+It is then added to the set of certificates placed in the CA's {\em user} database under the key
+which is derived from the name of the certificate owner.
+
+A zero return indicates no error.
+A -1 return indicates an error.
+
+
+
+\subsubsection{af\_cadb\_get\_Certificate}
+\nm{3X}{af\_cadb\_get\_Certificate}{Get Certificate from CA Database}
+\label{af_cadb_get_Certificate}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+Certificate *{\bf af\_cadb\_get\_Certificate} {\em (serial, cadir)} \\
+int  {\em serial}; \\
+char {\em *cadir};
+\hl{Parameter}
+\parname  {{\em serial}}
+\pardescript  {Serial number of requested certificate} 
+
+\parname  {{\em cadir}}
+\pardescript  {Name of the CA directory, where the CA database resides}
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of a Certificate or NULL pointer}
+\hl{Description}
+af\_cadb\_get\_Certificate accesses the calling CA's {\em cert} database and returns the address of 
+the certificate identified by serial number {\em serial}. 
+
+A NULL pointer return indicates
+\bi
+\m that the requested certificate is not found in the CA's {\em cert} database.
+\m an error.
+\ei
+
+
+
+\subsubsection{af\_cadb\_list\_user}
+\nm{3X}{af\_cadb\_list\_user}{Get Names of all Certified Users}
+\label{af_cadb_list_user}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+SET\_OF\_Name *{\bf af\_cadb\_list\_user} {\em (cadir)} \\
+char {\em *cadir};
+\hl{Parameter}
+\parname  {{\em cadir}}
+\pardescript  {Name of the CA directory, where the CA database resides} 
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of a Set of Names or NULL pointer}
+\hl{Description}
+af\_cadb\_list\_user traverses the calling CA's {\em user} database and returns all keys
+stored there. Each key represents the name of a user who has been certified by the
+calling CA.
+
+A NULL pointer return indicates
+\bi
+\m that the CA's {\em user} database is empty.
+\m an error.
+\ei
+
+
+
+
+\subsubsection{af\_cadb\_add\_PemCrlWithCerts}
+\nm{3X}{af\_cadb\_add\_PemCrlWithCerts}{Add Revocation List to CA Database}
+\label{af_cadb_add_PemCrlWithCerts}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+RC {\bf af\_cadb\_add\_PemCrlWithCerts} {\em (pemcrlwithcerts, cadir)} \\
+PemCrlWithCerts	{\em *pemcrlwithcerts}; \\
+char		{\em *cadir};
+\hl{Parameter}
+\parname  {{\em pemcrlwithcerts}}
+\pardescript  {Revocation list with accompanying originator certificate} 
+
+\parname  {{\em cadir}}
+\pardescript  {Name of the CA directory, where the CA database resides}
+
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+af\_cadb\_add\_PemCrlWithCerts inserts the revocation list with accompanying originator certificate
+(identified by {\em pemcrlwithcerts}) into the calling CA's {\em pemcrl} database. 
+
+The key under which the revocation list and accompanying originator certificate are placed is derived 
+from the name of the issuer of the revocation list.
+
+af\_cadb\_add\_PemCrlWithCerts replaces an existing entry if it has the same key.
+
+This routine supports the CRL-storage request mechanism defined by PEM (RFC 1424).
+
+A  zero return indicates no error.
+A -1 return indicates an error.
+
+
+
+
+\subsubsection{af\_cadb\_list\_PemCrlWithCerts}
+\nm{3X}{af\_cadb\_list\_PemCrlWithCerts}{Get all Revocation Lists from CA Database}
+\label{af_cadb_list_PemCrlWithCerts}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+SET\_OF\_PemCrlWithCerts *{\bf af\_cadb\_list\_PemCrlWithCerts} {\em (cadir)} \\
+char	{\em *cadir};
+\hl{Parameter}
+\parname  {{\em cadir}}
+\pardescript  {Name of the CA directory, where the CA database resides} 
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of a Set of Revocation Lists or NULL pointer.}
+\hl{Description}
+af\_cadb\_list\_PemCrlWithCerts traverses the calling CA's {\em pemcrl} database and returns all data
+stored there. Each datum represents the revocation list of a known CA and is accompanied by
+the originator certificate of that CA.
+
+This routine supports the CRL-retrieval reply mechanism defined by PEM (RFC 1424).
+
+A NULL pointer return indicates
+\bi
+\m that the CA's {\em pemcrl} database is empty.
+\m an error.
+\ei
+
+
+
+
+\subsubsection{af\_cadb\_get\_PemCrlWithCerts}
+\nm{3X}{af\_cadb\_get\_PemCrlWithCerts}{Get Revocation List from CA Database}
+\label{af_cadb_get_PemCrlWithCerts}
+\hl{Synopsis}
+\#include $<$af.h$>$
+
+PemCrlWithCerts *{\bf af\_cadb\_get\_PemCrlWithCerts} {\em (name, cadir)} \\
+Name	{\em *name}; \\
+char	{\em *cadir};
+\hl{Parameter}
+\parname  {{\em name}}
+\pardescript  {Name of the issuer of a required revocation list} 
+
+\parname  {{\em cadir}}
+\pardescript  {Name of the CA directory, where the CA database resides}
+
+\parname  {{\em Return Value}}
+\pardescript  {Address of a Revocation List or NULL pointer.}
+\hl{Description}
+af\_cadb\_get\_PemCrlWithCerts accesses the calling CA's {\em pemcrl} database and returns the 
+address of the revocation list issued by the CA with name {\em name}. The requested revocation list
+is accompanied by its issuer's originator certificate.
+
+This routine supports the CRL-retrieval reply mechanism defined by PEM (RFC 1424).
+
+A NULL pointer return indicates
+\bi
+\m that the requested revocation list is not found in the CA's {\em pemcrl} database.
+\m an error.
+\ei
+
+
+\subsection{ASN.1 Encoding and Decoding Functions}
+\nm{3X}{e\_AF}{ASN.1 Encoding and decoding functions for AF-IF}
+\label{Encoding-/Decoding-Routinen}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$ 
+
+OctetString *{\bf e\_DName} {\em (name)} \\
+DName *{\em name};
+
+DName *{\bf d\_DName} {\em (octetstring)} \\
+OctetString *{\em octetstring};
+
+OctetString *{\bf e\_Certificate} {\em (certificate)} \\
+Certificate *{\em certificate};
+
+Certificate *{\bf d\_Certificate} {\em (octetstring)} \\
+OctetString *{\em octetstring};
+
+OctetString *{\bf e\_CertificateSet} {\em (certificateset)} \\
+SET\_OF\_Certificate *{\em certificateset};
+
+SET\_OF\_Certificate *{\bf d\_CertificateSet} {\em (octetstring)} \\
+OctetString *{\em octetstring};
+
+OctetString *{\bf e\_CertificatePairSet} {\em (cpairset)} \\
+SET\_OF\_CertificatePair *{\em cpairset};
+
+SET\_OF\_CertificatePair *{\bf d\_CertificatePairSet} {\em (octetstring)} \\
+OctetString *{\em octetstring};
+
+OctetString *{\bf e\_ToBeSigned} {\em (tobesigned)} \\
+ToBeSigned *{\em tobesigned};
+
+OctetString *{\bf e\_FCPath} {\em (fcpath)} \\
+FCPath *{\em fcpath};
+
+FCPath *{\bf d\_FCPath} {\em (octetstring)} \\
+OctetString *{\em octetstring};
+
+OctetString *{\bf e\_SerialNumbers} {\em (serialnums)} \\
+SerialNumbers *{\em serialnums};
+
+SerialNumbers *{\bf d\_SerialNumbers} {\em (octetstring)} \\
+OctetString *{\em octetstring};
+
+OctetString *{\bf e\_Certificates} {\em (certificates)} \\
+Certificates *{\em certificates};
+
+Certificates *{\bf d\_Certificates} {\em (octetstring)} \\
+OctetString *{\em octetstring};
+
+OctetString *{\bf e\_PKRoot} {\em (pkroot)} \\
+PKRoot *{\em pkroot};
+
+PKRoot *{\bf d\_PKRoot} {\em (octetstring)} \\
+OctetString *{\em octetstring};
+
+OctetString *{\bf e\_PKList} {\em (pklist)} \\
+PKList *{\em pklist};
+
+PKList *{\bf d\_PKList} {\em (octetstring)} \\
+OctetString *{\em octetstring};
+
+OctetString *{\bf e\_Attribute} {\em (attr)} \\
+Attribute *{\em attr};
+
+Attribute *{\bf d\_Attribute} {\em (octetstring)} \\
+OctetString *{\bf octetstring};
+
+OctetString *{\bf e\_PemCrl} {\em (pemcrl)} \\
+PemCrl *{\em pemcrl};
+
+PemCrl *{\bf d\_PemCrl} {\em (octetstring)} \\
+OctetString *{\bf octetstring};
+
+OctetString *{\bf e\_RevCertPem} {\em (revcertpem)} \\
+RevCertPem *{\em revcertpem};
+
+RevCertPem *{\bf d\_RevCertPem} {\em (octetstring)} \\
+OctetString *{\bf octetstring};
+
+OctetString *{\bf e\_CrlTBS} {\em (rcltbs)} \\
+CrlTBS *{\em rcltbs};
+
+OctetString *{\bf e\_SET\_OF\_IssuedCertificate} {\em (isscertset)} \\
+SET\_OF\_IssuedCertificate  *{\em isscertset};
+
+SET\_OF\_IssuedCertificate  *{\bf d\_SET\_OF\_IssuedCertificate} {\em (octetstring)}
+OctetString *{\em octetstring};
+\hl{Description}     
+The functions e\_* (Encode) transform the given structure into an OctetString
+and return its address. Memory of the entire structure is provided 
+by the called program and can be released
+by aux\_free\_OctetString().
+
+The functions d\_* (Decode) transform the given OctetString into the indicated structure and return
+a pointer to that structure. Memory of the entire structure is provided 
+by the called program and can be released by the respective aux\_free* function (see~\ref{aux_free}).
+
+OctetString consists of the ASN.1 encoding of the corresponding ASN.1 description of the C-structure
+(see AF-PSE-OBJECTS(4) and AF-DIR-OBJECTS(4)).
+
+\subsection{PSE Objects}
+\nm{4}{AF-PSE-objects}{PSE objects of the AF-interface}
+\label{af-sw-cc}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$
+
+\hl{Description}
+     
+This section lists PSE objects needed by the af\_* functions. 
+Each object is presented both in terms
+of C-language structures as they are needed by the interface subroutines and
+by the application programmer, and in terms of corresponding ASN.1 structures
+which are needed as references for the bit coding of the object.
+ 
+Each AF PSE object is wrapped in the following ASN.1 structure:
+{\small
+\bvtab
+\2 PSEObject ::= \3 {\bf SEQUENCE} \{ \\
+\7 objectType \3 OBJECT IDENTIFIER, \\
+\7 objectValue \3 ANY DEFINED BY objectType \\
+\5 \}
+\evtab
+}
+The following object identifiers are used:
+\bc
+\begin{tabular}{|l|l|l|} \hline
+{\bf Object Name} & {\bf Object Identifier} & {\bf Content} \\ \hline
+SignCert       & \{ 1 3 36 2 1 1 \} & certificate of public verification key      \\
+EncCert        & \{ 1 3 36 2 1 2 \} & certificate of public encryption key        \\
+Cert           & \{ 1 3 36 2 1 3 \} & certificate of public key                    \\
+SignCSet       & \{ 1 3 36 2 2 1 \} & cross-certificates of public verification key \\
+EncCSet        & \{ 1 3 36 2 2 2 \} & cross-certificates of public encryption key   \\
+CSet           & \{ 1 3 36 2 2 3 \} & cross-certificates of public key            \\
+CrossCSet      & \{ 1 3 36 2 8 1 \} & cross certificate pairs		     \\
+SignSK         & \{ 1 3 36 2 3 1 \} & secret signature key                        \\
+DecSKnew       & \{ 1 3 36 2 3 2 \} & secret decryption key (current)             \\
+DecSKold       & \{ 1 3 36 2 3 3 \} & secret decryption key (old)                 \\
+SKnew          & \{ 1 3 36 2 3 4 \} & secret key (current)                        \\
+SKold          & \{ 1 3 36 2 3 5 \} & secret key (old)                            \\
+FCPath         & \{ 1 3 36 2 4 1 \} & forward certification path                  \\
+PKRoot         & \{ 1 3 36 2 5 1 \} & top level public verification key           \\
+PKList         & \{ 1 3 36 2 6 1 \} & list of trusted public verification keys    \\
+EKList         & \{ 1 3 36 2 6 2 \} & list of trusted public encryption keys      \\
+CrlSet         & \{ 1 3 36 2 9 1 \} & list of revocation lists         \\
+SerialNumbers  & \{ 1 3 36 2 10 1 \} & current serial number (CA only)         \\
+EDBKey         & \{ 1 3 36 2 11 1 \} & DSA database encryption key        \\
+AliasList      & \{ 1 3 36 2 12 1 \} & user's alias list         \\
+QuipuPWD       & \{ 1 3 36 2 13 1 \} & password for X.500 directory access         \\
+Name           & \{ 1 3 36 2 7 1 \}  & owner's distinguished name                      \\ \hline
+\end{tabular}
+\ec
+The AF PSE objects {\em Cert}, {\em CSet}, {\em SKnew}, and {\em SKold} are used in case
+of a PSE which is restricted to hold a single RSA key pair for both signature and encryption purposes.
+In this case, there are no objects {\em SignCert}, {\em EncCert}, {\em SignCSet}, {\em EncCSet}, {\em SignSK},
+{\em DecSKnew}, and {\em DecSKold} installed on the PSE. \\ [1em]
+The object identifier of each object is given in the table above.
+
+The structure of objectValue of each object is given in the sections below.
+The whole objects (i.e. the DER-code of PSEObject) can be read/written from/to
+the PSE using the functions sec\_read() and sec\_write(). The DER-code
+of objectValue can be read/written from/to the PSE using the functions
+sec\_read\_PSE() and sec\_write\_PSE().
+The transformation between the C-representation and the DER oriented bit coding
+is provided by the respective encoding/decoding functions e\_*(3X). 
+
+\subsubsection{Name}
+\hll{Name}
+Owner's distinguished name \\
+\underline{C-Structure of the object:} DName
+
+{\small
+\bvtab
+\2 typedef struct DName DName;                  \\
+\2 typedef struct RDName RDName;                \\
+\2 typedef struct AVA AVA;                      \\
+\2 struct DName \{                              \\
+\4        RDName       \3 *element\_IF\_2;      \\
+\4        DName        \3 *next;                \\
+\2 \}                                           \\ [1em]
+\2 struct RDName \{                             \\
+\4        AVA          \3 *member\_IF\_0;       \\
+\4        RDName       \3 *next;                \\
+\2 \};                                          \\ [1em]
+\2 struct AVA \{                                \\ 
+\4        ObjId  \3 *element\_IF\_0;            \\
+\4        PElement     \3 *element\_IF\_1;      \\
+\2 \};                                          \\
+\evtab
+}
+
+\underline{ASN.1-Structure of objectValue:}
+
+{\small
+\begin {center}
+\begin {tabular}{ll}
+Name & ::= DistinguishedName    \\
+DistinguishedName & ::= RDNSequence              \\
+RDNSequence  & ::= {\bf SEQUENCE OF} RelativeDistinguishedName \\
+ & \\
+RelativeDistinguishedName & ::= {\bf SET OF} AttributeValueAssertion \\
+ & \\
+AttributeValueAssertion   &
+   ::= {\bf SEQUENCE} \{ AttributeType, AttributeValue \} \\
+ & \\
+AttributeType  &  ::= {\bf OBJECT IDENTIFIER} \\
+AttributeValue &  ::= {\bf ANY} -- -- defined by AttributeType
+\end {tabular}
+\end {center}
+}
+The X.500 recommendations on the directory specify
+distinguished names for the purpose of unique identification of the directory objects
+(X.501, Directory Information Model).
+For example, distinguished names are assigned to human users.
+Also, issuer and subject of a certificate are identified by their distinguished names.
+The format of distinguished names is defined in
+X.501, Annex C.
+The directory attribute {\em DistinguishedName} is a sequence of {\em Relative DistinguishedName}
+which in turn is a set of attributeType/attributeValue pairs.
+Within SecuDe
+only a limited set of attribute types is used to construct relative distinguished names,
+these are:
+countryName, organizationalName, organizationalUnitName, commonName, surname,
+title, serialNumber, localityName, streetAddress, and businessCategory.
+All other attribute types would be ignored. SecuDE uses the X.520 defined object identifiers
+for the identification of attribute types.
+
+The corresponding C structure {\em DName} uses the ISODE defined presentation element
+PElement to carry the attribute value. 
+\\ [1em]
+Encoding/Decoding: e\_DName(), d\_DName(),
+
+which transform between the C-structure {\em DName} and the ASN.1 DER code.
+There are other name transformation functions which transform between
+the printable representation {\em Name} and the C-structure {\em DName}: \\
+aux\_Name2DName(), aux\_DName2Name() (see AUX\_NAME(3X)).
+
+\subsubsection{SignSK}
+\hll{SKnew, SKold, DecSKnew, DecSKold, SignSK}
+Secret component of asymmetric key pair.
+
+\underline{C-Structure of the object:} KeyInfo
+{\small
+\bvtab
+\4      typedef struct KeyInfo \{ \\
+\6              AlgId        \3 *subjectAI; \\
+\6              BitString    \3 subjectkey; \\
+\4      \} KeyInfo; \\ \\ \\
+with: \\ \\
+\4      typedef struct AlgId \{  \\
+\6              ObjId  \3 *objid; \\
+\6              char         \3 *parm; \\
+\4      \} AlgId; \\ \\ \\
+\4      typedef struct ObjId \{  \\
+\6              int          \3 oid\_nelem; \\
+\6              unsigned int \3 *oid\_elements; \\
+\4      \} ObjId;  \\  \\ \\
+\4      typedef struct BitString \{  \\
+\6              unsigned int \3 nbits; \\
+\6              char         \3 *bits; \\
+\4      \} BitString;  \\
+\evtab
+}
+
+\underline{ASN.1-Structure of objectValue:}
+{\small
+\bvtab
+\4 SubjectPrivateKeyInfo
+\evtab
+}
+
+{\em SubjectPrivateKeyInfo} is defined to have the same format as
+{\em SubjectPublicKeyInfo}, cf. X.509, Annex G.
+However, note the substructure of the private key BIT STRING.
+
+{\small
+\bvtab
+\1 SubjectPrivateKeyInfo ::= \5 {\bf SEQUENCE} \{  \\
+\7 algorithm         \2 AlgorithmIdentifier,    \\
+\7 subjectPrivateKey BitString            \\
+\7 -- -- \\
+\7 -- -- the BitString of subjectPrivateKey   \\
+\7 -- -- contains the ASN.1 encoding of a sequence of \\
+\7 -- -- the factors p and q of the RSA-modulus n:   \\
+\7 -- -- \\
+\7 -- -- SEQUENCE \{ \\
+\7 -- -- \2       p INTEGER,   \\
+\7 -- -- \2       q INTEGER  \\
+\7 -- -- \} \\
+\6 \} \\
+\evtab
+\bvtab
+\1 AlgorithmIdentifier ::= \5 {\bf SEQUENCE} \{    \\
+\7 algorithm  \3 OBJECT IDENTIFIER, \\
+\7 parameters \3 ANY DEFINED BY algorithm  \\
+\6 \}
+\evtab
+}
+
+Encoding/Decoding: e\_KeyInfo(), d\_KeyInfo() \\
+Used by: af\_sign()
+
+
+\subsubsection{Cert}
+\hll{Cert, SignCert, EncCert}
+X.509 Public key certificate (which is a User Certificate or a CA Certificate) 
+
+\underline{C-Structure of the object:}
+
+{\small
+\bvtab
+\4      typedef struct Certificate \{  \\
+\6              OctetString   \4 *tbs\_DERcode; \\
+\6              ToBeSigned    \4 *tbs; \\
+\6              Signature     \4 *sig; \\
+\4      \} Certificate;  \\ \\ \\
+with: \\ \\
+\4      typedef struct Signature \{  \\
+\6              AlgId         \3 *signAI; \\
+\6              BitString     \3 signature; \\
+\4 \}           Signature;  \\ \\ \\
+\4      typedef struct ToBeSigned \{ \\
+\6              int           \3 version; \\
+\6              int           \3 serialnumber; \\
+\6              AlgId         \3 *signatureAI; \\
+\6              DName          \3 *issuer; \\
+\6              UTCTime       \3 *notbefore; \\
+\6              UTCTime       \3 *notafter; \\
+\6              DName          \3 *subject; \\
+\6              KeyInfo       \3 *subjectPK; \\
+\4      \} ToBeSigned;  \\ \\ \\
+\4      typedef struct KeyInfo \{  \\
+\6              AlgId         \3 *subjectAI; \\
+\6              BitString     \3 subjectkey; \\
+\4      \} KeyInfo; \\ \\ \\
+\4      typedef struct OctetString \{ \\
+\6              unsigned int  \3 noctets; \\
+\6              char          \3 *octets; \\
+\4      \} OctetString;  \\ \\ \\
+\4      typedef char UTCTime;
+\evtab
+}
+and AlgId, BitString as in SKnew.
+
+\underline{ASN.1-Structure of objectValue:}
+{\small
+\bvtab
+\1 Cert ::=    \3 Certificate \\ \\
+\1 Certificate ::= \3 {\bf SIGNED SEQUENCE} \{  \\
+\5 version [0]          \5 INTEGER DEFAULT 0,          \\
+\5 serialNumber         \5 INTEGER,                    \\
+\5 signature            \5 AlgorithmIdentifier,        \\
+\5 issuer               \5 Name,                       \\
+\5 validity             \5 Validity,                   \\
+\5 subject              \5 Name,                       \\
+\5 subjectPublicKeyInfo \5 SubjectPublicKeyInfo     \\
+\4 \}
+\evtab
+}
+ 
+{\em Certificate} is defined by X.509, Annex G.
+{\em Algorithm\-Identifier} is defined in X.509, Annex G,
+as a SEQUENCE of an Object Identifier and a parameters type
+which depends on the algorithm.
+{\em Name} is defined in X.501, Annex C,
+as a SEQUENCE of Relative Distinguished Names,
+which are sets of Attribute-Value-Assertions.
+{\em Validity} is defined in X.509, Annex G,
+as a SEQUENCE of the UTCTimes {\em notBefore} and {\em notAfter}.
+
+
+{\em SubjectPublicKeyInfo} is defined by X.509, Annex G.
+The substructure of the public key BitString is defined by
+X.509, Annex C, C.3.
+\\ [1em]
+
+{\small
+\bvtab
+\1 SubjectPublicKeyInfo ::= \5 {\bf SEQUENCE} \{  \\
+\7 algorithm         \2 AlgorithmIdentifier,    \\
+\7 subjectPublicKey  BitString            \\
+\7 -- -- \\
+\7 -- -- the BitString of subjectPublicKey   \\
+\7 -- -- contains the ASN.1 encoding of a sequence of \\
+\7 -- -- the RSA-modulus n and the pubRSA-exponent e:   \\
+\7 -- -- \\
+\7 -- -- SEQUENCE \{ \\
+\7 -- -- \2       n INTEGER,   \\
+\7 -- -- \2       e INTEGER  \\
+\7 -- -- \} \\
+\6 \} \\
+\evtab
+}
+
+See also X.509, Annex G, for the SIGNED MACRO,
+which is replaced by the following MACRO:
+
+{\small
+\begin {center}
+\begin {tabular}{lll}
+SIGNED MACRO   ::= & & \\
+BEGIN              & & \\
+TYPE NOTATION  ::= & type(ToBeSigned)     & \\
+VALUE NOTATION ::= & type(VALUE           & \\
+		   & SEQUENCE \{          & \\
+		   & ToBeSigned,          & \\
+		   & AlgorithmIdentifier, & \\
+ & \multicolumn{2}{l} {-- -- of the algorithm used to generate}  \\
+ & \multicolumn{2}{l} {-- -- the signature}                      \\
+		   & BitString \}          & \\
+ & \multicolumn{2}{l} {-- -- where the BIT STRING is the result} \\
+ & \multicolumn{2}{l} {-- -- of the encryption of the value}     \\
+ & \multicolumn{2}{l} {-- -- of the hash of ToBeSigned}          \\
+ & ) & \\
+END & &
+\end {tabular}
+\end {center}
+}
+ 
+Encoding/Decoding: e\_Certificate(), d\_Certificate() \\
+Used by: af\_pse\_get\_Certificate(), af\_pse\_get\_Certificates(), af\_pse\_update\_Certificate(), 
+
+\subsubsection{SignCSet}
+\hll{CSet, SignCSet, EncCSet}
+CrossCertificates issued for the own public signature or encryption key.
+
+\underline{C-Structure of the object:}
+
+{\small
+\begin{center}
+typedef SET\_OF(Certificate)	SET\_OF\_Certificate;
+\end{center}
+}
+
+{\em ASN.1-Structure of objectValue:}
+{\small
+\begin{center}
+{\bf SET OF} Certificate
+\end{center}
+}
+Encoding/Decoding: e\_CertificateSet(), d\_CertificateSet()
+
+
+
+\subsubsection{CrossCSet}
+\hll{CrossCSet}
+Cross Certificate Pairs issued for the own public signature key.
+
+\underline{C-Structure of the object:} 
+{\small
+\bvtab
+\4 typedef SET\_OF(CertificatePair)	SET\_OF\_CertificatePair;
+\evtab
+}
+
+
+\underline{ASN.1-Structure of objectValue:}
+{\small
+\bvtab
+\4        CrossCSet ::= {\bf SET OF} CertificatePair \\ [0.5cm]
+\4        CertificatePair ::= \4 {\bf SEQUENCE} \{ \\
+\9                 forward [0] Certificate OPTIONAL, \\
+\9                 reverse [1] Certificate OPTIONAL  \\
+\8 \}
+\evtab
+}
+
+Encoding/Decoding: e\_CertificatePairSet(), d\_CertificatePairSet()
+
+\subsubsection{FCPath}
+\hll{FCPath}
+Own Forward Certification Path. 
+
+\underline{C-Structure of the object:}
+
+{\small
+\bvtab
+\4      typedef struct FCPath \{  \\
+\6              SET\_OF\_Certificate \4 *liste; \\
+\6              FCPath               \4 *next\_forwardpath; \\
+\4      \} FCPath;  \\ \\ \\
+with: \\ \\
+\4      typedef struct set\_of\_Certificate \{ \\
+\6              Certificate          \4 *element; \\
+\6              SET\_OF\_Certificate \4 *next; \\
+\4      \} SET\_OF\_Certificate;  \\
+\evtab
+}
+
+
+\underline{ASN.1-Structure of objectValue:}
+{\small
+\bvtab
+\2 FCPath ::=                    \6 ForwardCertificationPath \\
+\2 ForwardCertificationPath ::=  \6 {\bf SEQUENCE OF} CrossCertificates \\
+\2 CrossCertificates ::=         \6 {\bf SET OF} Certificate
+\evtab
+}
+
+{\em FCPath} is an element of {\em Certificates} (note the plural).
+{\em Certificates} is defined in X.509, Annex G,
+as a SEQUENCE of a user certificate and a forward certification path.
+The forward certification path is a SEQUENCE of cross certificates,
+which are SETs of 1-level certificates.
+One cross certificate per SET is supposed to be
+the hierarchy certificate of the path.
+The data of the PSE object {\em FCPath}
+can be composed with the data of
+{\em Cert} or of
+{\em SignCert} in order to build an
+n-level originator certificate of ASN.1-type {\em Certificates}.
+
+{\small
+\bvtab
+\1 Certificates ::= \3 {\bf SEQUENCE} \{   \\
+\5 certificate          \4 Certificate,                \\
+\5 certificationPath    \4 ForwardCertificationPath OPTIONAL   \\
+\4 \}
+\evtab
+}
+
+Encoding/Decoding: e\_FCPath(), d\_FCPath() \\
+Used by: af\_pse\_get\_FCPath(), af\_pse\_update\_FCPath(), af\_pse\_get\_Certificates()
+
+\subsubsection{PKRoot}
+\hll{PKRoot}
+Public key of the root CA (actual/old version).
+
+\underline{C-Structure of the object:}
+
+{\small
+\bvtab
+\4      typedef struct PKRoot \{ \\
+\6              DName          \3 *ca; \\
+\6              struct Serial \3 *new; \\
+\6              struct Serial \3 *old; \\
+\4      \} PKRoot;  \\ \\ \\
+with: \\ \\
+\4      struct Serial \{ \\
+\6             int            \3 serial; \\
+\6             KeyInfo        \3 *key; \\
+\4      \}; \\
+\evtab
+}
+
+
+\underline{ASN.1-Structure of objectValue:}
+
+{\small
+\bvtab
+\3 PKRoot ::= \3 {\bf SEQUENCE} \{     \\
+\7 cA                \2 Name,                 \\
+\7 serialNew         \2 INTEGER,              \\
+\7 keyNew            \2 SubjectPublicKeyInfo, \\
+\7 serialOld         \2 INTEGER,              \\
+\7 keyOld            \2 SubjectPublicKeyInfo \\
+\6 \}
+\evtab
+}
+ 
+{\em Name} is defined in X.501, Annex C,
+as a SEQUENCE of Relative Distinguished Names,
+which are sets of Attribute-Value-Assertions.
+{\em SubjectPublicKeyInfo} is defined by X.509, Annex G.
+
+
+Encoding/Decoding: e\_PKRoot(), d\_PKRoot() \\
+Used by: af\_pse\_get\_PKRoot(), af\_pse\_update\_PKRoot(), af\_verify()
+
+\subsubsection{PKList}
+\hll{PKList, EKList}
+{\em Content of the object:} Trusted public keys of communication partners.
+ 
+\underline{C-Structure of the object:}
+
+{\small
+\bvtab
+\4      typedef struct set\_of\_ToBeSigned \{ \\
+\6              ToBeSigned   \3 *element; \\
+\6              PKList       \3 *next; \\
+\4      \} PKList; \\ \\ \\
+\evtab
+}
+
+
+\underline{ASN.1-Structure of objectValue:}
+
+{\small
+\bvtab
+\3 PKList ::= \3 {\bf SET OF SEQUENCE} \{  \\
+\7 version [0]     \3 INTEGER DEFAULT 0,       \\
+\7 serialNumber    \3 INTEGER,                 \\
+\7 signature       \3 AlgorithmIdentifier,     \\
+\7 issuer          \3 Name,                    \\
+\7 validity        \3 Validity,                \\
+\7 partner         \3 Name,                    \\
+\7 verificationKey \3 SubjectPublicKeyInfo \\
+\6 \}
+\evtab
+}
+ 
+Compare the definition of {\em Certificate} above. A PKList is defined
+as a set of {\em ToBeSigned} values of certificates.
+ 
+The {\em verificationKey} is supposed to have the value
+of the currently valid public verification key of the {\em partner}.
+Before adding it to this list, it should be verified through
+the full certification path.
+
+
+Encoding/Decoding: e\_PKList(), d\_PKList() \\
+Used by: af\_pse\_get\_PKList(), af\_pse\_update\_PKList(), af\_pse\_add\_PK(), af\_pse\_update\_PK(),
+af\_pse\_delete\_PK(), af\_pse\_get\_owner()
+
+
+\subsubsection{CrlSet}
+\hll{CrlSet}
+Set of Revocation Lists of all known certification authorities.
+ 
+\underline{C-Structure of the object:}
+
+{\small
+\bvtab
+\4      typedef struct set\_of\_CrlPSE \{ \\
+\6              CrlPSE   \3 *element; \\
+\6              CrlSet   \3 *next; \\
+\4      \} CrlSet; \\ \\ \\
+with: \\ \\
+\4      typedef struct CrlPSE \{ \\
+\6              DName          \3 *issuer; \\
+\6              UTCTime        \3 *nextUpdate; \\
+\6              SET\_OF\_int     \3 *serialset; \\
+\4      \} CrlPSE;  \\ \\ \\
+with: \\ \\
+\4      typedef struct set\_of\_int \{ \\
+\6              int          \3 element; \\
+\6              SET\_OF\_int \3 *next; \\
+\4      \} SET\_OF\_int;  \\
+\evtab
+}
+
+
+\underline{ASN.1-Structure of objectValue:}
+
+{\small
+\bvtab
+\3 CrlSet ::= \3 {\bf SET OF SEQUENCE} \{  \\
+\7 issuer          \3 Name,                    \\
+\7 nextUpdate      \3 UTCTime,                \\
+\7 serialset       \3 SET OF INTEGER          \\
+\6 \}
+\evtab
+}
+ 
+Encoding/Decoding: e\_CrlSet(), d\_CrlSet() \\
+Used by: af\_pse\_get\_CrlSet(), af\_pse\_update\_CrlSet()
+
+
+\subsubsection{SerialNumbers}
+\hll{SerialNumbers}
+Serial Numbers used by a certification authority.
+ 
+\underline{C-Structure of the object:}
+
+{\small
+\bvtab
+\4      typedef struct SerialNumbers \{ \\
+\6              int   \3 initial; \\
+\6              int   \3 actual; \\
+\4      \} SerialNumbers;
+\evtab
+}
+
+\underline{ASN.1-Structure of objectValue:}
+
+{\small
+\bvtab
+\3 SerialNumbers ::= \3 {\bf SEQUENCE} \{     \\
+\7 initial         \2 INTEGER,    \\
+\7 actual          \2 INTEGER     \\
+\6 \}
+\evtab
+}
+
+{\em initial} contains the value of the serialnumber assigned to the first
+certificate issued by the certification authority, whereas {\em actual}
+holds the value of the serialnumber which will be assigned to the certificate that will next be issued
+by the certification authority.
+
+
+Encoding/Decoding: e\_SerialNumbers(), d\_SerialNumbers() \\
+Used by: af\_pse\_get\_SerialNumbers(), af\_pse\_update\_SerialNumbers()
+
+
+\subsection{Directory Objects}
+\nm{4}{AF-Dir-Objects}{Directory Objects of the AF-Interface}
+\label{af-dirobj}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$
+
+\hl{Description}
+     
+This section lists directory objects needed by the
+directory oriented af\_dir\_retrieve\_* and af\_dir\_enter\_* functions.
+Each object is presented in terms of C-language structures
+as they are needed by the interface subroutines and
+by the application programmer.
+The bit coding of the objects is given by applying
+ASN.1 Basic Encoding Rules to the corresponding ASN.1 structures as they
+are defined in Vol. 2, 2.1. Transformation between those two representations
+is provided by the respective encoding/decoding functions e\_*(3X).
+
+\subsubsection{Directory Attributes}
+\hll{Attribute}
+Directory attribute type and values. \\
+\underline{C-Structure of the object:}
+
+{\small
+\btab
+\1      typedef struct Attribute \{ \\
+\2              ObjId \2   type; \\
+\2              SET\_OF \2      *value; \\
+\1       \} Attribute; \\ \\ \\
+with:   \\ \\
+\1      typedef struct set\_of \{ \\
+\2              char  \2          *element; \\
+\2              struct set\_of \2 *next; \\
+\1      \} SET\_OF; \\
+\etab
+}
+
+The structure SET\_OF can be used by any ASN.1 type ``SET OF'',
+in that the subfield {\em *element} is only a placeholder
+of an address of the respective SET element.
+In particular, attributes are described by an attribute type
+and a set of attribute values. In the following example,
+the use of these C-structures is demonstrated with
+the attribute type ``Certificate''.
+
+{\small
+\btab
+\1 /* example use: */   \\ \\
+\2      SET\_OF     \2   *attrvalue; \\
+\2      Attribute   \2   *acert;     \\
+\2      Certificate \2   *cert;      \\ \\
+\2      for( attrvalue = acert$->$value;  \\
+\3         attrvalue != (SET\_OF *)0;  \\
+\3         attrvalue = attrvalue$->$next ) \\
+\2         \{ /* work on */ cert = (Certificate *)attrvalue$->$element; \} \\
+\etab
+}
+
+Encoding (and decoding) of an attribute depends on its attribute type.
+Thus, before encoding (and decoding) {\em value}\pf {\em element},
+the ObjId {\em type} is evaluated.
+\\
+Encoding/Decoding: e\_Attribute(), d\_Attribute() \\
+Used by: af\_dir\_retrieve\_*(), af\_dir\_enter\_*()
+
+\subsubsection{PemCrl}
+\hll{PemCrl}
+Revocation List with PEM syntax. \\
+\underline{C-Structure of the object:}
+
+{\small
+\btab
+\1      typedef struct PemCrl \{  \\
+\2              OctetString \5  *tbs\_DERcode; \\
+\2              PemCrlTBS  \5   *tbs;        \\
+\2              Signature \5    *sig; \\
+\1      \} PemCrl;  \\ \\
+with: \\ \\
+\1      typedef struct PemCrlTBS \{ \\
+\2              AlgId \5        *signatureAI; \\
+\2              DName \5         *issuer; \\
+\2              SEQUENCE\_OF\_RevCertPem \5     *revokedCertificates; \\
+\2              UTCTime  \5     *lastUpdate; \\
+\2              UTCTime  \5     *nextUpdate; \\
+\1       \} PemCrlTBS; \\ \\
+\1      typedef struct Signature \{  \\
+\2              AlgId \5        *signAI; \\
+\2              BitString \5    signature; \\
+\1 \}           Signature;  \\ \\
+\1      typedef struct RevCertPem \{ \\
+\2              int  \5          serialnumber; \\
+\2              UTCTime \5      *revocationDate; \\
+\1      \} RevCertPem;  \\ \\
+with: \\ \\
+\1      typedef struct sequence\_of\_RevCertPem \{ \\
+\2              RevCertPem          \5 *element; \\
+\2              SEQUENCE\_OF\_RevCertPem \5 *next; \\
+\1      \} SEQUENCE\_OF\_RevCertPem;  \\
+\etab
+}
+
+Below, a search in a list of revoked certificates is demonstrated:
+
+{\small
+\btab
+\1 /* Search revoked certificates: */ \\ \\
+\1      PemCrl   \4 *pemcrl;    \\
+\1      SEQUENCE\_OF\_RevCertPem \4 *seq;  \\
+\1      /* First verify pemcrl$->$sig with pemcrl$->$tbs\_DERcode. Then: */ \\
+\1      for( seq = pemcrl$->$tbs$->$revokedCertificates; \\
+\2        seq != (SEQUENCE\_OF\_RevCertPem *)0; \\
+\2        seq = seq$->$next ) \\
+\1      \{ /* check seq$->$element$->$serialnumber and seq$->$element$->$revocationDate */ \} \\
+\etab
+}
+
+Encoding/Decoding: e\_PemCrl(), d\_PemCrl() \\
+Used by: af\_dir\_retrieve\_PemCrl(), af\_dir\_enter\_PemCrl()
+
+
+\subsection{CA Database Objects}
+\nm{4}{CA-Database-objects}{CA Database objects of the AF-interface}
+\label{cadb}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$
+
+\hl{Description}
+     
+This section lists CA database objects required by the af\_cadb\_* functions. 
+Each object is presented in terms of C-language structures as they are needed by the 
+interface subroutines and by the application programmer. 
+\subsubsection{IssuedCertificate}
+\hll{IssuedCertificate}
+Serial number and date of issue. \\
+\underline{C-Structure of the object:}
+
+{\small
+\btab
+\1      typedef struct IssuedCertificate \{ \\
+\2              int  \2          serialnumber; \\
+\2              UTCTime \2  *date\_of\_issue; \\
+\1       \} IssuedCertificate; \\
+\etab
+}
+
+Encoding/Decoding: e\_IssuedCertificate(), d\_IssuedCertificate()
+
+\subsubsection{PemCrlWithCerts}
+\hll{PemCrlWithCerts}
+PEM Revocation List with Originator Certificate. \\
+\underline{C-Structure of the object:}
+
+{\small
+\btab
+\1      typedef struct PemCrlWithCerts \{ \\
+\2              PemCrl  \2          *pemcrl; \\
+\2              Certificates \2  *certificates; \\
+\1       \} PemCrlWithCerts; \\
+\etab
+}
+
+Encoding/Decoding: e\_PemCrlWithCerts(), d\_PemCrlWithCerts()
+
+
+
+\subsection{PSE Selection}
+\label{cc_sel}
+\nm{5}{PSE-Selection}{PSE-Selection at the AF-Interface}
+
+\hl{Synopsis}
+
+\#include $<$af.h$>$
+
+\hl{Description}
+     
+The af\_* functions do not provide the possibility
+to specify at their parameter interface the names and locations of
+PSE objects to be used, as it is possible with the sec\_* functions by
+means of the structure PSESel. af\_* functions operate on a predefined
+set of 12 objects in a PSE with the predefined name {\em .pse}.
+However, all af\_* functions use the global structure AF\_pse. AF\_pse is of
+type AFPSESel:
+
+{\small
+\bvtab
+\4 typedef struct \{ \\
+\6        char \1    *app\_name; \\
+\6        char \1    *pin; \\
+\6        struct \{ \\
+\8            char \1 *name; \\
+\8            char \1 *pin; \\
+\6        \}  \1      object[PSE\_MAXOBJ]; \\
+\6        int \1     dev; \\
+\6        int \1     app\_id; \\
+\4 \} AFPSESel; 
+\evtab
+}
+
+This global structure can be used for two purposes:
+\be
+\m AF\_pse contains the application name. This is the
+   name of the directory constituting the PSE. The name is interpreted 
+   relatively to the HOME directory, if it does not begin with character '/'.
+   The application name is initialized with {\em .pse} as default value.
+   AF\_pse\pf app\_name can be used to specify another PSE before calling
+   an af\_* routine. If multiple PSEs are used simultaneously, the content
+   of this global structure must be saved for each PSE and restored
+   before a call to an af\_* routine.
+\m AF\_pse contains all interactively entered PIN's in order to avoid multiple
+   questioning of PIN's in case of multiple access to the same PSE object within
+   one program. After a call to af\_sign, for instance, which asks for the PIN
+   of the PSE and for the PIN of the PSE object SignSK, if there is any,
+   AF\_pse\pf pin contains the PSE PIN and AF\_pse.object[1]\pf pin contains the
+   PIN of the PSE object SignSK. A second call to af\_sign within the same
+   program will not ask again for those PINs. PIN questionning can be
+   enforced again by clearing the PINs in the global structure AF\_pse.
+   See AF(5) for the exact definition of AF\_pse.
+\ee
+This structure can be used by the programmer by declaring \\
+
+{\small
+extern AFPSESel AF\_pse;
+}

@@ -1,0 +1,1055 @@
+\speconly{
+\section{X400-IF: X.400-1988 Security Interface}
+\markboth{X.400 Interface}{X.400 Interface}
+\thispagestyle{myheadings}
+\label{x4-if}
+
+\subsection{Introduction}
+\label{x4_fc}
+
+In this chapter, C-functions and C-structures are specified,
+which enable an X.400 programmer to add X.400 security elements
+into an existing X.400 implementation.
+In the following subsections, four types of functions are presented:
+
+\begin{enumerate}
+\item
+The {\em x400\_create\_*} functions fill the C-structures,
+which represent X.400 security elements, with the relevant
+security informations.
+\item
+The {\em x400\_check\_*} functions verify (received) X.400
+security elements which are represented as C-structures.
+\item
+The {\em x400\_include\_*} functions encode the C-structures,
+which represent X.400 security elements, into protocol presentation
+elements and include them into the existing message presentation
+element.
+\item
+The {\em x400\_extract\_*} functions extract the security
+oriented protocol presentation elements from
+the existing message presentation
+element and decode them into C-structures
+which represent X.400 security elements.
+\end{enumerate}
+
+Those functions which {\em include}
+the security informations stored in the C-structures
+into the protocol presentation elements,
+and those functions which {\em extract}
+the security informations
+from the protocol presentation elements
+and store them into the C-structures,
+{\em depend on the implementation} of the X.400 product.
+This is, because the protocol presentation is an essential part
+of any X.400 implementation.
+\\
+Therefore, this specification uses an abstract type PRESEL,
+which is a placeholder for the presentation element type of an
+X.400 implementation:
+\\[1ex]
+\begin{center}
+typedef $<$local presentation element type$>$ {\bf PRESEL}
+\end{center}
+%\newpage
+\subsubsection{Get Originator Certificate}
+\hll{x400\_get\_OCert}
+\label{x4_get_ocert}
+
+This functionality is performed by {\em af\_pse\_get\_Certificates}
+of the AF-Module
+(\ref{af_get_Certificates}).
+}
+\subsection{X.400 Security Functions}
+
+\subsubsection{x400\_create\_Label}
+\nm{3X}{x400\_create\_Label}{Create a security label}
+\label{x4_cr_Lab}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_create\_Label} {\em (label)} \\
+Label {\em *label};
+\hl{Parameter}
+\parname  {{\em label}}
+\pardescript  {Pointer to a Label structure defined by calling program.
+	       {\em label\pf policy} is set by the calling function.
+	       The other subfields of label,
+	       {\em class}, {\em mark} and {\em categs},
+	       will be allocated by called function
+	       and can/must be freed by calling function.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_create\_Label
+creates and fills the subfields
+{\em label\pf class}, {\em label\pf mark} and {\em label\pf categs} ,
+in dependence of the value of {\em label\pf policy}
+(default value is
+\\
+{\em \{ id-dfn-ssp \} }).
+For the simple security policy,
+there is a terminal prompt for
+``authentic'', ``confidential'', or ``both, authentic and confidential''.
+In dependence of the terminal input, {\em class} and {\em mark}
+are set. {\em categs} is set to NULL.
+\\
+The return value is 0 on success, and -1 if the security policy
+is unknown.
+
+\subsubsection{x400\_create\_MAC}
+\nm{3X}{x400\_create\_MAC}{Create message authentication check}
+\label{x4_cr_MAC}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_create\_MAC} {\em (mac, content, contid, label)} \\
+MAC {\em *mac};  \\
+PRESEL {\em *content}; \\
+char {\em *contid};    \\
+Label {\em *label};
+\hl{Parameter}
+\parname  {{\em mac}}
+\pardescript  {Pointer to a MAC structure defined by calling program.
+	       Its subfields
+	       will be allocated and filled by called function
+	       and can/must be freed by calling function.} \\[1ex]
+\parname  {{\em content}}
+\pardescript  {Input: Pointer to a protocol presentation element
+	       that contains the message content.} \\[1ex]
+\parname  {{\em contid}}
+\pardescript  {Input: Pointer to character string
+	       that contains the message content identifier.} \\[1ex]
+\parname  {{\em label}}
+\pardescript  {Input: Pointer to a Label structure.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_create\_MAC
+creates and fills the subfields of {\em mac\pf tbs},
+encodes them into {\em mac\pf tbs\_DERcode} and
+signs the latter into {\em mac\pf sig}.
+This requires the following steps:
+\\
+Read mac\pf tbs\pf signatureAI from the
+originator's PSE object SignCert.
+Transform (PRESEL *)content to (OctetString *)mac\pf tbs\pf \-con\-tent.
+Assign contid and label to tbs-subfields.
+Perform e\_MACTBS on mac\pf tbs and assign the result to mac\pf tbs\_DERcode.
+Sign the octetstring mac\pf tbs\_DERcode and place the result into mac\pf sig.
+\\
+Subfunctions used are e\_MACTBS(), af\_sign().
+The return value is 0 on success.
+If one of the operations fails,
+the respective error code is set, and -1 is returned.
+
+\subsubsection{x400\_create\_MsgToken}
+\nm{3X}{x400\_create\_MsgToken}{Create message token}
+\label{x4_cr_MTok}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_create\_MsgToken}
+{\em (token, label, recipname, recipcert, mseqnumber)} \\
+MsgToken {\em *token};  \\
+Label {\em *label}; \\
+DName {\em *recipname}; \\
+Certificate {\em *recipcert}; \\
+int {\em *mseqnumber};    \\
+\hl{Parameter}
+\parname  {{\em token}}
+\pardescript  {Pointer to a MsgToken structure defined by calling program.
+	       Its subfields
+	       will be allocated and filled by called function
+	       and can/must be freed by calling function.} \\[1ex]
+\parname  {{\em label}}
+\pardescript  {Input: Pointer to a Label structure.} \\[1ex]
+\parname  {{\em recipname}}
+\pardescript  {Input: Pointer to a DName that contains the
+	       name of the intended message recipient.} \\[1ex]
+\parname  {{\em recipcert}}
+\pardescript  {Input: Pointer to a user certificate of the recipient.
+	       It might be set to NULL.
+	       However, if given, the certificate owner must be the same
+	       as the recipient given in the parameter {\em recipname}.} \\[1ex]
+\parname  {{\em mseqnumber}}
+\pardescript  {Input: Pointer to an integer.
+	       Calling program must assign a message sequence
+	       number to it or set it to NULL.
+	       It will be assigned to token\pf tbs\pf mseq.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_create\_MsgToken
+creates and fills the subfields of {\em token\pf tbs},
+encodes them into {\em token\pf tbs\_DERcode} and
+signs the latter into {\em token\pf sig}.
+This requires the following steps:
+\\
+Evaluate input parameter label and then fill only those
+token subfields which are required by the security policy,
+the classification and the privacy mark.
+If no recipient name is given, terminate with error code ERECIPNAME;
+otherwise assign the token subfields
+label (if required), recipient name,
+(current) time and signatureAI (from PSE object SignCert).
+\\
+If ``authentic'' is requested, assign mseqnumber to
+token\pf tbs\pf mseq.
+If, however, mseqnumber is set to (int *)NULL,
+and ``confidential'' is not requested,
+terminate with error code ENOTOKEN.
+\\
+If ``confidential'' is requested,
+a structure TokenTBE is to be created and filled.
+Create a symmetric key and place it into the
+subfield cckey of the TokenTBE,
+and the symmetric algorithm identifier is assigned
+to token\pf tbs\pf confidAI.
+If no recipient certificate is given,
+read the recipient public encryption key information from
+PSE object EKList.
+If this is not available, terminate with error code ERECIPKEY.
+If a recipient certificate is given and valid,
+read the recipient public encryption key information from
+this certificate.
+The encryption algorithm is assigned to token\pf tbs\pf encryptionAI.
+\\
+Perform e\_TokenTBE on the created and filled TokenTBE structure,
+encrypt the result and assign the encrypted bitstring
+to token\pf tbs\pf encrypted.
+Perform e\_Msg\-To\-ken\-TBS on token\pf tbs and assign the result
+to token\pf tbs\_DERcode.
+Sign the octetstring token\pf tbs\_DERcode and place the result
+into token\pf sig.
+\\
+Subfunctions used are e\_TokenTBE(), e\_MsgTokenTBS(), af\_encrypt(),
+and af\_\-sign().
+The return value is 0 on success.
+If one of the operations fails,
+the respective error code is set, and -1 is returned.
+
+\subsubsection{x400\_create\_BindToken}
+\nm{3X}{x400\_create\_BindToken}{Create bind token}
+\label{x4_cr_BTok}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_create\_BindToken}
+{\em (token, recipname, random)} \\
+BindToken {\em *token};  \\
+DName {\em *recipname}; \\
+BitString {\em *random};    \\
+\hl{Parameter}
+\parname  {{\em token}}
+\pardescript  {Pointer to a BindToken structure defined by calling program.
+	       Its subfields
+	       will be allocated and filled by called function
+	       and can/must be freed by calling function.} \\[1ex]
+\parname  {{\em recipname}}
+\pardescript  {Input: Pointer to a DName that contains the
+	       name of the intended token recipient.} \\[1ex]
+\parname  {{\em random}}
+\pardescript  {Input: Pointer to a BitString.
+	       If set to NULL,
+	       this called function will create a random number,
+	       otherwise the given random number is used unchanged.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_create\_BindToken
+creates and fills the subfields of {\em token\pf tbs},
+encodes them into {\em token\pf tbs\_DERcode} and
+signs the latter into {\em token\pf sig}.
+No encryption service is offered, therefore
+token\pf tbs\pf encryptionAI and token\pf tbs\pf encrypted are set to NULL.
+The following steps are performed:
+\\
+If no recipient name is given, terminate with error code ERECIPNAME;
+otherwise assign the token subfields
+recipient name,
+(current) time and signatureAI (from PSE object SignCert).
+If the random parameter is set on input,
+the called function will assign it unchanged
+to token\pf tbs\pf random.
+If the random parameter is NULL on input,
+the called function will create a random number and assign it
+to token\pf tbs\pf random.
+\\
+Perform e\_BindTokenTBS() on token\pf tbs and assign the result
+to token\pf tbs\_DERcode.
+Sign the octetstring token\pf tbs\_DERcode and place the result
+into token\pf sig.
+\\
+Subfunctions used are e\_BindTokenTBS() and af\_sign().
+The return value is 0 on success.
+If one of the operations fails,
+the respective error code is set, and -1 is returned.
+
+\subsubsection{x400\_create\_Context}
+\nm{3X}{x400\_create\_Context}{Create security context}
+\label{x4_cr_Scon}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_create\_Context} {\em (seccont)} \\
+SecurityContext {\em *seccont};
+\hl{Parameter}
+\parname  {{\em seccont}}
+\pardescript  {Pointer to a SecurityContext structure
+	       defined by calling program.
+	       Its subfields
+	       will be allocated and filled by called function
+	       and can/must be freed by calling function.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_create\_Context
+constructs one simple security label that consists only
+the subfield {\em policy} set to \{ id-dfn-ssp \} .
+The other subfields are set to NULL.
+{\em seccont}\pf {\em next} is also set to NULL.
+In later versions, this function shall become more complex
+in order to assemble different security labels.
+\\
+Subfunction used is x400\_create\_Label(),
+although this is not necessary for the simple version.
+The return value is 0 on success, -1 on error.
+
+\subsubsection{x400\_create\_Credentials}
+\nm{3X}{x400\_create\_Credentials}{Create credentials}
+\label{x4_cr_Cred}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_create\_Credentials}
+{\em (creds, recip\_name, random, certype, ca\_name)} \\
+Credentials {\em *creds};  \\
+DName {\em *recip\_name}; \\
+BitString {\em *random};    \\
+KeyType {\em certype};    \\
+DName {\em *ca\_name}; \\
+\hl{Parameter}
+\parname  {{\em creds}}
+\pardescript  {Pointer to a Credentials structure defined by calling program.
+	       Its subfields
+	       will be allocated and filled by called function
+	       and can/must be freed by calling function.} \\[1ex]
+\parname  {{\em recip\_name}}
+\pardescript  {Input: Pointer to a DName that contains the
+	       name of the intended credentials recipient.} \\[1ex]
+\parname  {{\em random}}
+\pardescript  {Input: Pointer to a BitString.
+	       If set to NULL,
+	       this called function will create a random number,
+	       otherwise the given random number is used unchanged.} \\[1ex]
+\parname  {{\em certype}}
+\pardescript  {Input: Type of the user certificate of Certificates: \\
+	       SIGNATURE: user certificate of the signature key, \\
+	       ENCRYPTION: user certificate of the encryption key. \\
+	       -1: no Certificates to be included in Credentials structure.} \\[1ex]
+\parname  {{\em ca\_name}}
+\pardescript  {Input: Pointer to a DName that contains the
+	       name of a certification authority above
+	       the intended token recipient.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_create\_Credentials
+calls X400\_create\_BindToken() and af\_pse\_get\_Certificates()
+and assembles the bind token and certificates into the credentials structure.
+The error codes of the called functions are used.
+\\
+Subfunctions used are e\_BindToken() and af\_pse\_get\_Certificates().
+The return value is 0 on success.
+If one of the operations fails,
+the respective error code is set, and -1 is returned.
+
+\subsubsection{Check Originator Certificate}
+\hll{x400\_check\_OCert}
+\label{x4_check_ocert}
+
+This functionality is performed by {\em af\_verify}
+of the AF-Module
+\speconly{(\ref{af_verify})}
+.
+
+\subsubsection{x400\_check\_Label}
+\nm{3X}{x400\_check\_Label}{Check validity of a security label}
+\label{x4_ck_Lab}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_check\_Label} {\em (label)} \\
+Label {\em *label};
+\hl{Parameter}
+\parname  {{\em label}}
+\pardescript  {Input: Pointer to a Label structure defined by calling function.
+	       All subfields are defined and filled
+	       by the calling function.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_check\_Label
+checks, if the security policy is known.
+In case of the simple security policy (\{ id-dfn-ssp \}),
+the classification must be ``unrestricted'', ``restricted''
+or ``confidential'';
+and the privacy mark must be ``a'', ``b'', or ``c'' only.
+Change classification ``confidential'' and privacy mark ``a''
+to privacy mark ``b''.
+Change classification ``confidential'' and no privacy mark
+to privacy mark ``c''.
+\\
+The return value is 0 on success, and -1 if the label is invalid or the
+security policy is unknown.
+The error code would be EPOLICY, if the security policy is unknown,
+and ELABEL, if the label is not consistent or invalid.
+
+\subsubsection{x400\_check\_MAC}
+\nm{3X}{x400\_check\_MAC}{Check message authentication}
+\label{x4_ck_MAC}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_check\_MAC} {\em (mac)} \\
+MAC {\em *mac};
+\hl{Parameter}
+\parname  {{\em mac}}
+\pardescript  {Input: Pointer to a MAC structure defined by calling function.
+	       mac\pf sig and
+	       all subfields of mac\pf tbs are defined and filled
+	       by the calling function.
+	       mac\pf tbs\_DERcode is optionally NULL.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+If {\em mac}\pf {\em tbs\_DERcode} is NULL on input,
+x400\_check\_MAC calls x400\_create\_MACTBS() in order to fill it.
+The MAC signature is verified
+by comparison of {\em mac}\pf {\em tbs\_DERcode}
+with {\em mac}\pf {\em sig}.
+\\
+Subfunctions called are x400\_create\_MACTBS(), af\_verify().
+The return value is 0, if the given MAC is valid
+and if the signature is  verified.
+The return value is -1 otherwise;
+the error code would be EMAC
+or one inherited by one of the called subfunctions.
+
+\subsubsection{x400\_check\_MsgToken}
+\nm{3X}{x400\_check\_MsgToken}{Verify and decrypt message token}
+\label{x4_ck_MTok}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_check\_MsgToken} {\em (token, tokentbe)} \\
+MsgToken {\em *token}; \\
+TokenTBE {\em *tokentbe};
+\hl{Parameter}
+\parname  {{\em token}}
+\pardescript  {Input: Pointer to a MsgToken structure defined by calling function.
+	       All subfields are defined and filled
+	       by the calling function.} \\[1ex]
+\parname  {{\em tokentbe}}
+\pardescript  {Input: Pointer to a TokenTBE structure defined by calling function.
+	       Its subfields will be allocated and filled by called
+	       function and can/must be freed by calling function.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_check\_MsgToken verifies the token signed data and decrypts
+the token encrypted data.
+If a security label is included in the token signed data,
+it is checked
+by a call to x400\_check\_Label().
+The validity of the token time is checked.
+If token encrypted data are present, they are encrypted
+and the decrypted result is put into the TokenTBE parameter.
+\\
+If included,
+the label subfields, the content confidentiality key (from TokenTBE),
+and the message sequence number
+remain for further checks and actions of the calling function.
+\\
+Subfunctions called are x400\_check\_Label(), af\_decrypt(), af\_verify().
+The return value is 0, if the given MsgToken is valid,
+if the encrypted data can be decrypted,
+and if the signature is  verified.
+The return value is -1 otherwise;
+the error code would be ETOKSIGN, ETOKENCRYPT or ETOKTIME
+or one inherited by one of the called subfunctions.
+
+\subsubsection{x400\_check\_BindToken}
+\nm{3X}{x400\_check\_BindToken}{Verify and decrypt bind token}
+\label{x4_ck_BTok}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_check\_BindToken} {\em (token, tokentbe)} \\
+BindToken {\em *token}; \\
+TokenTBE {\em *tokentbe};
+\hl{Parameter}
+\parname  {{\em token}}
+\pardescript  {Input: Pointer to a BindToken structure defined by calling function.
+	       All subfields are defined and filled
+	       by the calling function.} \\[1ex]
+\parname  {{\em tokentbe}}
+\pardescript  {Input: Pointer to a TokenTBE structure defined by calling function.
+	       Its subfields will be allocated and filled by called
+	       function and can/must be freed by calling function.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_check\_BindToken verifies the token signed data
+(and decrypts the token encrypted data into the TokenTBE parameter,
+if a confidentiality service is implemented).
+The validity of the token time is checked.
+\\
+If the bind token was sent by an association responder,
+its random number
+remains for further checks and actions of the calling function.
+\\
+The subfunction af\_verify() is called.
+The return value is 0, if the given BindToken is valid,
+if the encrypted data can be decrypted,
+and if the signature is  verified.
+The return value is -1 otherwise;
+the error code would be ETOKSIGN, ETOKRANDOM or ETOKTIME
+or one inherited by one of the called subfunctions.
+
+\subsubsection{x400\_check\_Context}
+\nm{3X}{x400\_check\_Context}{Check labels of security context}
+\label{x4_ck_Scon}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_check\_Context} {\em (seccont)} \\
+SecurityContext {\em *seccont};
+\hl{Parameter}
+\parname  {{\em seccont}}
+\pardescript  {Input: Pointer to a SecurityContext structure defined by calling function.
+	       All subfields are defined and filled
+	       by the calling function.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+X400\_check\_Context reads through all labels of the security context
+and checks, if they make up an acceptable security context.
+In case of the simple security policy with no confidentiality
+service (\{ id-dfn-ssp \}),
+only one label is allowed,
+which contains the identifier of the simple security policy only.
+\\
+All labels' subfields
+remain for further checks and actions of the calling function.
+\\
+The subfunction x400\_check\_Label() is called
+(however not necessary for the simple security policy).
+The return value is 0, if the given SecurityContext is valid.
+The return value is -1 otherwise;
+the error code would be ESECCONTEXT.
+
+\subsubsection{x400\_check\_Credentials}
+\nm{3X}{x400\_check\_Credentials}{Check sender's bind token
+and originator certificate}
+\label{x4_ck_Cred}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC {\bf x400\_check\_Credentials} {\em (creds)} \\
+Credentials {\em *creds};
+\hl{Parameter}
+\parname  {{\em creds}}
+\pardescript  {Input: Pointer to a Credentials structure defined by calling function.
+	       All subfields are defined and filled
+	       by the calling function.} \\[1ex]
+\parname  {{\em Return Value}}
+\pardescript  {0 or -1}
+\hl{Description}
+In its full functionality,
+x400\_check\_Credentials would check the sender's bind token in the
+context of the sender's originator certificate.
+However, this specification is based upon the fact,
+that prior to the very first association between interacting X.400 agents,
+the originator certificates are mutually exchanged and stored.
+Therefore, certificates are not supposed to be included
+in the credentials exchanged during association establishment.
+In this case,
+x400\_check\_Credentials checks only the included bind token
+and verifies its signature on the base of locally known public key
+informations (e.g. from PSE object PKList).
+\\
+Subfunctions called are x400\_check\_BindToken() and af\_verify().
+The return value is 0, if the given Credentials is valid.
+The return value is -1 otherwise;
+the error code would be ECREDKEY
+or ECREDCERT, if Certificates is checked as well,
+or one inherited by one of the called subfunctions.
+
+\subsubsection{x400\_include\_*, x400\_extract\_*}
+\nm{3X}{x400\_in/ex}{Security elements included in or extracted from protocol elements}
+\label{x4_in_ex}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC *{\bf x400\_include\_Ocert} {\em (env, ocert)} \\
+PRESEL *{\em env}; \\
+Certificates *{\em ocert}; \\ [1ex]
+RC *{\bf x400\_extract\_Ocert} {\em (env, ocert)} \\
+PRESEL *{\em env}; \\
+Certificates *{\em ocert}; \\ [1ex]
+RC *{\bf x400\_include\_Label} {\em (env, label)} \\
+PRESEL *{\em env}; \\
+Label *{\em label}; \\ [1ex]
+RC *{\bf x400\_extract\_Label} {\em (env, label)} \\
+PRESEL *{\em env}; \\
+Label *{\em label}; \\ [1ex]
+RC *{\bf x400\_include\_MAC} {\em (env, mac)} \\
+PRESEL *{\em env}; \\
+MAC *{\em mac}; \\ [1ex]
+RC *{\bf x400\_extract\_MAC} {\em (env, mac)} \\
+PRESEL *{\em env}; \\
+MAC *{\em mac}; \\ [1ex]
+RC *{\bf x400\_include\_MsgToken} {\em (env, token)} \\
+PRESEL *{\em env}; \\
+MsgToken *{\em token}; \\ [1ex]
+RC *{\bf x400\_extract\_MsgToken} {\em (env, token)} \\
+PRESEL *{\em env}; \\
+MsgToken *{\em token}; \\
+\hl{Description}
+The x400\_include\_* functions above
+have {\em two} input parameters:
+The first parameter is a pointer to a protocol presentation element
+(in terms of the given X.400 implementation,
+\speconly{(see introductional remarks of section \ref{x4_fc})}
+).
+This presentation element
+represents the {\em message envelope}
+as far as it has been built by the calling function.
+The second parameter is a pointer to the security element
+which is to be included into the message envelope.
+After return from an x400\_include\_* function,
+the respective security element is included in the
+message envelope presentation element.
+The returncode is 0 on success, and -1 on failure.
+\\[1ex]
+The x400\_extract\_* functions above
+have {\em two} input parameters:
+The first parameter is a pointer to a protocol presentation element
+(in terms of the given X.400 implementation,
+\speconly{(see introductional remarks of section \ref{x4_fc})}
+).
+This presentation element
+represents the {\em message envelope}
+as far as it is to be parsed by the calling function.
+The second parameter is a pointer to the security element structure
+which is defined by the calling program.
+After return from an x400\_extract\_* function,
+the subfields of
+the respective security element are filled
+with the respective security informations,
+that the called function has parsed from the given
+message envelope presentation element.
+The returncode is 0 on success, and -1 on failure.
+\\[1em]
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+RC *{\bf x400\_include\_Credentials} {\em (bind\_arg, creds)} \\
+PRESEL *{\em bind\_arg}; \\
+Credentials *{\em creds}; \\ [1ex]
+RC *{\bf x400\_extract\_Credentials} {\em (bind\_arg, creds)} \\
+PRESEL *{\em bind\_arg}; \\
+Credentials *{\em creds}; \\ [1ex]
+RC *{\bf x400\_include\_Context} {\em (bind\_arg, seccont)} \\
+PRESEL *{\em bind\_arg}; \\
+SecurityContext *{\em seccont}; \\ [1ex]
+RC *{\bf x400\_extract\_Context} {\em (bind\_arg, seccont)} \\
+PRESEL *{\em bind\_arg}; \\
+SecurityContext *{\em seccont}; \\
+\hl{Description}
+The x400\_include\_* functions above
+have {\em two} input parameters:
+The first parameter is a pointer to a protocol presentation element
+(in terms of the given X.400 implementation,
+\speconly{(see introductional remarks of section \ref{x4_fc})}
+).
+This presentation element
+represents the {\em bind argument}
+as far as it has been built by the calling function.
+In case of the Credentials, the presentation element
+represents either the bind {\em argument}
+or the bind {\em result}.
+The second parameter is a pointer to the security element
+which is to be included into the bind argument.
+After return from an x400\_include\_* function,
+the respective security element is included in the
+bind argument presentation element.
+The returncode is 0 on success, and -1 on failure.
+\\[1ex]
+The x400\_extract\_* functions
+have {\em two} input parameters:
+The first parameter is a pointer to a protocol presentation element
+(in terms of the given X.400 implementation,
+\speconly{(see introductional remarks of section \ref{x4_fc})}
+).
+This presentation element
+represents the {\em bind argument}
+as far as it is to be parsed by the calling function.
+In case of the Credentials, the presentation element
+represents either the bind {\em argument}
+or the bind {\em result}.
+The second parameter is a pointer to the security element structure
+which is defined by the calling program.
+After return from an x400\_extract\_* function,
+the subfields of
+the respective security element are filled
+with the respective security informations,
+that the called function has parsed from the given
+bind argument presentation element.
+The returncode is 0 on success, and -1 on failure.
+
+\subsection{Encoding and Decoding Functions}
+\nm{3X}{e\_X400}{Encoding and decoding functions for X400-IF}
+\label{x4_encdec}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+OctetString *{\bf e\_MACTBS} {\em (mactbs)} \\
+MACTBS *{\em mactbs}; \\ [1ex]
+OctetString *{\bf e\_TokenTBE} {\em (toktbe)} \\
+TokenTBE *{\em toktbe}; \\ [1ex]
+OctetString *{\bf e\_MsgTokenTBS} {\em (mtoktbs)} \\
+MsgTokenTBS *{\em mtoktbs}; \\ [1ex]
+OctetString *{\bf e\_BindTokenTBS} {\em (btoktbs)} \\
+BindTokenTBS *{\em btoktbs}; \\ [1ex]
+RC *{\bf x400\_include\_*} {\em (presel, c\_struct)} \\
+PRESEL *{\em presel}; \\
+$<$C\_STRUCT$>$ *{\em c\_struct}; \\ [1ex]
+RC *{\bf x400\_extract\_*} {\em (presel, c\_struct)} \\
+PRESEL *{\em presel}; \\
+$<$C\_STRUCT$>$ *{\em c\_struct}; \\ [1ex]
+
+\subsection{X.400 Security Elements}
+\nm{4}{X.400 Security Elements}{X.400 Security Elements}
+\label{x4_se}
+\hl{Synopsis}
+\#include $<$x400.h$>$ \\ [1ex]
+\hl{Description}     
+This section describes the security elements of X.400-1988
+in terms of objects
+which the X.400 security module
+has access to in order to perform its functionality.
+The objects are stored either in the PSE or in
+a directory information base,
+or they are created by functions of this module.
+Each object is presented in terms
+of C-language structures as they are needed by the interface subroutines and
+by the application programmer as well. The bit coding of the objects
+is given by applying ASN.1 Basic Encoding Rules
+to the corresponding ASN.1 structures as they are defined in
+\speconly{chapter~\ref{asn1-x400}}
+\manonly{Vol. 2, 2.1}
+. Transformation between those two representations
+is provided by the respective encoding/decoding functions
+\speconly{of chapter~\ref{x4_encdec}}
+\manonly{e\_*(3X)}
+or by locally implemented include/extract functions
+\speconly{(see introductional remarks of section \ref{x4_fc})}
+.
+
+\subsubsection{Originator Certificate}
+\hll{x400\_OCert}
+\label{x4_ocert}
+{\em Name of the object:} {\bf Certificates} \\
+{\em Content of the object:} Originator certificate (of type Certificates). \\
+{\em Structure of the object:}
+
+{\small
+\btab
+\1 typedef struct Certs \{ \\
+\2    Certificate \2  *usercertificate; \\
+\2    FCPath      \2  *forwardpath; \\
+\1    \} Certificates; \\
+\etab
+}
+
+The {\em X.400 originator certificate} is defined to have the
+same structure as {\em Certificates}
+(see AF-Module).
+
+\subsubsection{Label}
+\hll{x400\_Label}
+\label{x4_Label}
+{\em Name of the object:} {\bf Label} \\
+{\em Content of the object:} {\bf Security label informations} \\
+{\em Structure of the object:}
+
+{\small
+\btab
+\1 typedef struct label \{ \\
+\2      ObjId \2  policy; \\
+\2      int  \2        *class;  \\
+\2      char \2        *mark;   \\
+\2      char \2        *categs; /* address of security categories */ \\
+\1 \} Label; \\
+\etab
+}
+
+Encoding/Decoding: x400\_include\_Label(), x400\_extract\_Label() \\
+Used by: x400\_create\_Label(), x400\_check\_Label()
+
+\subsubsection{Message Authentication Check}
+\hll{x400\_MAC}
+\label{x4_MAC}
+{\em Name of the object:} {\bf MAC, MIC} \\
+{\em Content of the object:} Informations for message authentication check. \\
+{\em Structure of the object:}
+
+{\small
+\btab
+\1 typedef struct mac \{ \\
+\2      OctetString \2  *tbs\_DERcode; \\
+\2      MACTBS    \2    *tbs; \\
+\2      Signature \2    *sig; /* sender's signature */ \\
+\1 \} MAC; \\ \\
+\1 typedef struct mac MIC; \\ \\
+with: \\ \\
+\1 typedef struct macTBS \{  \\
+\2     AlgId       \2   *signatureAI; \\
+\2     OctetString \2   *content; \\
+\2     char        \2   *contend\_id; \\
+\2     Label       \2   *label; \\
+\1 \} MACTBS; \\
+\etab
+}
+
+Note, that this object can also be used for the message integrity check,
+in that contend\_id and label are set to NULL,
+and the element is included in the message token signed data.
+\\
+Encoding/Decoding: e\_MACTBS(), x400\_include\_MAC(), x400\_extract\_MAC() \\
+Used by: x400\_create\_MAC(), x400\_check\_MAC()
+
+\subsubsection{Message Token}
+\hll{x400\_MTOC}
+\label{x4_MTOC}
+{\em Name of the object:} {\bf MsgToken} \\
+{\em Content of the object:} Informations for message token. \\
+{\em Structure of the object:}
+
+{\small
+\btab
+\1 typedef struct mtoken \{ \\
+\2      ObjId \2  *token\_type; /* id-tok-asymmetricToken */ \\
+\2      OctetString \2  *tbs\_DERcode; \\
+\2      MsgTokenTBS \2  *tbs; \\
+\2      Signature \2    *sig; /* sender's signature */ \\
+\1 \} MsgToken; \\ \\
+with: \\ \\
+\1 typedef struct mtokenTBS \{  \\
+\2     AlgId     \2   *signatureAI; \\
+\2     DName      \2   *recipient;   \\
+\2     UTCTime   \2   *time;        \\
+\2     AlgId     \2   *confidAI;    \\
+\2     MIC       \2   *cic;         \\
+\2     Label     \2   *label;       \\
+\2     int       \2   *pod\_req;    \\
+\2     int       \2   *mseq;        \\
+\2     AlgId     \2   *encryptionAI;\\
+\2     ENCRYPTED \2   *encrypted; /* from TokenTBE */  \\
+\1 \} MsgTokenTBS; \\ \\
+and: \\ \\
+\1 struct tokenTBE \{ \\
+\2     BitString \2   *cckey; \\
+\2     MIC       \2   *cic;   \\
+\2     Label     \2   *label; \\
+\2     BitString \2   *cikey; \\
+\2     int       \2   *mseq;  \\
+\1 \} TokenTBE; \\
+\etab
+}
+
+Encoding/Decoding: e\_MsgTokenTBS(), e\_TokenTBE(),
+x400\_include\_Msg\-To\-ken(), x400\_extract\_MsgToken() \\
+Used by: x400\_create\_MsgToken(), x400\_check\_MsgToken()
+
+\subsubsection{Bind Token}
+\hll{x400\_BTOC}
+\label{x4_BTOC}
+{\em Name of the object:} {\bf BindToken} \\
+{\em Content of the object:} Informations for bind token. \\
+{\em Structure of the object:}
+
+{\small
+\btab
+\1 typedef struct btoken \{ \\
+\2      ObjId  \2 *token\_type; /* id-tok-asymmetricToken */ \\
+\2      OctetString  \2 *tbs\_DERcode; \\
+\2      BindTokenTBS \2 *tbs; \\
+\2      Signature \2    *sig; /* sender's signature */ \\
+\1 \} BindToken; \\ \\
+with: \\ \\
+\1 typedef struct btokenTBS \{  \\
+\2     AlgId     \2   *signatureAI; \\
+\2     DName      \2   *recipient;   \\
+\2     UTCTime   \2   *time;        \\
+\2     BitString \2   *random;      \\
+\2     AlgId     \2   *encryptionAI;\\
+\2     ENCRYPTED \2   *encrypted; /* from TokenTBE */  \\
+\1 \} BindTokenTBS; \\ \\
+and: \\ \\
+\1 struct tokenTBE \{ \\
+\2     BitString \2   *cckey; \\
+\2     MIC       \2   *cic;   \\
+\2     Label     \2   *label; \\
+\2     BitString \2   *cikey; \\
+\2     int       \2   *mseq;  \\
+\1 \} TokenTBE; \\
+\etab
+}
+
+Encoding/Decoding: e\_BindTokenTBS(), e\_TokenTBE(),
+x400\_include\_Bind\-To\-ken(), x400\_extract\_BindToken() \\
+Used by: x400\_create\_BindToken(), x400\_check\_BindToken()
+
+\subsubsection{Security Context}
+\hll{x400\_SecCont}
+\label{x4_SecCont}
+{\em Name of the object:} {\bf SecurityContext} \\
+{\em Content of the object:} Set of security labels. \\
+{\em Structure of the object:}
+
+{\small
+\btab
+\1 typedef sec\_cont \{ \\
+\2      Label \2  *label; \\
+\2      struct sec\_cont \2 *next; \\
+\1 \} SecurityContext; \\
+\etab
+}
+
+In the following example,
+a loop over the labels in this C-structure is demonstrated:
+
+{\small
+\btab
+\1 /* example use: */   \\ \\
+\2      SecurityContext \2 *cont; \\
+\2      Label           \2 *lab;  \\
+\2      for( cont = /* given security context */ ; \\
+\3         cont != (SecurityContext *)0 ; \\
+\3         cont = cont$->$next ) \\
+\2         \{ /* work on */ lab = cont$->$label; \} \\
+\etab
+}
+
+Encoding/Decoding: x400\_include\_Context(), x400\_extract\_Context() \\
+Used by: x400\_create\_Context()
+
+\subsubsection{Strong Credentials}
+\hll{x400\_Creds}
+\label{x4_Creds}
+{\em Name of the object:} {\bf Credentials} \\
+{\em Content of the object:} Bind token and originator certificate. \\
+{\em Structure of the object:}
+
+{\small
+\btab
+\1 typedef credents \{ \\
+\2      BindToken \2  *btoken; \\
+\2      Certificates \2 *ocert; \\
+\1 \} Credentials; \\
+\etab
+}
+
+Encoding/Decoding: x400\_include\_Credentials(),
+x400\_extract\_Credentials() \\
+Used by: x400\_create\_Credentials()
+
+\speconly{
+\subsection{Error Handling}
+\label{x4_fehler}
+In case of an error ({\em Return Value} -1, if return parameter type  RC, or NULL pointer else),
+the error cause is indicated in the global variable {\em af\_error} (data type AF\_Error).
+{\em Af\_error.number} can have the following values: \\ [0.5cm]
+\parname  {EALGID}
+\pardescript  {Invalid Algorithm Identifier} \\
+\parname  {EAPP}
+\pardescript  {Cannot select application} \\
+\parname  {EAPPNAME}
+\pardescript  {Application name does not exist} \\
+\parname  {ECREATEAPP}
+\pardescript  {Cannot create application (e.g. application name already exists)} \\
+\parname  {EOBJ}
+\pardescript  {Cannot select object} \\
+\parname  {EOBJNAME}
+\pardescript  {Object does not exists} \\
+\parname  {ECREATEOBJ}
+\pardescript  {Cannot create object (e.g. object already exists)} \\
+\parname  {EPIN}
+\pardescript  {Invalid PIN} \\
+\parname  {EVERIFICATION}
+\pardescript  {Verification unsuccessful} \\
+\parname  {ESYSTEM}
+\pardescript  {System call failed inside routine} \\
+\parname  {EDAMAGE}
+\pardescript  {Toc of PSE not readable or PSE inconsistent} \\
+\parname  {EMALLOC}
+\pardescript  {Unable to allocate new memory} \\
+\parname  {EENCRYPT}
+\pardescript  {Wrong state of sec\_encrypt} \\
+\parname  {EDECRYPT}
+\pardescript  {Wrong state of sec\_decrypt} \\
+\parname  {EHASH}
+\pardescript  {Wrong state of sec\_hash} \\
+\parname  {ESIGN}
+\pardescript  {Wrong state of sec\_sign} \\
+\parname  {EENCODE}
+\pardescript  {ASN.1-encoding error} \\
+\parname  {EDECODE}
+\pardescript  {ASN.1-decoding error} \\
+\parname  {EINVALID}
+\pardescript  {Invalid argument} \\
+\parname  {EVALIDITY}
+\pardescript  {Invalid validity date of certificate} \\
+\parname  {EPK}
+\pardescript  {PK already exists in PKList} \\
+\parname  {ENAME}
+\pardescript  {Name already exists in PKList} \\
+\parname  {ENOPK}
+\pardescript  {PK not found in PKList} \\
+\parname  {ENONAME}
+\pardescript  {Name not found in PKList} \\
+\parname  {EROOTKEY}
+\pardescript  {Highest verification key not available} \\
+\parname  {ENODIR}
+\pardescript  {Directory service does not respond} \\
+\parname  {ENAMEDIR}
+\pardescript  {No object assigned to this name found in directory} \\
+\parname  {EASCDIR}
+\pardescript  {Directory access rights not sufficient for requested
+	       operation} \\
+\parname  {EATTRDIR}
+\pardescript  {No directory entry of requested attribute type
+	       found in directory} \\
+\parname  {ELABEL}
+\pardescript  {Security label inconsistent or invalid} \\
+\parname  {EPOLICY}
+\pardescript  {Unknown security policy} \\
+\parname  {ENOTOKEN}
+\pardescript  {According to message security label
+	       no message token required;
+	       or message sequence number missing on input} \\
+\parname  {ERECIPNAME}
+\pardescript  {Recipient name missing or invalid} \\
+\parname  {ERECIPKEY}
+\pardescript  {Recipient public key not available} \\
+\parname  {ESECCONTEXT}
+\pardescript  {Unacceptable security context} \\
+\parname  {EMAC}
+\pardescript  {Message authentication check (verification) failed} \\
+\parname  {ETOKENCRYPT}
+\pardescript  {Cannot decrypt (message or bind) token} \\
+\parname  {ETOKSIGN}
+\pardescript  {(Message or bind) token verification failed} \
+\parname  {ETOKRANDOM}
+\pardescript  {Unacceptable random number in bind token} \\
+\parname  {ETOKTIME}
+\pardescript  {Unacceptable (message or bind) token time} \\
+\parname  {ECREDCERT}
+\pardescript  {Credential certificates failure. The certificate of concern
+	       is returned in {\em af\_error.cert}} \\
+\parname  {ECREDKEY}
+\pardescript  {Unverifiable partner public key in
+	       bind token of credentials} \\[0.5cm]
+In case of {\em af\_error.number} $=$ ESYSTEM,  {\em errno} of the failed system call is given
+in {\em af\_error.data}. {\em af\_error.addr} contains an explanatory text (which can be printed
+to {\em stderr} with function {\em af\_perror()}).
+}

@@ -1,0 +1,106 @@
+.TH SNEFRU 1 LOCAL
+.SH NAME
+snefru \- Experimental secure one-way hash function
+.SH SYNOPSIS
+.B snefru
+[
+.BI \-l #
+] [
+.BI \-o #
+]
+.SH DESCRIPTION
+.I Snefru
+reads standard input, hashes it with a cryptographically secure one-way
+hash function, and prints the hash code on the standard output.
+The input can be any size.
+The output can be either 128 bits, printed as four 32-byte hexadecimal
+numbers, or 256 bits, printed as eight numbers.
+To set the output, use the ``\-o'' flag, with either the value four or
+eight.
+.PP
+The security level is set by the ``\-l'' flag, which determines the number
+of iterations in the hash.
+Pick a number between two and four, inclusive.
+.PP
+The primary use of one-way hash functions is to determine if there have
+been any unauthorized, malicious, or accidental changes made to a file.
+For example, if an executable program file produces the following hash:
+.RS
+209884c4 2e89d967 5456ac0e 61269550
+.RE
+then any change to that program file will cause the hash to be changed.
+Thus, the tampering can be detected by comparing the current output value
+with the previously computed (and presumably correct) output value.
+.SH INTERNALS
+.I Hash512
+is the central routine in this program.
+It is used in this
+program in a linear fashion \(em i.e., a sequential file is hashed down by
+repeated applications of
+.IR Hash512 .
+Changing a single bit in the file would then require completely
+re-computing the hash from the point of change onward.
+.PP
+.I Hash512
+can be used in a tree-structured fashion to authenticate a large
+table of data.
+This would imply that changing a single bit would not force a complete
+re-computation of the hash value, but would instead require only
+.I "log n"
+re-computations of
+.I Hash512
+to ``patch up'' the changes along the path from the root to the
+changed leaf entry.
+A tree-structured application also has the advantage that any single entry
+in the table can subsequently be authenticated by someone who knows only
+the ``authentication path'' from the root of the tree to the leaf entry.
+These concepts are discussed more thoroughly in
+.I "Secrecy, Authentication, and Public Key Systems"
+by Ralph C. Merkle, UMI Research Press, 1982 (see particularly Chapter 2,
+.IR "One Way Hash Functions" ).
+The use of a tree-structured pattern of applications of a one-way hash
+function is covered by U.S. Patent #4,309,569,
+.I "Method of Providing Digital Signatures"
+(contact Stanford University, Office of Technology Licensing).
+.PP
+At the present time (July 31, 1989) the author knows of no method for
+breaking this one-way function, (i.e., finding two input files that
+produce the same output value).
+The algorithm has undergone some review for security.
+Further review is expected.  Use of this algorithm for production use is
+not recomended at this time.
+Note that we are specifically examining the security of
+.I Hash512
+with a 512-bit input and a 128-bit output, and
+.I Hash512
+with a 512-bit input and a 256-bit output.
+Use of other sizes is not recomended at this time.
+In particular, we recomend against the use of output sizes smaller than
+128 bits, and recomend against the use of an input that is less than two
+times the size of the output.
+When the input size equals the output size,
+.I Snefru
+suffers a serious degradation in security (an observation due to
+Coppersmith).
+.SH WARNINGS
+If anyone using this program finds two different inputs that produce the
+same output, please contact
+.RS
+.nf
+Ralph C. Merkle, <merkle@xerox.com>
+Xerox PARC
+3333 Coyote Hill Road
+Palo Alto, CA 94304
+(415) 494\-4000
+.fi
+.RE
+.SH AUTHOR
+.nf
+Based on the reference implementation (no algorithm changes) of
+version 2.0, July 31, 1989.  Implementor:  Ralph C. Merkle.
+This edition is by Rich $alz, <rsalz@bbn.com>.
+$Header: snefru.1,v 1.1 90/03/22 13:00:08 rsalz Exp $
+.fi
+.SH "SEE ALSO"
+.IR "A Software One Way Hash Function" ,
+by Ralph C. Merkle.

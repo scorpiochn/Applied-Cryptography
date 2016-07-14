@@ -1,0 +1,200 @@
+From: Peter Gutmann (pgut1@cs.aukuni.ac.nz)
+Newsgroups: sci.crypt
+Subject: SHS/SHA source code + random thoughts
+Summary: Source code for SHS/SHA message digest algorithm + comparison with
+MD5
+Keywords: SHS SHA message digest
+Message-ID: <1992Sep4.060230.28313@cs.aukuni.ac.nz>
+Date: 4 Sep 92 06:02:30 GMT
+Sender: pgut1@cs.aukuni.ac.nz (PeterClaus          Gutmann        )
+Organization: HPACK Conspiracy Secret Laboratory
+Lines: 503
+
+
+  The following is a C implementation of the NIST SHA (Secure Hash
+Algorithm) -
+this is sometimes also referred to as SHS (Secure Hash Standard), but I've
+used
+SHA for now since the standard hasn't been adopted yet.  It's called SHS
+and
+SHA rather interchangeably just to confuse people, I've called it SHA in
+the
+text but SHS in the code in anticipation of it becoming a standard.  Once
+it's
+adopted, you can feed the text through sed and change all the names.  I'll
+assume everyone has a copy of the SHS document and won't bother including
+it in
+this posting (it's rather long).
+
+
+The SHS/SHA Code
+================
+
+  It's a fairly straightforward implementation which has been tested under
+MSDOS and OS/2 on a PClone, and Unix on a DECstation.  Some of the
+optimizations used are mentioned in the code.  One of the results of these
+optimizations is that the code isn't endianness-independant, meaning that
+on
+little-endian machines a byteReverse() function has to be used for
+endianness-reversal.  This entails defining LITTLE_ENDIAN on a
+little-endian
+system (it's currently defined by default in SHS.H).  Being able to assume
+a
+given data endianness makes getting data to the SHA transform() routine a
+lot
+faster.
+
+
+SHA Speed
+=========
+
+  I ran the SHA code against the distributed version of MD5 (which is
+significantly less optimised than the SHA code).  The results were as
+follows:
+
+	      25 MHz PClone     DECstation 2100     DECstation 5000
+
+    SHA         31 K/sec           120 K/sec           208 K/sec
+    MD5         55 K/sec           169 K/sec           278 K/sec
+
+This comparison isn't 100% fair since the standard MD5 distribution is a
+somewhat pessimal implementation (in fact an optimised PC version runs
+around 5
+times faster).  An implementation of MD5 optimised to the level of SHA runs
+around 2 times faster.
+
+Therefore with similar levels of optimisation it appears MD5 is around
+three
+times as fast on the PClone as SHA.  Even the pessimal MD5 on the
+DECstations
+is around a third as fast again as SHA, and would probably also be 2 or
+more
+times as fast if optimized (I used the standard MD5 distribution rather
+than
+an optimized custom one to allow others to verify the results).
+
+
+SHA's Awkward Block Size (Some Flamage)
+========================
+
+Will SHA be weakened by taking out h4 and E and reducing the number of
+rounds
+to create a 128-bit MD algorithm?  This seems a lot nicer than the current
+one
+since it's now a power-of-two size which fits in a lot better with most
+current
+software.  Removing h4 and E and reducing the total number of rounds by 16
+doesn't seem to weaken it any, and IMHO the decision to force SHA to fit an
+awkward DSS data size wasn't such a hot idea, especially if it's to be used
+with non-DSS code or if q is ever changed.
+
+
+SHA vs MD5
+==========
+
+When implementing SHA I noticed how very similar it was to MD4.  The main
+changes were the addition of an the 'expand' transformation (Step B), the
+addition of the previous round's output into the next round for a faster
+avalance effect, and the increasing of the whole transformation to fit the
+DSS
+block size.  SHA is very much an MD4-variant rather than a redesign like
+MD5.
+
+The design decisions behind MD5 were given in the MD5 document, the design
+for SHA is never gone into in the SHS/SHA document (mind you it's pretty
+obvious what's going on - everything except how the Mysterious Constants
+were chosen can be seen at a glance).  Presumably some of the changes made
+were to avoid the known attacks for MD4, but again no design details are
+given.  Anyway, using what I had available I took the points raised in the
+MD5 design and compared them with what SHA did:
+
+- A fourth round has been added.
+
+  SHA does this too.  However in SHA the fourth round uses the same
+f-function
+  as the second round (not obvious whether this is a problem or not, I'll
+have
+  to look at it a bit more).
+
+- Each step now has a unique additive constant.
+
+  SHA keeps the MD4 scheme where it reuses the constants for each group of
+  rounds (in this case for 20 rounds at a time).  Actually MD4 only has the
+  additive constants in the last two rounds, not for all 4, but the
+principal
+  is the same - the constants are reused many times.
+
+- The function g in round 2 was changed from ( XY v XZ v YZ ) to
+  ( XZ v Y not( Z ) ) to make g less symmetric.
+
+  SHA uses the MD4 version ( XY v XZ v YZ ) (SHA calls it f2 rather than
+g).
+
+- Each step now adds in the result of the previous step.  This promotes a
+faster
+  "avalanche effect".
+
+  This change has been made in SHA as well.
+
+- The order in which input words are accessed in rounds 2 and 3 is changed,
+to
+  make these patterns less like each other.
+      
+  SHA always access the words the same way, like MD4.
+
+- The shift amounts in each round have been approximately optimized, to
+yield a
+  faster "avalanche effect". The shifts in different rounds are distinct.
+
+  SHA uses a constant shift amount in each round.  This shift amount is
+  relatively prime to the word size (as in MD4).
+
+If you take SHA and remove h4, E, and a few rounds, the result is
+(basically)
+MD4 with one more round, the addition of the output of step n-1 to step n
+(giving a faster avalanche effect), and the addition of the initial
+"expand"
+transformation.  This initial transformation is important, since it spreads
+the
+input data bits out over an area four times as large as the original, and
+then
+mixes in the expanded version of the data in each round.  This means that
+instead of reusing the input data in each group of rounds, SHA uses
+different
+permutations of the input data in each group of rounds.  This is definitely
+A
+Good Thing.
+
+This leads to the following situation:  
+
+  SHA = MD4 + 'expand' transformation + extra round + better-avalanche
+
+  MD5 = MD4 + improved bit-bashing + extra round + better-avalanche
+
+Which is stronger, MD5 with its improved bit-bashing or SHA with it's
+'expand'
+transformation?  (Ain't no way I'm going to answer this one :-).
+
+One point is that the only "extra" in SHA which MD5 doesn't have, namely
+the
+'expand' transformation, can be easily added to MD5, but that the MD5
+improvements can't be added to SHA without redesigning the whole algorithm.
+Thus the paranoid types can hedge their bets by adding 'expand' to MD5,
+giving
+them the best of both worlds (its very easy to simply change MD5 to have
+the
+'expand' transformation - maybe this is an MD6 in the making?).
+			  
+
+Conclusion
+==========
+
+  This positing is beginning to sound as if I'm the official net.apologist
+for
+MD5 :-).  Maybe I'm being a bit harsh on SHA, but I think someone should
+point
+out that it may not be the be-all and end-all of message digest algorithms.
+ I
+welcome any email on the subject, or post your flames here....
+
+Peter.

@@ -1,0 +1,33 @@
+Path: papaya.bbn.com!rsalz
+From: rsalz@bbn.com (Rich Salz)
+Newsgroups: bbn.test
+Subject: This is a test of the hashing function
+Message-ID: <2340@litchi.bbn.com>
+Date: 22 Mar 90 15:53:47 GMT
+Distribution: bbn
+Organization: BBN Systems and Technology, Inc.
+Lines: 24
+
+This is my revision of Ralph Merkle's SNEFRU program.  Snefru is a one-way
+hash algorithm:  given some input text, Snefru will come up with a single
+number.  No two texts will hash down to the same number.  (Think of it as
+a super-strong checksum.)
+
+I completely rewrote and reorganized the code that Ralph has made
+available.  For example, I split the comments out into manual pages, and
+put all the tests out into a separate program.  What I'm making available
+is a derived work, and therefore must be distributed under the same terms
+as Ralph's original code.  Thanks to him and Xerox for making his work
+available.  Some of the programs and manual pages are my work, and
+therefore don't contain the Xerox copyright.  They are in the public
+domain, and feel free to do what you want with them.
+
+This code needs a 32bit machine; good luck trying to port it elsewhere!
+To compile, edit the Makefile if you use strchr/strrchr rather than
+index/rindex.  Also edit snefru.c to determine the byte order of your
+machine.
+
+	/rich $alz <rsalz@bbn.com>
+-- 
+Please send comp.sources.unix-related mail to rsalz@uunet.uu.net.
+Use a domain-based address or give alternate paths, or you may lose out.

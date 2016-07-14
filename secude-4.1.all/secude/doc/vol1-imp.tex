@@ -1,0 +1,260 @@
+\section{Implementation Strategy}
+\markboth{Implementation Strategy}{Implementation Strategy}
+\thispagestyle{myheadings}
+\label{isw}
+
+\subsection{Summary}
+\label{isw-is}
+
+A general strategy is to develop different modules,
+which are interrelated by a services provider -- services consumer concept,
+and which offer programming interfaces to interested programmers,
+who want to embed the modules into other, possibly more complex,
+application contexts.
+The following modules are about to be realized:
+
+\begin{enumerate}
+\item
+{\em Secure storage and cryptography}:
+A cryptographic system for RSA-, DSA- and DES-algorithms
+as well as hash functions,
+connected to a Personal Security Environment (PSE).
+It provides functions which perform
+cryptographic algorithms and a secure storage of keys and other
+personal local information.
+The smartcard technology
+is not visible at the interface. The smartcard service realized
+so far, is the so called ``software smartcard''.
+\item
+{\em Authentication framework certificate handling}:
+A richer functionality
+of cryptographic functions and secure storage of keys
+according to X.509 equipped with a more complex structure
+due to the description of these principles of security operations.
+There are two submodules, one supporting
+{\em local} (i.e. smartcard oriented)
+handling of signatures and certificates;
+the other one supports {\em distributed} (i.e. directory based)
+certificate and black lists information.
+\item
+{\em ``Pricacy Enhanced Mail''} (``PEM'')
+functions which {\em protect messages} according to the
+Internet specifications RFC 1421 - 1423 \cite{rfc1}.
+The protected messages can be securely
+exchanged within an unprotected network.
+\item
+{\em Key management functions}:
+There are functions to generate encryption keys and signatures,
+other functions to support secure interchange of security information
+like certificates, pairs of root-CA keys, etc.
+These functions are of interest for certification authorities,
+and for users to maintain their PSEs.
+\item
+{\em Auxiliary functions}
+of general applicability to support all modules.
+These functions include octetstring handling, file handling,
+printable representation of SecuDE objects,
+support of ASN.1 encoding/decoding, etc.
+\end{enumerate}
+
+\subsection{The Modular Structure}
+\label{isw-sm}
+
+The specifications describe basic functions in terms of C-language
+procedure calls. They constitute a basic set of software modules
+which are intended to support {\em security applications},
+in that they provide {\em security application programming interfaces}.
+The applications {\em Secured X.500} and {\em PEM} (Privacy Enhanced Mail, RFC 1421-1424)
+are based on these functions. They comprise the
+application programming interfaces {\em Secure-IF},
+{\em AF-IF}, and {\em PEM-IF} as shown in Fig. 17 below.
+This interface structure was chosen for the following reasons: \\ [1ex]
+Security applications should be independent of underlying technology, i.e. it should
+not make any difference for the security functionality in an application whether 
+cryptographic algorithms are realized
+in software or hardware chips or in external devices like smartcards or smartcard readers,
+nor should it make a difference how and where security relevant information like keys 
+are stored. They need an interface which largely hides the implications of particular
+technology and which is oriented on user required security characteristics
+in order to support migrations to advanced technologies. For this purpose
+we defined the interface {\em Secure-IF}.
+Secure-IF provides {\em Cryptographic Functions} 
+and a {\em Personal Security Environment} (PSE) in a technology independent form. \\ [1ex]
+The {\em Personal Security Environment} can be realized by various methods. The highest level of
+security against unallowed manipulation of security relevant information requires
+hardware support. By current standards, {\em smartcards} are appropriate means to
+store security relevant personal data because they combine the two aspects
+\bi
+\m security against eavesdropping through hardware properties and
+\m mobility and portability of personal information.
+\ei
+However, smartcard technology
+is currently developing fast, and standardisation in this area is not stable
+yet. For this reason, we provide a software substitute for a smartcard environment. 
+We assume that all security relevant functions are
+performed by software (e.g. in work stations, PC's or main frames) and that all
+security relevant information is stored on disks or other background memory
+of the systems. Protection mechanisms as they are offered by smartcards are to
+be modelled by means of file encryption and electronic signatures. Therefore
+we speak of the so called {\em Software PSE} (SW-PSE) to express the analogy of 
+security functionality of the smartcard and its software substitute. 
+
+\begin{figure}
+\input{genstruct11}
+{\footnotesize Fig.\arabic{Abb}:
+Software Modules Interface Structure}
+\label{ifstruct}
+\end{figure}
+
+Security of the applications X.500 and PEM is based on
+certification procedures and formats as defined in
+{\em Volume 2: Specification of Security Interfaces}
+of SecuDe in accordance to {\em CCITT X.500ff}.
+An essential part of it
+is the {\em Authentication Framework} X.509. For this functionality we defined the interface
+{\em AF-IF} (AF stands for Authentication Framework).
+One AF module provides the local handling of certificates
+and a certification path oriented signature verification procedure.
+Another AF module provides access to directories in order to
+support distributed security information.
+Directory access will particularly be used to retrieve or store
+certificates and black lists,
+both by certification authorities and ordinary users.
+It can be expected, however, that
+the functionality defined by {\em AF-IF} is not limited to the purpose of Electronic Mail, but that
+it is useful for a wide range of applications. On the other hand, one can imagine other
+applications, e.g. using ECMA certification methods, which use {\em Secure-IF} directly.
+\\[1em]
+The interface {\em PEM-IF} was defined for the purpose of the application {\em Privacy Enhanced 
+Mail}. It comprises functions which are necessary in the context of RFC 1421 - 1423.
+\\[1em]
+Naturally, a security system based on asymmetric cryptography
+depends on a well organized {\em key management} (``KM'') infrastructure
+including certification authorities, users and directories.
+For this purpose, the KM module is defined, comprising
+functions to generate keys and certificates,
+and other functions to support the secure exchange of security information
+such as keys and certificates.
+\\[1em]
+Additionally, there is
+a collection of useful auxiliary functions mostly destined for the
+handling of octetstrings, object identifiers, algorithm identifiers, and PEM-specific
+transformations. Some of them are of internal use only, and the application programmer will
+not need to handle them, but they are mentioned here for completeness.
+
+\subsection{Secure Storage and Cryptography}
+\label{isw-sec}
+
+This module consists of two submodules.
+One submodule performs cryptographic algorithms.
+The other submodule performs secure storage of data on a local smartcard.
+The cryptographic submodule uses the service of the secure storage submodule,
+in that cryptographic keys on the smartcard can be used.
+
+The cryptographic submodule contains the following set of functions:
+There is a set of functions which performs arithmetic operations
+on very large integer numbers. These functions are available in C
+and in a number of assembler codes for different CPU platforms
+for efficiency reasons.
+There are asymmetric RSA and DSA functions based on these arithmetic functions.
+There are symmetric DES
+encryption and decryption functions.
+There are also functions to perform different hash algorithms,
+which are used in the asymmetric signature and verification functions.
+There are functions to generate keys and keep them
+in a local reference table or store them in a PSE.
+There is also a function to generate a DES-key
+and encrypt it with an asymmetric public key,
+and the inverse hereof.
+Finally, the generation of a random number is also supported
+by this submodule.
+
+The other submodule provides functions with the help of which
+sensitive data (such as keys or certificates)
+can be stored on or retrieved from a PSE.
+This submodule comprises functions that simply
+open, close, create, read or write a named PSE object.
+The handling of pin-protection for the PSE and for
+objects on the PSE is performed by this
+submodule.
+
+\subsection{Authentication Framework: Certificate Handling}
+\label{isw-af}
+
+This module supports the handling of X.509 data formats and procedures.
+It consists of two submodules. One of the submodules
+deals with the local handling of keys and certificates,
+in that it accesses the PSE.
+The other submodule deals with the remote security information,
+in that it accesses an X.500 directory.
+
+The local-AF submodule
+invokes the functions for secure storage and cryptography
+but embeds them into a richer structure due to X.509.
+For example, this module defines and utilizes the certificates
+structure in order to verify a signature.
+It also defines and utilizes the X.509 format of a certificate
+or a Key Information when accessing PSE objects.
+This submodule ``knows'' the structure of the PSE objects.
+It is by purpose, that the design of this AF programming interface
+is hierarchically ``above'' the SEC interface.
+This is in order to give one complete programming interface to programmers
+who want to implement an X.509 oriented security application.
+
+The remote-AF submodule
+deals with the same X.509 formats.
+However, it supports the application programmer
+to implement programs for users
+to retrieve information
+from or store information into a distributed directory data base.
+This is required by certification authorities in order to maintain
+their certificates and black lists of certificates in directory attributes.
+This is also required by users who maintain their certificates in
+directory attributes.
+Beside these security information, this submodule provides also access to
+directory name attributes in order to support users and CAs
+in their secure certificate and message handling.
+
+\subsection{Key Management}
+\label{isw-km}
+
+This module supports users and certification authorities
+to maintain consistent security information
+within the communication environment.
+The communication community needs support
+to keep current and correct
+information on PSEs, in directory entries,
+and to exchange security information.
+The principles of key operations are described in previous chapters
+of this volume.
+The following functions are provided:
+
+\begin{itemize}
+\item create a PSE
+with the objects defined in the authentication framework module
+and with initial contents,
+\item check PSE for validity and consistency,
+\item display PSE objects,
+\item create a certificate or prototype certificate,
+\item send a a certificate or prototype certificate,
+\item extract oneself's certificate
+from a message and store it on the PSE,
+\item extract a partner's certificate
+from a message and store it in a local certificate list,
+\item edit PSE certificate lists,
+\item check certificate format and content from a CA's point of view
+(including uniqeness of public key),
+\item sign certificate,
+\item check certificate format and content from the owner's point of view,
+\item send a a certification path,
+\item extract a certification path
+from a message and store it in the PSE,
+\item send a pair of root-CA keys,
+\item extract a pair of root-CA keys
+from a message and store it in the PSE,
+\item maintain directory entry ``Old Certificates'',
+\item change signature keys (for users, CAs, root-CAs),
+\item change encryption keys,
+\item inform others about change of keys (for users, CAs, root-CAs),
+\item maintain black lists of certificates.
+\end{itemize}

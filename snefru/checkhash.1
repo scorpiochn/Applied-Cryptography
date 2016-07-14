@@ -1,0 +1,38 @@
+.TH HASHNEWS 1 LOCAL
+.SH NAME
+checkhash \- Check the Snefru hash code on a Usenet article
+.SH SYNOPSIS
+.B checkhash
+[
+.B \-n
+] [
+.I input
+]
+.SH DESCRIPTION
+.I Checkhash
+reads a Usenet article from the named file, or standard input if no file
+is given.
+It filters out the headers and calls
+.IR snefru (1L)
+to generate a one-way hash code for the article.
+It compares this with the hash given in the header, and prints a message
+indicating whether they match or not.
+To suppress the message, use the ``\-s'' flag.
+.PP
+The program will exit with status zero if the article is okay, a
+one if the hash codes don't match, or a two if no checksum header
+can be found.
+.SH WARNING
+.I Checkhash
+will only prove if an article has been tampered with; it does not
+provide any authentication.
+Also, see the warnings in the
+.I snefru
+manpage.
+.SH AUTHOR
+.nf
+Rich $alz <rsalz@bbn.com>
+$Header: checkhash.1,v 1.1 90/03/22 12:58:13 rsalz Exp $
+.fi
+.SH "SEE ALSO"
+hashnews(1L), snefru(1L).
